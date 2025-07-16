@@ -5,7 +5,6 @@ using BonusIdrici2.Data;
 using System.IO;
 using Dichiarante;
 using Atto;
-// using Ente;
 using leggiCSV; 
 
 namespace BonusIdrici2.Controllers
@@ -14,14 +13,12 @@ namespace BonusIdrici2.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
-
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context; // Assegna il DbContext iniettato
            // Console.WriteLine(_context);
         }
-
         public IActionResult Index()
         {
             return View();
@@ -31,7 +28,6 @@ namespace BonusIdrici2.Controllers
         {
             return View();
         }
-
         public IActionResult LoadFileINPS()
         {
             // Recupera tutti gli enti dal database
@@ -74,70 +70,51 @@ namespace BonusIdrici2.Controllers
 
             string filePath = Path.Combine(uploadDirectory, csv_file.FileName);
             string relativePath = Path.Combine("Uploads", selectedEnte.nome, csv_file.FileName);
-            List<DateTime?> date=CSVReader.LeggiDateCSV(filePath);
-            Console.WriteLine(date.Count);
-            if (date.Count <= 1)
-            {
-                 ViewBag.Message = "Data inizio e fine non trovate.";
-                ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFileINPS");
-            }
+           var fileUploadRecord = new FileUpload
+{
+    NomeFile = csv_file.FileName,
+    PercorsoFile = relativePath,
+    DataCaricamento = DateTime.Now,
+    IdEnte = selectedEnteId
+};
 
-            var fileUploadRecord = new FileUpload
-            {
-                NomeFile = csv_file.FileName,
-                PercorsoFile = relativePath,
-                DataInizio=date[0],
-                DataFine=date[1],
-                DataCaricamento = DateTime.Now,
-                IdEnte = selectedEnteId
-            };
+using (var transaction = _context.Database.BeginTransaction())
+{
+    try
+    {
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await csv_file.CopyToAsync(stream);
+        }
 
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                try
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await csv_file.CopyToAsync(stream);
-                    }
+        List<DateTime?> date = CSVReader.LeggiDateCSV(filePath);
 
-                    _context.FileUploads.Add(fileUploadRecord);
-                    await _context.SaveChangesAsync();
+        if (date.Count < 2)
+        {
+            ViewBag.Message = "Data inizio e fine non trovate.";
+            ViewBag.Enti = _context.Enti.ToList();
+            return View("LoadFileINPS");
+        }
 
-                    // var datiComplessivi = CSVReader.LeggiFileCSV(filePath);
+        fileUploadRecord.DataInizio = date[0];
+        fileUploadRecord.DataFine = date[1];
 
-                    // if (datiComplessivi.Dichiaranti.Any())
-                    // {
-                    //     foreach (var dichiarante in datiComplessivi.Dichiaranti)
-                    //     {
-                    //         // Aggiungi qui l'assegnazione di IdEnte al Dichiarante se non lo gestisci nel CSVReader
-                    //         // dichiarante.IdEnte = selectedEnteId;
-                    //         _context.Dichiaranti.Add(dichiarante);
-                    //     }
-                    //     await _context.SaveChangesAsync();
-                    // }
-                    // else
-                    // {
-                    //     Console.WriteLine("Nessun dichiarante trovato nel file CSV.");
-                    // }
+        _context.FileUploads.Add(fileUploadRecord);
+        await _context.SaveChangesAsync();
 
-                    // // Rimossa l'assegnazione dello stato a "Completato" e il successivo SaveChangesAsync
+        transaction.Commit();
 
-                    transaction.Commit();
+        ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati elaborati con successo per l'ente {selectedEnte.nome}.";
+    }
+    catch (Exception ex)
+    {
+        transaction.Rollback();
+        _logger.LogError(ex, "Errore durante l'elaborazione o il salvataggio del file CSV.");
 
-                    ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati elaborati con successo per l'ente {selectedEnte.nome}. ";
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    _logger.LogError(ex, "Errore durante l'elaborazione o il salvataggio del file CSV.");
+        ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
+    }
+}
 
-                    // Rimossa la logica per aggiornare Stato e NoteErrore nel database
-
-                    ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
-                }
-            }
 
             ViewBag.Enti = _context.Enti.ToList();
             return View("LoadFileINPS");

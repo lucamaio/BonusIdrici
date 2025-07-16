@@ -235,3 +235,5 @@ C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.genrunt
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\ref\BonusIdrici2.dll
 C:\Users\User000015\Documenti\BonusIdrici2\bin\Debug\net9.0\MySqlConnector.dll
 C:\Users\User000015\Documenti\BonusIdrici2\bin\Debug\net9.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.sourcelink.json
+C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\0fp1722d74-gu9v83yadh.gz

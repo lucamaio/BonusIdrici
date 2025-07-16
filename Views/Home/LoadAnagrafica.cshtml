@@ -2,18 +2,32 @@
     ViewData["Title"] = "Carica CSV";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Carica il file CSV</h1>
-    <form asp-controller="Home" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
-        <label>Carica file CSV:</label><br>
-        <input type="file" name="csv_file" required accept=".csv"><br><br>
-        <button type="submit" class="btn btn-primary">Carica File</button>
-    </form>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Carica il file CSV Selene</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-controller="Home" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
+                          <div class="mb-3">
+                            <label for="csv_file" class="form-label">Seleziona file CSV Selene</label>
+                            <input type="file" name="csv_file" class="form-control" required accept=".csv">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Carica File</button>
+                        </div>
+                    </form>
 
-    @if (!string.IsNullOrEmpty(ViewBag.Message))
-    {
-        <div class="alert alert-info mt-3" role="alert">
-            @ViewBag.Message
+                    @if (!string.IsNullOrEmpty(ViewBag.Message))
+                    {
+                        <div class="alert alert-info mt-3" role="alert">
+                            @ViewBag.Message
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-    }
+    </div>
 </div>

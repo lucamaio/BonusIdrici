@@ -62,33 +62,15 @@ namespace BonusIdrici2.Data
                 // Mappatura esplicita delle proprietà alle colonne del DB (snake_case)
                 entity.HasKey(f => f.Id); // Specifica che 'Id' è la chiave primaria
 
-                entity.Property(f => f.NomeFile).HasColumnName("nome_file").IsRequired().HasMaxLength(255);
-                entity.Property(f => f.PercorsoFile).HasColumnName("percorso_file").IsRequired().HasMaxLength(512);
-                entity.Property(f => f.DataInizio).HasColumnName("data_inizio_validita"); // Nullable per default
-                entity.Property(f => f.DataFine).HasColumnName("data_fine_validita");     // Nullable per default
+                entity.Property(f => f.NomeFile).HasColumnName("nome").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.PercorsoFile).HasColumnName("percorso").IsRequired().HasMaxLength(512);
+                entity.Property(f => f.DataInizio).HasColumnName("data_inizio"); // Nullable per default
+                entity.Property(f => f.DataFine).HasColumnName("data_fine");     // Nullable per default
                 entity.Property(f => f.DataCaricamento).HasColumnName("data_caricamento").IsRequired(); // Se l'hai reso non nullable nel modello
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
 
-                // RIMOVI QUESTE RIGHE:
-                // entity.Property(f => f.Stato).HasColumnName("stato").HasMaxLength(50);
-                // entity.Property(f => f.NoteErrore).HasColumnName("note_errore");
-
-                // Configurazione della chiave esterna
-                // entity.HasOne(f => f.Ente)
-                //       .WithMany()
-                //       .HasForeignKey(f => f.IdEnte)
-                //       .HasConstraintName("fk_fileuploads_id_ente")
-                //       .OnDelete(DeleteBehavior.Restrict);
             });
             // --- FINE: NUOVA CONFIGURAZIONE PER FILEUPLOAD ---
-
-            // Configurazione per la classe Atto (se decidi di scommentarla e usarla)
-            // modelBuilder.Entity<Atto.Atto>(entity =>
-            // {
-            //     entity.HasKey(a => a.id); // 'id' rimane la chiave primaria auto-incrementante
-            //     entity.Property(a => a.OriginalCsvId).IsRequired();
-            //     // Aggiungi altre mappature per Atto se i nomi delle colonne nel DB non corrispondono
-            // });
 
             base.OnModelCreating(modelBuilder); // Chiamata importante, deve essere l'ultima
         }
