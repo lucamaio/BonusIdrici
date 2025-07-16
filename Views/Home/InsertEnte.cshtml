@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Inserisci un nuovo Ente";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Crea un nuovo Ente</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-controller="Home" asp-action="creaEnte" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" placeholder="es. MESSINA">
+                        </div>
+                        <div class="mb-3">
+                            <label for="istat" class="form-label">Istat</label>
+                            <input type="text" min="5" max="5 class="form-control" id="istat" name="istat" placeholder="es. 083048">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cap" class="form-label">CAP</label>
+                            <input type="text" min="5" max="5" class="form-control" id="cap" name="cap" placeholder="es. 98121" maxlength="11">
+                        </div>
+                        <div class="mb-3">
+                            <label for="codiceFiscale" class="form-label">Codice Fiscale</label>
+                            <input type="text" class="form-control" id="codiceFiscale" name="codiceFiscale" placeholder="es. 00080270838" maxlength="11">
+                        </div>
+                        <div class="mb-3">
+                            <label for="provincia" class="form-label">Provincia</label>
+                            <input type="text" class="form-control" id="provincia" name="provincia" placeholder="es. ME" maxlength="2">
+                        </div>
+                        <div class="mb-4">
+                            <label for="regione" class="form-label">Regione</label>
+                            <input type="text" class="form-control" id="regione" name="regione" value="Sicilia">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3">Crea Ente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

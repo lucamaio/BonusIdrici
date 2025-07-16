@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="row g-6 mb-6">
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <a asp-controller="Home" asp-action="LoadAnagrafica">
+                    <h5 class="card-title text-white">Carica Anagrafica</h5>
+                </a>
+                <p class="card-text">
+                    Questa pagina consente di caricare sul database un'estrazione dei dati anagrafici comunali.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <a asp-controller="Home" asp-action="InsertEnte">
+                    <h5 class="card-title text-white">Inscerisci Ente</h5>
+                </a>
+                <p class="card-text">
+                    Vai alla pagina perinserire un nuovo ente
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <a asp-controller="Home" asp-action="LoadFileInps">
+                    <h5 class="card-title text-white">caricare file INPS</h5>
+                </a>
+                <p class="card-text">
+                    Vai alla pagina per effettuare il caricamento del file INPS
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-6 mb-6">
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <a asp-controller="Home" asp-action="Home">
+                    <h5 class="card-title text-white">Esito Competenza Teritoriale</h5>
+                </a>
+                <p class="card-text">
+                    Vai alla pagina per effettuare l'accesso alla piattaforma
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <a asp-controller="Home" asp-action="Home">
+                    <h5 class="card-title text-white">Esito bonus Idrico</h5>
+                </a>
+                <p class="card-text">
+                    Vai alla pagina per effettuare l'accesso alla piattaforma
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <a asp-controller="Home" asp-action="Login">
+                    <h5 class="card-title text-white">Login</h5>
+                </a>
+                <p class="card-text">
+                    Vai alla pagina per effettuare l'accesso alla piattaforma
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

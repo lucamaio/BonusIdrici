@@ -1,0 +1,20 @@
+using System.Collections.Generic;
+
+// Non è più necessario importare 'Dichiarante' e 'Atto' come namespace
+// perché useremo i nomi completi qualificati direttamente.
+
+namespace leggiCSV
+{
+    public class DatiCsvCompilati // Nome più descrittivo per il contenitore
+    {
+        // Specifichiamo Dichiarante.Dichiarante e Atto.Atto per indicare la CLASSE
+        public List<Dichiarante.Dichiarante> Dichiaranti { get; set; }
+        // public List<Atto.Atto> Atti { get; set; }
+
+        public DatiCsvCompilati() // Costruttore per inizializzare le liste
+        {
+            Dichiaranti = new List<Dichiarante.Dichiarante>();
+            // Atti = new List<Atto.Atto>();
+        }
+    }
+}

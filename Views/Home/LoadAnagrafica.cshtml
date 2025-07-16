@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Carica CSV";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Carica il file CSV</h1>
+    <form asp-controller="Home" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
+        <label>Carica file CSV:</label><br>
+        <input type="file" name="csv_file" required accept=".csv"><br><br>
+        <button type="submit" class="btn btn-primary">Carica File</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(ViewBag.Message))
+    {
+        <div class="alert alert-info mt-3" role="alert">
+            @ViewBag.Message
+        </div>
+    }
+</div>
