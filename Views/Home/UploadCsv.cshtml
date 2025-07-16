@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "UploadCsv";
+}
+<h1>@ViewData["Title"]</h1>
+
+
+public async Task<IActionResult> UploadCsv(IFormFile csv_file)
+{
+    if (csv_file == null || csv_file.Length == 0)
+    {
+        ModelState.AddModelError("", "File non selezionato o vuoto.");
+        return View("LoadFile");
+    }
+
+    if (!csv_file.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+    {
+        ModelState.AddModelError("", "Il file deve essere un CSV.");
+        return View("LoadFile");
+    }
+
+    // Percorso temporaneo in wwwroot/uploads (devi creare questa cartella)
+    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+    if (!Directory.Exists(uploadsFolder))
+        Directory.CreateDirectory(uploadsFolder);
+
+    var filePath = Path.Combine(uploadsFolder, Path.GetRandomFileName() + ".csv");
+
+    try
+    {
+        // Salva il file caricato
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            await csv_file.CopyToAsync(fileStream);
+        }
+
+        // Ora chiami il tuo parser CSV
+        var dati = CSVReader.LeggiFileCSV(filePath);
+
+        // Esempio: fai qualcosa con dati, come salvarli in DB
+        // await SalvaDatiNelDatabase(dati);
+
+        TempData["SuccessMessage"] = "File CSV caricato e processato correttamente.";
+    }
+    catch (Exception ex)
+    {
+        ModelState.AddModelError("", $"Errore durante l'elaborazione del file: {ex.Message}");
+        return View("LoadFile");
+    }
+    finally
+    {
+        // Elimina il file temporaneo
+        if (System.IO.File.Exists(filePath))
+            System.IO.File.Delete(filePath);
+    }
+
+    return RedirectToAction("Index"); // O altra vista di conferma
+}
