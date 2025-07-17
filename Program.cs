@@ -1,8 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using BonusIdrici2.Data;
-using MySql.EntityFrameworkCore; 
+using MySql.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Durata della sessione inattiva
+    options.Cookie.HttpOnly = true; // Impedisce l'accesso al cookie via JavaScript
+    options.Cookie.IsEssential = true; // Il cookie di sessione è essenziale per l'applicazione
+});
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -35,6 +43,14 @@ app.UseStaticFiles(); // Abilita il servizio dei file da wwwroot
 app.UseRouting();
 
 app.UseAuthorization();
+
+// Abilita il middleware di autenticazione e autorizzazione (fondamentale per il login)
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Abilita il middleware di sessione
+app.UseSession(); // Questo deve essere posizionato prima di UseRouting e UseEndpoints (o UseMVC)
+
 
 // Se app.MapStaticAssets() e .WithStaticAssets() non sono strettamente necessarie
 // per altre funzionalità o se causano problemi, potresti volerle rimuovere/commentare.

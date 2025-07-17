@@ -10,7 +10,7 @@
                     <h3 class="mb-0">Carica il file CSV Selene</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Home" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Azioni" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
                           <div class="mb-3">
                             <label for="csv_file" class="form-label">Seleziona file CSV Selene</label>
                             <input type="file" name="csv_file" class="form-control" required accept=".csv">

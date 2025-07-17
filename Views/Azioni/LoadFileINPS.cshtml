@@ -8,10 +8,10 @@
         <div class="col-md-8">
             <div class="card shadow rounded-4 border-0">
                 <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Carica il file CSV fornito Piranha</h3>
+                    <h3 class="mb-0">Carica il file CSV fornito INPS</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Home" asp-action="LoadFilePiranha" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Azioni" asp-action="LoadFileINPSAction" method="post" enctype="multipart/form-data">
                         
                         @* --- INIZIO AGGIUNTA SELECT ENTE QUI --- *@
                         <div class="mb-3">
@@ -30,7 +30,7 @@
                         @* --- FINE AGGIUNTA SELECT ENTE QUI --- *@
 
                         <div class="mb-3">
-                            <label for="csv_file" class="form-label">Seleziona file Piranha</label>
+                            <label for="csv_file" class="form-label">Seleziona file INPS</label>
                             <input type="file" name="csv_file" class="form-control" required accept=".csv">
                         </div>
                         <div class="d-grid">

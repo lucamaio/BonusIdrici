@@ -1,92 +1,89 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Pannello di Controllo";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Benvenuto!</h1>
+    <p>Esplora le funzionalità disponibili per la gestione e l'analisi dei dati.</p>
 </div>
 
-<div class="row g-6 mb-3 mt-3 align-items-stretch"> <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body">
-                <a asp-controller="Home" asp-action="LoadAnagrafica">
-                    <h5 class="card-title text-white">Carica Anagrafica</h5>
+@* Strumenti di Caricamento Dati *@
+<div class="row g-6 mb-3 mt-3 align-items-stretch">
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
+                <a asp-controller="Azioni" asp-action="LoadAnagrafica">
+                    <h5 class="card-title text-white">Carica Dati Anagrafici</h5>
                 </a>
                 <p class="card-text">
-                    Questa pagina consente di caricare sul database un'estrazione dei dati anagrafici comunali.
+                    Importa nel database i dati anagrafici estratti dai registri comunali.
                 </p>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body">
-                <a asp-controller="Home" asp-action="InsertEnte">
-                    <h5 class="card-title text-white">Inscerisci Ente</h5>
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
+                <a asp-controller="Azioni" asp-action="InsertEnte">
+                    <h5 class="card-title text-white">Gestione Enti</h5>
                 </a>
                 <p class="card-text">
-                    Vai alla pagina perinserire un nuovo ente
+                    Accedi alla sezione per aggiungere o modificare le informazioni sugli enti.
                 </p>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body">
-                <a asp-controller="Home" asp-action="LoadFileInps">
-                    <h5 class="card-title text-white">caricare file INPS</h5>
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
+                <a asp-controller="Azioni" asp-action="LoadFileInps">
+                    <h5 class="card-title text-white">Carica File INPS</h5>
                 </a>
                 <p class="card-text">
-                    Vai alla pagina per effettuare il caricamento del file INPS
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-6 mt-3 mb-3 align-items-stretch"> <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body"></div>
-                <a asp-controller="Home" asp-action="LoadFilePiranha">
-                    <h5 class="card-title text-white">Carica file PIRANHA</h5>
-                </a>
-                <p class="card-text">
-                    Vai alla pagina per Inserire un file CSV Piranha
-                </p>
-            </div>
-        </div>
-    </div>
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body">
-                <a asp-controller="Home" asp-action="Home">
-                    <h5 class="card-title text-white">Esito Competenza Teritoriale</h5>
-                </a>
-                <p class="card-text">
-                    Vai alla pagina per effettuare l'accesso alla piattaforma
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body">
-                <a asp-controller="Home" asp-action="Home">
-                    <h5 class="card-title text-white">Esito bonus Idrico</h5>
-                </a>
-                <p class="card-text">
-                    Vai alla pagina per effettuare l'accesso alla piattaforma
+                    Procedi con l'upload dei file relativi ai dati INPS.
                 </p>
             </div>
         </div>
     </div>
 </div>
 
+@* Elaborazione e Report *@
 
-@* <div class="row g-6 mt-3 mb-3 align-items-stretch"> <div class="col-md-6 col-xl-4">
+<div class="row g-6 mb-3 mt-3 align-items-stretch">
     <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100"> <div class="card-body">
-                <a asp-controller="Home" asp-action="Login">
-                    <h5 class="card-title text-white">Login</h5>
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
+                <a asp-controller="Azioni" asp-action="LoadFilePiranha">
+                    <h5 class="card-title text-white">Carica File PIRANHA</h5>
                 </a>
                 <p class="card-text">
-                    Vai alla pagina per effettuare l'accesso alla piattaforma
+                    Carica file in formato CSV per l'elaborazione dei dati PIRANHA.
                 </p>
             </div>
         </div>
     </div>
-</div> *@
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
+                <a asp-controller="Azioni" asp-action="generateReportCompetenzaTerritoriale">
+                    <h5 class="card-title text-white">Report Competenza Territoriale</h5>
+                </a>
+                <p class="card-text">
+                    Genera il report sull'esito della competenza territoriale.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
+                <a asp-controller="Azioni" asp-action="generateReportBonusIdrico">
+                    <h5 class="card-title text-white">Report Bonus Idrico</h5>
+                </a>
+                <p class="card-text">
+                    Crea il file di esito per il bonus idrico.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

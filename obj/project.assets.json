@@ -5444,11 +5444,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User000015\\Documenti\\BonusIdrici2\\BonusIdrici2.csproj",
+      "projectUniqueName": "C:\\Users\\User000015\\Documenti\\Bonusidrici2\\BonusIdrici2.csproj",
       "projectName": "BonusIdrici2",
-      "projectPath": "C:\\Users\\User000015\\Documenti\\BonusIdrici2\\BonusIdrici2.csproj",
+      "projectPath": "C:\\Users\\User000015\\Documenti\\Bonusidrici2\\BonusIdrici2.csproj",
       "packagesPath": "C:\\Users\\User000015\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User000015\\Documenti\\BonusIdrici2\\obj\\",
+      "outputPath": "C:\\Users\\User000015\\Documenti\\Bonusidrici2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User000015\\AppData\\Roaming\\NuGet\\NuGet.Config"
