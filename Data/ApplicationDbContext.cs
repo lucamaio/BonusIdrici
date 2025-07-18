@@ -20,7 +20,10 @@ namespace BonusIdrici2.Data
         // public DbSet<Atto.Atto> Atti { get; set; }
         public DbSet<Dichiarante.Dichiarante> Dichiaranti { get; set; }
         public DbSet<Ente> Enti { get; set; }
-        public DbSet<FileUpload> FileUploads { get; set; } // Già presente, ottimo!
+
+        public DbSet<UtenzaIdrica> UtenzeIdriche { get; set; }
+        public DbSet<FileUpload> FileUploads { get; set; }
+        public object UtenzeIdrica { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,7 +73,31 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
 
             });
-            // --- FINE: NUOVA CONFIGURAZIONE PER FILEUPLOAD ---
+
+                modelBuilder.Entity<BonusIdrici2.Models.UtenzaIdrica>(entity =>
+            {
+                entity.ToTable("utenzeidriche"); // Mappa la classe FileUpload alla tabella 'fileuploads' nel DB
+
+                // Mappatura esplicita delle proprietà alle colonne del DB (snake_case)
+                entity.HasKey(f => f.id); 
+                entity.Property(f => f.idAcquedotto).HasColumnName("idAcquedotto").IsRequired();
+                entity.Property(f => f.stato).HasColumnName("stato").IsRequired();
+                entity.Property(f => f.periodoIniziale).HasColumnName("periodo_iniziale").IsRequired();
+                entity.Property(f => f.periodoFinale).HasColumnName("periodo_finale"); // Nullable per default
+                entity.Property(f => f.matricolaContatore).HasColumnName("matricola_contatore").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.indirizzoUbicazione).HasColumnName("indirizzo_ubicazione").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.numeroCivico).HasColumnName("numero_civico").IsRequired().HasMaxLength(10);
+                entity.Property(f => f.subUbicazione).HasColumnName("sub_ubicazione").HasMaxLength(20);
+                entity.Property(f => f.scalaUbicazione).HasColumnName("scala_ubicazione").HasMaxLength(50);
+                entity.Property(f => f.piano).HasColumnName("piano").HasMaxLength(20);
+                entity.Property(f => f.interno).HasColumnName("interno").HasMaxLength(20);
+                entity.Property(f => f.tipoUtenza).HasColumnName("tipo_utenza").HasMaxLength(100); // Esempio: "Domestica", "Non Domestica"
+                entity.Property(f => f.cognome).HasColumnName("cognome").IsRequired().HasMaxLength(100);
+                entity.Property(f => f.nome).HasColumnName("nome").IsRequired().HasMaxLength(100);
+                entity.Property(f => f.codiceFiscale).HasColumnName("codice_fiscale").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+
+            });
 
             base.OnModelCreating(modelBuilder); // Chiamata importante, deve essere l'ultima
         }

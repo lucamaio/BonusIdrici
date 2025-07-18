@@ -13,7 +13,7 @@
                 <div class="card-body p-4">
                     <form asp-controller="Azioni" asp-action="LoadFilePiranha" method="post" enctype="multipart/form-data">
                         
-                        @* --- INIZIO AGGIUNTA SELECT ENTE QUI --- *@
+                        @* --- SELECT ENTE QUI --- *@
                         <div class="mb-3">
                             <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
                             <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
@@ -27,7 +27,6 @@
                                 }
                             </select>
                         </div>
-                        @* --- FINE AGGIUNTA SELECT ENTE QUI --- *@
 
                         <div class="mb-3">
                             <label for="csv_file" class="form-label">Seleziona file Piranha</label>

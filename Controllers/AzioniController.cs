@@ -19,8 +19,7 @@ namespace BonusIdrici2.Controllers
         public AzioniController(ILogger<AzioniController> logger, ApplicationDbContext context)
         {
             _logger = logger;
-            _context = context; // Assegna il DbContext iniettato
-                                // Console.WriteLine(_context);
+            _context = context;
         }
 
         // Pagine di navigazione
@@ -44,6 +43,9 @@ namespace BonusIdrici2.Controllers
         }
         public IActionResult LoadFilePiranha()
         {
+            List<Ente> enti = _context.Enti.ToList();
+            // Passa la lista degli enti alla vista tramite ViewBag
+            ViewBag.Enti = enti;
             return View();
         }
 
@@ -230,6 +232,99 @@ namespace BonusIdrici2.Controllers
             // In caso di errore, ritorna la stessa vista con il modello
             return View("InsertEnte");
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId) 
+        {
+             if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadFilePiranha");
+            }
+
+            if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                return View("LoadFilePiranha"); // Torna alla pagina di upload con un messaggio
+            }
+
+            // Validazione del tipo di file (opzionale ma consigliata)
+            if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
+            {
+                ViewBag.Message = "Il file selezionato non è un CSV valido.";
+                return View("LoadFilePiranha");
+            }
+
+            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
+            if (selectedEnte == null)
+            {
+                ViewBag.Message = "Ente selezionato non valido.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadFilePiranha");
+            }
+
+            string filePath = Path.GetTempFileName(); // Crea un file temporaneo
+
+            try
+            {
+                // Salva il file caricato su disco
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await csv_file.CopyToAsync(stream);
+                }
+
+                // Leggi il file CSV con la tua classe CSVReader
+                var datiComplessivi = CSVReader.LeggiFilePhiranaCSV(filePath);
+
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        // Salva i dichiaranti nel database
+                        foreach (var UtenzeIdrica in datiComplessivi.UtenzeIdriche)
+                        {
+                            UtenzeIdrica.IdEnte = selectedEnteId; // Associa l'utenza all'ente selezionato                            
+                            if (string.IsNullOrEmpty(UtenzeIdrica.numeroCivico))
+                            {
+                                UtenzeIdrica.numeroCivico = "N/A";
+                            }else  if(UtenzeIdrica.numeroCivico == "0"){
+                                UtenzeIdrica.numeroCivico = "SNC";
+                            }
+                            _context.UtenzeIdriche.Add(UtenzeIdrica);
+                        }
+                       
+                        // await _context.SaveChangesAsync(); // Salva i dichiaranti prima
+
+                        // transaction.Commit(); // Conferma la transazione se tutto è andato bene
+                        ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Utenze: {datiComplessivi.UtenzeIdriche.Count}, "; //Atti: {datiComplessivi.Atti.Count}";
+                    }
+                    catch (Exception dbEx)
+                    {
+                        transaction.Rollback(); // Annulla la transazione in caso di errore
+                        _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
+                        ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
+                ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
+            }
+            finally
+            {
+                // Assicurati di eliminare il file temporaneo
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return View("LoadFilePiranha"); // Torna alla pagina di upload con il messaggio di stato
+        }
+
 
 
     }

@@ -7,14 +7,15 @@ namespace leggiCSV
 {
     public class DatiCsvCompilati // Nome più descrittivo per il contenitore
     {
-        // Specifichiamo Dichiarante.Dichiarante e Atto.Atto per indicare la CLASSE
         public List<Dichiarante.Dichiarante> Dichiaranti { get; set; }
-        // public List<Atto.Atto> Atti { get; set; }
+        public List<BonusIdrici2.Models.UtenzaIdrica> UtenzeIdriche { get; set; }
+        public List<Atto.Atto> Atti { get; set; }
 
         public DatiCsvCompilati() // Costruttore per inizializzare le liste
         {
             Dichiaranti = new List<Dichiarante.Dichiarante>();
-            // Atti = new List<Atto.Atto>();
+            UtenzeIdriche = new List<BonusIdrici2.Models.UtenzaIdrica>();
+            Atti = new List<Atto.Atto>();
         }
     }
 }

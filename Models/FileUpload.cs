@@ -11,11 +11,11 @@ namespace BonusIdrici2.Models
 
         [Required]
         [StringLength(255)]
-        public string NomeFile { get; set; } // nome_file nel DB
+        public required string NomeFile { get; set; } // nome_file nel DB
 
         [Required]
         [StringLength(512)]
-        public string PercorsoFile { get; set; } // percorso_file nel DB
+        public required string PercorsoFile { get; set; } // percorso_file nel DB
 
         public DateTime? DataInizio { get; set; } // data_inizio_validita nel DB (nullable)
         public DateTime? DataFine { get; set; } // data_fine_validita nel DB (nullable)
@@ -23,7 +23,7 @@ namespace BonusIdrici2.Models
         public DateTime? DataCaricamento { get; set; }
 
         [Required]
-        public int IdEnte { get; set; } // id_ente nel DB (chiave esterna)
+        public required int IdEnte { get; set; } // id_ente nel DB (chiave esterna)
 
     }
 }
