@@ -15,12 +15,12 @@ namespace BonusIdrici2.Models
         [Required]
         public int? stato { get; set; }
 
-        [Required]
-        public string? periodoIniziale { get; set; }
+        // [Required]
+        public DateTime? periodoIniziale { get; set; }
 
-        public string? periodoFinale { get; set; }
+        public DateTime? periodoFinale { get; set; }
 
-        [Required]
+        // [Required]
         public required string? matricolaContatore { get; set; }
 
         [Required]

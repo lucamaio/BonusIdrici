@@ -2,6 +2,7 @@
 using BonusIdrici2.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BonusIdrici2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721095627_FixDichiaranteColumnType2")]
+    partial class FixDichiaranteColumnType2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,15 +162,15 @@ namespace BonusIdrici2.Migrations
                         .HasColumnType("varchar(16)")
                         .HasColumnName("codiceFiscale");
 
-                    b.Property<int>("CodiceFiscaleIntestatarioScheda")
-                        .HasMaxLength(16)
-                        .HasColumnType("int")
+                    b.Property<string>("CodiceFiscaleIntestatarioScheda")
+                        .IsRequired()
+                        .HasColumnType("longtext")
                         .HasColumnName("CodiceFiscaleIntestatarioScheda");
 
                     b.Property<string>("Cognome")
                         .IsRequired()
-                        .HasMaxLength(125)
-                        .HasColumnType("varchar(125)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("cognome");
 
                     b.Property<string>("ComuneNascita")
@@ -189,14 +192,14 @@ namespace BonusIdrici2.Migrations
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(125)
-                        .HasColumnType("varchar(125)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("nome");
 
                     b.Property<string>("NomeEnte")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("NomeEnte");
 
                     b.Property<string>("NumeroCivico")
@@ -205,14 +208,16 @@ namespace BonusIdrici2.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("NumeroCivico");
 
-                    b.Property<int>("NumeroComponenti")
-                        .HasColumnType("int")
+                    b.Property<string>("NumeroComponenti")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)")
                         .HasColumnName("NumeroComponenti");
 
                     b.Property<string>("Parentela")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("Parentela");
 
                     b.Property<string>("Sesso")

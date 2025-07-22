@@ -11,11 +11,14 @@ namespace leggiCSV
         public List<BonusIdrici2.Models.UtenzaIdrica> UtenzeIdriche { get; set; }
         public List<Atto.Atto> Atti { get; set; }
 
+        public List<BonusIdrici2.Models.Report> reports { get; set; } = new List<BonusIdrici2.Models.Report>();
+
         public DatiCsvCompilati() // Costruttore per inizializzare le liste
         {
             Dichiaranti = new List<Dichiarante.Dichiarante>();
             UtenzeIdriche = new List<BonusIdrici2.Models.UtenzaIdrica>();
             Atti = new List<Atto.Atto>();
+            reports = new List<BonusIdrici2.Models.Report>();
         }
     }
 }
