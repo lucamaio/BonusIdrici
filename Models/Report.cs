@@ -22,15 +22,11 @@ namespace BonusIdrici2.Models
 
         public required string esito { get; set; }  // (1<valore>5) 
 
-        public string idFornitura { get; set; }
+        public int? idFornitura { get; set; }
 
         public string codiceFiscale { get; set; }
 
         public string numeroComponenti { get; set; }
-
-        public string dataInzio { get; set; } = string.Empty;
-        public string dataFine { get; set; } = string.Empty;
-
         public string? nomeDichiarante { get; set; }
         public string? cognomeDichiarante { get; set; }
 
@@ -49,10 +45,16 @@ namespace BonusIdrici2.Models
         public string? presenzaPod { get; set; }
 
         // [Required]
-        public required string dataInizioValidita { get; set; }
+        // public required string dataInizioValidita { get; set; }
 
         // [Required]
-        public required string? dataFineValidita { get; set; }
+        // public required string? dataFineValidita { get; set; }
+
+        [Required]
+        public required DateTime? dataInizioValidita { get; set; }
+
+        [Required]
+        public required DateTime? dataFineValidita { get; set; }
         
         
         [Required]
