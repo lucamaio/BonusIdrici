@@ -13,7 +13,7 @@ namespace BonusIdrici2.Models
         public string? idAto { get; set; }
 
         [Required]
-        public required string? codiceBonus { get; set; }
+        public required string codiceBonus { get; set; }
 
         // [Required]
         // public required string IdRichiesta { get; set; }
@@ -24,9 +24,9 @@ namespace BonusIdrici2.Models
 
         public int? idFornitura { get; set; }
 
-        public string codiceFiscale { get; set; }
+        public string? codiceFiscale { get; set; }
 
-        public string numeroComponenti { get; set; }
+        public int? numeroComponenti { get; set; }
         public string? nomeDichiarante { get; set; }
         public string? cognomeDichiarante { get; set; }
 
@@ -44,18 +44,13 @@ namespace BonusIdrici2.Models
 
         public string? presenzaPod { get; set; }
 
-        // [Required]
-        // public required string dataInizioValidita { get; set; }
-
-        // [Required]
-        // public required string? dataFineValidita { get; set; }
-
         [Required]
         public required DateTime? dataInizioValidita { get; set; }
 
         [Required]
         public required DateTime? dataFineValidita { get; set; }
-        
+    
+        public DateTime? dataCreazione { get; set; }
         
         [Required]
         public required int IdEnte { get; set; }

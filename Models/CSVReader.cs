@@ -567,7 +567,7 @@ public class CSVReader
                     capAbitazione = capAbitazione,
                     provinciaAbitazione = provinciaAbitazione,
                     presenzaPod = presenzaPod,
-                    numeroComponenti = numeroComponenti,
+                    numeroComponenti = int.Parse(numeroComponenti),
                     esitoStr = esitoStr,
                     esito = esito,
                     IdEnte = selectedEnteId,

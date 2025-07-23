@@ -8,6 +8,8 @@ namespace BonusIdrici2.Models
 
         public string? nome { get; set; }
         public string? istat { get; set; } 
+
+        public string? partitaIva { get; set; }
         public string? CodiceFiscale { get; set; }
         public string? Cap { get; set; }
         public string? Provincia { get; set; }
