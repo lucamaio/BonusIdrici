@@ -235,28 +235,6 @@ namespace BonusIdrici2.Controllers
         // [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         // [HttpPost]
-        // public IActionResult creaEnte(Ente ente)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         //  string nome = ente.Nome;
-        //         // string istat = ente.Istat;
-        //         // string codiceFiscale = ente.CodiceFiscale;
-        //         // string provincia = ente.Provincia;
-        //         // string regione = ente.Regione;
-        //         // Logica per salvare l'ente nel database
-
-        //         _context.Enti.Add(ente);
-        //         _context.SaveChanges();
-        //         TempData["SuccessMessage"] = "Ente creato con successo.";
-        //         return RedirectToAction("Index", "Home"); // oppure una vista di conferma
-        //     }
-        //     // In caso di errore, ritorna la stessa vista con il modello
-        //     return View("InsertEnte");
-        // }
-
-
-        // [HttpPost]
         // public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
         // {
         //     if (csv_file == null || csv_file.Length == 0)

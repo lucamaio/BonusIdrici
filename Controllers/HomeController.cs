@@ -38,33 +38,15 @@ namespace BonusIdrici2.Controllers
             // }
             return View();
         }
-
-          public IActionResult Login()
-        {
-            return View();
-        }
-
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
         public IActionResult Privacy()
         {
             return View();
         }
-
-
-        // Esempio nel tuo HomeController.cs o LoginController.cs
-        // [HttpPost]
-        // public async Task<IActionResult> Logout()
-        // {
-        //     await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //     HttpContext.Session.Clear(); // Opzionale: pulisce anche i dati specifici della sessione
-
-        //     return RedirectToAction("Index", "Home"); // Reindirizza alla home page o pagina di login
-        // }
 
     }
     

@@ -12,6 +12,18 @@
     <div class="col-md-6 col-xl-4">
         <div class="card bg-primary text-white d-flex flex-column h-100">
             <div class="card-body">
+                <a asp-controller="Enti" asp-action="Index">
+                    <h5 class="card-title text-white">Gestione Enti</h5>
+                </a>
+                <p class="card-text">
+                    Accedi alla sezione per aggiungere o modificare le informazioni sugli enti.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card bg-primary text-white d-flex flex-column h-100">
+            <div class="card-body">
                 <a asp-controller="Azioni" asp-action="LoadAnagrafica">
                     <h5 class="card-title text-white">Carica Dati Anagrafici</h5>
                 </a>
@@ -24,23 +36,11 @@
     <div class="col-md-6 col-xl-4">
         <div class="card bg-primary text-white d-flex flex-column h-100">
             <div class="card-body">
-                <a asp-controller="Azioni" asp-action="InsertEnte">
-                    <h5 class="card-title text-white">Gestione Enti</h5>
+                <a asp-controller="Azioni" asp-action="LoadFilePiranha">
+                    <h5 class="card-title text-white">Carica File PIRANHA</h5>
                 </a>
                 <p class="card-text">
-                    Accedi alla sezione per aggiungere o modificare le informazioni sugli enti.
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Azioni" asp-action="LoadFileInps">
-                    <h5 class="card-title text-white">Carica File INPS</h5>
-                </a>
-                <p class="card-text">
-                    Procedi con l'upload dei file relativi ai dati INPS.
+                    Carica file in formato CSV per l'elaborazione dei dati PIRANHA.
                 </p>
             </div>
         </div>
@@ -50,14 +50,14 @@
 @* Elaborazione e Report *@
 
 <div class="row g-6 mb-3 mt-3 align-items-stretch">
-    <div class="col-md-6 col-xl-4">
+   <div class="col-md-6 col-xl-4">
         <div class="card bg-primary text-white d-flex flex-column h-100">
             <div class="card-body">
-                <a asp-controller="Azioni" asp-action="LoadFilePiranha">
-                    <h5 class="card-title text-white">Carica File PIRANHA</h5>
+                <a asp-controller="Azioni" asp-action="LoadFileInps">
+                    <h5 class="card-title text-white">Carica File INPS</h5>
                 </a>
                 <p class="card-text">
-                    Carica file in formato CSV per l'elaborazione dei dati PIRANHA.
+                    Procedi con l'upload dei file relativi ai dati INPS.
                 </p>
             </div>
         </div>
@@ -74,7 +74,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-4">
+    @* <div class="col-md-6 col-xl-4">
         <div class="card bg-primary text-white d-flex flex-column h-100">
             <div class="card-body">
                 <a asp-controller="Azioni" asp-action="generateReportBonusIdrico">
@@ -85,5 +85,5 @@
                 </p>
             </div>
         </div>
-    </div>
+    </div> *@
 </div>

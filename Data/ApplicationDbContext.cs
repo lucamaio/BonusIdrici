@@ -55,7 +55,7 @@ namespace BonusIdrici2.Data
                 entity.HasKey(f => f.id); // La chiave primaria è 'id'
                 entity.Property(f => f.nome).HasColumnName("nome").IsRequired();
                 entity.Property(f => f.istat).HasColumnName("istat").IsRequired();
-                entity.Property(f => f.partitaIva).HasColumnName("partitaIVA").IsRequired();
+                entity.Property(f => f.partitaIva).HasColumnName("partita_iva").IsRequired();
                 entity.Property(f => f.CodiceFiscale).HasColumnName("CodiceFiscale").IsRequired().HasMaxLength(16);
                 entity.Property(f => f.Cap).HasColumnName("cap").IsRequired().HasMaxLength(10);
                 entity.Property(f => f.Provincia).HasColumnName("provincia").IsRequired().HasMaxLength(50);

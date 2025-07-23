@@ -10,24 +10,28 @@
                     <h3 class="mb-0">Crea un nuovo Ente</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="creaEnte" method="POST" enctype="multipart/form-data">
+                    <form asp-controller="Enti" asp-action="creaEnte" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label for="nome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="nome" name="nome" placeholder="es. MESSINA">
+                            <label for="nome" class="form-label">Nome*</label>
+                            <input type="text" class="form-control" id="nome" name="nome" placeholder="es. MESSINA" required>
                         </div>
                         <div class="mb-3">
-                            <label for="istat" class="form-label">Istat</label>
-                            <input type="text" min="5" max="5 class="form-control" id="istat" name="istat" placeholder="es. 083048">
+                            <label for="istat" class="form-label">Istat*</label>
+                            <input type="text" min="5" max="5" class="form-control" id="istat" name="istat" placeholder="es. 083048" maxlength="11" required>
                         </div>
                         <div class="mb-3">
-                            <label for="cap" class="form-label">CAP</label>
-                            <input type="text" min="5" max="5" class="form-control" id="cap" name="cap" placeholder="es. 98121" maxlength="11">
+                            <label for="cap" class="form-label">CAP*</label>
+                            <input type="text" min="5" max="5" class="form-control" id="cap" name="cap" placeholder="es. 98121" maxlength="11" required>
+                        </div>
+                         <div class="mb-3">
+                            <label for="partitaIVA" class="form-label">Partita IVA*</label>
+                            <input type="text" class="form-control" id="partitaIVA" name="partitaIVA" placeholder="es. 00080270838" maxlength="11" required>
                         </div>
                         <div class="mb-3">
                             <label for="codiceFiscale" class="form-label">Codice Fiscale</label>
                             <input type="text" class="form-control" id="codiceFiscale" name="codiceFiscale" placeholder="es. 00080270838" maxlength="11">
                         </div>
-                        <div class="mb-3">
+                       <div class="mb-3">
                             <label for="provincia" class="form-label">Provincia</label>
                             <input type="text" class="form-control" id="provincia" name="provincia" placeholder="es. ME" maxlength="2">
                         </div>
