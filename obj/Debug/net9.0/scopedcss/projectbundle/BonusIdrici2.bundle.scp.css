@@ -47,3 +47,9 @@ button.accept-policy[b-xrv69dks3l] {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.table-primary[b-xrv69dks3l]{
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}

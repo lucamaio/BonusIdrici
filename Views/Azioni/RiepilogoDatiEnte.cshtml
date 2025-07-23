@@ -23,7 +23,7 @@
                         <div class="table-responsive">
                             @* {{-- La tua tabella esistente, con l'ID per DataTables e le classi necessarie --}} *@
                             <table id="riepilogoTable" class="table table-bordered table-responsive dataTable dtr-column collapsed" style="width: 100%;">
-                                <thead class="table-dark">
+                                <thead class="table-primary">
                                     <tr>
                                         @* {{-- Queste sono le intestazioni delle tue colonne reali --}} *@
                                         <th>Giorno Inserimento</th>
@@ -95,12 +95,10 @@
         $(document).ready(function () {
             $('#riepilogoTable').DataTable({
                 // Questa è la configurazione per replicare lo stile e le funzionalità
-                // che hai indicato dalla "seconda tabella" (DataTables).
-                // Ho rimosso le colonne statiche e mantenuto solo le opzioni generali.
                 paging: true,
                 searching: true,
                 ordering: true,
-                info: true,
+                info: false, 
                 responsive: true,
                 // Traduzione in italiano
                 language: {
