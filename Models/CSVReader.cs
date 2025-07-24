@@ -6,11 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions; // Necessario per la classe Regex
 using BonusIdrici2.Data;
-//using Atto;
+using BonusIdrici2.Controllers;
+
 using leggiCSV;
 using Org.BouncyCastle.Crypto.Digests;
 using ZstdSharp.Unsafe;
 using Org.BouncyCastle.Bcpg;
+using BonusIdrici2.Models;
 
 public class CSVReader
 {
@@ -381,10 +383,12 @@ public class CSVReader
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
+            FileLog logFile = new FileLog("Elaborazione_INPS");
 
             int rigaCorrente = 1;
             int errori = 0;
-            Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
+            // Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
+            logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
             var dichiaranti = context.Dichiaranti.ToList();
             //Console.WriteLine($"Dichiaranti presenti: {dichiaranti.Count}");
 
@@ -528,8 +532,12 @@ public class CSVReader
 
                 if (error)
                 {
+                    logFile.LogError($"Errori riscontrati riga {rigaCorrente} : {errori}");
                     continue; // Salta la riga se ci sono errori
+                }else{
+                    logFile.LogInfo($"Nessun errore riscontrato nei campi della riga {rigaCorrente}");
                 }
+
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
 
@@ -670,6 +678,7 @@ public class CSVReader
                 };
 
                 datiComplessivi.reports.Add(report);
+                logFile.LogInfo($"Report creato riga {rigaCorrente}");
 
                 Console.WriteLine($"Riga {rigaCorrente}: Report creato: idAto: {report.idAto}, CodiceBonus: {report.codiceBonus}, CodiceFiscale: {report.codiceFiscale}, NomeDichiarante: {report.nomeDichiarante}, CognomeDichiarante: {report.cognomeDichiarante}, Esito: {report.esitoStr}, Esito numerico: {report.esito}, DataInizioValidita: {report.dataInizioValidita}, DataFineValidita: {report.dataFineValidita}");
             }
