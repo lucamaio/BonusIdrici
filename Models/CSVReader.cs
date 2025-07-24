@@ -189,95 +189,156 @@ public class CSVReader
     //     return date;
     // }
 
-    // public static DatiCsvCompilati LeggiFilePhiranaCSV(string percorsoFile)
-    // {
-    //     var datiComplessivi = new DatiCsvCompilati();
+    public static DatiCsvCompilati LeggiFilePhiranaCSV(string percorsoFile)
+    {
+        var datiComplessivi = new DatiCsvCompilati();
 
-    //     try
-    //     {
-    //         var righe = File.ReadAllLines(percorsoFile).Skip(1);
+        try
+        {
+            var righe = File.ReadAllLines(percorsoFile).Skip(1);
 
-    //         int rigaCorrente = 1;
-    //         // Console.WriteLine($"Inizio lettura del file CSV: {percorsoFile}");
-    //         // Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
-    //         // Console.WriteLine($"Numero di righe {righe}");
-    //         // Console.WriteLine($"Formato atteso per le date: {DateFormat}");
+            int rigaCorrente = 1;
+            int errori = 0;
+            Console.WriteLine($"Inizio lettura del file CSV: {percorsoFile}");
+            Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
 
-    //         foreach (var riga in righe)
-    //         {
-    //             Console.WriteLine($"Inizio lettura del file CSV: {percorsoFile}");
-    //             Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
-    //             Console.WriteLine($"Formato atteso per le date: {DateFormat}");
+            foreach (var riga in righe)
+            {
+                var error = false;
+                rigaCorrente++;
 
-    //             rigaCorrente++;
+                // 1. VERIFICO CHE I CAMPI SONO VALIDI
 
-    //             if (string.IsNullOrWhiteSpace(riga)) continue;
+                // a) verifico se la riga è vuota
+                if (string.IsNullOrWhiteSpace(riga)) continue;
 
-    //             var campi = riga.Split(CsvDelimiter);
-    //             // Il campo codiceFiscale è a indice 38, quindi ci servono almeno 39 campi.
-    //             if (campi.Length < 39)
-    //             {
-    //                 Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
-    //                 continue;
-    //             }
+                var campi = riga.Split(CsvDelimiter);
 
-    //             // Controllo se il campo Codice Fiscale è presente e non vuoto
-    //             if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36]))) // CODICE FISCALE O PARTITA IVA
-    //             {
-    //                 Console.WriteLine($"Attenzione: Codice Fiscale mancante, saltata. Riga {rigaCorrente}");
-    //                 continue;
-    //             }
+                // b) Verifico che il file ha i campi minimi per poter effetuare le operazioni successive
 
-    //             // Controllo se la matricola del contatore è presente
-    //             if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0].Trim())))
-    //             {
-    //                 Console.WriteLine($"Attenzione: Matricola o id Acquedotto mancante, saltata. Riga {rigaCorrente}");
-    //                 continue;
-    //             }
+                if (campi.Length < 39)
+                {
+                    Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
+                    continue;
+                }
 
-    //             // Controllo se i campi nomi e cognome sono presenti
-    //             if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[31])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])))
-    //             {
-    //                 Console.WriteLine($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
-    //                 continue;
-    //             }
+                // c) Verifico che esiste il campo idAcquedotto è presente
 
-    //             var utenza = new BonusIdrici2.Models.UtenzaIdrica
-    //             {
-    //                 idAcquedotto = rimuoviVirgolette(campi[0].Trim()),
-    //                 stato = int.TryParse(rimuoviVirgolette(campi[9].Trim()), out int stato) ? stato : 0,
-    //                 periodoIniziale = ConvertiData(rimuoviVirgolette(campi[13].Trim())),
-    //                 periodoFinale = ConvertiData(rimuoviVirgolette(campi[14].Trim())),
-    //                 matricolaContatore = rimuoviVirgolette(campi[12].Trim()),
-    //                 indirizzoUbicazione = rimuoviVirgolette(campi[15].Trim()),
-    //                 numeroCivico = rimuoviVirgolette(campi[16].Trim()),
-    //                 subUbicazione = rimuoviVirgolette(campi[17].Trim()),
-    //                 scalaUbicazione = rimuoviVirgolette(campi[18].Trim()),
-    //                 piano = rimuoviVirgolette(campi[19].Trim()),
-    //                 interno = rimuoviVirgolette(campi[20].Trim()),
-    //                 tipoUtenza = rimuoviVirgolette(campi[26].Trim()),
-    //                 cognome = rimuoviVirgolette(campi[32].Trim()),
-    //                 nome = rimuoviVirgolette(campi[33].Trim()),
-    //                 codiceFiscale = rimuoviVirgolette(campi[36].Trim()),
-    //             };
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0].Trim())))
+                {
+                    Console.WriteLine($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
 
-    //             datiComplessivi.UtenzeIdriche.Add(utenza);
+                // d) Controllo se il campo Codice Fiscale è valido è != null
 
-    //             // CORREZIONE STAMPA: Gestisci correttamente le date nullable
-    //             Console.WriteLine($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto},  CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)},\n");
-    //         }
-    //     }
-    //     catch (FileNotFoundException)
-    //     {
-    //         Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
-    //     }
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])) || rimuoviVirgolette(campi[36]).Length != 16) // CODICE FISCALE O PARTITA IVA
+                {
+                    Console.WriteLine($"Attenzione: Codice Fiscale mancante o malformato, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
 
-    //     return datiComplessivi;
-    // }
+                // e) Controllo se la matricola del contatore è presente
+
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0].Trim())))
+                {
+                    Console.WriteLine($"Attenzione: Matricola o id Acquedotto mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // f) Controllo se i campi nomi e cognome sono presenti
+
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[31])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])))
+                {
+                    Console.WriteLine($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // g) Controllo se il campo periodoIniziale è presente
+
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[13])))
+                {
+                    Console.WriteLine($"Attenzione: Periodo iniziale mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // h) Verifico se il campo tipo utenza è presente
+
+                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[26])))
+                {
+                    Console.WriteLine($"Attenzione: Tipo Utenza mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+                
+                // i) Verifico se il campo indirizzo Ubicazione è presente
+
+                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
+                {
+                    Console.WriteLine($"Attenzione: Indirizzo ubicazione mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // Verifico se il campo numero civico è presente
+
+                if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[16])))
+                {
+                    Console.WriteLine($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // Controllo se sono presenti degli errrori
+
+                if (error)
+                {
+                    continue; // Salta la riga se ci sono errori
+                }
+
+                // Creo una istanza di Utenza Idrica
+
+                var utenza = new BonusIdrici2.Models.UtenzaIdrica
+                {
+                    idAcquedotto = rimuoviVirgolette(campi[0]),
+                    stato = int.TryParse(rimuoviVirgolette(campi[9]), out int stato) ? stato : 0,
+                    periodoIniziale = ConvertiData(rimuoviVirgolette(campi[13])),
+                    periodoFinale = ConvertiData(rimuoviVirgolette(campi[14])),
+                    matricolaContatore = rimuoviVirgolette(campi[12]),
+                    indirizzoUbicazione = rimuoviVirgolette(campi[15]),
+                    numeroCivico = FormattaNumeroCivico(campi[16]),
+                    subUbicazione = rimuoviVirgolette(campi[17]),
+                    scalaUbicazione = rimuoviVirgolette(campi[18]),
+                    piano = rimuoviVirgolette(campi[19]),
+                    interno = rimuoviVirgolette(campi[20]),
+                    tipoUtenza = rimuoviVirgolette(campi[26]),
+                    cognome = rimuoviVirgolette(campi[32]),
+                    nome = rimuoviVirgolette(campi[33]),
+                    codiceFiscale = rimuoviVirgolette(campi[36]),
+                };
+
+                datiComplessivi.UtenzeIdriche.Add(utenza);
+
+                // CORREZIONE STAMPA: Gestisci correttamente le date nullable
+                //Console.WriteLine($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto},  CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)},\n");
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
+        }
+
+        return datiComplessivi;
+    }
 
 
     public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, BonusIdrici2.Data.ApplicationDbContext context, int selectedEnteId)
@@ -439,26 +500,26 @@ public class CSVReader
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
 
-                string idAto = rimuoviVirgolette(campi[0]).Trim();
-                string codiceBonus = rimuoviVirgolette(campi[1]).Trim();
-                string codiceFiscale = rimuoviVirgolette(campi[2]).Trim();
+                string idAto = rimuoviVirgolette(campi[0]);
+                string codiceBonus = rimuoviVirgolette(campi[1]);
+                string codiceFiscale = rimuoviVirgolette(campi[2]);
 
-                string nomeDichiarante = rimuoviVirgolette(campi[3]).Trim();
-                string cognomeDichiarante = rimuoviVirgolette(campi[4]).Trim();
+                string nomeDichiarante = rimuoviVirgolette(campi[3]);
+                string cognomeDichiarante = rimuoviVirgolette(campi[4]);
                 string[] codiciFiscaliFamigliari = splitCodiceFiscale(campi[5]);
 
-                string annoValidita = rimuoviVirgolette(campi[6]).Trim();
-                string dataInizioValidita = rimuoviVirgolette(campi[7]).Trim();
-                string dataFineValidita = rimuoviVirgolette(campi[8]).Trim();
+                string annoValidita = rimuoviVirgolette(campi[6]);
+                string dataInizioValidita = rimuoviVirgolette(campi[7]);
+                string dataFineValidita = rimuoviVirgolette(campi[8]);
 
-                string indirizzoAbitazione = rimuoviVirgolette(campi[9]).Trim();
+                string indirizzoAbitazione = rimuoviVirgolette(campi[9]);
                 string numeroCivico = FormattaNumeroCivico(campi[10]);
-                string istatAbitazione = rimuoviVirgolette(campi[11]).Trim();
-                string capAbitazione = rimuoviVirgolette(campi[12]).Trim();
-                string provinciaAbitazione = rimuoviVirgolette(campi[13]).Trim();
+                string istatAbitazione = rimuoviVirgolette(campi[11]);
+                string capAbitazione = rimuoviVirgolette(campi[12]);
+                string provinciaAbitazione = rimuoviVirgolette(campi[13]);
 
-                string presenzaPod = rimuoviVirgolette(campi[14]).Trim();
-                string numeroComponenti = rimuoviVirgolette(campi[15]).Trim();
+                string presenzaPod = rimuoviVirgolette(campi[14]);
+                string numeroComponenti = rimuoviVirgolette(campi[15]);
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
                 string esitoStr = "No";

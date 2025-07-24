@@ -63,98 +63,6 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-
-        // public IActionResult EsitoCompetenzaTerritoriale(){
-        //      List<Ente> enti = _context.Enti.ToList();
-        //     // Passa la lista degli enti alla vista tramite ViewBag
-        //     ViewBag.Enti = enti;
-        //     return View();
-        // }
-
-        // [HttpPost]
-        // public async Task<IActionResult> LoadFileINPSAction(IFormFile csv_file, int selectedEnteId)
-        // {
-        //     if (csv_file == null || csv_file.Length == 0)
-        //     {
-        //         ViewBag.Message = "Seleziona un file CSV da caricare.";
-        //         ViewBag.Enti = _context.Enti.ToList();
-        //         return View("LoadFileINPS");
-        //     }
-
-        //     if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
-        //     {
-        //         ViewBag.Message = "Il file selezionato non è un CSV valido.";
-        //         ViewBag.Enti = _context.Enti.ToList();
-        //         return View("LoadFileINPS");
-        //     }
-
-        //     var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
-        //     if (selectedEnte == null)
-        //     {
-        //         ViewBag.Message = "Ente selezionato non valido.";
-        //         ViewBag.Enti = _context.Enti.ToList();
-        //         return View("LoadFileINPS");
-        //     }
-
-        //     string uploadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", selectedEnte.nome);
-        //     if (!Directory.Exists(uploadDirectory))
-        //     {
-        //         Directory.CreateDirectory(uploadDirectory);
-        //     }
-
-        //     string filePath = Path.Combine(uploadDirectory, csv_file.FileName);
-        //     string relativePath = Path.Combine("Uploads", selectedEnte.nome, csv_file.FileName);
-        //     var fileUploadRecord = new FileUpload
-        //     {
-        //         NomeFile = csv_file.FileName,
-        //         PercorsoFile = relativePath,
-        //         DataCaricamento = DateTime.Now,
-        //         IdEnte = selectedEnteId
-        //     };
-
-        //     using (var transaction = _context.Database.BeginTransaction())
-        //     {
-        //         try
-        //         {
-        //             using (var stream = new FileStream(filePath, FileMode.Create))
-        //             {
-        //                 await csv_file.CopyToAsync(stream);
-        //             }
-
-        //             List<DateTime?> date = CSVReader.LeggiDateCSV(filePath);
-
-        //             if (date.Count < 2)
-        //             {
-        //                 ViewBag.Message = "Data inizio e fine non trovate.";
-        //                 ViewBag.Enti = _context.Enti.ToList();
-        //                 return View("LoadFileINPS");
-        //             }
-
-        //             fileUploadRecord.DataInizio = date[0];
-        //             fileUploadRecord.DataFine = date[1];
-
-        //             _context.FileUploads.Add(fileUploadRecord);
-        //             await _context.SaveChangesAsync();
-
-        //             transaction.Commit();
-
-        //             ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati elaborati con successo per l'ente {selectedEnte.nome}.";
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             transaction.Rollback();
-        //             _logger.LogError(ex, "Errore durante l'elaborazione o il salvataggio del file CSV.");
-
-        //             ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
-        //         }
-        //     }
-
-
-        //     ViewBag.Enti = _context.Enti.ToList();
-        //     return View("LoadFileINPS");
-        // }
-
-
         // [HttpPost]
         // public async Task<IActionResult> UploadCsv(IFormFile csv_file) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         // {
@@ -234,98 +142,90 @@ namespace BonusIdrici2.Controllers
 
         // [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
-        // [HttpPost]
-        // public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
-        // {
-        //     if (csv_file == null || csv_file.Length == 0)
-        //     {
-        //         ViewBag.Message = "Seleziona un file CSV da caricare.";
-        //         ViewBag.Enti = _context.Enti.ToList();
-        //         return View("LoadFilePiranha");
-        //     }
+        [HttpPost]
+        public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
+        {
+            if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadFilePiranha");
+            }
 
-        //     if (csv_file == null || csv_file.Length == 0)
-        //     {
-        //         ViewBag.Message = "Seleziona un file CSV da caricare.";
-        //         return View("LoadFilePiranha"); // Torna alla pagina di upload con un messaggio
-        //     }
+            if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                return View("LoadFilePiranha"); // Torna alla pagina di upload con un messaggio
+            }
 
-        //     // Validazione del tipo di file (opzionale ma consigliata)
-        //     if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
-        //     {
-        //         ViewBag.Message = "Il file selezionato non è un CSV valido.";
-        //         return View("LoadFilePiranha");
-        //     }
+            // Validazione del tipo di file (opzionale ma consigliata)
+            if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
+            {
+                ViewBag.Message = "Il file selezionato non è un CSV valido.";
+                return View("LoadFilePiranha");
+            }
 
-        //     var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
-        //     if (selectedEnte == null)
-        //     {
-        //         ViewBag.Message = "Ente selezionato non valido.";
-        //         ViewBag.Enti = _context.Enti.ToList();
-        //         return View("LoadFilePiranha");
-        //     }
+            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
+            if (selectedEnte == null)
+            {
+                ViewBag.Message = "Ente selezionato non valido.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadFilePiranha");
+            }
 
-        //     string filePath = Path.GetTempFileName(); // Crea un file temporaneo
+            string filePath = Path.GetTempFileName(); // Crea un file temporaneo
 
-        //     try
-        //     {
-        //         // Salva il file caricato su disco
-        //         using (var stream = new FileStream(filePath, FileMode.Create))
-        //         {
-        //             await csv_file.CopyToAsync(stream);
-        //         }
+            try
+            {
+                // Salva il file caricato su disco
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await csv_file.CopyToAsync(stream);
+                }
 
-        //         // Leggi il file CSV con la tua classe CSVReader
-        //         var datiComplessivi = CSVReader.LeggiFilePhiranaCSV(filePath);
+                // Leggi il file CSV con la tua classe CSVReader
+                var datiComplessivi = CSVReader.LeggiFilePhiranaCSV(filePath);
 
-        //         using (var transaction = _context.Database.BeginTransaction())
-        //         {
-        //             try
-        //             {
-        //                 // Salva le utenze nel database
-        //                 foreach (var UtenzeIdrica in datiComplessivi.UtenzeIdriche)
-        //                 {
-        //                     UtenzeIdrica.IdEnte = selectedEnteId; // Associa l'utenza all'ente selezionato                            
-        //                     if (string.IsNullOrEmpty(UtenzeIdrica.numeroCivico))
-        //                     {
-        //                         UtenzeIdrica.numeroCivico = "N/A";
-        //                     }
-        //                     else if (UtenzeIdrica.numeroCivico == "0")
-        //                     {
-        //                         UtenzeIdrica.numeroCivico = "SNC";
-        //                     }
-        //                     _context.UtenzeIdriche.Add(UtenzeIdrica);
-        //                 }
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        // Salva le utenze nel database
+                        foreach (var UtenzeIdrica in datiComplessivi.UtenzeIdriche)
+                        {
+                            UtenzeIdrica.IdEnte = selectedEnteId;                         
+                            _context.UtenzeIdriche.Add(UtenzeIdrica);
+                        }
 
-        //                 await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
 
-        //                 transaction.Commit(); // Conferma la transazione se tutto è andato bene
-        //                 ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Utenze: {datiComplessivi.UtenzeIdriche.Count}, "; //Atti: {datiComplessivi.Atti.Count}";
-        //             }
-        //             catch (Exception dbEx)
-        //             {
-        //                 transaction.Rollback(); // Annulla la transazione in caso di errore
-        //                 _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
-        //                 ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
-        //             }
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
-        //         ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
-        //     }
-        //     finally
-        //     {
-        //         // Assicurati di eliminare il file temporaneo
-        //         if (System.IO.File.Exists(filePath))
-        //         {
-        //             System.IO.File.Delete(filePath);
-        //         }
-        //     }
+                        transaction.Commit(); // Conferma la transazione se tutto è andato bene
+                        ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Utenze: {datiComplessivi.UtenzeIdriche.Count}, ";
+                    }
+                    catch (Exception dbEx)
+                    {
+                        transaction.Rollback(); // Annulla la transazione in caso di errore
+                        _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
+                        ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
+                ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
+            }
+            finally
+            {
+                // Assicurati di eliminare il file temporaneo
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
 
-        //     return View("LoadFilePiranha"); // Torna alla pagina di upload con il messaggio di stato
-        // }
+            return View("LoadFilePiranha"); // Torna alla pagina di upload con il messaggio di stato
+        }
 
 
         [HttpPost]

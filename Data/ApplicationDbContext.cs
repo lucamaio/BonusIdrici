@@ -56,7 +56,7 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.nome).HasColumnName("nome").IsRequired();
                 entity.Property(f => f.istat).HasColumnName("istat").IsRequired();
                 entity.Property(f => f.partitaIva).HasColumnName("partita_iva").IsRequired();
-                entity.Property(f => f.CodiceFiscale).HasColumnName("CodiceFiscale").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").IsRequired().HasMaxLength(16);
                 entity.Property(f => f.Cap).HasColumnName("cap").IsRequired().HasMaxLength(10);
                 entity.Property(f => f.Provincia).HasColumnName("provincia").IsRequired().HasMaxLength(50);
                 entity.Property(f => f.Regione).HasColumnName("regione").IsRequired().HasMaxLength(50);
