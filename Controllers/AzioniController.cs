@@ -4,7 +4,6 @@ using BonusIdrici2.Models;
 using BonusIdrici2.Data;
 using System.Globalization;
 using System.IO;
-using Dichiarante;
 using Atto;
 using leggiCSV;
 using System.Security.Claims;
@@ -63,114 +62,20 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-        // [HttpPost]
-        // public async Task<IActionResult> UploadCsv(IFormFile csv_file) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
-        // {
-        //     if (csv_file == null || csv_file.Length == 0)
-        //     {
-        //         ViewBag.Message = "Seleziona un file CSV da caricare.";
-        //         return View("LoadAnagrafica"); // Torna alla pagina di upload con un messaggio
-        //     }
-
-        //     // Validazione del tipo di file (opzionale ma consigliata)
-        //     if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
-        //     {
-        //         ViewBag.Message = "Il file selezionato non è un CSV valido.";
-        //         return View("LoadAnagrafica");
-        //     }
-
-        //     string filePath = Path.GetTempFileName(); // Crea un file temporaneo
-
-        //     try
-        //     {
-        //         // Salva il file caricato su disco
-        //         using (var stream = new FileStream(filePath, FileMode.Create))
-        //         {
-        //             await csv_file.CopyToAsync(stream);
-        //         }
-
-        //         // Leggi il file CSV con la tua classe CSVReader
-        //         var datiComplessivi = CSVReader.LeggiFileCSV(filePath);
-
-        //         // Inizia una transazione per assicurare che tutti i dati vengano salvati
-        //         // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
-        //         using (var transaction = _context.Database.BeginTransaction())
-        //         {
-        //             try
-        //             {
-        //                 // Salva i dichiaranti nel database
-        //                 foreach (var dichiarante in datiComplessivi.Dichiaranti)
-        //                 {
-        //                     _context.Dichiaranti.Add(dichiarante);
-        //                 }
-        //                 await _context.SaveChangesAsync(); // Salva i dichiaranti prima
-
-        //                 // Salva gli atti nel database
-        //                 // foreach (var atto in datiComplessivi.Atti)
-        //                 // {
-        //                 //     _context.Atti.Add(atto);
-        //                 // }
-        //                 // await _context.SaveChangesAsync(); // Salva gli atti
-
-        //                 transaction.Commit(); // Conferma la transazione se tutto è andato bene
-        //                 ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Dichiaranti: {datiComplessivi.Dichiaranti.Count}, "; //Atti: {datiComplessivi.Atti.Count}";
-        //             }
-        //             catch (Exception dbEx)
-        //             {
-        //                 transaction.Rollback(); // Annulla la transazione in caso di errore
-        //                 _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
-        //                 ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
-        //             }
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
-        //         ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
-        //     }
-        //     finally
-        //     {
-        //         // Assicurati di eliminare il file temporaneo
-        //         if (System.IO.File.Exists(filePath))
-        //         {
-        //             System.IO.File.Delete(filePath);
-        //         }
-        //     }
-
-        //     return View("LoadAnagrafica"); // Torna alla pagina di upload con il messaggio di stato
-        // }
-
-        // [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-
         [HttpPost]
-        public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
+        public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
-                ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFilePiranha");
-            }
-
-            if (csv_file == null || csv_file.Length == 0)
-            {
-                ViewBag.Message = "Seleziona un file CSV da caricare.";
-                return View("LoadFilePiranha"); // Torna alla pagina di upload con un messaggio
+                return View("LoadAnagrafica"); // Torna alla pagina di upload con un messaggio
             }
 
             // Validazione del tipo di file (opzionale ma consigliata)
             if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
             {
                 ViewBag.Message = "Il file selezionato non è un CSV valido.";
-                return View("LoadFilePiranha");
-            }
-
-            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
-            if (selectedEnte == null)
-            {
-                ViewBag.Message = "Ente selezionato non valido.";
-                ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFilePiranha");
+                return View("LoadAnagrafica");
             }
 
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
@@ -184,7 +89,94 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFilePhiranaCSV(filePath);
+                var datiComplessivi = CSVReader.LoadAnagrafe(filePath);
+
+                // Inizia una transazione per assicurare che tutti i dati vengano salvati
+                // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        // Salva i dichiaranti nel database
+                        foreach (var dichiarante in datiComplessivi.Dichiaranti)
+                        {
+                            _context.Dichiaranti.Add(dichiarante);
+                        }
+                        await _context.SaveChangesAsync(); // Salva i dichiaranti prima
+
+                        transaction.Commit(); // Conferma la transazione se tutto è andato bene
+                        ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Dichiaranti: {datiComplessivi.Dichiaranti.Count}, "; //Atti: {datiComplessivi.Atti.Count}";
+                    }
+                    catch (Exception dbEx)
+                    {
+                        transaction.Rollback(); // Annulla la transazione in caso di errore
+                        _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
+                        ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
+                ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
+            }
+            finally
+            {
+                // Assicurati di eliminare il file temporaneo
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return View("LoadAnagrafica"); // Torna alla pagina di upload con il messaggio di stato
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+        [HttpPost]
+        public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
+        {
+            if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadFilePiranha","Azioni");
+            }
+
+            if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                return View("LoadFilePiranha","Azioni"); // Torna alla pagina di upload con un messaggio
+            }
+
+            // Validazione del tipo di file (opzionale ma consigliata)
+            if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
+            {
+                ViewBag.Message = "Il file selezionato non è un CSV valido.";
+                return View("LoadFilePiranha","Azioni");
+            }
+
+            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
+            if (selectedEnte == null)
+            {
+                ViewBag.Message = "Ente selezionato non valido.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadFilePiranha","Azioni");
+            }
+
+            string filePath = Path.GetTempFileName(); // Crea un file temporaneo
+
+            try
+            {
+                // Salva il file caricato su disco
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await csv_file.CopyToAsync(stream);
+                }
+
+                // Leggi il file CSV con la tua classe CSVReader
+                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath);
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -224,7 +216,7 @@ namespace BonusIdrici2.Controllers
                 }
             }
 
-            return View("LoadFilePiranha"); // Torna alla pagina di upload con il messaggio di stato
+            return View("LoadFilePiranha","Azioni"); // Torna alla pagina di upload con il messaggio di stato
         }
 
 
@@ -326,7 +318,7 @@ namespace BonusIdrici2.Controllers
             // Assumi che il tuo modello Report abbia idEnte e data_inserimento
             var riepilogoDati = _context.Reports
                                         .Where(r => r.IdEnte == selectedEnteId)
-                                        .GroupBy(r => r.dataCreazione) // Raggruppa per data di inserimento
+                                        .GroupBy(r => r.DataCreazione) // Raggruppa per data di inserimento
                                         .Select(g => new RiepilogoDatiViewModel
                                         {
                                             DataCreazione = g.Key,
@@ -361,12 +353,8 @@ namespace BonusIdrici2.Controllers
 
             // 2. Recupero dei dati dal database (una sola query per entrambi i tipi di report)
             List<Report> datiDelReport = _context.Reports
-                                                .Where(r => r.IdEnte == enteId && r.dataCreazione == dataCreazioneParsed)
+                                                .Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed)
                                                 .ToList();
-
-            // List<Report> datiDelReport = _context.Reports
-            //                                     .Where(r => r.dataCreazione == dataCreazioneParsed)
-            //                                     .ToList();
 
             byte[]? fileBytes;
             string fileName = "";

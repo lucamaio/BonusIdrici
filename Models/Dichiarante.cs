@@ -1,29 +1,43 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations;
 
-namespace Dichiarante
+namespace BonusIdrici2.Models
 {
     public class Dichiarante
     {
+        [Key]
+        
         public int? IdDichiarante { get; set; }
-        public string Cognome { get; set; } = string.Empty;
-        public string Nome { get; set; } = string.Empty;
-        public string CodiceFiscale { get; set; } = string.Empty;
-        public string Sesso { get; set; } = string.Empty;
-        public string DataNascita { get; set; } = string.Empty;
-        public string ComuneNascita { get; set; } = string.Empty;
-        public string IndirizzoResidenza { get; set; } = string.Empty;
-        public string NumeroCivico { get; set; } = string.Empty;
-        public string NomeEnte { get; set; } = string.Empty;
 
-        // public string NumeroComponenti { get; set; }  = string.Empty;
+        [Required]
+        public required string Cognome { get; set; }
 
-        // public string CodiceFamiglia { get; set; } = string.Empty;
+        [Required]
+        public required string Nome { get; set; }
+
+        [Required]
+        public required string CodiceFiscale { get; set; }
+
+        [Required]
+        public required string Sesso { get; set; }
+
+        [Required]
+        public required DateTime? DataNascita { get; set; }
+        public string? ComuneNascita { get; set; }
+
+        [Required]
+        public required string IndirizzoResidenza { get; set; }
+
+        [Required]
+
+        public required string NumeroCivico { get; set; }
+
+        [Required]
+        public required string NomeEnte { get; set; }
+
         public int? CodiceFamiglia { get; set; }
-        public string Parentela { get; set; } = string.Empty;
-        public string CodiceFiscaleIntestatarioScheda { get; set; } = string.Empty;
+        public string? Parentela { get; set; }
+        public string? CodiceFiscaleIntestatarioScheda { get; set; }
 
-        // public int? CodiceFiscaleIntestatarioScheda { get; set; }
        public int? NumeroComponenti { get; set; }
     }
 }

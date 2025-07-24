@@ -38,7 +38,7 @@ namespace BonusIdrici2.Models
         public string? interno { get; set; }
         
         [Required]
-        public required string? tipoUtenza { get; set; } // Esempio: "Domestica", "Non Domestica"
+        public required string tipoUtenza { get; set; } // Esempio: "Domestica", "Non Domestica"
 
         [Required]
         public required string? cognome { get; set; }

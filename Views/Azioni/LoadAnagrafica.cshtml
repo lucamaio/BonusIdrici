@@ -7,12 +7,12 @@
         <div class="col-md-8">
             <div class="card shadow rounded-4 border-0">
                 <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Carica il file CSV Selene</h3>
+                    <h3 class="mb-0">Carica Anagrafe</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="UploadCsv" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Azioni" asp-action="LoadAnagrafe" method="post" enctype="multipart/form-data">
                           <div class="mb-3">
-                            <label for="csv_file" class="form-label">Seleziona file CSV Selene</label>
+                            <label for="csv_file" class="form-label">Seleziona file CSV Anagrafe</label>
                             <input type="file" name="csv_file" class="form-control" required accept=".csv">
                         </div>
                         <div class="d-grid">

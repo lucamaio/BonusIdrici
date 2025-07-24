@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using BonusIdrici2.Models;
 using System.Linq;
 using System;
-using Atto;
-using Dichiarante;
 
 namespace BonusIdrici2.Data
 {
@@ -17,34 +15,33 @@ namespace BonusIdrici2.Data
 
         // Se Atti non è più usato, puoi eliminarlo o lasciarlo commentato
         // public DbSet<Atto.Atto> Atti { get; set; }
-        public DbSet<Dichiarante.Dichiarante> Dichiaranti { get; set; }
+        public DbSet<Dichiarante> Dichiaranti { get; set; }
         public DbSet<Ente> Enti { get; set; }
 
         public DbSet<UtenzaIdrica> UtenzeIdriche { get; set; }
         // public DbSet<FileUpload> FileUploads { get; set; }
-        public object UtenzeIdrica { get; internal set; }
         
          public DbSet<Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configurazione per la classe Dichiarante
-            modelBuilder.Entity<Dichiarante.Dichiarante>(entity =>
+            modelBuilder.Entity<Dichiarante>(entity =>
             {
                 entity.ToTable("dichiaranti");
                 entity.HasKey(d => d.IdDichiarante);
                 entity.Property(f => f.Nome).HasColumnName("nome").IsRequired().HasMaxLength(125);
                 entity.Property(f => f.Cognome).HasColumnName("cognome").IsRequired().HasMaxLength(125);
-                entity.Property(f => f.CodiceFiscale).HasColumnName("codiceFiscale").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.CodiceFiscale).HasColumnName("codiceFiscale").IsRequired();
                 entity.Property(f => f.DataNascita).HasColumnName("dataNascita").IsRequired();
-                entity.Property(f => f.IndirizzoResidenza).HasColumnName("IndirizzoResidenza").IsRequired().HasMaxLength(255);
-                entity.Property(f => f.NumeroCivico).HasColumnName("NumeroCivico").IsRequired().HasMaxLength(255);
-                entity.Property(f => f.ComuneNascita).HasColumnName("ComuneNascita").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.IndirizzoResidenza).HasColumnName("IndirizzoResidenza").IsRequired().HasMaxLength(250);
+                entity.Property(f => f.NumeroCivico).HasColumnName("NumeroCivico").IsRequired().HasMaxLength(250);
+                entity.Property(f => f.ComuneNascita).HasColumnName("ComuneNascita").HasMaxLength(250);
                 entity.Property(f => f.Sesso).HasColumnName("Sesso").IsRequired().HasMaxLength(1);
                 entity.Property(f => f.NomeEnte).HasColumnName("NomeEnte").IsRequired().HasMaxLength(250);
-                entity.Property(f => f.NumeroComponenti).HasColumnName("NumeroComponenti").IsRequired();
-                entity.Property(f => f.CodiceFamiglia).HasColumnName("CodiceFamiglia").IsRequired();
-                entity.Property(f => f.Parentela).HasColumnName("Parentela").IsRequired().HasMaxLength(128);
+                entity.Property(f => f.NumeroComponenti).HasColumnName("NumeroComponenti");
+                entity.Property(f => f.CodiceFamiglia).HasColumnName("CodiceFamiglia");
+                entity.Property(f => f.Parentela).HasColumnName("Parentela").HasMaxLength(128);
                 entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("CodiceFiscaleIntestatarioScheda").IsRequired().HasMaxLength(16);
             });
 
@@ -56,31 +53,15 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.nome).HasColumnName("nome").IsRequired();
                 entity.Property(f => f.istat).HasColumnName("istat").IsRequired();
                 entity.Property(f => f.partitaIva).HasColumnName("partita_iva").IsRequired();
-                entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").HasMaxLength(16);
                 entity.Property(f => f.Cap).HasColumnName("cap").IsRequired().HasMaxLength(10);
-                entity.Property(f => f.Provincia).HasColumnName("provincia").IsRequired().HasMaxLength(50);
-                entity.Property(f => f.Regione).HasColumnName("regione").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.Provincia).HasColumnName("provincia").HasMaxLength(50);
+                entity.Property(f => f.Regione).HasColumnName("regione").HasMaxLength(50);
+                entity.Property(f => f.Nostro).HasColumnName("nostro").HasMaxLength(50);
             });
 
 
-            // --- INIZIO: NUOVA CONFIGURAZIONE PER FILEUPLOAD ---
-            //    modelBuilder.Entity<FileUpload>(entity =>
-            //     {
-            //         entity.ToTable("fileuploads"); // Mappa la classe FileUpload alla tabella 'fileuploads' nel DB
-
-            //         // Mappatura esplicita delle proprietà alle colonne del DB (snake_case)
-            //         entity.HasKey(f => f.Id); // Specifica che 'Id' è la chiave primaria
-
-            //         entity.Property(f => f.NomeFile).HasColumnName("nome").IsRequired().HasMaxLength(255);
-            //         entity.Property(f => f.PercorsoFile).HasColumnName("percorso").IsRequired().HasMaxLength(512);
-            //         entity.Property(f => f.DataInizio).HasColumnName("data_inizio"); // Nullable per default
-            //         entity.Property(f => f.DataFine).HasColumnName("data_fine");     // Nullable per default
-            //         entity.Property(f => f.DataCaricamento).HasColumnName("data_caricamento").IsRequired(); // Se l'hai reso non nullable nel modello
-            //         entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
-
-            //     });
-
-            modelBuilder.Entity<BonusIdrici2.Models.UtenzaIdrica>(entity =>
+            modelBuilder.Entity<UtenzaIdrica>(entity =>
         {
             entity.ToTable("utenzeidriche"); // Mappa la classe FileUpload alla tabella 'fileuploads' nel DB
 
@@ -102,9 +83,9 @@ namespace BonusIdrici2.Data
             entity.Property(f => f.nome).HasColumnName("nome").IsRequired().HasMaxLength(100);
             entity.Property(f => f.codiceFiscale).HasColumnName("codice_fiscale").IsRequired().HasMaxLength(16);
             entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
-        });
+        }); 
 
-            modelBuilder.Entity<BonusIdrici2.Models.Report>(entity =>
+            modelBuilder.Entity<Report>(entity =>
        {
            entity.ToTable("reports"); // Mappa la classe FileUpload alla tabella 'fileuploads' nel DB
 
@@ -128,7 +109,7 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.presenzaPod).HasColumnName("presenza_pod");
            entity.Property(f => f.dataInizioValidita).HasColumnName("data_inizio_validita").IsRequired();
            entity.Property(f => f.dataFineValidita).HasColumnName("data_fine_validita").IsRequired();
-           entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
+           entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
            entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
        });
 

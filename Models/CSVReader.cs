@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions; // Necessario per la classe Regex
-using Dichiarante;
 using BonusIdrici2.Data;
 //using Atto;
 using leggiCSV;
@@ -19,108 +18,140 @@ public class CSVReader
     private const string PresenzaPodValue = "SI";
     private const string DateFormat = "dd/MM/yyyy";
 
-    // public static DatiCsvCompilati LeggiFileCSV(string percorsoFile)
-    // {
-    //     var datiComplessivi = new DatiCsvCompilati();
+    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile)
+    {
+        var datiComplessivi = new DatiCsvCompilati();
 
-    //     try
-    //     {
-    //         var righe = File.ReadAllLines(percorsoFile).Skip(1);
+        try
+        {
+            var righe = File.ReadAllLines(percorsoFile).Skip(1);
 
-    //         int rigaCorrente = 1;
-    //         foreach (var riga in righe)
-    //         {
-    //             rigaCorrente++;
-    //             if (string.IsNullOrWhiteSpace(riga)) continue;
+            int errori = 0;
+            int rigaCorrente = 1;
+            foreach (var riga in righe)
+            {
+                rigaCorrente++;
+                var error = false;
 
-    //             var campi = riga.Split(CsvDelimiter);
+                // 1. VERIFICO CHE I CAMPI SONO VALIDI
 
-    //             // if (campi.Length < 16)
-    //             // {
-    //             //     Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}");
-    //             //     continue;
-    //             // }
+                // a) verifico se la riga è vuota
+                if (string.IsNullOrWhiteSpace(riga)) continue;
 
-    //             // int idAttoOriginaleCsv; // Nuovo nome per l'ID dal CSV
-    //             // if (!int.TryParse(campi[0], out idAttoOriginaleCsv))
-    //             // {
-    //             //     Console.WriteLine($"Errore: Riga {rigaCorrente}, impossibile convertire 'id' ({campi[0]}) in int. Sarà 0.");
-    //             //     idAttoOriginaleCsv = 0;
-    //             // }
+                var campi = riga.Split(CsvDelimiter);
 
-    //             // long codBonusIdrico;
-    //             // if (!long.TryParse(campi[1], out codBonusIdrico))
-    //             // {
-    //             //     Console.WriteLine($"Errore: Riga {rigaCorrente}, impossibile convertire 'codBonusIdrico' ({campi[1]}) in long. Sarà 0.");
-    //             //     codBonusIdrico = 0;
-    //             // }
+                // b) Verifico che il file contine tutti i vampi minimi per poter procedere
 
-    //             // int annoAtto;
-    //             // if (!int.TryParse(campi[6], out annoAtto))
-    //             // {
-    //             //     Console.WriteLine($"Errore: Riga {rigaCorrente}, impossibile convertire 'anno' ({campi[6]}) in int. Sarà 0.");
-    //             //     annoAtto = 0;
-    //             // }
+                if (campi.Length < 19)
+                {
+                    Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
+                    continue;
+                }
 
-    //             // DateTime dataInizio;
-    //             // if (!DateTime.TryParseExact(campi[7], DateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dataInizio))
-    //             // {
-    //             //     Console.WriteLine($"Errore: Riga {rigaCorrente}, impossibile convertire 'dataInizio' ({campi[7]}) in data (formato atteso: {DateFormat}). Sarà DateTime.MinValue.");
-    //             //     dataInizio = DateTime.MinValue;
-    //             // }
+                // c) Verifico che il campo cognome è valido 
 
-    //             // DateTime dataFine;
-    //             // if (!DateTime.TryParseExact(campi[8], DateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dataFine))
-    //             // {
-    //             //     Console.WriteLine($"Errore: Riga {rigaCorrente}, impossibile convertire 'dataFine' ({campi[8]}) in data (formato atteso: {DateFormat}). Sarà DateTime.MinValue.");
-    //             //     dataFine = DateTime.MinValue;
-    //             // }
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
+                {
+                    Console.WriteLine($"Attenzione: Cognome mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
 
-    //             // bool presenzaPod = GetPresenzaPodCaseInsensitive(campi[14]);
+                // d) Verifico che il campo nome è valido
 
-    //             var dichiarante = new Dichiarante.Dichiarante
-    //             {
-    //                 Cognome = campi[0].Trim(),
-    //                 Nome = campi[1].Trim(),
-    //                 CodiceFiscale = campi[2].Trim(),
-    //                 Sesso = campi[3].Trim(),
-    //                 DataNascita = campi[4].Trim(),
-    //                 ComuneNascita = campi[5].Trim(),
-    //                 IndirizzoResidenza = campi[7].Trim(),
-    //                 NumeroCivico = campi[8].Trim(),
-    //                 Parentela = campi[10].Trim(),
-    //                 // CodiceFamiglia = campi[11].Trim(),
-    //                 // NumeroComponenti = campi[13].Trim(),
-    //                 NomeEnte = campi[16].Trim(),
-    //                 // CodiceFiscaleIntestatarioScheda = campi[19].Trim()
-    //             };
-    //             datiComplessivi.Dichiaranti.Add(dichiarante);
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[1])))
+                {
+                    Console.WriteLine($"Attenzione: Nome mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
 
-    //             //     var atto = new Atto.Atto
-    //             //     {
-    //             //         // NON assegnare id qui, lascialo a 0 per l'auto-generazione del DB.
-    //             //         // id = idAtto, // Rimuovi o commenta questa riga
-    //             //         OriginalCsvId = idAttoOriginaleCsv, // Assegna l'ID del CSV alla nuova proprietà
-    //             //         codBonusIdrico = codBonusIdrico,
-    //             //         Anno = annoAtto,
-    //             //         DataInizio = dataInizio,
-    //             //         DataFine = dataFine,
-    //             //         PRESENZA_POD = presenzaPod
-    //             //     };
-    //             //     datiComplessivi.Atti.Add(atto);
-    //         }
-    //     }
-    //     catch (FileNotFoundException)
-    //     {
-    //         Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
-    //     }
+                // e) Verifico che il Codice Fiscale è valido
 
-    //     return datiComplessivi;
-    // }
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[2])) || rimuoviVirgolette(campi[2]).Length != 16)
+                {
+                    Console.WriteLine($"Attenzione: Codice Fiscale mancante o mal formato, saltata. Riga {rigaCorrente} {rimuoviVirgolette(campi[2]).Length}");
+                    errori++;
+                    error = true;
+                }
+
+                // f) Verifico il campo sesso se è valido
+
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[3])) && (rimuoviVirgolette(campi[3]).ToUpper() != "M") && (rimuoviVirgolette(campi[3]).ToUpper() != "F"))
+                {
+                    Console.WriteLine($"Attenzione: Sesso mancante o mal formato, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // g) Verifico se il campo indirizzo residente è presente
+
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[7])))
+                {
+                    Console.WriteLine($"Attenzione: Indirizzo residenza mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // h) Verifico se il campo numero civico è presente
+
+                if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[8])))
+                {
+                    Console.WriteLine($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // i) Verifico se il campo Nome Ente è presente
+
+                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[16])))
+                {
+                    Console.WriteLine($"Attenzione: Nome Ente mancante, saltata. Riga {rigaCorrente}");
+                    errori++;
+                    error = true;
+                }
+
+                // Controllo se sono presenti Errori
+
+                  if (error)
+                {
+                    continue; // Salta la riga se ci sono errori
+                }
+
+                // Creo una istanza di Dichiarante
+
+                var dichiarante = new BonusIdrici2.Models.Dichiarante
+                {
+                    Cognome = rimuoviVirgolette(campi[0]).ToUpper(),
+                    Nome = rimuoviVirgolette(campi[1]).ToUpper(),
+                    CodiceFiscale = rimuoviVirgolette(campi[2]).ToUpper(),
+                    Sesso = rimuoviVirgolette(campi[3]).ToUpper(),
+                    DataNascita = ConvertiData(campi[4]),
+                    ComuneNascita = rimuoviVirgolette(campi[5]).ToUpper(),
+                    IndirizzoResidenza = rimuoviVirgolette(campi[7]).ToUpper(),
+                    NumeroCivico = FormattaNumeroCivico(campi[8]),
+                    Parentela = rimuoviVirgolette(campi[10]).ToUpper(),
+                    CodiceFamiglia = int.Parse(campi[11].Trim()),
+                    NumeroComponenti = int.Parse(campi[13].Trim()),
+                    NomeEnte = rimuoviVirgolette(campi[16]).ToUpper(),
+                    CodiceFiscaleIntestatarioScheda = rimuoviVirgolette(campi[19])
+                };
+
+                datiComplessivi.Dichiaranti.Add(dichiarante);
+
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
+        }
+
+        return datiComplessivi;
+    }
 
     // public static List<DateTime?> LeggiDateCSV(string percorsoFile)
     // {
@@ -189,7 +220,7 @@ public class CSVReader
     //     return date;
     // }
 
-    public static DatiCsvCompilati LeggiFilePhiranaCSV(string percorsoFile)
+    public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile)
     {
         var datiComplessivi = new DatiCsvCompilati();
 
@@ -224,7 +255,7 @@ public class CSVReader
 
                 // c) Verifico che esiste il campo idAcquedotto è presente
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0].Trim())))
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
                 {
                     Console.WriteLine($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}");
                     errori++;
@@ -293,13 +324,15 @@ public class CSVReader
                     errori++;
                     error = true;
                 }
-
-                // Controllo se sono presenti degli errrori
+                Console.WriteLine("Pre Error Control");
+                // Controllo se sono presenti Errori
 
                 if (error)
                 {
                     continue; // Salta la riga se ci sono errori
                 }
+
+                Console.WriteLine("POST Error control");
 
                 // Creo una istanza di Utenza Idrica
 
@@ -309,22 +342,22 @@ public class CSVReader
                     stato = int.TryParse(rimuoviVirgolette(campi[9]), out int stato) ? stato : 0,
                     periodoIniziale = ConvertiData(rimuoviVirgolette(campi[13])),
                     periodoFinale = ConvertiData(rimuoviVirgolette(campi[14])),
-                    matricolaContatore = rimuoviVirgolette(campi[12]),
-                    indirizzoUbicazione = rimuoviVirgolette(campi[15]),
-                    numeroCivico = FormattaNumeroCivico(campi[16]),
-                    subUbicazione = rimuoviVirgolette(campi[17]),
+                    matricolaContatore = rimuoviVirgolette(campi[12]).ToUpper(),
+                    indirizzoUbicazione = rimuoviVirgolette(campi[15]).ToUpper(),
+                    numeroCivico = FormattaNumeroCivico(campi[16]).ToUpper(),
+                    subUbicazione = rimuoviVirgolette(campi[17]).ToUpper(),
                     scalaUbicazione = rimuoviVirgolette(campi[18]),
                     piano = rimuoviVirgolette(campi[19]),
                     interno = rimuoviVirgolette(campi[20]),
-                    tipoUtenza = rimuoviVirgolette(campi[26]),
-                    cognome = rimuoviVirgolette(campi[32]),
-                    nome = rimuoviVirgolette(campi[33]),
-                    codiceFiscale = rimuoviVirgolette(campi[36]),
+                    tipoUtenza = rimuoviVirgolette(campi[26]).ToUpper(),
+                    cognome = rimuoviVirgolette(campi[32]).ToUpper(),
+                    nome = rimuoviVirgolette(campi[33]).ToUpper(),
+                    codiceFiscale = rimuoviVirgolette(campi[36]).ToUpper(),
                 };
 
                 datiComplessivi.UtenzeIdriche.Add(utenza);
 
-                // CORREZIONE STAMPA: Gestisci correttamente le date nullable
+                // Stampa di debug
                 //Console.WriteLine($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto},  CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)},\n");
             }
         }
@@ -501,25 +534,26 @@ public class CSVReader
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
 
                 string idAto = rimuoviVirgolette(campi[0]);
-                string codiceBonus = rimuoviVirgolette(campi[1]);
-                string codiceFiscale = rimuoviVirgolette(campi[2]);
+                string codiceBonus = rimuoviVirgolette(campi[1]).ToUpper();
+                string codiceFiscale = rimuoviVirgolette(campi[2]).ToUpper();
 
-                string nomeDichiarante = rimuoviVirgolette(campi[3]);
-                string cognomeDichiarante = rimuoviVirgolette(campi[4]);
+                string nomeDichiarante = rimuoviVirgolette(campi[3]).ToUpper();
+                string cognomeDichiarante = rimuoviVirgolette(campi[4]).ToUpper();
                 string[] codiciFiscaliFamigliari = splitCodiceFiscale(campi[5]);
 
                 string annoValidita = rimuoviVirgolette(campi[6]);
                 string dataInizioValidita = rimuoviVirgolette(campi[7]);
                 string dataFineValidita = rimuoviVirgolette(campi[8]);
 
-                string indirizzoAbitazione = rimuoviVirgolette(campi[9]);
-                string numeroCivico = FormattaNumeroCivico(campi[10]);
-                string istatAbitazione = rimuoviVirgolette(campi[11]);
-                string capAbitazione = rimuoviVirgolette(campi[12]);
-                string provinciaAbitazione = rimuoviVirgolette(campi[13]);
+                string indirizzoAbitazione = rimuoviVirgolette(campi[9]).ToUpper();
+                string numeroCivico = FormattaNumeroCivico(campi[10]).ToUpper();
+                string istatAbitazione = rimuoviVirgolette(campi[11]).ToUpper();
+                string capAbitazione = rimuoviVirgolette(campi[12]).ToUpper();
+                string provinciaAbitazione = rimuoviVirgolette(campi[13]).ToUpper();
 
-                string presenzaPod = rimuoviVirgolette(campi[14]);
-                string numeroComponenti = rimuoviVirgolette(campi[15]);
+                string presenzaPod = rimuoviVirgolette(campi[14]).ToUpper();
+                string numeroComponenti = rimuoviVirgolette(campi[15]).ToUpper();
+                DateTime dataCreazione = DateTime.Now;
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
                 string esitoStr = "No";
@@ -615,13 +649,13 @@ public class CSVReader
                 {
                     idAto = idAto,
                     codiceBonus = codiceBonus,
-                    idFornitura= idFornituraIdrica,
+                    idFornitura = idFornituraIdrica,
                     codiceFiscale = codiceFiscale,
                     nomeDichiarante = nomeDichiarante,
                     cognomeDichiarante = cognomeDichiarante,
                     annoValidita = annoValidita,
-                    dataInizioValidita=ConvertiData(dataInizioValidita),
-                    dataFineValidita=ConvertiData(dataFineValidita),
+                    dataInizioValidita = ConvertiData(dataInizioValidita),
+                    dataFineValidita = ConvertiData(dataFineValidita),
                     indirizzoAbitazione = indirizzoAbitazione,
                     numeroCivico = numeroCivico,
                     istat = istatAbitazione,
@@ -632,6 +666,7 @@ public class CSVReader
                     esitoStr = esitoStr,
                     esito = esito,
                     IdEnte = selectedEnteId,
+                    DataCreazione=dataCreazione
                 };
 
                 datiComplessivi.reports.Add(report);
@@ -668,7 +703,7 @@ public class CSVReader
     {
         // 1. Pulizia e normalizzazione iniziale
         // Rimuove virgolette, trimma spazi e converte in maiuscolo
-        string numero_civico = rimuoviVirgolette(stringa).Trim().ToUpperInvariant();
+        string numero_civico = rimuoviVirgolette(stringa).ToUpperInvariant();
 
         // 2. Gestione casi speciali: null/vuoto, "0", "SN"
         if (string.IsNullOrEmpty(numero_civico))
