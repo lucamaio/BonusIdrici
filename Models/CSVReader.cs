@@ -13,6 +13,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using ZstdSharp.Unsafe;
 using Org.BouncyCastle.Bcpg;
 using BonusIdrici2.Models;
+using Mysqlx.Notice;
 
 public class CSVReader
 {
@@ -27,6 +28,7 @@ public class CSVReader
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
             int rigaCorrente = 1;
+            logFile.LogInfo($"Numero di righe da caricare: {righe.Count()}");
 
             foreach (var riga in righe)
             {
@@ -111,7 +113,7 @@ public class CSVReader
                     continue; // Salta la riga se ci sono errori
                 }
 
-                // Creo una istanza di Dichiarante
+                // 2) Creo una istanza di Dichiarante
 
                 var dichiarante = new Dichiarante
                 {
@@ -135,7 +137,7 @@ public class CSVReader
             
             if (errori.Count > 0)
             {
-                 logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
+                logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
                 foreach (var errore in errori)
                 {
                     logFile.LogError(errore);
@@ -163,13 +165,15 @@ public class CSVReader
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"Lettura_phirana.log");
         List<string> errori = new List<string>();
+        List <string> warning = new List<string>();
 
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
 
             int rigaCorrente = 1;
-            logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
+            logFile.LogInfo($"Nuovo caricamento dati phirana per il Comune di ...");
+            logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()} ");
 
             foreach (var riga in righe)
             {
@@ -195,23 +199,49 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
                 {
-                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
                     error = true;
                 }
 
                 // d) Controllo se il campo Codice Fiscale è valido è != null
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])) || rimuoviVirgolette(campi[36]).Length != 16) // CODICE FISCALE O PARTITA IVA
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])))
                 {
-                    errori.Add($"Attenzione : Codice Fiscale mancante o malformato, saltata. Riga {rigaCorrente}");
+                    if (rimuoviVirgolette(campi[34]) != "D")
+                    {
+                        errori.Add($"Attenzione : Codice Fiscale mancante, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
+                    }
+                    else
+                    {
+                        warning.Add($"Attenzione: Codice Fiscale della ditta {rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione).");
+                    }
+                    error = true;
+                }
+                else if (rimuoviVirgolette(campi[36]).Length != 16)
+                {
+                    // Se il codice fiscale non è lungo 16 caratteri e non è un codice di tipo "D" (dichiarazione)
+                    if (rimuoviVirgolette(campi[34]) != "D")
+                    {
+                        errori.Add($"Attenzione : Codice Fiscale mal formato, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
+                    }
+                    else
+                    {
+                        warning.Add($"Attenzione: Codice Fiscale della ditta {rimuoviVirgolette(campi[32])} < 16 caratteri . (Questo non è un errore, ma una segnalazione).");
+                    }
                     error = true;
                 }
 
                 // e) Controllo se la matricola del contatore è presente
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0].Trim())))
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])))
                 {
-                    errori.Add($"Attenzione: Matricola o id Acquedotto mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Matricola mancante, saltata. Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
+                    error = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0])))
+                {
+                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}  | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
                     error = true;
                 }
 
@@ -219,7 +249,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[31])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])))
                 {
-                    errori.Add($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Nome o Cognome mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
@@ -227,7 +257,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[13])))
                 {
-                    errori.Add($"Attenzione: Periodo iniziale mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Periodo iniziale mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
@@ -235,7 +265,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[26])))
                 {
-                    errori.Add($"Attenzione: Tipo Utenza mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Tipo Utenza mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
@@ -243,7 +273,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
                 {
-                    errori.Add($"Attenzione: Indirizzo ubicazione mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Indirizzo ubicazione mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
@@ -251,7 +281,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[16])))
                 {
-                    errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add($"Attenzione: Numero civico mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
@@ -285,22 +315,39 @@ public class CSVReader
 
                 datiComplessivi.UtenzeIdriche.Add(utenza);
 
-                 if(errori.Count > 0)
-                {
-                    logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
-                    foreach (var errore in errori)
-                    {
-                        logFile.LogError(errore);
-                    }
-                }
-                else
-                {
-                    logFile.LogInfo("Elaborazione completata senza errori.");
-                }
-
                 // Stampa di debug
                 // errori.Add($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto}, MatricolaContatore: {utenza.matricolaContatore}, CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)}, TipoUtenza: {utenza.tipoUtenza}, IndirizzoUbicazione: {utenza.indirizzoUbicazione}, NumeroCivico: {utenza.numeroCivico}, Nome: {utenza.nome}, Cognome: {utenza.cognome}");
             }
+            if (errori.Count > 0)
+            {
+                logFile.LogInfo($"Errori riscontrati durante l'elaborazione: {errori.Count} ");
+                foreach (var errore in errori)
+                {
+                    logFile.LogError(errore);
+                }
+            }
+            else
+            {
+                logFile.LogInfo("Elaborazione completata senza errori.");
+            }
+
+
+            // Faccio la stessa cosa per i warning
+
+            if (warning.Count > 0)
+            {
+                logFile.LogInfo($"Warning riscontrati durante l'elaborazione: {warning.Count} ");
+                foreach (var errore in warning)
+                {
+                    logFile.LogWarning(errore);
+                }
+            }
+            else
+            {
+                logFile.LogInfo("Elaborazione completata senza warning.");
+            }
+
+
         }
         catch (FileNotFoundException)
         {
@@ -674,19 +721,13 @@ public class CSVReader
         {
             firstDelimiterIndex = Math.Min(firstDelimiterIndex, indiceDash);
         }
-        // Se vuoi includere lo spazio come delimitatore per la "parte iniziale":
-        // if (indiceSpazio != -1)
-        // {
-        //     firstDelimiterIndex = Math.Min(firstDelimiterIndex, indiceSpazio);
-        // }
-
-
+        
         // Se un delimitatore è stato trovato (firstDelimiterIndex è minore della lunghezza originale)
         if (firstDelimiterIndex < numero_civico.Length)
         {
             // Estrai la sottostringa fino al primo delimitatore
             string parteIniziale = numero_civico.Substring(0, firstDelimiterIndex);
-            
+
             // Applica Regex.Replace solo alla parte iniziale per rimuovere eventuali caratteri non numerici
             // Questo gestirà casi come "10A/B" -> "10A" -> "10"
             return Regex.Replace(parteIniziale, @"[^\d]", "");

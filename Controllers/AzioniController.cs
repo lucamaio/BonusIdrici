@@ -158,11 +158,12 @@ namespace BonusIdrici2.Controllers
             }
 
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
+        
             if (selectedEnte == null)
             {
                 ViewBag.Message = "Ente selezionato non valido.";
                 ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFilePiranha","Azioni");
+                return View("LoadFilePiranha", "Azioni");
             }
 
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
