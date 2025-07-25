@@ -300,7 +300,6 @@ public class CSVReader
 
                 // Stampa di debug
                 // errori.Add($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto}, MatricolaContatore: {utenza.matricolaContatore}, CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)}, TipoUtenza: {utenza.tipoUtenza}, IndirizzoUbicazione: {utenza.indirizzoUbicazione}, NumeroCivico: {utenza.numeroCivico}, Nome: {utenza.nome}, Cognome: {utenza.cognome}");
-                //Console.WriteLine($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto},  CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)},\n");
             }
         }
         catch (FileNotFoundException)
@@ -719,14 +718,12 @@ public class CSVReader
         // Formato comune italiano: "gg/MM/aaaa"
         if (DateTime.TryParseExact(dataStringa, "dd/MM/yyyy", new CultureInfo("it-IT"), DateTimeStyles.None, out DateTime parsedDate))
         {
-           // Console.WriteLine("CASO 1 di conversione!");
             return parsedDate;
         }
 
         // Se hai altri formati possibili nel CSV (es. "aaaa-MM-gg"), aggiungili qui:
         if (DateTime.TryParseExact(dataStringa, "yyyy-MM-dd", new CultureInfo("it-IT"), DateTimeStyles.None, out parsedDate))
         {
-            //Console.WriteLine("CASO 2 di conversione!");
             return parsedDate;
         }
 
