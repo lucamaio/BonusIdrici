@@ -4,7 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions; // Necessario per la classe Regex
+using System.Text.RegularExpressions; 
 using BonusIdrici2.Data;
 using BonusIdrici2.Controllers;
 
@@ -17,19 +17,17 @@ using BonusIdrici2.Models;
 public class CSVReader
 {
     private const char CsvDelimiter = ';';
-    private const string PresenzaPodValue = "SI";
-    private const string DateFormat = "dd/MM/yyyy";
 
     public static DatiCsvCompilati LoadAnagrafe(string percorsoFile)
     {
         var datiComplessivi = new DatiCsvCompilati();
-
+        FileLog logFile = new FileLog($"Elaborazione_Anagrafe.log");
+        List<string> errori = new List<string>();
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
-
-            int errori = 0;
             int rigaCorrente = 1;
+
             foreach (var riga in righe)
             {
                 rigaCorrente++;
@@ -46,7 +44,7 @@ public class CSVReader
 
                 if (campi.Length < 19)
                 {
-                    Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
+                    errori.Add($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
                     continue;
                 }
 
@@ -54,8 +52,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
                 {
-                    Console.WriteLine($"Attenzione: Cognome mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Cognome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -63,8 +60,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[1])))
                 {
-                    Console.WriteLine($"Attenzione: Nome mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Nome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -72,8 +68,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[2])) || rimuoviVirgolette(campi[2]).Length != 16)
                 {
-                    Console.WriteLine($"Attenzione: Codice Fiscale mancante o mal formato, saltata. Riga {rigaCorrente} {rimuoviVirgolette(campi[2]).Length}");
-                    errori++;
+                    errori.Add($"Attenzione: Codice Fiscale mancante o mal formato, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -81,8 +76,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[3])) && (rimuoviVirgolette(campi[3]).ToUpper() != "M") && (rimuoviVirgolette(campi[3]).ToUpper() != "F"))
                 {
-                    Console.WriteLine($"Attenzione: Sesso mancante o mal formato, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Sesso mancante o mal formato, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -90,8 +84,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[7])))
                 {
-                    Console.WriteLine($"Attenzione: Indirizzo residenza mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Indirizzo residenza mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -99,30 +92,28 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[8])))
                 {
-                    Console.WriteLine($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // i) Verifico se il campo Nome Ente è presente
 
-                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[16])))
+                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[16])))
                 {
-                    Console.WriteLine($"Attenzione: Nome Ente mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Nome Ente mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Controllo se sono presenti Errori
 
-                  if (error)
+                if (error)
                 {
                     continue; // Salta la riga se ci sono errori
                 }
 
                 // Creo una istanza di Dichiarante
 
-                var dichiarante = new BonusIdrici2.Models.Dichiarante
+                var dichiarante = new Dichiarante
                 {
                     Cognome = rimuoviVirgolette(campi[0]).ToUpper(),
                     Nome = rimuoviVirgolette(campi[1]).ToUpper(),
@@ -140,100 +131,45 @@ public class CSVReader
                 };
 
                 datiComplessivi.Dichiaranti.Add(dichiarante);
-
+            }
+            
+            if (errori.Count > 0)
+            {
+                 logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
+                foreach (var errore in errori)
+                {
+                    logFile.LogError(errore);
+                }
+            }
+            else
+            {
+                logFile.LogInfo("Elaborazione completata senza errori.");
             }
         }
         catch (FileNotFoundException)
         {
-            Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
+            logFile.LogError($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
+            logFile.LogError($"Errore generico durante la lettura del file CSV: {ex.Message}");
         }
 
         return datiComplessivi;
     }
 
-    // public static List<DateTime?> LeggiDateCSV(string percorsoFile)
-    // {
-    //     DateTime? dataInizio = null;
-    //     DateTime? dataFine = null;
-    //     List<DateTime?> date = new List<DateTime?>();
-
-    //     try
-    //     {
-    //         var righe = File.ReadAllLines(percorsoFile);
-
-    //         if (righe.Length <= 1)
-    //         {
-    //             Console.WriteLine("Il file CSV è vuoto o contiene solo l'intestazione.");
-    //             return date;
-    //         }
-
-    //         string primaRigaDati = righe[1];
-
-    //         if (string.IsNullOrWhiteSpace(primaRigaDati))
-    //         {
-    //             Console.WriteLine("La prima riga di dati nel file CSV è vuota.");
-    //             return date;
-    //         }
-
-    //         var campi = primaRigaDati.Split(CsvDelimiter);
-
-    //         if (campi.Length <= 8)
-    //         {
-    //             Console.WriteLine($"Errore: La prima riga di dati non contiene abbastanza campi per le date di validità (campi 7 e 8). Trovati {campi.Length}, attesi almeno 9.");
-    //             return date;
-    //         }
-
-    //         if (DateTime.TryParseExact(campi[7].Trim(), DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDataInizio))
-    //         {
-    //             dataInizio = parsedDataInizio;
-    //         }
-    //         else
-    //         {
-    //             Console.WriteLine($"Avviso: Impossibile convertire '{campi[7].Trim()}' in DataInizio nel formato '{DateFormat}'. Impostato a NULL.");
-    //         }
-
-    //         if (DateTime.TryParseExact(campi[8].Trim(), DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDataFine))
-    //         {
-    //             dataFine = parsedDataFine;
-    //         }
-    //         else
-    //         {
-    //             Console.WriteLine($"Avviso: Impossibile convertire '{campi[8].Trim()}' in DataFine nel formato '{DateFormat}'. Impostato a NULL.");
-    //         }
-
-    //         date.Add(dataInizio);
-    //         date.Add(dataFine);
-
-    //         return date;
-    //     }
-    //     catch (FileNotFoundException)
-    //     {
-    //         Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
-    //     }
-
-    //     return date;
-    // }
-
     public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile)
     {
         var datiComplessivi = new DatiCsvCompilati();
+        FileLog logFile = new FileLog($"Lettura_phirana.log");
+        List<string> errori = new List<string>();
 
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
 
             int rigaCorrente = 1;
-            int errori = 0;
-            Console.WriteLine($"Inizio lettura del file CSV: {percorsoFile}");
-            Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
+            logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
 
             foreach (var riga in righe)
             {
@@ -251,7 +187,7 @@ public class CSVReader
 
                 if (campi.Length < 39)
                 {
-                    Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
+                    errori.Add($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
                     continue;
                 }
 
@@ -259,8 +195,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
                 {
-                    Console.WriteLine($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -268,8 +203,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])) || rimuoviVirgolette(campi[36]).Length != 16) // CODICE FISCALE O PARTITA IVA
                 {
-                    Console.WriteLine($"Attenzione: Codice Fiscale mancante o malformato, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione : Codice Fiscale mancante o malformato, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -277,8 +211,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0].Trim())))
                 {
-                    Console.WriteLine($"Attenzione: Matricola o id Acquedotto mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Matricola o id Acquedotto mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -286,8 +219,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[31])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])))
                 {
-                    Console.WriteLine($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -295,26 +227,23 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[13])))
                 {
-                    Console.WriteLine($"Attenzione: Periodo iniziale mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Periodo iniziale mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // h) Verifico se il campo tipo utenza è presente
 
-                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[26])))
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[26])))
                 {
-                    Console.WriteLine($"Attenzione: Tipo Utenza mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Tipo Utenza mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
-                
+
                 // i) Verifico se il campo indirizzo Ubicazione è presente
 
-                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
                 {
-                    Console.WriteLine($"Attenzione: Indirizzo ubicazione mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Indirizzo ubicazione mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -322,11 +251,10 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[16])))
                 {
-                    Console.WriteLine($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
-                Console.WriteLine("Pre Error Control");
+
                 // Controllo se sono presenti Errori
 
                 if (error)
@@ -334,11 +262,9 @@ public class CSVReader
                     continue; // Salta la riga se ci sono errori
                 }
 
-                Console.WriteLine("POST Error control");
-
                 // Creo una istanza di Utenza Idrica
 
-                var utenza = new BonusIdrici2.Models.UtenzaIdrica
+                var utenza = new UtenzaIdrica
                 {
                     idAcquedotto = rimuoviVirgolette(campi[0]),
                     stato = int.TryParse(rimuoviVirgolette(campi[9]), out int stato) ? stato : 0,
@@ -359,17 +285,31 @@ public class CSVReader
 
                 datiComplessivi.UtenzeIdriche.Add(utenza);
 
+                 if(errori.Count > 0)
+                {
+                    logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
+                    foreach (var errore in errori)
+                    {
+                        logFile.LogError(errore);
+                    }
+                }
+                else
+                {
+                    logFile.LogInfo("Elaborazione completata senza errori.");
+                }
+
                 // Stampa di debug
+                // errori.Add($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto}, MatricolaContatore: {utenza.matricolaContatore}, CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)}, TipoUtenza: {utenza.tipoUtenza}, IndirizzoUbicazione: {utenza.indirizzoUbicazione}, NumeroCivico: {utenza.numeroCivico}, Nome: {utenza.nome}, Cognome: {utenza.cognome}");
                 //Console.WriteLine($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto},  CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)},\n");
             }
         }
         catch (FileNotFoundException)
         {
-            Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
+            logFile.LogError($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
+            logFile.LogError($"Errore generico durante la lettura del file CSV: {ex.Message}");
         }
 
         return datiComplessivi;
@@ -379,18 +319,15 @@ public class CSVReader
     public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, BonusIdrici2.Data.ApplicationDbContext context, int selectedEnteId)
     {
         var datiComplessivi = new DatiCsvCompilati();
-
+        FileLog logFile = new FileLog($"Elaborazione_INPS.log");
+        List<string> errori = new List<string>();
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
-            FileLog logFile = new FileLog("Elaborazione_INPS");
 
             int rigaCorrente = 1;
-            int errori = 0;
-            // Console.WriteLine($"Numero di righe da elaborare: {righe.Count()}");
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
             var dichiaranti = context.Dichiaranti.ToList();
-            //Console.WriteLine($"Dichiaranti presenti: {dichiaranti.Count}");
 
             foreach (var riga in righe)
             {
@@ -407,16 +344,14 @@ public class CSVReader
                 // Verifico se la riga ha almeno 15 campi
                 if (campi.Length < 15)
                 {
-                    Console.WriteLine($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 15.");
-                    errori++;
+                    errori.Add($"Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 15.");
                     error = true;
                 }
 
                 // Verifico se il campo idAto è presente e nonn vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0])))
                 {
-                    Console.WriteLine($"Attenzione: ID_ATO mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"ID_ATO mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -424,8 +359,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[1])) || rimuoviVirgolette(campi[1]).Length != 15)
                 {
-                    Console.WriteLine($"Attenzione: Codice Bonus mancante o non valido, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Codice Bonus mancante o non valido, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -433,16 +367,14 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[2])))
                 {
-                    Console.WriteLine($"Attenzione: Codice Fiscale mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Codice Fiscale mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo NOME_DICHIARANTE e COGNOME_DICHIARANTE sono presenti e non vuoti
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[3])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[4])))
                 {
-                    Console.WriteLine($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -450,40 +382,35 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[6])))
                 {
-                    Console.WriteLine($"Attenzione: Anno di validità mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Anno di validità mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // verifico se il campo Data_inizio_validità è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[7])))
                 {
-                    Console.WriteLine($"Attenzione: Data di inizio validità mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Data di inizio validità mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo Data_fine_validità è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[8])))
                 {
-                    Console.WriteLine($"Attenzione: Data di fine validità mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Data di fine validità mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo indirizzo_abitazione è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[9])))
                 {
-                    Console.WriteLine($"Attenzione: Indirizzo abitazione mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Indirizzo abitazione mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo numero_civico è presente e non vuotO
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[10])))
                 {
-                    Console.WriteLine($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -492,23 +419,21 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(istat) || istat.Length != 6)
                 {
-                    Console.WriteLine($"Attenzione: ISTAT mancante o malformata, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: ISTAT mancante o malformata, saltata. Riga {rigaCorrente}");
+                    error = true;
                 }
 
                 // VERIFICO Se il campo cap è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) || rimuoviVirgolette(campi[12]).Length != 5)
                 {
-                    Console.WriteLine($"Attenzione: CAP mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: CAP mancante o malformato, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // vrifico se il campo provincia_abitazione è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[13])) || rimuoviVirgolette(campi[13]).Length != 2)
                 {
-                    Console.WriteLine($"Attenzione: Provincia abitazione mancante o malformata, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Provincia abitazione mancante o malformata, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
@@ -517,25 +442,20 @@ public class CSVReader
                     (!rimuoviVirgolette(campi[14]).Equals("SI", StringComparison.OrdinalIgnoreCase) &&
                      !rimuoviVirgolette(campi[14]).Equals("NO", StringComparison.OrdinalIgnoreCase)))
                 {
-                    Console.WriteLine($"Attenzione: Presenza POD mancante o non valida, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Presenza POD mancante o non valida, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // verifdico se il campo n_componenti è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
                 {
-                    Console.WriteLine($"Attenzione: Numero componenti mancante, saltata. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Numero componenti mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 if (error)
                 {
-                    logFile.LogError($"Errori riscontrati riga {rigaCorrente} : {errori}");
                     continue; // Salta la riga se ci sono errori
-                }else{
-                    logFile.LogInfo($"Nessun errore riscontrato nei campi della riga {rigaCorrente}");
                 }
 
 
@@ -574,8 +494,7 @@ public class CSVReader
 
                 if (enti.Count == 0)
                 {
-                    Console.WriteLine($"Attenzione: Nessun ente trovato con l'ID selezionato {selectedEnteId}. Riga {rigaCorrente}");
-                    errori++;
+                    errori.Add($"Attenzione: Nessun ente trovato con l'ID selezionato {selectedEnteId}. Riga {rigaCorrente}");
                     continue; // Salta la riga se non c'è l'ente
                 }
 
@@ -653,7 +572,7 @@ public class CSVReader
                 }
 
                 // 4) Creo un nuovo report con i dati raccolti
-                var report = new BonusIdrici2.Models.Report
+                var report = new Report
                 {
                     idAto = idAto,
                     codiceBonus = codiceBonus,
@@ -674,22 +593,34 @@ public class CSVReader
                     esitoStr = esitoStr,
                     esito = esito,
                     IdEnte = selectedEnteId,
-                    DataCreazione=dataCreazione
+                    DataCreazione = dataCreazione
                 };
 
                 datiComplessivi.reports.Add(report);
-                logFile.LogInfo($"Report creato riga {rigaCorrente}");
 
-                Console.WriteLine($"Riga {rigaCorrente}: Report creato: idAto: {report.idAto}, CodiceBonus: {report.codiceBonus}, CodiceFiscale: {report.codiceFiscale}, NomeDichiarante: {report.nomeDichiarante}, CognomeDichiarante: {report.cognomeDichiarante}, Esito: {report.esitoStr}, Esito numerico: {report.esito}, DataInizioValidita: {report.dataInizioValidita}, DataFineValidita: {report.dataFineValidita}");
+                // salvo il report nel contesto del database
+                //logFile.LogInfo($"Riga {rigaCorrente}: Report creato: idAto: {report.idAto}, CodiceBonus: {report.codiceBonus}, CodiceFiscale: {report.codiceFiscale}, NomeDichiarante: {report.nomeDichiarante}, CognomeDichiarante: {report.cognomeDichiarante}, Esito: {report.esitoStr}, Esito numerico: {report.esito}, DataInizioValidita: {report.dataInizioValidita}, DataFineValidita: {report.dataFineValidita}");
+            }
+            if(errori.Count > 0)
+            {
+                logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
+                foreach (var errore in errori)
+                {
+                    logFile.LogError(errore);
+                }
+            }
+            else
+            {
+                logFile.LogInfo("Elaborazione completata senza errori.");
             }
         }
         catch (FileNotFoundException)
         {
-            Console.WriteLine($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
+            logFile.LogError($"Errore: Il file CSV non è stato trovato al percorso specificato: {percorsoFile}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Errore generico durante la lettura del file CSV: {ex.Message}");
+            logFile.LogError($"Errore generico durante la lettura del file CSV: {ex.Message}");
         }
 
         return datiComplessivi;
