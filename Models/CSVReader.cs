@@ -164,7 +164,7 @@ public class CSVReader
     public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile, int selectedEnteId, List<UtenzaIdrica> utenzeIdriche)
     {
         var datiComplessivi = new DatiCsvCompilati();
-        FileLog logFile = new FileLog($"Lettura_phirana.log");
+        FileLog logFile = new FileLog($"wwwroot/log/Lettura_phirana.log");
         List<string> errori = new List<string>();
         List<string> warning = new List<string>();
 
@@ -416,12 +416,10 @@ public class CSVReader
                 if (!esiste)
                 {
                     // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
-                    //logFile.LogInfo($"Nuova utenza idrica aggiunta: {utenza.toString()}");
                     datiComplessivi.UtenzeIdriche.Add(utenza);
                 }
                 else if (aggiornare)
                 {
-                    //logFile.LogInfo($"Utenza Esistente da aggiornare: {utenza.toString()}");
                     datiComplessivi.UtenzeIdricheEsistente.Add(utenza);
                 }
             }
