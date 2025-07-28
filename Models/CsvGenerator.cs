@@ -65,11 +65,7 @@ public static class CsvGenerator
         return Encoding.UTF8.GetBytes(csvContent.ToString());
     }
 
-    /// <summary>
-    /// Genera il contenuto CSV per il report "Esito Competenza Territoriale".
-    /// </summary>
-    /// <param name="dati">Lista di oggetti Report contenente i dati della competenza territoriale.</param>
-    /// <returns>Array di byte del contenuto CSV.</returns>
+   
     public static byte[] GeneraCsvCompetenzaTerritoriale(List<Report> dati) // Nota: nome corretto "Territoriale"
     {
         StringBuilder csvContent = new StringBuilder();

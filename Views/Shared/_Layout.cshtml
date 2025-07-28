@@ -3,10 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BonusIdrici2</title>
+    <title>@ViewData["Title"] - BonusIdrici</title>
     
-    @* {{-- Removed duplicate <script type="importmap"></script> as it's not typically needed here --}}
-    {{-- The following lines are for your core Bootstrap and site-specific CSS --}} *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BonusIdrici2.styles.css" asp-append-version="true" />
@@ -17,8 +15,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    @* {{-- THIS IS THE ESSENTIAL ADDITION FOR THE "Styles" SECTION --}}
-    {{-- It allows individual views to inject CSS into the head --}} *@
+    @* {{-- THIS IS THE ESSENTIAL ADDITION FOR THE "Styles" SECTION --}} *@
     @RenderSection("Styles", required: false) 
 
 </head>
@@ -26,7 +23,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BonusIdrici2</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BonusIdrici</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -55,7 +52,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - BonusIdrici2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - BonusIdrici - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     

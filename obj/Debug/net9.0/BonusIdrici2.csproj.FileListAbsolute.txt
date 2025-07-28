@@ -463,7 +463,6 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\l2vcab1vy
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\fw7j6kdczd-muycvpuwrr.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\4kr8r9rnay-87fc7y1x7t.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\d7bn7f0j62-mlv21k5csn.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\0fp1722d74-gu9v83yadh.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\staticwebassets.development.json

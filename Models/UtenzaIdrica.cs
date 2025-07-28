@@ -15,12 +15,12 @@ namespace BonusIdrici2.Models
         [Required]
         public int? stato { get; set; }
 
-        // [Required]
+        [Required]
         public DateTime? periodoIniziale { get; set; }
 
         public DateTime? periodoFinale { get; set; }
 
-        // [Required]
+        [Required]
         public required string? matricolaContatore { get; set; }
 
         [Required]
@@ -36,7 +36,7 @@ namespace BonusIdrici2.Models
         public string? piano { get; set; }
 
         public string? interno { get; set; }
-        
+
         [Required]
         public required string tipoUtenza { get; set; } // Esempio: "Domestica", "Non Domestica"
 
@@ -46,10 +46,21 @@ namespace BonusIdrici2.Models
         [Required]
         public required string? nome { get; set; }
 
+        public string? sesso { get; set; }
+
         [Required]
         public required string? codiceFiscale { get; set; }
 
-        // [Required]
+        [Required]
         public int IdEnte { get; set; } 
+        
+       public string? toString()
+        {
+            return $"UtenzaIdrica: Acquedotto: {idAcquedotto}, Stato: {stato}, " +
+                $"Periodo Iniziale: {(periodoIniziale.HasValue ? periodoIniziale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " +
+                $"Periodo Finale: {(periodoFinale.HasValue ? periodoFinale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " + // <-- Gestione del null
+                $"Matricola Contatore: {matricolaContatore}, Indirizzo: {indirizzoUbicazione}, " +
+                $"Numero Civico: {numeroCivico}, Tipo Utenza: {tipoUtenza}, Cognome: {cognome}, Nome: {nome}, Codice Fiscale: {codiceFiscale}";
+        }
     }
 }

@@ -15,9 +15,6 @@ namespace BonusIdrici2.Models
         [Required]
         public required string codiceBonus { get; set; }
 
-        // [Required]
-        // public required string IdRichiesta { get; set; }
-
         public required string esitoStr { get; set; }  // esito "Si" o "No"
 
         public required string esito { get; set; }  // (1<valore>5) 

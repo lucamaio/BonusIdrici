@@ -10,6 +10,8 @@ namespace leggiCSV
     {
         public List<Dichiarante> Dichiaranti { get; set; }
         public List<UtenzaIdrica> UtenzeIdriche { get; set; }
+
+        public List<UtenzaIdrica> UtenzeIdricheEsistente { get; set; }
         public List<Atto.Atto> Atti { get; set; }
 
         public List<Report> reports { get; set; }
@@ -18,6 +20,7 @@ namespace leggiCSV
         {
             Dichiaranti = new List<Dichiarante>();
             UtenzeIdriche = new List<UtenzaIdrica>();
+            UtenzeIdricheEsistente = new List<UtenzaIdrica>();
             Atti = new List<Atto.Atto>();
             reports = new List<Report>();
         }

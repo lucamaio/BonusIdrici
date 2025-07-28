@@ -4,7 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions; 
+using System.Text.RegularExpressions;
 using BonusIdrici2.Data;
 using BonusIdrici2.Controllers;
 
@@ -28,6 +28,7 @@ public class CSVReader
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
             int rigaCorrente = 1;
+            logFile.LogInfo($"Nuovo caricamento dati Anagrafe per il Comune di ...");
             logFile.LogInfo($"Numero di righe da caricare: {righe.Count()}");
 
             foreach (var riga in righe)
@@ -134,7 +135,7 @@ public class CSVReader
 
                 datiComplessivi.Dichiaranti.Add(dichiarante);
             }
-            
+
             if (errori.Count > 0)
             {
                 logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
@@ -160,19 +161,19 @@ public class CSVReader
         return datiComplessivi;
     }
 
-    public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile)
+    public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile, int selectedEnteId, List<UtenzaIdrica> utenzeIdriche)
     {
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"Lettura_phirana.log");
         List<string> errori = new List<string>();
-        List <string> warning = new List<string>();
+        List<string> warning = new List<string>();
 
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
 
             int rigaCorrente = 1;
-            logFile.LogInfo($"Nuovo caricamento dati phirana per il Comune di ...");
+            logFile.LogInfo($"Nuovo caricamento dati phirana id Ente: {selectedEnteId}");
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()} ");
 
             foreach (var riga in righe)
@@ -195,6 +196,7 @@ public class CSVReader
                     continue;
                 }
 
+
                 // c) Verifico che esiste il campo idAcquedotto è presente
 
                 if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
@@ -210,10 +212,12 @@ public class CSVReader
                     if (rimuoviVirgolette(campi[34]) != "D")
                     {
                         errori.Add($"Attenzione : Codice Fiscale mancante, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
+                        error = true;
                     }
-                    else
+                    // Se il codice fiscale è vuoto e il tipo di utenza non è "D" (dichiarazione) e la partita IVA è vuota
+                    else if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) && rimuoviVirgolette(campi[9]) != "4" && rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) && rimuoviVirgolette(campi[34]) == "D")
                     {
-                        warning.Add($"Attenzione: Codice Fiscale della ditta {rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione).");
+                        warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
                     }
                     error = true;
                 }
@@ -223,19 +227,26 @@ public class CSVReader
                     if (rimuoviVirgolette(campi[34]) != "D")
                     {
                         errori.Add($"Attenzione : Codice Fiscale mal formato, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
+                        error = true;
                     }
                     else
                     {
-                        warning.Add($"Attenzione: Codice Fiscale della ditta {rimuoviVirgolette(campi[32])} < 16 caratteri . (Questo non è un errore, ma una segnalazione).");
+                        // Verifico se l'utenza è attiva e se il campo partita IVA è vuoto
+                        if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) && rimuoviVirgolette(campi[9]) != "4" && rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) && rimuoviVirgolette(campi[34]) == "D")
+                        {
+                            warning.Add($"Atteznzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non trovati. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
+                            error = true;
+                        }
                     }
-                    error = true;
+
                 }
 
                 // e) Controllo se la matricola del contatore è presente
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])))
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) && rimuoviVirgolette(campi[9]) != "4" && rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(rimuoviVirgolette(campi[14])))
                 {
-                    errori.Add($"Attenzione: Matricola mancante, saltata. Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
+
+                    errori.Add($"Attenzione: Matricola Contatore mancante, saltata. Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
                     error = true;
                 }
 
@@ -245,11 +256,18 @@ public class CSVReader
                     error = true;
                 }
 
-                // f) Controllo se i campi nomi e cognome sono presenti
+                // f) Controllo se i campi nomi, cognome e sesso sono presenti
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[31])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])))
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])) && string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[33])) && rimuoviVirgolette(campi[34]).ToUpper() != "D")
                 {
                     errori.Add($"Attenzione: Nome o Cognome mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    error = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[34])) ||
+                    (rimuoviVirgolette(campi[34]).ToUpper() != "M" && rimuoviVirgolette(campi[34]).ToUpper() != "F" && rimuoviVirgolette(campi[34]).ToUpper() != "D"))
+                {
+                    errori.Add($"Attenzione: Sesso mancante o mal formato, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
@@ -277,7 +295,7 @@ public class CSVReader
                     error = true;
                 }
 
-                // Verifico se il campo numero civico è presente
+                // j) Verifico se il campo numero civico è presente
 
                 if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[16])))
                 {
@@ -292,8 +310,7 @@ public class CSVReader
                     continue; // Salta la riga se ci sono errori
                 }
 
-                // Creo una istanza di Utenza Idrica
-
+                // 2) Verifico se l'utenza idrica è già presente
                 var utenza = new UtenzaIdrica
                 {
                     idAcquedotto = rimuoviVirgolette(campi[0]),
@@ -310,14 +327,105 @@ public class CSVReader
                     tipoUtenza = rimuoviVirgolette(campi[26]).ToUpper(),
                     cognome = rimuoviVirgolette(campi[32]).ToUpper(),
                     nome = rimuoviVirgolette(campi[33]).ToUpper(),
+                    sesso = rimuoviVirgolette(campi[34]).ToUpper(),
                     codiceFiscale = rimuoviVirgolette(campi[36]).ToUpper(),
+                    IdEnte = selectedEnteId,
                 };
 
-                datiComplessivi.UtenzeIdriche.Add(utenza);
+                var esiste = false;
+                var aggiornare = false;
 
-                // Stampa di debug
-                // errori.Add($"Riga {rigaCorrente}: UtenzaIdrica: idAcquedotto: {utenza.idAcquedotto}, MatricolaContatore: {utenza.matricolaContatore}, CodiceFiscale: {utenza.codiceFiscale},\n PeriodoIniziale: {(utenza.periodoIniziale)}, PeriodoFinale: {(utenza.periodoFinale)}, TipoUtenza: {utenza.tipoUtenza}, IndirizzoUbicazione: {utenza.indirizzoUbicazione}, NumeroCivico: {utenza.numeroCivico}, Nome: {utenza.nome}, Cognome: {utenza.cognome}");
+                if (utenzeIdriche != null && utenza != null)
+                {
+                    // 2.a) Verifico se l'utenza idrica è già presente
+                    var utenzaEsistente = utenzeIdriche.Find(u => u.idAcquedotto == utenza.idAcquedotto && u.codiceFiscale == utenza.codiceFiscale);
+
+                    Console.WriteLine($"Verifico se l'utenza idrica esiste: {utenza.idAcquedotto} - {utenza.codiceFiscale}");
+                    if (utenzaEsistente != null)
+                    {
+                        Console.WriteLine($"Utenza idrica esistente trovata:{utenzaEsistente.ToString()}");
+                        esiste = true;
+                        // Utenza già presente, controllo se devo aggiornare i campi
+                        // 2.b) Verifico lo stato dell'utenza
+                        if (utenza.stato != utenzaEsistente.stato)
+                        {
+                            utenza.stato = utenzaEsistente.stato;
+                            aggiornare = true;
+                        }
+
+                        //2.c) Verifico se il periodo Finale è diverso
+                        // if (utenza.periodoFinale != utenzaEsistente.periodoFinale)
+                        // {
+                        //     utenza.periodoFinale = utenzaEsistente.periodoFinale; 
+                        //     aggiornare = true;
+                        // }
+
+                        // 2.d) Verifico se la matricola del contatore è diversa
+                        if (utenza.matricolaContatore != utenzaEsistente.matricolaContatore)
+                        {
+                            utenza.matricolaContatore = utenzaEsistente.matricolaContatore;
+                            aggiornare = true;
+                        }
+
+                        // 2.e) Verifico se l'indirizzo ubicazione è diverso
+                        if (utenza.indirizzoUbicazione != utenzaEsistente.indirizzoUbicazione)
+                        {
+                            utenza.indirizzoUbicazione = utenzaEsistente.indirizzoUbicazione;
+                            aggiornare = true;
+                        }
+
+                        if (utenza.numeroCivico != utenzaEsistente.numeroCivico)
+                        {
+                            utenza.numeroCivico = utenzaEsistente.numeroCivico;
+                            aggiornare = true;
+                        }
+
+                        if (!string.IsNullOrEmpty(utenza.subUbicazione) && utenza.subUbicazione != utenzaEsistente.subUbicazione)
+                        {
+                            utenza.subUbicazione = utenzaEsistente.subUbicazione;
+                            aggiornare = true;
+                        }
+
+                        if (!string.IsNullOrEmpty(utenza.scalaUbicazione) && utenza.scalaUbicazione != utenzaEsistente.scalaUbicazione)
+                        {
+                            utenza.scalaUbicazione = utenzaEsistente.scalaUbicazione;
+                            aggiornare = true;
+                        }
+
+                        if (!string.IsNullOrEmpty(utenza.piano) && utenza.piano != utenzaEsistente.piano)
+                        {
+                            utenza.piano = utenzaEsistente.piano;
+                            aggiornare = true;
+                        }
+
+                        if (!string.IsNullOrEmpty(utenza.interno) && utenza.interno != utenzaEsistente.interno)
+                        {
+                            utenza.interno = utenzaEsistente.interno;
+                            aggiornare = true;
+                        }
+
+                        // 2.f) Verifico se il tipo utenza è diverso
+                        if (utenza.tipoUtenza != utenzaEsistente.tipoUtenza)
+                        {
+                            utenza.tipoUtenza = utenzaEsistente.tipoUtenza;
+                            aggiornare = true;
+                        }
+                    }
+                }
+
+                if (!esiste)
+                {
+                    // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
+                    //logFile.LogInfo($"Nuova utenza idrica aggiunta: {utenza.toString()}");
+                    datiComplessivi.UtenzeIdriche.Add(utenza);
+                }
+                else if (aggiornare)
+                {
+                    //logFile.LogInfo($"Utenza Esistente da aggiornare: {utenza.toString()}");
+                    datiComplessivi.UtenzeIdricheEsistente.Add(utenza);
+                }
             }
+
             if (errori.Count > 0)
             {
                 logFile.LogInfo($"Errori riscontrati durante l'elaborazione: {errori.Count} ");
@@ -331,15 +439,13 @@ public class CSVReader
                 logFile.LogInfo("Elaborazione completata senza errori.");
             }
 
-
             // Faccio la stessa cosa per i warning
-
             if (warning.Count > 0)
             {
                 logFile.LogInfo($"Warning riscontrati durante l'elaborazione: {warning.Count} ");
-                foreach (var errore in warning)
+                foreach (var w in warning) // Cambiato nome variabile per evitare conflitto
                 {
-                    logFile.LogWarning(errore);
+                    logFile.LogWarning(w);
                 }
             }
             else
@@ -347,7 +453,23 @@ public class CSVReader
                 logFile.LogInfo("Elaborazione completata senza warning.");
             }
 
-
+            if (datiComplessivi.UtenzeIdriche.Count > 0)
+            {
+                logFile.LogInfo($"Numero di utenze idriche aggiunte: {datiComplessivi.UtenzeIdriche.Count}");
+            }
+            else
+            {
+                logFile.LogInfo("Nessuna utenza nuova idrica trovata.");
+            }
+            
+            if (datiComplessivi.UtenzeIdricheEsistente.Count > 0)
+            {
+                logFile.LogInfo($"Numero di utenze idriche esistenti aggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}");
+            }
+            else
+            {
+                logFile.LogInfo("Nessuna utenza idrica esistente trovata da aggiornare.");
+            }
         }
         catch (FileNotFoundException)
         {
@@ -647,7 +769,7 @@ public class CSVReader
                 // salvo il report nel contesto del database
                 //logFile.LogInfo($"Riga {rigaCorrente}: Report creato: idAto: {report.idAto}, CodiceBonus: {report.codiceBonus}, CodiceFiscale: {report.codiceFiscale}, NomeDichiarante: {report.nomeDichiarante}, CognomeDichiarante: {report.cognomeDichiarante}, Esito: {report.esitoStr}, Esito numerico: {report.esito}, DataInizioValidita: {report.dataInizioValidita}, DataFineValidita: {report.dataFineValidita}");
             }
-            if(errori.Count > 0)
+            if (errori.Count > 0)
             {
                 logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
                 foreach (var errore in errori)
@@ -708,10 +830,10 @@ public class CSVReader
 
         int indiceSeparatore = numero_civico.IndexOf('/');
         int indiceDash = numero_civico.IndexOf('-');
-        
+
         // Inizializza firstDelimiterIndex a un valore che indica che nessun delimitatore è stato trovato
         // (es. lunghezza della stringa, così Substring non fallirà se non ci sono delimitatori)
-        int firstDelimiterIndex = numero_civico.Length; 
+        int firstDelimiterIndex = numero_civico.Length;
 
         if (indiceSeparatore != -1)
         {
@@ -721,7 +843,7 @@ public class CSVReader
         {
             firstDelimiterIndex = Math.Min(firstDelimiterIndex, indiceDash);
         }
-        
+
         // Se un delimitatore è stato trovato (firstDelimiterIndex è minore della lunghezza originale)
         if (firstDelimiterIndex < numero_civico.Length)
         {
@@ -747,7 +869,7 @@ public class CSVReader
         string formatedCodiceFiscale = codiceFiscale.Trim().Replace("\"", "");
         return formatedCodiceFiscale.Split(',');
     }
-    
+
 
     public static DateTime? ConvertiData(string dataStringa)
     {
@@ -772,7 +894,7 @@ public class CSVReader
         Console.WriteLine($"Attenzione: Impossibile convertire la data '{dataStringa}' nel formato atteso. Verrà salvato un valore nullo.");
         return null;
     }
-    
+
 
     private static (string esito, int? idFornitura) verificaEsisistenzaFornitura(string codiceFiscale, int selectedEnteId, BonusIdrici2.Data.ApplicationDbContext context, string IndirizzoResidenza, string NumeroCivico)
     {

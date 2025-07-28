@@ -63,7 +63,7 @@ namespace BonusIdrici2.Data
 
             modelBuilder.Entity<UtenzaIdrica>(entity =>
         {
-            entity.ToTable("utenzeidriche"); // Mappa la classe FileUpload alla tabella 'fileuploads' nel DB
+            entity.ToTable("utenzeidriche"); // Mappa la classe uTENZE Idrica alla tabella 'utenzeidriche' nel DB
 
             // Mappatura esplicita delle proprietà alle colonne del DB (snake_case)
             entity.HasKey(f => f.id);
@@ -81,13 +81,14 @@ namespace BonusIdrici2.Data
             entity.Property(f => f.tipoUtenza).HasColumnName("tipo_utenza").HasMaxLength(100);
             entity.Property(f => f.cognome).HasColumnName("cognome").IsRequired().HasMaxLength(100);
             entity.Property(f => f.nome).HasColumnName("nome").IsRequired().HasMaxLength(100);
+            entity.Property(f => f.sesso).HasColumnName("sesso").HasMaxLength(1); 
             entity.Property(f => f.codiceFiscale).HasColumnName("codice_fiscale").IsRequired().HasMaxLength(16);
             entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
         }); 
 
             modelBuilder.Entity<Report>(entity =>
        {
-           entity.ToTable("reports"); // Mappa la classe FileUpload alla tabella 'fileuploads' nel DB
+           entity.ToTable("reports"); // Mappa la classe Report alla tabella 'reports' nel DB
 
            // Mappatura esplicita delle proprietà alle colonne del DB (snake_case)
            entity.HasKey(f => f.id);

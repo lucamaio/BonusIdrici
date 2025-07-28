@@ -1,19 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using BonusIdrici2.Models;
 using BonusIdrici2.Data;
 using System.Globalization;
-using System.IO;
-using Atto;
-using leggiCSV;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using BonusIdrici2.Models.ViewModels; // Aggiungi questo using
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace BonusIdrici2.Controllers
 {
@@ -168,6 +157,7 @@ namespace BonusIdrici2.Controllers
 
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
 
+            List<UtenzaIdrica> utenzeIdriche = _context.UtenzeIdriche.Where(u => u.IdEnte == selectedEnteId).ToList();
             try
             {
                 // Salva il file caricato su disco
@@ -177,30 +167,55 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath);
-
-                using (var transaction = _context.Database.BeginTransaction())
+                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath, selectedEnteId,utenzeIdriche);
+                if (datiComplessivi != null )
                 {
-                    try
+                    using (var transaction = _context.Database.BeginTransaction())
                     {
-                        // Salva le utenze nel database
-                        foreach (var UtenzeIdrica in datiComplessivi.UtenzeIdriche)
+                        try
                         {
-                            UtenzeIdrica.IdEnte = selectedEnteId;                         
-                            _context.UtenzeIdriche.Add(UtenzeIdrica);
+                            if(datiComplessivi.UtenzeIdriche.Count > 0)
+                            {
+                                foreach (var UtenzeIdrica in datiComplessivi.UtenzeIdriche)
+                                {
+                                    _context.UtenzeIdriche.Add(UtenzeIdrica);
+                                }
+
+                            }
+                            else if(datiComplessivi.UtenzeIdricheEsistente.Count > 0)
+                            {
+                                // Se non ci sono nuove utenze, aggiorna quelle esistenti
+                                foreach (var utenzaEsistente in datiComplessivi.UtenzeIdricheEsistente)
+                                {
+                                    _context.UtenzeIdriche.Update(utenzaEsistente);
+                                }
+                            }
+                            else
+                            {
+                                ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
+                                return View("LoadFilePiranha", "Azioni");
+                            }
+                           
+                            // Salva le modifiche al database
+                            if (datiComplessivi.UtenzeIdriche.Count > 0 || datiComplessivi.UtenzeIdricheEsistente.Count > 0)
+                            {
+                                await _context.SaveChangesAsync();
+                            }
+
+                            transaction.Commit(); // Conferma la transazione se tutto è andato bene
+                            ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Utenze: {datiComplessivi.UtenzeIdriche.Count}, ";
                         }
-
-                        await _context.SaveChangesAsync();
-
-                        transaction.Commit(); // Conferma la transazione se tutto è andato bene
-                        ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Utenze: {datiComplessivi.UtenzeIdriche.Count}, ";
+                        catch (Exception dbEx)
+                        {
+                            transaction.Rollback(); // Annulla la transazione in caso di errore
+                            _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
+                            ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
+                        }
                     }
-                    catch (Exception dbEx)
-                    {
-                        transaction.Rollback(); // Annulla la transazione in caso di errore
-                        _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
-                        ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
-                    }
+                }
+                else
+                {
+                    ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
                 }
             }
             catch (Exception ex)
