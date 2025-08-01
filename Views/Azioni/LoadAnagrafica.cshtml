@@ -11,6 +11,21 @@
                 </div>
                 <div class="card-body p-4">
                     <form asp-controller="Azioni" asp-action="LoadAnagrafe" method="post" enctype="multipart/form-data">
+                           @* --- SELECT ENTE QUI --- *@
+                        <div class="mb-3">
+                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
+                            <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
+                                <option value="">-- Seleziona un Ente --</option>
+                                @if (ViewBag.Enti != null)
+                                {
+                                    foreach (var ente in ViewBag.Enti)
+                                    {
+                                        <option value="@ente.id">@ente.nome</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
                           <div class="mb-3">
                             <label for="csv_file" class="form-label">Seleziona file CSV Anagrafe</label>
                             <input type="file" name="csv_file" class="form-control" required accept=".csv">

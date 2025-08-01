@@ -19,6 +19,10 @@ namespace BonusIdrici2.Controllers
         // Pagine di navigazione
         public IActionResult LoadAnagrafica()
         {
+            // Recupera tutti gli enti dal database
+            List<Ente> enti = _context.Enti.ToList();
+            // Passa la lista degli enti alla vista tramite ViewBag
+            ViewBag.Enti = enti;
             return View();
         }
 
@@ -52,7 +56,7 @@ namespace BonusIdrici2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
+        public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
             if (csv_file == null || csv_file.Length == 0)
             {
@@ -67,6 +71,19 @@ namespace BonusIdrici2.Controllers
                 return View("LoadAnagrafica");
             }
 
+            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
+        
+            if (selectedEnte == null)
+            {
+                ViewBag.Message = "Ente selezionato non valido.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return View("LoadAnagrafica", "Azioni");
+            }
+            List<Dichiarante> dichiaranti = _context.Dichiaranti.Where(d => d.IdEnte == selectedEnteId).ToList();
+            if (dichiaranti == null)
+            {
+                dichiaranti = new List<Dichiarante>();
+            }
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
 
             try
@@ -78,7 +95,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LoadAnagrafe(filePath);
+                var datiComplessivi = CSVReader.LoadAnagrafe(filePath,selectedEnteId,dichiaranti);
 
                 // Inizia una transazione per assicurare che tutti i dati vengano salvati
                 // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
@@ -86,12 +103,32 @@ namespace BonusIdrici2.Controllers
                 {
                     try
                     {
-                        // Salva i dichiaranti nel database
-                        foreach (var dichiarante in datiComplessivi.Dichiaranti)
+                        if(datiComplessivi.Dichiaranti.Count > 0)
                         {
-                            _context.Dichiaranti.Add(dichiarante);
+                            // Salva i nuovi dichiaranti nel database
+                            foreach (var dichiarante in datiComplessivi.Dichiaranti)
+                            {
+                                _context.Dichiaranti.Add(dichiarante);
+                            }
                         }
-                        await _context.SaveChangesAsync(); // Salva i dichiaranti prima
+                        else if(datiComplessivi.DichiarantiDaAggiornare.Count > 0)
+                        {
+                            // Aggiorna i dichiaranti esistenti
+                            foreach (var dichiarante in datiComplessivi.DichiarantiDaAggiornare)
+                            {
+                                _context.Dichiaranti.Update(dichiarante);
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
+                            return View("LoadAnagrafica"); // Torna alla pagina di upload con un messaggio
+                        }
+                        if(datiComplessivi.Dichiaranti.Count > 0 || datiComplessivi.DichiarantiDaAggiornare.Count > 0)
+                        {
+                            // Salva le modifiche al database
+                            await _context.SaveChangesAsync();
+                        }
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
                         ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Dichiaranti: {datiComplessivi.Dichiaranti.Count}, "; //Atti: {datiComplessivi.Atti.Count}";
@@ -167,7 +204,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath, selectedEnteId,utenzeIdriche);
+                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath, selectedEnteId,utenzeIdriche,_context);
                 if (datiComplessivi != null )
                 {
                     using (var transaction = _context.Database.BeginTransaction())

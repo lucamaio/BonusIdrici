@@ -5,8 +5,8 @@ namespace BonusIdrici2.Models
     public class Dichiarante
     {
         [Key]
-        
-        public int? IdDichiarante { get; set; }
+
+        public int? id { get; set; }
 
         [Required]
         public required string Cognome { get; set; }
@@ -31,13 +31,23 @@ namespace BonusIdrici2.Models
 
         public required string NumeroCivico { get; set; }
 
-        [Required]
-        public required string NomeEnte { get; set; }
+        // [Required]
+        // public required string NomeEnte { get; set; }
 
         public int? CodiceFamiglia { get; set; }
         public string? Parentela { get; set; }
         public string? CodiceFiscaleIntestatarioScheda { get; set; }
 
-       public int? NumeroComponenti { get; set; }
+        public int? NumeroComponenti { get; set; }
+       
+       [Required]
+        public required int IdEnte { get; set; } // ID dell'ente associato al dichiarante
+
+        public string? toString()
+        {
+            return $"Dichiarante: {Cognome}, {Nome}, Codice Fiscale: {CodiceFiscale}, " +
+                   $"Sesso: {Sesso}, Data Nascita: {(DataNascita.HasValue ? DataNascita.Value.ToString("dd/MM/yyyy") : "")}, " +
+                   $"Indirizzo Residenza: {IndirizzoResidenza}, Numero Civico: {NumeroCivico}";
+        }
     }
 }

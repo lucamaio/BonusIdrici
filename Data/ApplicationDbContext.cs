@@ -29,7 +29,7 @@ namespace BonusIdrici2.Data
             modelBuilder.Entity<Dichiarante>(entity =>
             {
                 entity.ToTable("dichiaranti");
-                entity.HasKey(d => d.IdDichiarante);
+                entity.HasKey(d => d.id);
                 entity.Property(f => f.Nome).HasColumnName("nome").IsRequired().HasMaxLength(125);
                 entity.Property(f => f.Cognome).HasColumnName("cognome").IsRequired().HasMaxLength(125);
                 entity.Property(f => f.CodiceFiscale).HasColumnName("codiceFiscale").IsRequired();
@@ -38,11 +38,12 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.NumeroCivico).HasColumnName("NumeroCivico").IsRequired().HasMaxLength(250);
                 entity.Property(f => f.ComuneNascita).HasColumnName("ComuneNascita").HasMaxLength(250);
                 entity.Property(f => f.Sesso).HasColumnName("Sesso").IsRequired().HasMaxLength(1);
-                entity.Property(f => f.NomeEnte).HasColumnName("NomeEnte").IsRequired().HasMaxLength(250);
+                // entity.Property(f => f.NomeEnte).HasColumnName("NomeEnte").IsRequired().HasMaxLength(250);
                 entity.Property(f => f.NumeroComponenti).HasColumnName("NumeroComponenti");
                 entity.Property(f => f.CodiceFamiglia).HasColumnName("CodiceFamiglia");
                 entity.Property(f => f.Parentela).HasColumnName("Parentela").HasMaxLength(128);
                 entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("CodiceFiscaleIntestatarioScheda").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.IdEnte).HasColumnName("idEnte").IsRequired();
             });
 
             // Configurazione per la classe Ente

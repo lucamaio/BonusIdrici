@@ -39,7 +39,8 @@ public static class CsvGenerator
                 
                 riga.Append(EscapeCsvField(report.codiceBonus, Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esito, Delimitatore)).Append(Delimitatore);
-                if (!string.IsNullOrEmpty(codiceFornitua))
+                
+                if (!string.IsNullOrEmpty(codiceFornitua) && report.esito == "01")
                 {
                     riga.Append(EscapeCsvField(codiceFornitua, Delimitatore)).Append(Delimitatore);
                 }
@@ -47,7 +48,14 @@ public static class CsvGenerator
                 {
                     riga.Append(EscapeCsvField("", Delimitatore)).Append(Delimitatore);
                 }
-                riga.Append(EscapeCsvField(report.codiceFiscale.ToString(), Delimitatore)).Append(Delimitatore);
+                if (!string.IsNullOrEmpty(report.codiceFiscale) && (report.esito == "01" || report.esito == "02"))
+                {
+                    riga.Append(EscapeCsvField(report.codiceFiscale.ToString(), Delimitatore)).Append(Delimitatore);
+                }else
+                {
+                    riga.Append(EscapeCsvField("", Delimitatore)).Append(Delimitatore);
+                }
+                                
                 riga.Append(EscapeCsvField(report.numeroComponenti.ToString(), Delimitatore)).Append(Delimitatore);
                 
                 // Usa CultureInfo.InvariantCulture per formattare i decimali con il punto

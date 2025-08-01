@@ -221,8 +221,6 @@ C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\l2vcab1vy
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\fw7j6kdczd-muycvpuwrr.gz
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\4kr8r9rnay-87fc7y1x7t.gz
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\d7bn7f0j62-mlv21k5csn.gz
-C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34j-tan8gd1o1e.gz
-C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-tan8gd1o1e.gz
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\staticwebassets.development.json
@@ -236,7 +234,6 @@ C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\ref\BonusIdrici2.dll
 C:\Users\User000015\Documenti\BonusIdrici2\bin\Debug\net9.0\MySqlConnector.dll
 C:\Users\User000015\Documenti\BonusIdrici2\bin\Debug\net9.0\Pomelo.EntityFrameworkCore.MySql.dll
 C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.sourcelink.json
-C:\Users\User000015\Documenti\BonusIdrici2\obj\Debug\net9.0\compressed\0fp1722d74-gu9v83yadh.gz
 C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\appsettings.json
 C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\BonusIdrici2.staticwebassets.endpoints.json
@@ -475,3 +472,5 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.genrunt
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\ref\BonusIdrici2.dll
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34j-q6rt4zr0qx.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-q6rt4zr0qx.gz
+C:\Users\User000015\Documenti\Bonusidrici2\obj\Debug\net9.0\compressed\iac6pyj34j-q6rt4zr0qx.gz
+C:\Users\User000015\Documenti\Bonusidrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-q6rt4zr0qx.gz

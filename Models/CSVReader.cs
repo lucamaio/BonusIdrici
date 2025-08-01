@@ -19,16 +19,16 @@ public class CSVReader
 {
     private const char CsvDelimiter = ';';
 
-    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile)
+    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, List<Dichiarante> dichiaranti)
     {
         var datiComplessivi = new DatiCsvCompilati();
-        FileLog logFile = new FileLog($"Elaborazione_Anagrafe.log");
+        FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_Anagrafe.log");
         List<string> errori = new List<string>();
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
             int rigaCorrente = 1;
-            logFile.LogInfo($"Nuovo caricamento dati Anagrafe per il Comune di ...");
+            logFile.LogInfo($"Nuovo caricamento dati Anagrafe ID ENTE: {selectedEnteId}");
             logFile.LogInfo($"Numero di righe da caricare: {righe.Count()}");
 
             foreach (var riga in righe)
@@ -99,14 +99,6 @@ public class CSVReader
                     error = true;
                 }
 
-                // i) Verifico se il campo Nome Ente è presente
-
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[16])))
-                {
-                    errori.Add($"Attenzione: Nome Ente mancante, saltata. Riga {rigaCorrente}");
-                    error = true;
-                }
-
                 // Controllo se sono presenti Errori
 
                 if (error)
@@ -129,11 +121,89 @@ public class CSVReader
                     Parentela = rimuoviVirgolette(campi[10]).ToUpper(),
                     CodiceFamiglia = int.Parse(campi[11].Trim()),
                     NumeroComponenti = int.Parse(campi[13].Trim()),
-                    NomeEnte = rimuoviVirgolette(campi[16]).ToUpper(),
-                    CodiceFiscaleIntestatarioScheda = rimuoviVirgolette(campi[19])
+                    CodiceFiscaleIntestatarioScheda = rimuoviVirgolette(campi[19]),
+                    IdEnte = selectedEnteId
                 };
 
-                datiComplessivi.Dichiaranti.Add(dichiarante);
+                var esiste = false;
+                var aggiornare = false;
+
+                if (dichiaranti != null && dichiarante != null)
+                {
+                    var dichiaranteEsistente = dichiaranti.Find(d => d.CodiceFiscale == dichiarante.CodiceFiscale);
+                    if (dichiaranteEsistente != null)
+                    {
+                        esiste = true;
+                        dichiarante.id = dichiaranteEsistente.id;
+                        // Dichiarante già presente, controllo se devo aggiornare i campi
+                        if (dichiarante.Nome != dichiaranteEsistente.Nome)
+                        {
+                            //dichiarante.Nome = dichiaranteEsistente.Nome;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.Cognome != dichiaranteEsistente.Cognome)
+                        {
+                            //dichiarante.Cognome = dichiaranteEsistente.Cognome;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.Sesso != dichiaranteEsistente.Sesso)
+                        {
+                            //dichiarante.Sesso = dichiaranteEsistente.Sesso;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.DataNascita != dichiaranteEsistente.DataNascita)
+                        {
+                            //dichiarante.DataNascita = dichiaranteEsistente.DataNascita;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.ComuneNascita != dichiaranteEsistente.ComuneNascita)
+                        {
+                            //dichiarante.ComuneNascita = dichiaranteEsistente.ComuneNascita;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.IndirizzoResidenza != dichiaranteEsistente.IndirizzoResidenza)
+                        {
+                            //dichiarante.IndirizzoResidenza = dichiaranteEsistente.IndirizzoResidenza;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.NumeroCivico != dichiaranteEsistente.NumeroCivico)
+                        {
+                            //dichiarante.NumeroCivico = dichiaranteEsistente.NumeroCivico;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.Parentela != dichiaranteEsistente.Parentela)
+                        {
+                            //dichiarante.Parentela = dichiaranteEsistente.Parentela;
+                            aggiornare = true;
+                        }
+
+                        if (dichiarante.CodiceFamiglia != dichiaranteEsistente.CodiceFamiglia)
+                        {
+                            //dichiarante.CodiceFamiglia = dichiaranteEsistente.CodiceFamiglia;
+                            aggiornare = true;
+                        }
+                    }
+                }
+
+                if (!esiste)
+                {
+                    // Aggiungo il nuovo Dichiarante alla lista
+                    datiComplessivi.Dichiaranti.Add(dichiarante);
+                }
+                else if (aggiornare)
+                {
+                    // Aggiorno il Dichiarante esistente
+                    datiComplessivi.DichiarantiDaAggiornare.Add(dichiarante);
+                }
+
+
             }
 
             if (errori.Count > 0)
@@ -148,6 +218,23 @@ public class CSVReader
             {
                 logFile.LogInfo("Elaborazione completata senza errori.");
             }
+
+            if (datiComplessivi.Dichiaranti.Count > 0)
+            {
+                logFile.LogInfo($"Trovati {datiComplessivi.Dichiaranti.Count} dichiaranti da aggiungere.");
+            }
+            else
+            {
+                logFile.LogInfo("Nessun dichiarante trovato da aggiungere.");
+            }
+            if (datiComplessivi.DichiarantiDaAggiornare.Count > 0)
+            {
+                logFile.LogInfo($"Trovati {datiComplessivi.DichiarantiDaAggiornare.Count} dichiaranti da aggiornare.");
+            }
+            else
+            {
+                logFile.LogInfo("Nessun dichiarante trovato da aggiornare.");
+            }
         }
         catch (FileNotFoundException)
         {
@@ -161,7 +248,7 @@ public class CSVReader
         return datiComplessivi;
     }
 
-    public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile, int selectedEnteId, List<UtenzaIdrica> utenzeIdriche)
+    public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile, int selectedEnteId, List<UtenzaIdrica> utenzeIdriche, ApplicationDbContext context)
     {
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Lettura_phirana.log");
@@ -206,40 +293,52 @@ public class CSVReader
                 }
 
                 // d) Controllo se il campo Codice Fiscale è valido è != null
+                // logFile.LogInfo($"CODICE Fiscale {rimuoviVirgolette(campi[36])} | Riga {rigaCorrente} | lunghezza {rimuoviVirgolette(campi[36]).Length} ");
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])))
+               if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])))
                 {
-                    if (rimuoviVirgolette(campi[34]) != "D")
+                    // logFile.LogInfo($"SONO NULL! | SESSO: {rimuoviVirgolette(campi[34])}");
+                    if (!rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
+                        logFile.LogInfo("COD FISC MANCATE E sesso != D");
                         errori.Add($"Attenzione : Codice Fiscale mancante, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
                         error = true;
                     }
-                    // Se il codice fiscale è vuoto e il tipo di utenza non è "D" (dichiarazione) e la partita IVA è vuota
-                    else if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) && rimuoviVirgolette(campi[9]) != "4" && rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) && rimuoviVirgolette(campi[34]) == "D")
+                    else if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) &&
+                            rimuoviVirgolette(campi[9]) != "4" &&
+                            rimuoviVirgolette(campi[9]) != "5" &&
+                            string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) &&
+                            rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
+                        // logFile.LogInfo("PIVA NULL && stato != 4, e sesso =D");
                         warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
+                        error = true;
                     }
-                    error = true;
                 }
                 else if (rimuoviVirgolette(campi[36]).Length != 16)
                 {
-                    // Se il codice fiscale non è lungo 16 caratteri e non è un codice di tipo "D" (dichiarazione)
-                    if (rimuoviVirgolette(campi[34]) != "D")
+                    // logFile.LogInfo($"mal formata! | SESSO: {rimuoviVirgolette(campi[34])}");
+                    if (!rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
+                        // logFile.LogInfo("Sesso diverso da D!");
                         errori.Add($"Attenzione : Codice Fiscale mal formato, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
                         error = true;
                     }
                     else
                     {
-                        // Verifico se l'utenza è attiva e se il campo partita IVA è vuoto
-                        if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) && rimuoviVirgolette(campi[9]) != "4" && rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) && rimuoviVirgolette(campi[34]) == "D")
+                        if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) &&
+                            rimuoviVirgolette(campi[9]) != "4" &&
+                            rimuoviVirgolette(campi[9]) != "5" &&
+                            string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) &&
+                            rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                         {
-                            warning.Add($"Atteznzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non trovati. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
+                            // logFile.LogInfo("PIVA 2 NULL && stato != 4, e sesso =D");
+                            warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non trovati. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
                             error = true;
                         }
                     }
-
                 }
+
 
                 // e) Controllo se la matricola del contatore è presente
 
@@ -303,6 +402,25 @@ public class CSVReader
                     error = true;
                 }
 
+                // Formatto l'indirizzo sono uguali
+                var cod_fisc = rimuoviVirgolette(campi[36]).ToUpper();
+                var indirizzoUbicazione = rimuoviVirgolette(campi[15]).ToUpper();
+                var indirizzoRicavato = FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc,selectedEnteId);
+
+                if (indirizzoRicavato == null && cod_fisc != null)
+                {
+                    errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {rimuoviVirgolette(campi[32]).ToUpper()} {rimuoviVirgolette(campi[33]).ToUpper()}");
+                    error = true;
+                }
+                else if (cod_fisc == null)
+                {
+                    warning.Add($"Attenzione: CODICE FISCALE MANCANTE. Riga {riga} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                }
+                else if (indirizzoUbicazione != indirizzoRicavato)
+                {
+                    warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
+                }
+
                 // Controllo se sono presenti Errori
 
                 if (error)
@@ -318,7 +436,7 @@ public class CSVReader
                     periodoIniziale = ConvertiData(rimuoviVirgolette(campi[13])),
                     periodoFinale = ConvertiData(rimuoviVirgolette(campi[14])),
                     matricolaContatore = rimuoviVirgolette(campi[12]).ToUpper(),
-                    indirizzoUbicazione = rimuoviVirgolette(campi[15]).ToUpper(),
+                    indirizzoUbicazione = indirizzoRicavato.ToUpper(),
                     numeroCivico = FormattaNumeroCivico(campi[16]).ToUpper(),
                     subUbicazione = rimuoviVirgolette(campi[17]).ToUpper(),
                     scalaUbicazione = rimuoviVirgolette(campi[18]),
@@ -328,7 +446,7 @@ public class CSVReader
                     cognome = rimuoviVirgolette(campi[32]).ToUpper(),
                     nome = rimuoviVirgolette(campi[33]).ToUpper(),
                     sesso = rimuoviVirgolette(campi[34]).ToUpper(),
-                    codiceFiscale = rimuoviVirgolette(campi[36]).ToUpper(),
+                    codiceFiscale = cod_fisc,
                     IdEnte = selectedEnteId,
                 };
 
@@ -459,7 +577,7 @@ public class CSVReader
             {
                 logFile.LogInfo("Nessuna utenza nuova idrica trovata.");
             }
-            
+
             if (datiComplessivi.UtenzeIdricheEsistente.Count > 0)
             {
                 logFile.LogInfo($"Numero di utenze idriche esistenti aggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}");
@@ -482,7 +600,7 @@ public class CSVReader
     }
 
 
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, BonusIdrici2.Data.ApplicationDbContext context, int selectedEnteId)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId)
     {
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"Elaborazione_INPS.log");
@@ -665,7 +783,7 @@ public class CSVReader
                 }
 
                 var ente = enti.First();
-                var nomeEnte = ente.nome;
+                // var nomeEnte = ente.nome;
                 var codiceFiscaleEnte = ente.CodiceFiscale;
                 var istatEnte = ente.istat;
                 var capEnte = ente.Cap;
@@ -675,7 +793,7 @@ public class CSVReader
                 if (!(istatEnte != istatAbitazione || capEnte != capAbitazione || provinciaAbitazione != ente.Provincia))
                 {
                     // 2.c) se i campi corispondono verifico se il richiedente è residente nel comune selezionato
-                    var dichiarantiFiltratiPerNomeEnte = dichiaranti.Where(s => s.CodiceFiscale == codiceFiscale && s.NomeEnte == nomeEnte).ToList();
+                    var dichiarantiFiltratiPerNomeEnte = dichiaranti.Where(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId).ToList();
                     if (dichiarantiFiltratiPerNomeEnte.Count == 1)
                     {
                         // 2.c.1) se è residente nel comune selzionato allora esito è uguale a Si
@@ -699,7 +817,7 @@ public class CSVReader
                             {
                                 foreach (var codFisc in codiciFiscaliFamigliari)
                                 {
-                                    var dichiaranteFamigliare = dichiaranti.Where(s => s.CodiceFiscale == codFisc && s.NomeEnte == nomeEnte).ToList();
+                                    var dichiaranteFamigliare = dichiaranti.Where(s => s.CodiceFiscale == codFisc && s.IdEnte == selectedEnteId).ToList();
                                     if (dichiaranteFamigliare.Count == 1)
                                     {
                                         // Verifico se il membro della famiglia ha una fornitura idrica diretta
@@ -894,7 +1012,7 @@ public class CSVReader
     }
 
 
-    private static (string esito, int? idFornitura) verificaEsisistenzaFornitura(string codiceFiscale, int selectedEnteId, BonusIdrici2.Data.ApplicationDbContext context, string IndirizzoResidenza, string NumeroCivico)
+    private static (string esito, int? idFornitura) verificaEsisistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, string IndirizzoResidenza, string NumeroCivico)
     {
         // Verifica se il richiedente ha una fornitura idrica diretta
         var forniture = context.UtenzeIdriche.Where(s => s.codiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId).ToList();
@@ -933,5 +1051,41 @@ public class CSVReader
         }
         return ("04", null); // Nessuna fornitura
     }
+
+   private static string? FormattaIndirizzo(ApplicationDbContext context, string indirizzo_ubicazione, string codiceFiscale, int IdEnte)
+{
+    // 1. Recupero il dichiarante
+    var dichiarante = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte==IdEnte);
+    if (dichiarante == null) { return null; }
+
+    var indirizzoResidenza = rimuoviVirgolette(dichiarante.IndirizzoResidenza).Trim();
+    var indirizzoUbicazione = rimuoviVirgolette(indirizzo_ubicazione).Trim();
+
+    // 2. Confronto diretto ignorando le maiuscole
+    if (string.Equals(indirizzoUbicazione, indirizzoResidenza, StringComparison.OrdinalIgnoreCase))
+    {
+        return indirizzoUbicazione;
+    }
+
+    // 3. Suddivido la via di ubicazione in token significativi
+    var partiIndirizzoUb = indirizzoUbicazione.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries);
+    var paroleDaIgnorare = new HashSet<string> { "via", "viale", "piazza", "corso", "strada" };
+
+    foreach (var part in partiIndirizzoUb)
+    {
+        var token = part.ToLowerInvariant();
+        if (token.Length <= 3 || paroleDaIgnorare.Contains(token))
+            continue;
+
+        if (indirizzoResidenza.Contains(token, StringComparison.OrdinalIgnoreCase))
+        {
+            return indirizzoResidenza;
+        }
+    }
+
+    // 4. Nessuna corrispondenza significativa trovata → mantengo l'indirizzo originale
+    return indirizzoUbicazione;
+}
+
 
 }

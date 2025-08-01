@@ -9,6 +9,8 @@ namespace leggiCSV
     public class DatiCsvCompilati // Nome più descrittivo per il contenitore
     {
         public List<Dichiarante> Dichiaranti { get; set; }
+
+        public List<Dichiarante> DichiarantiDaAggiornare { get; set; }
         public List<UtenzaIdrica> UtenzeIdriche { get; set; }
 
         public List<UtenzaIdrica> UtenzeIdricheEsistente { get; set; }
@@ -19,6 +21,7 @@ namespace leggiCSV
         public DatiCsvCompilati() // Costruttore per inizializzare le liste
         {
             Dichiaranti = new List<Dichiarante>();
+            DichiarantiDaAggiornare = new List<Dichiarante>();
             UtenzeIdriche = new List<UtenzaIdrica>();
             UtenzeIdricheEsistente = new List<UtenzaIdrica>();
             Atti = new List<Atto.Atto>();
