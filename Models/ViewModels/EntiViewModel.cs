@@ -20,11 +20,11 @@ namespace BonusIdrici2.Models.ViewModels
 
         public string? Regione { get; set; }
         
-        // public bool? Nostro { get; set; }
+        public bool? Nostro { get; set; }
 
-        // public DateTime? data_creazione { get; set;}
+        public DateTime? data_creazione { get; set;}
         
-        // public DateTime? data_aggiornamento { get; set; }
+        public DateTime? data_aggiornamento { get; set; }
         
     }
 }

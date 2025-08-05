@@ -44,7 +44,11 @@
                                             <td>@item.Provincia</td>
                                             <td>@item.Regione</td>
                                             <td>
-                                                <!-- Azioni future -->
+                                                @* public IActionResult ModificaToponimo(int id, string denominazione, string? normalizzazione, DateTime? data_creazione, int idEnte){ *@
+                                                 <a class="btn btn-sm btn-outline-primary me-1" title="Modifica Ente"
+                                                    href="@Url.Action("Modifica", "Enti", new { id = item.id , nome = item.nome, istat = item.istat, partitaIva=item.partitaIva, CodiceFiscale=item.CodiceFiscale, Cap=item.Cap, Provincia=item.Provincia, Regione=item.Regione, Nostro=item.Nostro })">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
                                             </td>
                                         </tr>
                                     }
@@ -81,28 +85,28 @@
                     url: "//cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json"
                 },
                 dom:
-                    "<'row mb-3'" +
-                        "<'col-md-6 d-flex align-items-center'l>" +
-                        "<'col-md-6 d-flex justify-content-end'B>" +
-                    ">" +
-                    "<'row mb-3'" +
-                        "<'col-md-12'f>" +
-                    ">" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row mt-3'" +
-                        "<'col-md-6'i>" +
-                        "<'col-md-6'p>" +
-                    ">",
-                buttons: [
-                    {
-                        text: '<i class="bi bi-plus-circle me-2"></i> Crea',
-                        className: 'btn btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("Create", "Enti")';
-                        }
+                '<"row card-header flex-column flex-md-row pb-10 mb-3"' +
+                    '<"d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0"l>' +
+                    '<"d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"' +
+                        '<"me-3"f>' + // margine tra cerca e bottone
+                        'B' +
+                    '>' +
+                '>' +
+                '<"row m-3 my-0 justify-content-between"' +
+                    '<"d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0"i>' +
+                    '<"d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"p>' +
+                '>' +
+                '<"justify-content-between dt-layout-tabl mt-3"t>',
+            buttons: [
+                {
+                    text: '<span class="d-flex align-items-center gap-5"><i class="bi bi-plus-circle"></i></span>',
+                    className: 'btn btn-success',
+                    action: function () {
+                        window.location.href = '@Url.Action("Create", "Enti")';
                     }
-                ]
-            });
+                }
+            ]
+        });
         });
     </script>
 }

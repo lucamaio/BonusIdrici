@@ -10,14 +10,12 @@
                     <h3 class="mb-0">Modifica Toponimo</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Toponomi" asp-action="Update" method="POST" enctype="multipart/form-data">
+                    <form asp-controller="Enti" asp-action="Update" method="POST" enctype="multipart/form-data">
                         @* Campo nascosto per salvare l'ID dell'ente *@
                         <input type="hidden" name="id" value="@ViewBag.id" />
-                        <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
-                        <input type="hidden" name="data_creazione" value="@ViewBag.data_creazione" />
-
+                        
                         <div class="mb-3">
-                            <label for="denominazione" class="form-label">Denominazione* </label>
+                            <label for="nome" class="form-label">Nome* </label>
                             <input type="text" class="form-control" id="denominazione" name="denominazione" value="@ViewBag.denominazione"required>
                         </div>
 

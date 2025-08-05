@@ -30,7 +30,11 @@ namespace BonusIdrici2.Models
         public string? Provincia { get; set; }
 
         public string? Regione { get; set; }
-        
+
         public bool? Nostro { get; set; }
+        
+        public DateTime? data_creazione { get; set;}
+        
+        public DateTime? data_aggiornamento { get; set; }
     }
 }

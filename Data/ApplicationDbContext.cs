@@ -61,6 +61,9 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.Provincia).HasColumnName("provincia").HasMaxLength(50);
                 entity.Property(f => f.Regione).HasColumnName("regione").HasMaxLength(50);
                 entity.Property(f => f.Nostro).HasColumnName("nostro").HasMaxLength(50);
+                entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
+                entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
+
             });
 
 
