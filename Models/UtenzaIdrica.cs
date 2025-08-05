@@ -54,7 +54,7 @@ namespace BonusIdrici2.Models
         [Required]
         public int IdEnte { get; set; } 
         
-       public string? toString()
+       public string? ToString()
         {
             return $"UtenzaIdrica: Acquedotto: {idAcquedotto}, Stato: {stato}, " +
                 $"Periodo Iniziale: {(periodoIniziale.HasValue ? periodoIniziale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " +

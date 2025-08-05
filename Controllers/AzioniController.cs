@@ -211,22 +211,36 @@ namespace BonusIdrici2.Controllers
                     {
                         try
                         {
-                            if(datiComplessivi.UtenzeIdriche.Count > 0)
+                            if (datiComplessivi.UtenzeIdriche.Count > 0)
                             {
                                 foreach (var UtenzeIdrica in datiComplessivi.UtenzeIdriche)
                                 {
                                     _context.UtenzeIdriche.Add(UtenzeIdrica);
                                 }
+                                if (datiComplessivi.Toponimi.Count > 0)
+                                {
+                                    foreach (var top in datiComplessivi.Toponimi)
+                                    {
+                                        _context.Toponomi.Add(top);
+                                    }
+                                }
+                                if (datiComplessivi.ToponimiDaAggiornare.Count > 0)
+                                {
+                                    foreach (var top in datiComplessivi.ToponimiDaAggiornare)
+                                    {
+                                        _context.Toponomi.Update(top);
+                                    }
+                                }
 
                             }
-                            else if(datiComplessivi.UtenzeIdricheEsistente.Count > 0)
-                            {
-                                // Se non ci sono nuove utenze, aggiorna quelle esistenti
-                                foreach (var utenzaEsistente in datiComplessivi.UtenzeIdricheEsistente)
-                                {
-                                    _context.UtenzeIdriche.Update(utenzaEsistente);
-                                }
-                            }
+                            // else if(datiComplessivi.UtenzeIdricheEsistente.Count > 0)
+                            // {
+                            //     // Se non ci sono nuove utenze, aggiorna quelle esistenti
+                            //     foreach (var utenzaEsistente in datiComplessivi.UtenzeIdricheEsistente)
+                            //     {
+                            //         _context.UtenzeIdriche.Update(utenzaEsistente);
+                            //     }
+                            // }
                             else
                             {
                                 ViewBag.Message = "Nessun dato valido trovato nel file CSV.";

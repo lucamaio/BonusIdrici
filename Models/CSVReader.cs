@@ -262,6 +262,16 @@ public class CSVReader
             int rigaCorrente = 1;
             logFile.LogInfo($"Nuovo caricamento dati phirana id Ente: {selectedEnteId}");
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()} ");
+            // Carico le toponimie esistenti dal database per l'ente specificato
+            var toponimi = context.Toponomi.Where(s => s.IdEnte == selectedEnteId).ToList();
+
+            // Inizializzazione sicura della lista dei toponimi
+            if (toponimi == null)
+            {
+                logFile.LogInfo($"AVVISO: La lista di toponimi per l'ente {selectedEnteId} è null. Ne creo una nuova.");
+                toponimi = new List<Toponimo>();
+            }
+            logFile.LogInfo($"Toponimi caricati per l'ente {selectedEnteId}: {toponimi.Count}");
 
             foreach (var riga in righe)
             {
@@ -295,7 +305,7 @@ public class CSVReader
                 // d) Controllo se il campo Codice Fiscale è valido è != null
                 // logFile.LogInfo($"CODICE Fiscale {rimuoviVirgolette(campi[36])} | Riga {rigaCorrente} | lunghezza {rimuoviVirgolette(campi[36]).Length} ");
 
-               if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])))
+                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])))
                 {
                     // logFile.LogInfo($"SONO NULL! | SESSO: {rimuoviVirgolette(campi[34])}");
                     if (!rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
@@ -405,24 +415,101 @@ public class CSVReader
                 // Formatto l'indirizzo sono uguali
                 var cod_fisc = rimuoviVirgolette(campi[36]).ToUpper();
                 var indirizzoUbicazione = rimuoviVirgolette(campi[15]).ToUpper();
-                var indirizzoRicavato = FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc,selectedEnteId);
+                var indirizzoRicavato = FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc, selectedEnteId);
 
-                if (indirizzoRicavato == null && cod_fisc != null)
+                // if (indirizzoRicavato == null && cod_fisc != null)
+                // {
+                //     errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {rimuoviVirgolette(campi[32]).ToUpper()} {rimuoviVirgolette(campi[33]).ToUpper()}");
+                //     error = true;
+                // }
+                // else  if (indirizzoUbicazione != indirizzoRicavato)
+                // {
+                //     warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
+                // }
+
+                if (string.IsNullOrEmpty(indirizzoRicavato))
                 {
-                    errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {rimuoviVirgolette(campi[32]).ToUpper()} {rimuoviVirgolette(campi[33]).ToUpper()}");
-                    error = true;
+                    var findToponimo = new Toponimo
+                    {
+                        denominazione = indirizzoUbicazione,
+                        IdEnte = selectedEnteId,
+                    };
+
+                    // Uso FirstOrDefault per trovare il toponimo esistente, che è l'approccio corretto.
+                    var toponimoEsistente = toponimi.FirstOrDefault(t => t.denominazione.Equals(findToponimo.denominazione, StringComparison.OrdinalIgnoreCase) && t.IdEnte == findToponimo.IdEnte);
+
+                    if (toponimoEsistente == null)
+                    {
+                        // Se non esiste, lo aggiungo.
+                        findToponimo.nomarlizzazione = null;
+                        findToponimo.data_creazione = DateTime.Now;
+                        findToponimo.data_aggiornamento = null;
+
+                        toponimi.Add(findToponimo);
+                        indirizzoRicavato = indirizzoUbicazione;
+                        datiComplessivi.Toponimi.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
+                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' aggiunto.");
+                    }
+                    else
+                    {
+                        // Se esiste, lo utilizzo.
+                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
+
+                        if (toponimoEsistente.nomarlizzazione != null)
+                        {
+                            // Assegno l'indirizzo associato a quel toponimo
+                            indirizzoRicavato = toponimoEsistente.nomarlizzazione;
+                        }
+                        else
+                        {
+                            indirizzoRicavato = indirizzoUbicazione;
+                        }
+                    }
                 }
-                else if (cod_fisc == null)
+                else if (indirizzoRicavato != indirizzoUbicazione)
                 {
-                    warning.Add($"Attenzione: CODICE FISCALE MANCANTE. Riga {riga} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
-                }
-                else if (indirizzoUbicazione != indirizzoRicavato)
-                {
+                    // ... La tua logica per i warning o l'aggiornamento continua qui
+
                     warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
+
+                    var findToponimo = new Toponimo
+                    {
+                        denominazione = indirizzoUbicazione,
+                        IdEnte = selectedEnteId,
+                    };
+
+                    // Uso FirstOrDefault per trovare il toponimo esistente, che è l'approccio corretto.
+                    var toponimoEsistente = toponimi.FirstOrDefault(t => t.denominazione.Equals(findToponimo.denominazione, StringComparison.OrdinalIgnoreCase) && t.IdEnte == findToponimo.IdEnte);
+
+                    if (toponimoEsistente == null)
+                    {
+                        // Se non esiste, lo aggiungo.
+                        findToponimo.nomarlizzazione = indirizzoRicavato;
+                        findToponimo.data_creazione = DateTime.Now;
+                        findToponimo.data_aggiornamento = null;
+
+                        toponimi.Add(findToponimo);
+                        indirizzoRicavato = indirizzoUbicazione;
+                        datiComplessivi.ToponimiDaAggiornare.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
+                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' aggiunto.");
+                    }
+                    else
+                    {
+                        // Se esiste, lo utilizzo.
+                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
+
+                        if (toponimoEsistente.nomarlizzazione == null)
+                        {
+                            //logFile.LogInfo($"Aggiornamento toponimo {toponimoEsistente.ToString()}");
+                            // Assegno l'indirizzo associato a quel toponimo
+                            toponimoEsistente.nomarlizzazione = indirizzoRicavato;
+                            toponimoEsistente.data_aggiornamento = DateTime.Now;
+                        }
+                    }
                 }
-
+                //logFile.LogInfo($"Indirizzo ricavato: {indirizzoRicavato}");
                 // Controllo se sono presenti Errori
-
+                //logFile.LogInfo($"ERROR: {error}");
                 if (error)
                 {
                     continue; // Salta la riga se ci sono errori
@@ -449,97 +536,9 @@ public class CSVReader
                     codiceFiscale = cod_fisc,
                     IdEnte = selectedEnteId,
                 };
-
-                var esiste = false;
-                var aggiornare = false;
-
-                if (utenzeIdriche != null && utenza != null)
-                {
-                    // 2.a) Verifico se l'utenza idrica è già presente
-                    var utenzaEsistente = utenzeIdriche.Find(u => u.idAcquedotto == utenza.idAcquedotto && u.codiceFiscale == utenza.codiceFiscale);
-
-                    Console.WriteLine($"Verifico se l'utenza idrica esiste: {utenza.idAcquedotto} - {utenza.codiceFiscale}");
-                    if (utenzaEsistente != null)
-                    {
-                        Console.WriteLine($"Utenza idrica esistente trovata:{utenzaEsistente.ToString()}");
-                        esiste = true;
-                        // Utenza già presente, controllo se devo aggiornare i campi
-                        // 2.b) Verifico lo stato dell'utenza
-                        if (utenza.stato != utenzaEsistente.stato)
-                        {
-                            utenza.stato = utenzaEsistente.stato;
-                            aggiornare = true;
-                        }
-
-                        //2.c) Verifico se il periodo Finale è diverso
-                        // if (utenza.periodoFinale != utenzaEsistente.periodoFinale)
-                        // {
-                        //     utenza.periodoFinale = utenzaEsistente.periodoFinale; 
-                        //     aggiornare = true;
-                        // }
-
-                        // 2.d) Verifico se la matricola del contatore è diversa
-                        if (utenza.matricolaContatore != utenzaEsistente.matricolaContatore)
-                        {
-                            utenza.matricolaContatore = utenzaEsistente.matricolaContatore;
-                            aggiornare = true;
-                        }
-
-                        // 2.e) Verifico se l'indirizzo ubicazione è diverso
-                        if (utenza.indirizzoUbicazione != utenzaEsistente.indirizzoUbicazione)
-                        {
-                            utenza.indirizzoUbicazione = utenzaEsistente.indirizzoUbicazione;
-                            aggiornare = true;
-                        }
-
-                        if (utenza.numeroCivico != utenzaEsistente.numeroCivico)
-                        {
-                            utenza.numeroCivico = utenzaEsistente.numeroCivico;
-                            aggiornare = true;
-                        }
-
-                        if (!string.IsNullOrEmpty(utenza.subUbicazione) && utenza.subUbicazione != utenzaEsistente.subUbicazione)
-                        {
-                            utenza.subUbicazione = utenzaEsistente.subUbicazione;
-                            aggiornare = true;
-                        }
-
-                        if (!string.IsNullOrEmpty(utenza.scalaUbicazione) && utenza.scalaUbicazione != utenzaEsistente.scalaUbicazione)
-                        {
-                            utenza.scalaUbicazione = utenzaEsistente.scalaUbicazione;
-                            aggiornare = true;
-                        }
-
-                        if (!string.IsNullOrEmpty(utenza.piano) && utenza.piano != utenzaEsistente.piano)
-                        {
-                            utenza.piano = utenzaEsistente.piano;
-                            aggiornare = true;
-                        }
-
-                        if (!string.IsNullOrEmpty(utenza.interno) && utenza.interno != utenzaEsistente.interno)
-                        {
-                            utenza.interno = utenzaEsistente.interno;
-                            aggiornare = true;
-                        }
-
-                        // 2.f) Verifico se il tipo utenza è diverso
-                        if (utenza.tipoUtenza != utenzaEsistente.tipoUtenza)
-                        {
-                            utenza.tipoUtenza = utenzaEsistente.tipoUtenza;
-                            aggiornare = true;
-                        }
-                    }
-                }
-
-                if (!esiste)
-                {
-                    // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
-                    datiComplessivi.UtenzeIdriche.Add(utenza);
-                }
-                else if (aggiornare)
-                {
-                    datiComplessivi.UtenzeIdricheEsistente.Add(utenza);
-                }
+                logFile.LogInfo($"Utenza: {utenza.ToString()}");
+                // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
+                datiComplessivi.UtenzeIdriche.Add(utenza);
             }
 
             if (errori.Count > 0)
@@ -585,6 +584,22 @@ public class CSVReader
             else
             {
                 logFile.LogInfo("Nessuna utenza idrica esistente trovata da aggiornare.");
+            }
+
+            if (datiComplessivi.Toponimi.Count > 0)
+            {
+                logFile.LogInfo($"Numero di Toponimi Aggiunti: {datiComplessivi.Toponimi.Count}");
+            }
+            else
+            {
+                logFile.LogInfo("Nessun toponimo aggiunto");
+            }
+
+            if (datiComplessivi.ToponimiDaAggiornare.Count > 0)
+            {
+                logFile.LogInfo($"Toponimi Aggiornati: {datiComplessivi.ToponimiDaAggiornare.Count}");
+            }else{
+                logFile.LogInfo($"Nessun toponimo aggiornato!");
             }
         }
         catch (FileNotFoundException)

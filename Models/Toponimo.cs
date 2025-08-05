@@ -1,0 +1,32 @@
+// using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+
+namespace BonusIdrici2.Models
+{
+    public class Toponimo
+    {
+        [Key]
+        public int? id { get; set; }
+
+        [Required]
+        public required string denominazione { get; set; }
+
+        public string? nomarlizzazione { get; set; }
+
+        public DateTime? data_creazione { get; set; }
+
+        public DateTime? data_aggiornamento { get; set; }
+
+        [Required]
+        public required int IdEnte { get; set; }
+
+        // Aggiungere identificativo all'utente che effetua la modifica
+
+        public string? ToString()
+        {
+            return $"Id: {id} Denominazione: {denominazione} Normalizzazione {nomarlizzazione} Data Creazione: {data_creazione} Data Aggiornamento {data_aggiornamento} Id Ente: {IdEnte}";
+        }
+
+    }
+}

@@ -13,9 +13,13 @@ namespace Atto
         public int OriginalCsvId { get; set; }
 
         public long codBonusIdrico { get; set; }
+
         public int Anno { get; set; }
+
         public DateTime DataInizio { get; set; }
+
         public DateTime DataFine { get; set; }
+        
         public bool PRESENZA_POD { get; set; }
     }
 }
