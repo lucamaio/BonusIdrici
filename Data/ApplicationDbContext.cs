@@ -40,11 +40,12 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.NumeroCivico).HasColumnName("NumeroCivico").IsRequired().HasMaxLength(250);
                 entity.Property(f => f.ComuneNascita).HasColumnName("ComuneNascita").HasMaxLength(250);
                 entity.Property(f => f.Sesso).HasColumnName("Sesso").IsRequired().HasMaxLength(1);
-                // entity.Property(f => f.NomeEnte).HasColumnName("NomeEnte").IsRequired().HasMaxLength(250);
                 entity.Property(f => f.NumeroComponenti).HasColumnName("NumeroComponenti");
                 entity.Property(f => f.CodiceFamiglia).HasColumnName("CodiceFamiglia");
                 entity.Property(f => f.Parentela).HasColumnName("Parentela").HasMaxLength(128);
                 entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("CodiceFiscaleIntestatarioScheda").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
+                entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.IdEnte).HasColumnName("idEnte").IsRequired();
             });
 

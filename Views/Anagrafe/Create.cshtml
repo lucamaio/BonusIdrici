@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Aggiungi una persona";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Aggiungi una persona</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-controller="Anagrafe" asp-action="crea" method="POST" enctype="multipart/form-data">
+                        @* Campo nascosto per salvare l'ID dell'ente *@
+                        <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
+
+                        <div class="mb-3">
+                            <label for="cognome" class="form-label">Cognome: *</label>
+                            <input type="text" class="form-control" id="cognome" name="cognome" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome: *</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="codice_fiscale" class="form-label">Codice Fiscale: *</label>
+                            <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" min="16" max="16" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sesso" class="form-label">Sesso: *</label>
+                            <input type="text" class="form-control" id="sesso" name="sesso" min="1" max="1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data_nascita" class="col-md-2 col-form-label">Data Nascita: *</label>
+                            <input class="form-control" type="date" id="data_nascita" name="data_nascita" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="comune_nascita" class="form-label">Comune Nascita: *</label>
+                            <input type="text" class="form-control" id="comune_nascita" name="comune_nascita" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="indirizzo_residenza" class="form-label">Indirizzo Residenza: *</label>
+                            <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza" required>
+                        </div>
+
+                         <div class="mb-3">
+                            <label for="numero_civico" class="form-label">Numero Civico: *</label>
+                            <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3">Aggiungi Persona</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
