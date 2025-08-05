@@ -418,6 +418,7 @@ public class CSVReader
                 var indirizzoRicavato = FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc, selectedEnteId);
 
                 // if (indirizzoRicavato == null && cod_fisc != null)
+<<<<<<< HEAD
                 // {
                 //     errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {rimuoviVirgolette(campi[32]).ToUpper()} {rimuoviVirgolette(campi[33]).ToUpper()}");
                 //     error = true;
@@ -470,11 +471,86 @@ public class CSVReader
                 else if (indirizzoRicavato != indirizzoUbicazione)
 =======
                 // else if (cod_fisc == null)
+=======
+>>>>>>> 2af5234eea92edf59d79a2c25644883a73150ddf
                 // {
-                //     warning.Add($"Attenzione: CODICE FISCALE MANCANTE. Riga {riga} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                //     errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {rimuoviVirgolette(campi[32]).ToUpper()} {rimuoviVirgolette(campi[33]).ToUpper()}");
+                //     error = true;
                 // }
+<<<<<<< HEAD
                 else  if (indirizzoUbicazione != indirizzoRicavato)
 >>>>>>> f843c930ff350d45a33002e0b4c759dc1af88df3
+                {
+                    // ... La tua logica per i warning o l'aggiornamento continua qui
+
+                    warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
+
+=======
+                // else  if (indirizzoUbicazione != indirizzoRicavato)
+                // {
+                //     warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
+                // }
+
+                if (string.IsNullOrEmpty(indirizzoRicavato))
+                {
+>>>>>>> 2af5234eea92edf59d79a2c25644883a73150ddf
+                    var findToponimo = new Toponimo
+                    {
+                        denominazione = indirizzoUbicazione,
+                        IdEnte = selectedEnteId,
+                    };
+
+                    // Uso FirstOrDefault per trovare il toponimo esistente, che è l'approccio corretto.
+                    var toponimoEsistente = toponimi.FirstOrDefault(t => t.denominazione.Equals(findToponimo.denominazione, StringComparison.OrdinalIgnoreCase) && t.IdEnte == findToponimo.IdEnte);
+
+                    if (toponimoEsistente == null)
+                    {
+                        // Se non esiste, lo aggiungo.
+<<<<<<< HEAD
+                        findToponimo.nomarlizzazione = indirizzoRicavato;
+=======
+                        findToponimo.nomarlizzazione = null;
+>>>>>>> 2af5234eea92edf59d79a2c25644883a73150ddf
+                        findToponimo.data_creazione = DateTime.Now;
+                        findToponimo.data_aggiornamento = null;
+
+                        toponimi.Add(findToponimo);
+                        indirizzoRicavato = indirizzoUbicazione;
+<<<<<<< HEAD
+                        datiComplessivi.ToponimiDaAggiornare.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
+=======
+                        datiComplessivi.Toponimi.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
+>>>>>>> 2af5234eea92edf59d79a2c25644883a73150ddf
+                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' aggiunto.");
+                    }
+                    else
+                    {
+                        // Se esiste, lo utilizzo.
+                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
+
+<<<<<<< HEAD
+                        if (toponimoEsistente.nomarlizzazione == null)
+                        {
+                            //logFile.LogInfo($"Aggiornamento toponimo {toponimoEsistente.ToString()}");
+                            // Assegno l'indirizzo associato a quel toponimo
+                            toponimoEsistente.nomarlizzazione = indirizzoRicavato;
+                            toponimoEsistente.data_aggiornamento = DateTime.Now;
+                        }
+                    }
+                }
+=======
+                        if (toponimoEsistente.nomarlizzazione != null)
+                        {
+                            // Assegno l'indirizzo associato a quel toponimo
+                            indirizzoRicavato = toponimoEsistente.nomarlizzazione;
+                        }
+                        else
+                        {
+                            indirizzoRicavato = indirizzoUbicazione;
+                        }
+                    }
+                }
+                else if (indirizzoRicavato != indirizzoUbicazione)
                 {
                     // ... La tua logica per i warning o l'aggiornamento continua qui
 
@@ -515,6 +591,7 @@ public class CSVReader
                         }
                     }
                 }
+>>>>>>> 2af5234eea92edf59d79a2c25644883a73150ddf
                 //logFile.LogInfo($"Indirizzo ricavato: {indirizzoRicavato}");
                 // Controllo se sono presenti Errori
                 //logFile.LogInfo($"ERROR: {error}");
@@ -544,6 +621,7 @@ public class CSVReader
                     codiceFiscale = cod_fisc,
                     IdEnte = selectedEnteId,
                 };
+<<<<<<< HEAD
 <<<<<<< HEAD
                 logFile.LogInfo($"Utenza: {utenza.ToString()}");
                 // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
@@ -641,6 +719,11 @@ public class CSVReader
                 //     datiComplessivi.UtenzeIdricheEsistente.Add(utenza);
                 // }
 >>>>>>> f843c930ff350d45a33002e0b4c759dc1af88df3
+=======
+                logFile.LogInfo($"Utenza: {utenza.ToString()}");
+                // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
+                datiComplessivi.UtenzeIdriche.Add(utenza);
+>>>>>>> 2af5234eea92edf59d79a2c25644883a73150ddf
             }
 
             if (errori.Count > 0)
