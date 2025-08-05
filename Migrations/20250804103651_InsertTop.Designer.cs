@@ -272,7 +272,7 @@ namespace BonusIdrici2.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("denominazione");
 
-                    b.Property<string>("nomarlizzazione")
+                    b.Property<string>("normalizzazione")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("normalizzazione");

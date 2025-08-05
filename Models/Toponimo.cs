@@ -12,7 +12,7 @@ namespace BonusIdrici2.Models
         [Required]
         public required string denominazione { get; set; }
 
-        public string? nomarlizzazione { get; set; }
+        public string? normalizzazione { get; set; }
 
         public DateTime? data_creazione { get; set; }
 
@@ -25,7 +25,7 @@ namespace BonusIdrici2.Models
 
         public string? ToString()
         {
-            return $"Id: {id} Denominazione: {denominazione} Normalizzazione {nomarlizzazione} Data Creazione: {data_creazione} Data Aggiornamento {data_aggiornamento} Id Ente: {IdEnte}";
+            return $"Id: {id} Denominazione: {denominazione} Normalizzazione {normalizzazione} Data Creazione: {data_creazione} Data Aggiornamento {data_aggiornamento} Id Ente: {IdEnte}";
         }
 
     }

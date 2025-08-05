@@ -441,7 +441,7 @@ public class CSVReader
                     if (toponimoEsistente == null)
                     {
                         // Se non esiste, lo aggiungo.
-                        findToponimo.nomarlizzazione = null;
+                        findToponimo.normalizzazione = null;
                         findToponimo.data_creazione = DateTime.Now;
                         findToponimo.data_aggiornamento = null;
 
@@ -455,10 +455,10 @@ public class CSVReader
                         // Se esiste, lo utilizzo.
                         //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
 
-                        if (toponimoEsistente.nomarlizzazione != null)
+                        if (toponimoEsistente.normalizzazione != null)
                         {
                             // Assegno l'indirizzo associato a quel toponimo
-                            indirizzoRicavato = toponimoEsistente.nomarlizzazione;
+                            indirizzoRicavato = toponimoEsistente.normalizzazione;
                         }
                         else
                         {
@@ -484,7 +484,7 @@ public class CSVReader
                     if (toponimoEsistente == null)
                     {
                         // Se non esiste, lo aggiungo.
-                        findToponimo.nomarlizzazione = indirizzoRicavato;
+                        findToponimo.normalizzazione = indirizzoRicavato;
                         findToponimo.data_creazione = DateTime.Now;
                         findToponimo.data_aggiornamento = null;
 
@@ -498,11 +498,11 @@ public class CSVReader
                         // Se esiste, lo utilizzo.
                         //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
 
-                        if (toponimoEsistente.nomarlizzazione == null)
+                        if (toponimoEsistente.normalizzazione == null)
                         {
                             //logFile.LogInfo($"Aggiornamento toponimo {toponimoEsistente.ToString()}");
                             // Assegno l'indirizzo associato a quel toponimo
-                            toponimoEsistente.nomarlizzazione = indirizzoRicavato;
+                            toponimoEsistente.normalizzazione = indirizzoRicavato;
                             toponimoEsistente.data_aggiornamento = DateTime.Now;
                         }
                     }

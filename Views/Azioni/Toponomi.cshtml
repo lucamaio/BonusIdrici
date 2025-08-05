@@ -1,0 +1,46 @@
+@* Views/Azioni/GeneraEsitoCompetenza.cshtml *@
+@{
+    ViewData["Title"] = "Toponomi"; // Titolo più appropriato per la pagina iniziale
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Seleziona Ente per Visualizzare i Toponomi</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-controller="Azioni" asp-action="ShowToponomi" method="post"> @* Azione POST modificata *@
+                        
+                        <div class="mb-3">
+                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
+                            <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
+                                <option value="">-- Seleziona un Ente --</option>
+                                @if (ViewBag.Enti != null)
+                                {
+                                    foreach (var ente in ViewBag.Enti)
+                                    {
+                                        // Assicurati che "id" e "nome" siano le proprietà corrette del tuo oggetto ente
+                                        <option value="@ente.id">@ente.nome</option> 
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Visualizza Dati Ente</button> @* Testo del pulsante modificato *@
+                        </div>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(ViewBag.Message))
+                    {
+                        <div class="alert alert-info mt-3" role="alert">
+                            @ViewBag.Message
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

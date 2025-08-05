@@ -55,6 +55,29 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
+        public IActionResult Toponomi()
+        {
+            // ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            ViewBag.Enti = enti;
+            return View();
+        }
+
+        public IActionResult CreateToponimo(int idEnte)
+        {
+            ViewBag.IdEnte = idEnte;
+            return View();
+        }
+
+        public IActionResult ModificaToponimo(int id, string denominazione, string? normalizzazione, DateTime data_creazione, int idEnte){
+            ViewBag.id=id;
+            ViewBag.denominazione=denominazione;
+            ViewBag.normalizzazione=normalizzazione;
+            ViewBag.data_creazione=data_creazione;
+            ViewBag.IdEnte=idEnte;
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
@@ -72,7 +95,7 @@ namespace BonusIdrici2.Controllers
             }
 
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
-        
+
             if (selectedEnte == null)
             {
                 ViewBag.Message = "Ente selezionato non valido.";
@@ -95,7 +118,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LoadAnagrafe(filePath,selectedEnteId,dichiaranti);
+                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, dichiaranti);
 
                 // Inizia una transazione per assicurare che tutti i dati vengano salvati
                 // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
@@ -103,7 +126,7 @@ namespace BonusIdrici2.Controllers
                 {
                     try
                     {
-                        if(datiComplessivi.Dichiaranti.Count > 0)
+                        if (datiComplessivi.Dichiaranti.Count > 0)
                         {
                             // Salva i nuovi dichiaranti nel database
                             foreach (var dichiarante in datiComplessivi.Dichiaranti)
@@ -111,7 +134,7 @@ namespace BonusIdrici2.Controllers
                                 _context.Dichiaranti.Add(dichiarante);
                             }
                         }
-                        else if(datiComplessivi.DichiarantiDaAggiornare.Count > 0)
+                        else if (datiComplessivi.DichiarantiDaAggiornare.Count > 0)
                         {
                             // Aggiorna i dichiaranti esistenti
                             foreach (var dichiarante in datiComplessivi.DichiarantiDaAggiornare)
@@ -124,7 +147,7 @@ namespace BonusIdrici2.Controllers
                             ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
                             return View("LoadAnagrafica"); // Torna alla pagina di upload con un messaggio
                         }
-                        if(datiComplessivi.Dichiaranti.Count > 0 || datiComplessivi.DichiarantiDaAggiornare.Count > 0)
+                        if (datiComplessivi.Dichiaranti.Count > 0 || datiComplessivi.DichiarantiDaAggiornare.Count > 0)
                         {
                             // Salva le modifiche al database
                             await _context.SaveChangesAsync();
@@ -167,24 +190,24 @@ namespace BonusIdrici2.Controllers
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
                 ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFilePiranha","Azioni");
+                return View("LoadFilePiranha", "Azioni");
             }
 
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
-                return View("LoadFilePiranha","Azioni"); // Torna alla pagina di upload con un messaggio
+                return View("LoadFilePiranha", "Azioni"); // Torna alla pagina di upload con un messaggio
             }
 
             // Validazione del tipo di file (opzionale ma consigliata)
             if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
             {
                 ViewBag.Message = "Il file selezionato non è un CSV valido.";
-                return View("LoadFilePiranha","Azioni");
+                return View("LoadFilePiranha", "Azioni");
             }
 
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
-        
+
             if (selectedEnte == null)
             {
                 ViewBag.Message = "Ente selezionato non valido.";
@@ -204,8 +227,8 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath, selectedEnteId,utenzeIdriche,_context);
-                if (datiComplessivi != null )
+                var datiComplessivi = CSVReader.LeggiFilePhirana(filePath, selectedEnteId, utenzeIdriche, _context);
+                if (datiComplessivi != null)
                 {
                     using (var transaction = _context.Database.BeginTransaction())
                     {
@@ -246,7 +269,7 @@ namespace BonusIdrici2.Controllers
                                 ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
                                 return View("LoadFilePiranha", "Azioni");
                             }
-                           
+
                             // Salva le modifiche al database
                             if (datiComplessivi.UtenzeIdriche.Count > 0 || datiComplessivi.UtenzeIdricheEsistente.Count > 0)
                             {
@@ -283,7 +306,7 @@ namespace BonusIdrici2.Controllers
                 }
             }
 
-            return View("LoadFilePiranha","Azioni"); // Torna alla pagina di upload con il messaggio di stato
+            return View("LoadFilePiranha", "Azioni"); // Torna alla pagina di upload con il messaggio di stato
         }
 
 
@@ -401,6 +424,77 @@ namespace BonusIdrici2.Controllers
             return View("RiepilogoDatiEnte", riepilogoDati);
         }
 
+        public IActionResult ShowToponomi(int selectedEnteId)
+        {
+            if (selectedEnteId == 0)
+            {
+                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
+                ViewBag.Message = "Per favore, seleziona un ente valido.";
+                return View("Toponomi");
+            }
+
+            var dati = _context.Toponomi
+                        .Where(r => r.IdEnte == selectedEnteId)
+                        .OrderByDescending(x => x.denominazione)
+                        .ToList();
+
+            var viewModelList = dati.Select(x => new ToponomiViewModel
+            {
+                id= x.id,
+                denominazione = x.denominazione,
+                normalizzazione = x.normalizzazione,
+                data_creazione = x.data_creazione,
+                data_aggiornamento = x.data_aggiornamento,
+                IdEnte = x.IdEnte
+            }).ToList();
+
+            ViewBag.SelectedEnteId = selectedEnteId;
+            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+
+            return View("ShowToponomi", viewModelList);
+        }
+
+        [HttpPost]
+        public IActionResult creaToponimo(string denominazione, string normalizzazione, int idEnte)
+        {
+            var nuovoToponimo = new Toponimo
+            {
+                denominazione = denominazione.Trim().ToUpper(),
+                normalizzazione = normalizzazione.Trim().ToUpper(),
+                IdEnte = idEnte,
+                data_creazione = DateTime.Now,
+                data_aggiornamento =null
+            };
+
+            _context.Toponomi.Add(nuovoToponimo);
+            _context.SaveChanges();
+
+            return RedirectToAction("ShowToponomi", "Azioni", new { selectedEnteId = idEnte });
+        }
+
+        [HttpPost]
+        public IActionResult UpdateToponimo(int id, string denominazione, string normalizzazione, DateTime data_creazione, int idEnte)
+        {
+            var toponimoEsistente = _context.Toponomi.FirstOrDefault(t => t.id == id);
+
+            if (toponimoEsistente == null)
+            {
+                return RedirectToAction("Index","Home"); // oppure restituisci una view con errore
+            }
+
+            // Aggiorna le proprietà
+            toponimoEsistente.denominazione = denominazione.Trim().ToUpper();
+            toponimoEsistente.normalizzazione = normalizzazione.Trim().ToUpper();
+            toponimoEsistente.data_aggiornamento = DateTime.Now;
+            // data_creazione non viene modificata
+            toponimoEsistente.IdEnte = idEnte;
+
+            _context.SaveChanges();
+
+            return RedirectToAction("ShowToponomi", "Azioni", new { selectedEnteId = idEnte });
+        }
+
+
         public async Task<IActionResult> ScaricaCsv(int enteId, string DataCreazione, string tipoReport)
         {
             // 1. Validazione input
@@ -458,7 +552,5 @@ namespace BonusIdrici2.Controllers
             // 5. Restituisci i byte come file
             return File(fileBytes, contentType, fileName);
         }
-    }
-
-
+    }   
 }

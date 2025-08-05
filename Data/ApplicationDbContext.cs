@@ -123,7 +123,7 @@ namespace BonusIdrici2.Data
                 entity.ToTable("toponomi"); // Assicurati che il nome della tabella sia "enti"
                 entity.HasKey(f => f.id); // La chiave primaria è 'id'
                 entity.Property(f => f.denominazione).HasColumnName("denominazione").IsRequired().HasMaxLength(255);
-                entity.Property(f => f.nomarlizzazione).HasColumnName("normalizzazione").HasMaxLength(255);
+                entity.Property(f => f.normalizzazione).HasColumnName("normalizzazione").HasMaxLength(255);
                 entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
                 entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();

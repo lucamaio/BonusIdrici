@@ -1,0 +1,110 @@
+@model IEnumerable<BonusIdrici2.Models.ViewModels.ToponomiViewModel>
+
+@{
+    ViewData["Title"] = "Riepilogo Dati Ente";
+    var selectedEnteId = ViewBag.SelectedEnteId;
+    var selectedEnteNome = ViewBag.SelectedEnteNome;
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Dati Disponibili per l'Ente: <span class="fw-bold">@selectedEnteNome</span></h3>
+                    <small>ID Ente: @selectedEnteId</small>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <p class="lead">Di seguito sono elencati i toponimi associati all’ente selezionato.</p>
+                        <div class="table-responsive">
+                            <table id="riepilogoTable" class="table table-bordered table-responsive dataTable dtr-column collapsed" style="width: 100%;">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>Denominazione</th>
+                                        <th>Normalizzazione</th>
+                                        <th>Data Creazione</th>
+                                        <th>Data Aggiornamento</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.denominazione</td>
+                                            <td>@item.normalizzazione</td>
+                                            <td>@item.data_creazione?.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.data_aggiornamento?.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @* public IActionResult ModificaToponimo(int id, string denominazione, string? normalizzazione, DateTime? data_creazione, int idEnte){ *@
+                                                 <a class="btn btn-sm btn-outline-primary me-1" title="Modifica Toponimo"
+                                                    href="@Url.Action("ModificaToponimo", "Azioni", new { id = item.id , denominazione =item.denominazione, normalizzazione= item.normalizzazione, data_creazione= item.data_creazione, IdEnte= item.IdEnte })">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center" role="alert">
+                            Nessun dato di report trovato per l'ente selezionato.
+                        </div>
+                    }
+
+                    <div class="d-grid mt-4">
+                        <a href="@Url.Action("Toponomi", "Azioni")" class="btn btn-outline-secondary">Torna alla Selezione Ente</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#riepilogoTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: false,
+                responsive: true,
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json"
+                },
+                dom:
+                    '<"row card-header flex-column flex-md-row pb-0"<"d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0"l><"d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"Bf>>' +
+                    '<"row m-3 my-0 justify-content-between"<"d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0"i><"d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"p>>' +
+                    '<"justify-content-between dt-layout-table"t>',
+                buttons: [
+                    {
+                        text: '<span class="d-flex align-items-center gap-2"><i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline-block">Aggiungi Toponimo</span></span>',
+                        className: 'btn btn-success',
+                        action: function () {
+                            window.location.href = '@Url.Action("CreateToponimo", "Azioni", new { idEnte = selectedEnteId })';
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+}
