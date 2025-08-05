@@ -466,7 +466,15 @@ public class CSVReader
                         }
                     }
                 }
+<<<<<<< HEAD
                 else if (indirizzoRicavato != indirizzoUbicazione)
+=======
+                // else if (cod_fisc == null)
+                // {
+                //     warning.Add($"Attenzione: CODICE FISCALE MANCANTE. Riga {riga} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                // }
+                else  if (indirizzoUbicazione != indirizzoRicavato)
+>>>>>>> f843c930ff350d45a33002e0b4c759dc1af88df3
                 {
                     // ... La tua logica per i warning o l'aggiornamento continua qui
 
@@ -536,9 +544,103 @@ public class CSVReader
                     codiceFiscale = cod_fisc,
                     IdEnte = selectedEnteId,
                 };
+<<<<<<< HEAD
                 logFile.LogInfo($"Utenza: {utenza.ToString()}");
                 // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
                 datiComplessivi.UtenzeIdriche.Add(utenza);
+=======
+
+                var esiste = false;
+                // var aggiornare = false;
+
+                // if (utenzeIdriche != null && utenza != null)
+                // {
+                //     // 2.a) Verifico se l'utenza idrica è già presente
+                //     var utenzaEsistente = utenzeIdriche.Find(u => u.idAcquedotto == utenza.idAcquedotto && u.codiceFiscale == utenza.codiceFiscale);
+
+                //     Console.WriteLine($"Verifico se l'utenza idrica esiste: {utenza.idAcquedotto} - {utenza.codiceFiscale}");
+                //     if (utenzaEsistente != null)
+                //     {
+                //         Console.WriteLine($"Utenza idrica esistente trovata:{utenzaEsistente.ToString()}");
+                //         esiste = true;
+                //         // Utenza già presente, controllo se devo aggiornare i campi
+                //         // 2.b) Verifico lo stato dell'utenza
+                //         if (utenza.stato != utenzaEsistente.stato)
+                //         {
+                //             utenza.stato = utenzaEsistente.stato;
+                //             aggiornare = true;
+                //         }
+
+                //         //2.c) Verifico se il periodo Finale è diverso
+                //         // if (utenza.periodoFinale != utenzaEsistente.periodoFinale)
+                //         // {
+                //         //     utenza.periodoFinale = utenzaEsistente.periodoFinale; 
+                //         //     aggiornare = true;
+                //         // }
+
+                //         // 2.d) Verifico se la matricola del contatore è diversa
+                //         if (utenza.matricolaContatore != utenzaEsistente.matricolaContatore)
+                //         {
+                //             utenza.matricolaContatore = utenzaEsistente.matricolaContatore;
+                //             aggiornare = true;
+                //         }
+
+                //         // 2.e) Verifico se l'indirizzo ubicazione è diverso
+                //         if (utenza.indirizzoUbicazione != utenzaEsistente.indirizzoUbicazione)
+                //         {
+                //             utenza.indirizzoUbicazione = utenzaEsistente.indirizzoUbicazione;
+                //             aggiornare = true;
+                //         }
+
+                //         if (utenza.numeroCivico != utenzaEsistente.numeroCivico)
+                //         {
+                //             utenza.numeroCivico = utenzaEsistente.numeroCivico;
+                //             aggiornare = true;
+                //         }
+
+                //         if (!string.IsNullOrEmpty(utenza.subUbicazione) && utenza.subUbicazione != utenzaEsistente.subUbicazione)
+                //         {
+                //             utenza.subUbicazione = utenzaEsistente.subUbicazione;
+                //             aggiornare = true;
+                //         }
+
+                //         if (!string.IsNullOrEmpty(utenza.scalaUbicazione) && utenza.scalaUbicazione != utenzaEsistente.scalaUbicazione)
+                //         {
+                //             utenza.scalaUbicazione = utenzaEsistente.scalaUbicazione;
+                //             aggiornare = true;
+                //         }
+
+                //         if (!string.IsNullOrEmpty(utenza.piano) && utenza.piano != utenzaEsistente.piano)
+                //         {
+                //             utenza.piano = utenzaEsistente.piano;
+                //             aggiornare = true;
+                //         }
+
+                //         if (!string.IsNullOrEmpty(utenza.interno) && utenza.interno != utenzaEsistente.interno)
+                //         {
+                //             utenza.interno = utenzaEsistente.interno;
+                //             aggiornare = true;
+                //         }
+
+                //         // 2.f) Verifico se il tipo utenza è diverso
+                //         if (utenza.tipoUtenza != utenzaEsistente.tipoUtenza)
+                //         {
+                //             utenza.tipoUtenza = utenzaEsistente.tipoUtenza;
+                //             aggiornare = true;
+                //         }
+                //     }
+                // }
+
+                if (!esiste)
+                {
+                    // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
+                    datiComplessivi.UtenzeIdriche.Add(utenza);
+                }
+                // else if (aggiornare)
+                // {
+                //     datiComplessivi.UtenzeIdricheEsistente.Add(utenza);
+                // }
+>>>>>>> f843c930ff350d45a33002e0b4c759dc1af88df3
             }
 
             if (errori.Count > 0)
