@@ -55,29 +55,6 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-        public IActionResult Toponomi()
-        {
-            // ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            ViewBag.Enti = enti;
-            return View();
-        }
-
-        public IActionResult CreateToponimo(int idEnte)
-        {
-            ViewBag.IdEnte = idEnte;
-            return View();
-        }
-
-        public IActionResult ModificaToponimo(int id, string denominazione, string? normalizzazione, DateTime data_creazione, int idEnte){
-            ViewBag.id=id;
-            ViewBag.denominazione=denominazione;
-            ViewBag.normalizzazione=normalizzazione;
-            ViewBag.data_creazione=data_creazione;
-            ViewBag.IdEnte=idEnte;
-            return View();
-        }
-
         [HttpPost]
         public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
@@ -423,77 +400,6 @@ namespace BonusIdrici2.Controllers
 
             return View("RiepilogoDatiEnte", riepilogoDati);
         }
-
-        public IActionResult ShowToponomi(int selectedEnteId)
-        {
-            if (selectedEnteId == 0)
-            {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-                ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("Toponomi");
-            }
-
-            var dati = _context.Toponomi
-                        .Where(r => r.IdEnte == selectedEnteId)
-                        .OrderByDescending(x => x.denominazione)
-                        .ToList();
-
-            var viewModelList = dati.Select(x => new ToponomiViewModel
-            {
-                id= x.id,
-                denominazione = x.denominazione,
-                normalizzazione = x.normalizzazione,
-                data_creazione = x.data_creazione,
-                data_aggiornamento = x.data_aggiornamento,
-                IdEnte = x.IdEnte
-            }).ToList();
-
-            ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
-
-            return View("ShowToponomi", viewModelList);
-        }
-
-        [HttpPost]
-        public IActionResult creaToponimo(string denominazione, string normalizzazione, int idEnte)
-        {
-            var nuovoToponimo = new Toponimo
-            {
-                denominazione = denominazione.Trim().ToUpper(),
-                normalizzazione = normalizzazione.Trim().ToUpper(),
-                IdEnte = idEnte,
-                data_creazione = DateTime.Now,
-                data_aggiornamento =null
-            };
-
-            _context.Toponomi.Add(nuovoToponimo);
-            _context.SaveChanges();
-
-            return RedirectToAction("ShowToponomi", "Azioni", new { selectedEnteId = idEnte });
-        }
-
-        [HttpPost]
-        public IActionResult UpdateToponimo(int id, string denominazione, string normalizzazione, DateTime data_creazione, int idEnte)
-        {
-            var toponimoEsistente = _context.Toponomi.FirstOrDefault(t => t.id == id);
-
-            if (toponimoEsistente == null)
-            {
-                return RedirectToAction("Index","Home"); // oppure restituisci una view con errore
-            }
-
-            // Aggiorna le proprietà
-            toponimoEsistente.denominazione = denominazione.Trim().ToUpper();
-            toponimoEsistente.normalizzazione = normalizzazione.Trim().ToUpper();
-            toponimoEsistente.data_aggiornamento = DateTime.Now;
-            // data_creazione non viene modificata
-            toponimoEsistente.IdEnte = idEnte;
-
-            _context.SaveChanges();
-
-            return RedirectToAction("ShowToponomi", "Azioni", new { selectedEnteId = idEnte });
-        }
-
 
         public async Task<IActionResult> ScaricaCsv(int enteId, string DataCreazione, string tipoReport)
         {
