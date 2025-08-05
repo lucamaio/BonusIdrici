@@ -7,6 +7,7 @@ using System.IO;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using BonusIdrici2.Models.ViewModels; 
 
 namespace BonusIdrici2.Controllers
 {
@@ -24,12 +25,26 @@ namespace BonusIdrici2.Controllers
 
           public IActionResult Index()
         {
-            return View();
+            var dati = _context.Enti.ToList();
+            // Console.WriteLine(dati.Count());
+            var viewModelList = dati.Select(x => new EntiViewModel
+            {
+                id = x.id,
+                nome = x.nome,
+                istat = x.istat,
+                partitaIva = x.partitaIva,
+                CodiceFiscale = x.CodiceFiscale,
+                Cap = x.Cap,
+                Provincia = x.Provincia,
+                Regione = x.Regione,
+            }).ToList();
+
+            return View("Index",viewModelList);
         }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [HttpPost]
-        public IActionResult creaEnte(Ente ente)
+        public IActionResult Create(Ente ente)
         {
             if (ModelState.IsValid)
             {
