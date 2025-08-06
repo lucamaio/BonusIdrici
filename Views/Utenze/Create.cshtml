@@ -1,0 +1,114 @@
+@{
+    ViewData["Title"] = "Crea Utenza";
+
+    var tipiDisponibili = new List<string>
+    {
+        "UTENZA COMMERCIALE",
+        "UTENZA DOMESTICA",
+        "UTENZA USO ARTIGIANALE",
+        "UTENZA USO INDUSTRIALE",
+        "UTENZA SPECIALE TEMPORANEA"
+    };
+
+    var sessoUtenza = new List<string> { "M", "F", "D" };
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Crea Nuova Utenza</h3>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-controller="Utenze" asp-action="Create" method="POST" enctype="multipart/form-data">
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+
+                            <div>
+                                <label for="matricolaContatore" class="form-label">Matricola: *</label>
+                                <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" required>
+                            </div>
+
+                            <div>
+                                <label for="stato" class="form-label">Stato: *</label>
+                                <input type="number" class="form-control" id="stato" name="stato" min="1" max="5" required>
+                            </div>
+
+                            <div>
+                                <label for="periodoIniziale" class="form-label">Periodo Iniziale: *</label>
+                                <input class="form-control" type="date" id="periodoIniziale" name="periodoIniziale" required>
+                            </div>
+
+                            <div>
+                                <label for="periodoFinale" class="form-label">Periodo Finale:</label>
+                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale">
+                            </div>
+
+                            <div>
+                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo: *</label>
+                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione" required>
+                            </div>
+
+                            <div>
+                                <label for="numero_civico" class="form-label">Civico: *</label>
+                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                            </div>
+
+                            <div>
+                                <label for="tipo_utenza" class="form-label">Tipo Utenza: *</label>
+                                <select class="form-select" id="tipo_utenza" name="tipo_utenza" required>
+                                    <option value="" disabled selected>Seleziona tipo utenza</option>
+                                    @foreach (var tipo in tipiDisponibili)
+                                    {
+                                        <option value="@tipo">@tipo</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="cognome" class="form-label">Cognome: *</label>
+                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+                            </div>
+
+                            <div>
+                                <label for="nome" class="form-label">Nome: *</label>
+                                <input type="text" class="form-control" id="nome" name="nome" required>
+                            </div>
+
+                            <div>
+                                <label for="sesso" class="form-label">Sesso: *</label>
+                                <select class="form-select" id="sesso" name="sesso" required>
+                                    <option value="" disabled selected>Seleziona sesso</option>
+                                    @foreach (var sex in sessoUtenza)
+                                    {
+                                        <option value="@sex">@sex</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="codice_fiscale" class="form-label">Codice Fiscale: *</label>
+                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" required>
+                            </div>
+
+                            <div>
+                                <label for="partita_iva" class="form-label">Partita IVA:</label>
+                                <input type="text" class="form-control" id="partita_iva" name="partita_iva">
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3">Crea</button>
+                            <a class="btn btn-back btn-lg rounded-3" href="@Url.Action("Index", "Utenze")">
+                                Annulla
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

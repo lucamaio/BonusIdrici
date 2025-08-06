@@ -50,6 +50,12 @@ namespace BonusIdrici2.Models
 
         [Required]
         public required string? codiceFiscale { get; set; }
+        
+        public string? partitaIva { get; set; }
+
+        public DateTime? data_creazione { get; set; }
+        
+        public DateTime? data_aggiornamento { get; set; }
 
         [Required]
         public int IdEnte { get; set; } 

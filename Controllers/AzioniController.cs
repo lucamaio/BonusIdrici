@@ -49,8 +49,7 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Report()
         {
-            // ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            List<Ente> enti = _context.Enti.ToList();
+            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
             ViewBag.Enti = enti;
             return View();
         }

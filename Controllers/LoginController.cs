@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using BonusIdrici2.Models; 
 using BonusIdrici2.Data;
 using System.IO;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BonusIdrici2.Controllers
 {

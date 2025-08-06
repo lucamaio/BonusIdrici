@@ -534,6 +534,8 @@ public class CSVReader
                     nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(),
                     sesso = FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper(),
                     codiceFiscale = cod_fisc,
+                    partitaIva = FunzioniTrasversali.rimuoviVirgolette(campi[37]),
+                    data_creazione = DateTime.Now,
                     IdEnte = selectedEnteId,
                 };
                 logFile.LogInfo($"Utenza: {utenza.ToString()}");
