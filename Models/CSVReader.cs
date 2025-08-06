@@ -53,7 +53,7 @@ public class CSVReader
 
                 // c) Verifico che il campo cognome è valido 
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
+                if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[0])))
                 {
                     errori.Add($"Attenzione: Cognome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -61,7 +61,7 @@ public class CSVReader
 
                 // d) Verifico che il campo nome è valido
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[1])))
+                if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[1])))
                 {
                     errori.Add($"Attenzione: Nome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -69,7 +69,7 @@ public class CSVReader
 
                 // e) Verifico che il Codice Fiscale è valido
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[2])) || rimuoviVirgolette(campi[2]).Length != 16)
+                if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[2])) || FunzioniTrasversali.rimuoviVirgolette(campi[2]).Length != 16)
                 {
                     errori.Add($"Attenzione: Codice Fiscale mancante o mal formato, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -77,7 +77,7 @@ public class CSVReader
 
                 // f) Verifico il campo sesso se è valido
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[3])) && (rimuoviVirgolette(campi[3]).ToUpper() != "M") && (rimuoviVirgolette(campi[3]).ToUpper() != "F"))
+                if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[3])) && (FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper() != "M") && (FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper() != "F"))
                 {
                     errori.Add($"Attenzione: Sesso mancante o mal formato, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -85,7 +85,7 @@ public class CSVReader
 
                 // g) Verifico se il campo indirizzo residente è presente
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[7])))
+                if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[7])))
                 {
                     errori.Add($"Attenzione: Indirizzo residenza mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -93,7 +93,7 @@ public class CSVReader
 
                 // h) Verifico se il campo numero civico è presente
 
-                if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[8])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.FormattaNumeroCivico(campi[8])))
                 {
                     errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -110,18 +110,18 @@ public class CSVReader
 
                 var dichiarante = new Dichiarante
                 {
-                    Cognome = rimuoviVirgolette(campi[0]).ToUpper(),
-                    Nome = rimuoviVirgolette(campi[1]).ToUpper(),
-                    CodiceFiscale = rimuoviVirgolette(campi[2]).ToUpper(),
-                    Sesso = rimuoviVirgolette(campi[3]).ToUpper(),
-                    DataNascita = ConvertiData(campi[4]),
-                    ComuneNascita = rimuoviVirgolette(campi[5]).ToUpper(),
-                    IndirizzoResidenza = rimuoviVirgolette(campi[7]).ToUpper(),
-                    NumeroCivico = FormattaNumeroCivico(campi[8]),
-                    Parentela = rimuoviVirgolette(campi[10]).ToUpper(),
+                    Cognome = FunzioniTrasversali.rimuoviVirgolette(campi[0]).ToUpper(),
+                    Nome = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper(),
+                    CodiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper(),
+                    Sesso = FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper(),
+                    DataNascita = FunzioniTrasversali.ConvertiData(campi[4]),
+                    ComuneNascita = FunzioniTrasversali.rimuoviVirgolette(campi[5]).ToUpper(),
+                    IndirizzoResidenza = FunzioniTrasversali.rimuoviVirgolette(campi[7]).ToUpper(),
+                    NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[8]),
+                    Parentela = FunzioniTrasversali.rimuoviVirgolette(campi[10]).ToUpper(),
                     CodiceFamiglia = int.Parse(campi[11].Trim()),
                     NumeroComponenti = int.Parse(campi[13].Trim()),
-                    CodiceFiscaleIntestatarioScheda = rimuoviVirgolette(campi[19]),
+                    CodiceFiscaleIntestatarioScheda = FunzioniTrasversali.rimuoviVirgolette(campi[19]),
                     IdEnte = selectedEnteId
                 };
 
@@ -296,54 +296,54 @@ public class CSVReader
 
                 // c) Verifico che esiste il campo idAcquedotto è presente
 
-                if (string.IsNullOrEmpty(rimuoviVirgolette(campi[0])))
+                if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[0])))
                 {
-                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
+                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. | Riga {rigaCorrente} | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[32])} {FunzioniTrasversali.rimuoviVirgolette(campi[33])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[36])}");
                     error = true;
                 }
 
                 // d) Controllo se il campo Codice Fiscale è valido è != null
-                // logFile.LogInfo($"CODICE Fiscale {rimuoviVirgolette(campi[36])} | Riga {rigaCorrente} | lunghezza {rimuoviVirgolette(campi[36]).Length} ");
+                // logFile.LogInfo($"CODICE Fiscale {FunzioniTrasversali.rimuoviVirgolette(campi[36])} | Riga {rigaCorrente} | lunghezza {FunzioniTrasversali.rimuoviVirgolette(campi[36]).Length} ");
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[36])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[36])))
                 {
-                    // logFile.LogInfo($"SONO NULL! | SESSO: {rimuoviVirgolette(campi[34])}");
-                    if (!rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
+                    // logFile.LogInfo($"SONO NULL! | SESSO: {FunzioniTrasversali.rimuoviVirgolette(campi[34])}");
+                    if (!FunzioniTrasversali.rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
                         logFile.LogInfo("COD FISC MANCATE E sesso != D");
-                        errori.Add($"Attenzione : Codice Fiscale mancante, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
+                        errori.Add($"Attenzione : Codice Fiscale mancante, saltata. | Riga {rigaCorrente} | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[32])} {FunzioniTrasversali.rimuoviVirgolette(campi[33])}");
                         error = true;
                     }
-                    else if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) &&
-                            rimuoviVirgolette(campi[9]) != "4" &&
-                            rimuoviVirgolette(campi[9]) != "5" &&
-                            string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) &&
-                            rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
+                    else if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[37])) &&
+                            FunzioniTrasversali.rimuoviVirgolette(campi[9]) != "4" &&
+                            FunzioniTrasversali.rimuoviVirgolette(campi[9]) != "5" &&
+                            string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[14])) &&
+                            FunzioniTrasversali.rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
                         // logFile.LogInfo("PIVA NULL && stato != 4, e sesso =D");
-                        warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
+                        warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {FunzioniTrasversali.rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
                         error = true;
                     }
                 }
-                else if (rimuoviVirgolette(campi[36]).Length != 16)
+                else if (FunzioniTrasversali.rimuoviVirgolette(campi[36]).Length != 16)
                 {
-                    // logFile.LogInfo($"mal formata! | SESSO: {rimuoviVirgolette(campi[34])}");
-                    if (!rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
+                    // logFile.LogInfo($"mal formata! | SESSO: {FunzioniTrasversali.rimuoviVirgolette(campi[34])}");
+                    if (!FunzioniTrasversali.rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
                         // logFile.LogInfo("Sesso diverso da D!");
-                        errori.Add($"Attenzione : Codice Fiscale mal formato, saltata. | Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])}");
+                        errori.Add($"Attenzione : Codice Fiscale mal formato, saltata. | Riga {rigaCorrente} | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[32])} {FunzioniTrasversali.rimuoviVirgolette(campi[33])}");
                         error = true;
                     }
                     else
                     {
-                        if (string.IsNullOrEmpty(rimuoviVirgolette(campi[37])) &&
-                            rimuoviVirgolette(campi[9]) != "4" &&
-                            rimuoviVirgolette(campi[9]) != "5" &&
-                            string.IsNullOrEmpty(rimuoviVirgolette(campi[14])) &&
-                            rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
+                        if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[37])) &&
+                            FunzioniTrasversali.rimuoviVirgolette(campi[9]) != "4" &&
+                            FunzioniTrasversali.rimuoviVirgolette(campi[9]) != "5" &&
+                            string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[14])) &&
+                            FunzioniTrasversali.rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                         {
                             // logFile.LogInfo("PIVA 2 NULL && stato != 4, e sesso =D");
-                            warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {rimuoviVirgolette(campi[32])} non trovati. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
+                            warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {FunzioniTrasversali.rimuoviVirgolette(campi[32])} non trovati. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
                             error = true;
                         }
                     }
@@ -352,74 +352,74 @@ public class CSVReader
 
                 // e) Controllo se la matricola del contatore è presente
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) && rimuoviVirgolette(campi[9]) != "4" && rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(rimuoviVirgolette(campi[14])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[12])) && FunzioniTrasversali.rimuoviVirgolette(campi[9]) != "4" && FunzioniTrasversali.rimuoviVirgolette(campi[9]) != "5" && string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[14])))
                 {
 
-                    errori.Add($"Attenzione: Matricola Contatore mancante, saltata. Riga {rigaCorrente} | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
+                    errori.Add($"Attenzione: Matricola Contatore mancante, saltata. Riga {rigaCorrente} | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[32])} {FunzioniTrasversali.rimuoviVirgolette(campi[33])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[36])}");
                     error = true;
                 }
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[0])))
                 {
-                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}  | Nominativo: {rimuoviVirgolette(campi[32])} {rimuoviVirgolette(campi[33])} | Codice Fiscale: {rimuoviVirgolette(campi[36])}");
+                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}  | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[32])} {FunzioniTrasversali.rimuoviVirgolette(campi[33])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[36])}");
                     error = true;
                 }
 
                 // f) Controllo se i campi nomi, cognome e sesso sono presenti
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[32])) && string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[33])) && rimuoviVirgolette(campi[34]).ToUpper() != "D")
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[32])) && string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[33])) && FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper() != "D")
                 {
-                    errori.Add($"Attenzione: Nome o Cognome mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    errori.Add($"Attenzione: Nome o Cognome mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[34])) ||
-                    (rimuoviVirgolette(campi[34]).ToUpper() != "M" && rimuoviVirgolette(campi[34]).ToUpper() != "F" && rimuoviVirgolette(campi[34]).ToUpper() != "D"))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[34])) ||
+                    (FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper() != "M" && FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper() != "F" && FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper() != "D"))
                 {
-                    errori.Add($"Attenzione: Sesso mancante o mal formato, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    errori.Add($"Attenzione: Sesso mancante o mal formato, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
                 // g) Controllo se il campo periodoIniziale è presente
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[13])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[13])))
                 {
-                    errori.Add($"Attenzione: Periodo iniziale mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    errori.Add($"Attenzione: Periodo iniziale mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
                 // h) Verifico se il campo tipo utenza è presente
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[26])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[26])))
                 {
-                    errori.Add($"Attenzione: Tipo Utenza mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    errori.Add($"Attenzione: Tipo Utenza mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
                 // i) Verifico se il campo indirizzo Ubicazione è presente
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[15])))
                 {
-                    errori.Add($"Attenzione: Indirizzo ubicazione mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    errori.Add($"Attenzione: Indirizzo ubicazione mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
                 // j) Verifico se il campo numero civico è presente
 
-                if (string.IsNullOrWhiteSpace(FormattaNumeroCivico(campi[16])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.FormattaNumeroCivico(campi[16])))
                 {
-                    errori.Add($"Attenzione: Numero civico mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {rimuoviVirgolette(campi[0])} | Matricola Contatore: {rimuoviVirgolette(campi[12])}");
+                    errori.Add($"Attenzione: Numero civico mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
                     error = true;
                 }
 
                 // Formatto l'indirizzo sono uguali
-                var cod_fisc = rimuoviVirgolette(campi[36]).ToUpper();
-                var indirizzoUbicazione = rimuoviVirgolette(campi[15]).ToUpper();
-                var indirizzoRicavato = FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc, selectedEnteId);
+                var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[36]).ToUpper();
+                var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
+                var indirizzoRicavato = FunzioniTrasversali.FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc, selectedEnteId);
 
                 // if (indirizzoRicavato == null && cod_fisc != null)
                 // {
-                //     errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {rimuoviVirgolette(campi[32]).ToUpper()} {rimuoviVirgolette(campi[33]).ToUpper()}");
+                //     errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper()} {FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper()}");
                 //     error = true;
                 // }
                 // else  if (indirizzoUbicazione != indirizzoRicavato)
@@ -518,21 +518,21 @@ public class CSVReader
                 // 2) Verifico se l'utenza idrica è già presente
                 var utenza = new UtenzaIdrica
                 {
-                    idAcquedotto = rimuoviVirgolette(campi[0]),
-                    stato = int.TryParse(rimuoviVirgolette(campi[9]), out int stato) ? stato : 0,
-                    periodoIniziale = ConvertiData(rimuoviVirgolette(campi[13])),
-                    periodoFinale = ConvertiData(rimuoviVirgolette(campi[14])),
-                    matricolaContatore = rimuoviVirgolette(campi[12]).ToUpper(),
+                    idAcquedotto = FunzioniTrasversali.rimuoviVirgolette(campi[0]),
+                    stato = int.TryParse(FunzioniTrasversali.rimuoviVirgolette(campi[9]), out int stato) ? stato : 0,
+                    periodoIniziale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[13])),
+                    periodoFinale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[14])),
+                    matricolaContatore = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper(),
                     indirizzoUbicazione = indirizzoRicavato.ToUpper(),
-                    numeroCivico = FormattaNumeroCivico(campi[16]).ToUpper(),
-                    subUbicazione = rimuoviVirgolette(campi[17]).ToUpper(),
-                    scalaUbicazione = rimuoviVirgolette(campi[18]),
-                    piano = rimuoviVirgolette(campi[19]),
-                    interno = rimuoviVirgolette(campi[20]),
-                    tipoUtenza = rimuoviVirgolette(campi[26]).ToUpper(),
-                    cognome = rimuoviVirgolette(campi[32]).ToUpper(),
-                    nome = rimuoviVirgolette(campi[33]).ToUpper(),
-                    sesso = rimuoviVirgolette(campi[34]).ToUpper(),
+                    numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[16]).ToUpper(),
+                    subUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[17]).ToUpper(),
+                    scalaUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[18]),
+                    piano = FunzioniTrasversali.rimuoviVirgolette(campi[19]),
+                    interno = FunzioniTrasversali.rimuoviVirgolette(campi[20]),
+                    tipoUtenza = FunzioniTrasversali.rimuoviVirgolette(campi[26]).ToUpper(),
+                    cognome = FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper(),
+                    nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(),
+                    sesso = FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper(),
                     codiceFiscale = cod_fisc,
                     IdEnte = selectedEnteId,
                 };
@@ -648,7 +648,7 @@ public class CSVReader
                 }
 
                 // Verifico se il campo idAto è presente e nonn vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[0])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[0])))
                 {
                     errori.Add($"ID_ATO mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -656,7 +656,7 @@ public class CSVReader
 
                 // Verifico se il campo codice_bonus è presente, non vuoto è ha una lunhezza di 15 carratteri
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[1])) || rimuoviVirgolette(campi[1]).Length != 15)
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[1])) || FunzioniTrasversali.rimuoviVirgolette(campi[1]).Length != 15)
                 {
                     errori.Add($"Attenzione: Codice Bonus mancante o non valido, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -664,14 +664,14 @@ public class CSVReader
 
                 // Verifico se il campo Codice Fiscale è presente e non vuoto
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[2])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[2])))
                 {
                     errori.Add($"Attenzione: Codice Fiscale mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo NOME_DICHIARANTE e COGNOME_DICHIARANTE sono presenti e non vuoti
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[3])) || string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[4])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[3])) || string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[4])))
                 {
                     errori.Add($"Attenzione: Nome o Cognome mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -679,42 +679,42 @@ public class CSVReader
 
                 // Verifico se il campo Anno_validità è presente e non vuoto
 
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[6])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[6])))
                 {
                     errori.Add($"Attenzione: Anno di validità mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // verifico se il campo Data_inizio_validità è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[7])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[7])))
                 {
                     errori.Add($"Attenzione: Data di inizio validità mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo Data_fine_validità è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[8])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[8])))
                 {
                     errori.Add($"Attenzione: Data di fine validità mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo indirizzo_abitazione è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[9])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[9])))
                 {
                     errori.Add($"Attenzione: Indirizzo abitazione mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo numero_civico è presente e non vuotO
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[10])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[10])))
                 {
                     errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo iSTAT è presente e non vuoto
-                string istat = rimuoviVirgolette(campi[11]);
+                string istat = FunzioniTrasversali.rimuoviVirgolette(campi[11]);
 
                 if (string.IsNullOrWhiteSpace(istat) || istat.Length != 6)
                 {
@@ -723,30 +723,30 @@ public class CSVReader
                 }
 
                 // VERIFICO Se il campo cap è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[12])) || rimuoviVirgolette(campi[12]).Length != 5)
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[12])) || FunzioniTrasversali.rimuoviVirgolette(campi[12]).Length != 5)
                 {
                     errori.Add($"Attenzione: CAP mancante o malformato, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // vrifico se il campo provincia_abitazione è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[13])) || rimuoviVirgolette(campi[13]).Length != 2)
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[13])) || FunzioniTrasversali.rimuoviVirgolette(campi[13]).Length != 2)
                 {
                     errori.Add($"Attenzione: Provincia abitazione mancante o malformata, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // Verifico se il campo Presenza_POD è presente ed è valido
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[14])) ||
-                    (!rimuoviVirgolette(campi[14]).Equals("SI", StringComparison.OrdinalIgnoreCase) &&
-                     !rimuoviVirgolette(campi[14]).Equals("NO", StringComparison.OrdinalIgnoreCase)))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[14])) ||
+                    (!FunzioniTrasversali.rimuoviVirgolette(campi[14]).Equals("SI", StringComparison.OrdinalIgnoreCase) &&
+                     !FunzioniTrasversali.rimuoviVirgolette(campi[14]).Equals("NO", StringComparison.OrdinalIgnoreCase)))
                 {
                     errori.Add($"Attenzione: Presenza POD mancante o non valida, saltata. Riga {rigaCorrente}");
                     error = true;
                 }
 
                 // verifdico se il campo n_componenti è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(rimuoviVirgolette(campi[15])))
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[15])))
                 {
                     errori.Add($"Attenzione: Numero componenti mancante, saltata. Riga {rigaCorrente}");
                     error = true;
@@ -760,26 +760,26 @@ public class CSVReader
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
 
-                string idAto = rimuoviVirgolette(campi[0]);
-                string codiceBonus = rimuoviVirgolette(campi[1]).ToUpper();
-                string codiceFiscale = rimuoviVirgolette(campi[2]).ToUpper();
+                string idAto = FunzioniTrasversali.rimuoviVirgolette(campi[0]);
+                string codiceBonus = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper();
+                string codiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper();
 
-                string nomeDichiarante = rimuoviVirgolette(campi[3]).ToUpper();
-                string cognomeDichiarante = rimuoviVirgolette(campi[4]).ToUpper();
-                string[] codiciFiscaliFamigliari = splitCodiceFiscale(campi[5]);
+                string nomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper();
+                string cognomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[4]).ToUpper();
+                string[] codiciFiscaliFamigliari = FunzioniTrasversali.splitCodiceFiscale(campi[5]);
 
-                string annoValidita = rimuoviVirgolette(campi[6]);
-                string dataInizioValidita = rimuoviVirgolette(campi[7]);
-                string dataFineValidita = rimuoviVirgolette(campi[8]);
+                string annoValidita = FunzioniTrasversali.rimuoviVirgolette(campi[6]);
+                string dataInizioValidita = FunzioniTrasversali.rimuoviVirgolette(campi[7]);
+                string dataFineValidita = FunzioniTrasversali.rimuoviVirgolette(campi[8]);
 
-                string indirizzoAbitazione = rimuoviVirgolette(campi[9]).ToUpper();
-                string numeroCivico = FormattaNumeroCivico(campi[10]).ToUpper();
-                string istatAbitazione = rimuoviVirgolette(campi[11]).ToUpper();
-                string capAbitazione = rimuoviVirgolette(campi[12]).ToUpper();
-                string provinciaAbitazione = rimuoviVirgolette(campi[13]).ToUpper();
+                string indirizzoAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[9]).ToUpper();
+                string numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[10]).ToUpper();
+                string istatAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[11]).ToUpper();
+                string capAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper();
+                string provinciaAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[13]).ToUpper();
 
-                string presenzaPod = rimuoviVirgolette(campi[14]).ToUpper();
-                string numeroComponenti = rimuoviVirgolette(campi[15]).ToUpper();
+                string presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
+                string numeroComponenti = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
                 DateTime dataCreazione = DateTime.Now;
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
@@ -816,7 +816,7 @@ public class CSVReader
 
                         //3.a) verifica se il richiedente ha una fornitura idrica diretta 
 
-                        (string esitoRestituito, int? idFornituraTrovato) = verificaEsisistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico);
+                        (string esitoRestituito, int? idFornituraTrovato) = FunzioniTrasversali.verificaEsisistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico);
                         idFornituraIdrica = idFornituraTrovato;
                         if (esitoRestituito == "01")
                         {
@@ -836,7 +836,7 @@ public class CSVReader
                                     if (dichiaranteFamigliare.Count == 1)
                                     {
                                         // Verifico se il membro della famiglia ha una fornitura idrica diretta
-                                        (string esitoFamigliare, int? idFornituraMembro) = verificaEsisistenzaFornitura(codFisc, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico);
+                                        (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.verificaEsisistenzaFornitura(codFisc, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico);
                                         idFornituraIdrica = idFornituraMembro;
                                         if (esitoFamigliare == "01")
                                         {
@@ -880,8 +880,8 @@ public class CSVReader
                     nomeDichiarante = nomeDichiarante,
                     cognomeDichiarante = cognomeDichiarante,
                     annoValidita = annoValidita,
-                    dataInizioValidita = ConvertiData(dataInizioValidita),
-                    dataFineValidita = ConvertiData(dataFineValidita),
+                    dataInizioValidita = FunzioniTrasversali.ConvertiData(dataInizioValidita),
+                    dataFineValidita = FunzioniTrasversali.ConvertiData(dataFineValidita),
                     indirizzoAbitazione = indirizzoAbitazione,
                     numeroCivico = numeroCivico,
                     istat = istatAbitazione,
@@ -924,183 +924,5 @@ public class CSVReader
 
         return datiComplessivi;
     }
-
-    private static string rimuoviVirgolette(string stringa)
-    {
-        string formatedString = stringa.Trim();
-        if (formatedString.Contains("\""))
-        {
-            // Rimuove gli spazi e i caratteri speciali come / e -
-            formatedString = formatedString.Replace("\"", "");
-        }
-        return formatedString;
-    }
-
-
-
-    private static string FormattaNumeroCivico(string stringa)
-    {
-        // 1. Pulizia e normalizzazione iniziale
-        // Rimuove virgolette, trimma spazi e converte in maiuscolo
-        string numero_civico = rimuoviVirgolette(stringa).ToUpperInvariant();
-
-        // 2. Gestione casi speciali: null/vuoto, "0", "SN"
-        if (string.IsNullOrEmpty(numero_civico))
-        {
-            return "N/A"; // O string.Empty, a seconda della tua preferenza per numeri civici mancanti
-        }
-
-        if (numero_civico.Equals("0") || numero_civico.Equals("SN"))
-        {
-            return "SNC"; // "Senza Numero Civico"
-        }
-
-        // 3. Verifica la presenza di separatori ('/', '-') per estrarre la parte iniziale
-        // Se vuoi considerare anche lo spazio come separatore, aggiungilo qui:
-        // int indiceSpazio = numero_civico.IndexOf(' ');
-
-        int indiceSeparatore = numero_civico.IndexOf('/');
-        int indiceDash = numero_civico.IndexOf('-');
-
-        // Inizializza firstDelimiterIndex a un valore che indica che nessun delimitatore è stato trovato
-        // (es. lunghezza della stringa, così Substring non fallirà se non ci sono delimitatori)
-        int firstDelimiterIndex = numero_civico.Length;
-
-        if (indiceSeparatore != -1)
-        {
-            firstDelimiterIndex = Math.Min(firstDelimiterIndex, indiceSeparatore);
-        }
-        if (indiceDash != -1)
-        {
-            firstDelimiterIndex = Math.Min(firstDelimiterIndex, indiceDash);
-        }
-
-        // Se un delimitatore è stato trovato (firstDelimiterIndex è minore della lunghezza originale)
-        if (firstDelimiterIndex < numero_civico.Length)
-        {
-            // Estrai la sottostringa fino al primo delimitatore
-            string parteIniziale = numero_civico.Substring(0, firstDelimiterIndex);
-
-            // Applica Regex.Replace solo alla parte iniziale per rimuovere eventuali caratteri non numerici
-            // Questo gestirà casi come "10A/B" -> "10A" -> "10"
-            return Regex.Replace(parteIniziale, @"[^\d]", "");
-        }
-        else
-        {
-            // Nessun delimitatore '/' o '-' trovato.
-            // Applica Regex.Replace all'intera stringa per rimuovere caratteri non numerici.
-            // Questo gestirà casi come "10C" -> "10" o "VIA12" -> "12"
-            return Regex.Replace(numero_civico, @"[^\d]", "");
-        }
-    }
-
-    private static string[] splitCodiceFiscale(string codiceFiscale)
-    {
-        // Rimuove gli spazi e i caratteri speciali come / e -
-        string formatedCodiceFiscale = codiceFiscale.Trim().Replace("\"", "");
-        return formatedCodiceFiscale.Split(',');
-    }
-
-
-    public static DateTime? ConvertiData(string dataStringa)
-    {
-        if (string.IsNullOrWhiteSpace(dataStringa))
-        {
-            return null; // Restituisce null se la stringa è vuota/nulla
-        }
-
-        // Formato comune italiano: "gg/MM/aaaa"
-        if (DateTime.TryParseExact(dataStringa, "dd/MM/yyyy", new CultureInfo("it-IT"), DateTimeStyles.None, out DateTime parsedDate))
-        {
-            return parsedDate;
-        }
-
-        // Se hai altri formati possibili nel CSV (es. "aaaa-MM-gg"), aggiungili qui:
-        if (DateTime.TryParseExact(dataStringa, "yyyy-MM-dd", new CultureInfo("it-IT"), DateTimeStyles.None, out parsedDate))
-        {
-            return parsedDate;
-        }
-
-        // Se nessun formato corrisponde, stampa un avviso e restituisci null
-        Console.WriteLine($"Attenzione: Impossibile convertire la data '{dataStringa}' nel formato atteso. Verrà salvato un valore nullo.");
-        return null;
-    }
-
-
-    private static (string esito, int? idFornitura) verificaEsisistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, string IndirizzoResidenza, string NumeroCivico)
-    {
-        // Verifica se il richiedente ha una fornitura idrica diretta
-        var forniture = context.UtenzeIdriche.Where(s => s.codiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId).ToList();
-        if (forniture.Count == 1)
-        {
-            string? tipoUtenza = forniture[0].tipoUtenza;
-            int? idFornituraTrovata = int.Parse(forniture[0].idAcquedotto);       //  Aggiungo una variabile per salvare id della fornitura
-
-            if (tipoUtenza.Equals("UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
-            {
-                // 3.c) adessso verifico se l'utenza è situata nello stesso indirizzo del richiedente
-                string? indirizzoUtenza = forniture[0].indirizzoUbicazione;
-                string? numeroCivicoUtenza = forniture[0].numeroCivico;    // N.B Crea una funzione per formattare il numero civico come in FormattaNumeroCivico
-
-                if (indirizzoUtenza.Equals(IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
-                    numeroCivicoUtenza.Equals(NumeroCivico, StringComparison.OrdinalIgnoreCase))
-                {
-                    // 3.d) Adesso verifico se lo stato della fornitura e compresso tra 1 e 3
-                    if (forniture[0].stato >= 1 && forniture[0].stato <= 3)
-                    {
-                        // 3.e) se lo stato è compreso tra 1 e 3 allora esito è uguale a 01
-                        return ("01", idFornituraTrovata);
-                    }
-                    else
-                    {
-                        // 3.e.2) se lo stato non è compreso tra 1 e 3 allora esito è uguale a 03
-                        return ("03", idFornituraTrovata);
-                    }
-                }
-                else
-                {
-                    // 3.c.2) se l'utenza non è situata nello stesso indirizzo allora esito è uguale a 03
-                    return ("03", idFornituraTrovata);
-                }
-            }
-        }
-        return ("04", null); // Nessuna fornitura
-    }
-
-   private static string? FormattaIndirizzo(ApplicationDbContext context, string indirizzo_ubicazione, string codiceFiscale, int IdEnte)
-{
-    // 1. Recupero il dichiarante
-    var dichiarante = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte==IdEnte);
-    if (dichiarante == null) { return null; }
-
-    var indirizzoResidenza = rimuoviVirgolette(dichiarante.IndirizzoResidenza).Trim();
-    var indirizzoUbicazione = rimuoviVirgolette(indirizzo_ubicazione).Trim();
-
-    // 2. Confronto diretto ignorando le maiuscole
-    if (string.Equals(indirizzoUbicazione, indirizzoResidenza, StringComparison.OrdinalIgnoreCase))
-    {
-        return indirizzoUbicazione;
-    }
-
-    // 3. Suddivido la via di ubicazione in token significativi
-    var partiIndirizzoUb = indirizzoUbicazione.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries);
-    var paroleDaIgnorare = new HashSet<string> { "via", "viale", "piazza", "corso", "strada" };
-
-    foreach (var part in partiIndirizzoUb)
-    {
-        var token = part.ToLowerInvariant();
-        if (token.Length <= 3 || paroleDaIgnorare.Contains(token))
-            continue;
-
-        if (indirizzoResidenza.Contains(token, StringComparison.OrdinalIgnoreCase))
-        {
-            return indirizzoResidenza;
-        }
-    }
-
-    // 4. Nessuna corrispondenza significativa trovata → mantengo l'indirizzo originale
-    return indirizzoUbicazione;
-}
-
 
 }

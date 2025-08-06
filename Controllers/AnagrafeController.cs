@@ -1,20 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using BonusIdrici2.Models; 
 using BonusIdrici2.Data;
-using System.IO;
 
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using BonusIdrici2.Models.ViewModels; 
+using BonusIdrici2.Models.ViewModels;
 
 namespace BonusIdrici2.Controllers
 {
     public class AnagrafeController : Controller
     {
         private readonly ILogger<AnagrafeController> _logger;
-        private readonly ApplicationDbContext _context; 
+        private readonly ApplicationDbContext _context;
         public AnagrafeController(ILogger<AnagrafeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
@@ -38,20 +33,20 @@ namespace BonusIdrici2.Controllers
             {
                 ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("Index","Anagrafe");
+                return View("Index", "Anagrafe");
             }
 
             var dati = _context.Dichiaranti.Where(r => r.IdEnte == selectedEnteId).ToList();
 
             var viewModelList = dati.Select(x => new AnagrafeViewModel
             {
-                id= x.id,
+                id = x.id,
                 Cognome = x.Cognome,
                 Nome = x.Nome,
                 CodiceFiscale = x.CodiceFiscale,
-                Sesso = x.Sesso,
+                Sesso = x.Sesso ?? string.Empty,
                 DataNascita = x.DataNascita,
-                ComuneNascita = x.ComuneNascita,
+                ComuneNascita = x.ComuneNascita ?? string.Empty,
                 IndirizzoResidenza = x.IndirizzoResidenza,
                 NumeroCivico = x.NumeroCivico,
                 CodiceFamiglia = x.CodiceFamiglia,
@@ -62,6 +57,7 @@ namespace BonusIdrici2.Controllers
                 data_aggiornamento = x.data_aggiornamento,
                 IdEnte = x.IdEnte
             }).ToList();
+
 
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
@@ -80,17 +76,17 @@ namespace BonusIdrici2.Controllers
         {
             var nuovaPersona = new Dichiarante
             {
-                Cognome = cognome,
-                Nome = nome,
-                CodiceFiscale = codice_fiscale,
-                Sesso = sesso,
+                Cognome = FunzioniTrasversali.rimuoviVirgolette(cognome).ToUpper(),
+                Nome = FunzioniTrasversali.rimuoviVirgolette(nome).ToUpper(),
+                CodiceFiscale = codice_fiscale.ToUpper(),
+                Sesso = FunzioniTrasversali.rimuoviVirgolette(sesso).ToUpper(),
                 DataNascita = data_nascita,
-                ComuneNascita = comune_nascita,
-                IndirizzoResidenza = indirizzo_residenza,
-                NumeroCivico = numero_civico,
+                ComuneNascita = FunzioniTrasversali.rimuoviVirgolette(comune_nascita).ToUpper(),
+                IndirizzoResidenza = indirizzo_residenza.ToUpper(),
+                NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(numero_civico).ToUpper(),
                 IdEnte = idEnte,
                 data_creazione = DateTime.Now,
-                data_aggiornamento =null
+                data_aggiornamento = null
             };
 
             _context.Dichiaranti.Add(nuovaPersona);
@@ -98,5 +94,40 @@ namespace BonusIdrici2.Controllers
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
         }
+
+        public IActionResult Modifica(int id)
+        {
+            ViewBag.id = id;
+            List<Dichiarante> dichiarante = _context.Dichiaranti.Where(s=>s.id==id).ToList();
+            ViewBag.Dichiarante = dichiarante.First();
+            return View();
+        }
+        
+        [HttpPost]
+        public IActionResult Update(int id, string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
+        {
+            var DichiaranteEsistente = _context.Dichiaranti.FirstOrDefault(t => t.id == id);
+
+            if (DichiaranteEsistente == null)
+            {
+                return RedirectToAction("Index","Home"); // oppure restituisci una view con errore
+            }
+
+            // Aggiorna le proprietà
+            DichiaranteEsistente.Cognome = FunzioniTrasversali.rimuoviVirgolette(cognome).ToUpper();
+            DichiaranteEsistente.Nome = FunzioniTrasversali.rimuoviVirgolette(nome).ToUpper();
+            DichiaranteEsistente.Sesso = FunzioniTrasversali.rimuoviVirgolette(sesso).ToUpper();
+            DichiaranteEsistente.CodiceFiscale = FunzioniTrasversali.rimuoviVirgolette(codice_fiscale).ToUpper();
+            DichiaranteEsistente.DataNascita = data_nascita;
+            DichiaranteEsistente.ComuneNascita = FunzioniTrasversali.rimuoviVirgolette(comune_nascita).ToUpper();
+            DichiaranteEsistente.IndirizzoResidenza = FunzioniTrasversali.rimuoviVirgolette(indirizzo_residenza).ToUpper();
+            DichiaranteEsistente.NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(numero_civico).ToUpper();
+            DichiaranteEsistente.data_aggiornamento = DateTime.Now;
+            
+            _context.SaveChanges();
+
+            return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
+        }
+
     }
 }

@@ -12,17 +12,11 @@ namespace BonusIdrici2.Data
             : base(options)
         {
         }
-
-        // Se Atti non è più usato, puoi eliminarlo o lasciarlo commentato
-        // public DbSet<Atto.Atto> Atti { get; set; }
         public DbSet<Dichiarante> Dichiaranti { get; set; }
         public DbSet<Ente> Enti { get; set; }
 
-        public DbSet<UtenzaIdrica> UtenzeIdriche { get; set; }
-        // public DbSet<FileUpload> FileUploads { get; set; }
-        
+        public DbSet<UtenzaIdrica> UtenzeIdriche { get; set; }        
         public DbSet<Report> Reports { get; set; }
-
         public DbSet<Toponimo> Toponomi { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,7 +37,7 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.NumeroComponenti).HasColumnName("NumeroComponenti");
                 entity.Property(f => f.CodiceFamiglia).HasColumnName("CodiceFamiglia");
                 entity.Property(f => f.Parentela).HasColumnName("Parentela").HasMaxLength(128);
-                entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("CodiceFiscaleIntestatarioScheda").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("CodiceFiscaleIntestatarioScheda").HasMaxLength(16);
                 entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
                 entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.IdEnte).HasColumnName("idEnte").IsRequired();

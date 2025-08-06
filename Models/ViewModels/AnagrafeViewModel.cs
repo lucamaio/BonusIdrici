@@ -14,12 +14,12 @@ namespace BonusIdrici2.Models.ViewModels
 
         public string Sesso { get; set; }
 
-        public required DateTime? DataNascita { get; set; }
+        public DateTime? DataNascita { get; set; }
         public string? ComuneNascita { get; set; }
 
-        public required string IndirizzoResidenza { get; set; }
+        public string? IndirizzoResidenza { get; set; }
 
-        public required string NumeroCivico { get; set; }
+        public string? NumeroCivico { get; set; }
 
         public int? CodiceFamiglia { get; set; }
         public string? Parentela { get; set; }

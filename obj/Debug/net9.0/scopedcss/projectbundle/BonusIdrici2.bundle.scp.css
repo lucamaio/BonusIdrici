@@ -18,6 +18,12 @@ a[b-xrv69dks3l] {
   border-color: #1861ac;
 }
 
+.btn-back[b-xrv69dks3l]{
+  color: #fff !important;
+  background-color: #9e0911 !important;
+  border-color: #7c050b !important;
+}
+
 .nav-pills .nav-link.active[b-xrv69dks3l], .nav-pills .show > .nav-link[b-xrv69dks3l] {
   color: #fff;
   background-color: #1b6ec2;
@@ -46,6 +52,7 @@ button.accept-policy[b-xrv69dks3l] {
   width: 100%;
   white-space: nowrap;
   line-height: 60px;
+  background-color: transparent;
 }
 
 .table-primary[b-xrv69dks3l]{
