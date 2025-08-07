@@ -416,16 +416,7 @@ public class CSVReader
                 var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[36]).ToUpper();
                 var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
                 var indirizzoRicavato = FunzioniTrasversali.FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc, selectedEnteId);
-
-                // if (indirizzoRicavato == null && cod_fisc != null)
-                // {
-                //     errori.Add($"Attenzione: Dichiarante e codice fiscale {cod_fisc} non trovato durante la ricerca sul idEnte {selectedEnteId}. Riga {rigaCorrente} | Nominativo {FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper()} {FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper()}");
-                //     error = true;
-                // }
-                // else  if (indirizzoUbicazione != indirizzoRicavato)
-                // {
-                //     warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
-                // }
+                int? idToponimo = null;
 
                 if (string.IsNullOrEmpty(indirizzoRicavato))
                 {
@@ -454,7 +445,7 @@ public class CSVReader
                     {
                         // Se esiste, lo utilizzo.
                         //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
-
+                        idToponimo = toponimoEsistente.id;
                         if (toponimoEsistente.normalizzazione != null)
                         {
                             // Assegno l'indirizzo associato a quel toponimo
@@ -497,7 +488,7 @@ public class CSVReader
                     {
                         // Se esiste, lo utilizzo.
                         //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
-
+                        idToponimo = toponimoEsistente.id;
                         if (toponimoEsistente.normalizzazione == null)
                         {
                             //logFile.LogInfo($"Aggiornamento toponimo {toponimoEsistente.ToString()}");
@@ -538,7 +529,15 @@ public class CSVReader
                     data_creazione = DateTime.Now,
                     IdEnte = selectedEnteId,
                 };
-                logFile.LogInfo($"Utenza: {utenza.ToString()}");
+                if (idToponimo != null)
+                {
+                    utenza.idToponimo = idToponimo;
+                }
+                else
+                {
+                    utenza.idToponimo = null;
+                }
+                // logFile.LogInfo($"Utenza: {utenza.ToString()}");
                 // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
                 datiComplessivi.UtenzeIdriche.Add(utenza);
             }

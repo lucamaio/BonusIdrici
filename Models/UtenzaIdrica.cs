@@ -58,15 +58,17 @@ namespace BonusIdrici2.Models
         public DateTime? data_aggiornamento { get; set; }
 
         [Required]
-        public int IdEnte { get; set; } 
+        public int IdEnte { get; set; }
+
+        public int? idToponimo { get; set; }
         
        public string? ToString()
         {
             return $"UtenzaIdrica: Acquedotto: {idAcquedotto}, Stato: {stato}, " +
                 $"Periodo Iniziale: {(periodoIniziale.HasValue ? periodoIniziale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " +
-                $"Periodo Finale: {(periodoFinale.HasValue ? periodoFinale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " + // <-- Gestione del null
+                $"Periodo Finale: {(periodoFinale.HasValue ? periodoFinale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " +
                 $"Matricola Contatore: {matricolaContatore}, Indirizzo: {indirizzoUbicazione}, " +
-                $"Numero Civico: {numeroCivico}, Tipo Utenza: {tipoUtenza}, Cognome: {cognome}, Nome: {nome}, Codice Fiscale: {codiceFiscale}";
+                $"Numero Civico: {numeroCivico}, Tipo Utenza: {tipoUtenza}, Cognome: {cognome}, Nome: {nome}, Codice Fiscale: {codiceFiscale}, Partita IVA {partitaIva}";
         }
     }
 }
