@@ -36,3 +36,36 @@ body {
   background-color: #44454b !important;
   border-color: rgb(41, 40, 40) !important;
 }
+
+.card-action{
+  background-color: #fafafa;
+}
+/* Stile per le card e le icone */
+.card-action:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease-in-out;
+}
+
+.card-action a {
+    text-decoration: none;
+}
+
+.card-action .card-title {
+    color: rgb(39, 96, 153); /* Grigio scuro per i titoli */
+    transition: color 0.3s ease-in-out;
+}
+
+.card-action:hover .card-title {
+    color: #0d6efd; /* Colore link Bootstrap al passaggio del mouse */
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

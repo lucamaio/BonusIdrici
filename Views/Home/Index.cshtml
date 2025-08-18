@@ -2,116 +2,173 @@
     ViewData["Title"] = "Pannello di Controllo";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Benvenuto! @// ViewBag.Username</h1>
-    <p>Esplora le funzionalità disponibili per la gestione e l'analisi dei dati.</p>
+<style>
+    /* Cerchio per le icone */
+    .icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+    }
+
+    /* Effetto hover sulle card */
+    .hover-shadow:hover {
+        box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+
+<div class="text-center py-5">
+    <h1 class="display-4 fw-bold text-dark">Benvenuto nel Pannello di Controllo</h1>
+    <p class="lead text-secondary">Scegli una delle funzionalità per iniziare a lavorare.</p>
 </div>
 
-@* Strumenti di Caricamento Dati *@
-<div class="row g-6 mb-3 mt-3 align-items-stretch">
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Enti" asp-action="Index">
-                    <h5 class="card-title text-white">Gestione Enti</h5>
-                </a>
-                <p class="card-text">
-                    Accedi alla sezione per aggiungere o modificare le informazioni sugli enti.
-                </p>
+<div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Enti" asp-action="Index" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary text-white me-3">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Gestione Enti</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Accedi per aggiungere o modificare le informazioni sugli enti.
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Azioni" asp-action="LoadAnagrafica">
-                    <h5 class="card-title text-white">Carica Dati Anagrafici</h5>
-                </a>
-                <p class="card-text">
-                    Importa nel database i dati anagrafici estratti dai registri comunali.
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Azioni" asp-action="LoadFilePiranha">
-                    <h5 class="card-title text-white">Carica Utenze Idriche</h5>
-                </a>
-                <p class="card-text">
-                    Carica il file CSV contente le Utenze Idriche.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
 
-@* Elaborazione e Report *@
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Azioni" asp-action="LoadAnagrafica" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success text-white me-3">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Carica Anagrafica</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Importa nel database i dati anagrafici estratti dai registri comunali.
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
 
-<div class="row g-6 mb-3 mt-3 align-items-stretch">
-   <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Azioni" asp-action="LoadFileInps">
-                    <h5 class="card-title text-white">Carica File INPS</h5>
-                </a>
-                <p class="card-text">
-                    Procedi con l'upload dei file relativi ai dati INPS.
-                </p>
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Azioni" asp-action="LoadFilePiranha" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-info text-white me-3">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Carica Utenze Idriche</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Carica il file CSV contenente le utenze idriche.
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Azioni" asp-action="Report">
-                    <h5 class="card-title text-white">Report</h5>
-                </a>
-                <p class="card-text">
-                    Genera il report sull'esito della competenza territoriale.
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Toponomi" asp-action="Index">
-                    <h5 class="card-title text-white">Toponomi</h5>
-                </a>
-                <p class="card-text">
-                    Visualizza tutti i Toponomi di un Ente
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
 
-
-<div class="row g-6 mb-3 mt-3 align-items-stretch">
-   <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Anagrafe" asp-action="Index">
-                    <h5 class="card-title text-white">Anagrafe</h5>
-                </a>
-                <p class="card-text">
-                    Vedi Anagrafe enti
-                </p>
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Azioni" asp-action="LoadFileInps" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-warning text-white me-3">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Carica File INPS</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Procedi con l'upload dei file relativi ai dati INPS.
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card bg-primary text-white d-flex flex-column h-100">
-            <div class="card-body">
-                <a asp-controller="Utenze" asp-action="Index">
-                    <h5 class="card-title text-white">Utenze Idriche</h5>
-                </a>
-                <p class="card-text">
-                    Vedi Utenze Idriche
-                </p>
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Azioni" asp-action="Report" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-danger text-white me-3">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Report</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Genera il report sull'esito della competenza territoriale.
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Toponomi" asp-action="Index" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-dark text-white me-3">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Toponomi</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Visualizza tutti i Toponomi di un Ente.
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Anagrafe" asp-action="Index" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-secondary text-white me-3">
+                            <i class="fas fa-address-card"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Anagrafe</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Vedi Anagrafe enti.
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Utenze" asp-action="Index" class="text-decoration-none text-reset">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-dark text-white me-3">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Utenze Idriche</h5>
+                    </div>
+                    <p class="card-text text-secondary mt-auto">
+                        Vedi Utenze Idriche.
+                    </p>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
