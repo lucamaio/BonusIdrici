@@ -22,7 +22,7 @@ namespace BonusIdrici2.Controllers
         // Pagine di navigazione
         public IActionResult Index()
         {
-        //    int? idUtente = HttpContext.Session.GetInt32("idUser");
+            int? idUtente = HttpContext.Session.GetInt32("idUser");
 
             // Recupera il nome utente
             string username = HttpContext.Session.GetString("Username");
@@ -30,20 +30,21 @@ namespace BonusIdrici2.Controllers
             // Recupera il ruolo dell'utente
             string ruolo = HttpContext.Session.GetString("Role");
 
-            // if (string.IsNullOrEmpty(username))
-            // {
-            //     // Se non trovi il nome utente, la sessione è scaduta o non esiste.
-            //     // Reindirizza l'utente alla pagina di login.
-            //     return RedirectToAction("Index", "Login");
-            // }
+            if (string.IsNullOrEmpty(username))
+            {
+                // Se non trovi il nome utente, la sessione è scaduta o non esiste.
+                // Reindirizza l'utente alla pagina di login.
+                return RedirectToAction("Index", "Login");
+            }
 
             // Passa i dati alla View tramite ViewBag o un Model
-            // ViewBag.IdUtente = idUtente;
+            ViewBag.IdUtente = idUtente;
             ViewBag.Username = username;
             ViewBag.Ruolo = ruolo;
 
             return View();
         }
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -53,7 +54,8 @@ namespace BonusIdrici2.Controllers
         {
             return View();
         }
-
+        
+        // Aggiungere una pagina info
     }
     
 }

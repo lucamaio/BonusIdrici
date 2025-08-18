@@ -20,7 +20,26 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Index()
         {
-            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            if (!VerificaSessione())
+            {
+                //ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ruolo = HttpContext.Session.GetString("Role");
+            int idUser = (int)HttpContext.Session.GetInt32("idUser");
+            List<Ente> enti = new List<Ente>();
+
+            if (ruolo == "OPERATORE")
+            {
+                enti = FunzioniTrasversali.GetEnti(_context, idUser);
+                if (enti.Count == 1)
+                {
+                    return Show(enti[0].id);
+                }
+            }
+
+            enti = _context.Enti.OrderBy(e => e.nome).ToList();
             ViewBag.Enti = enti;
             return View();
         }
@@ -50,7 +69,7 @@ namespace BonusIdrici2.Controllers
                 numeroCivico = x.numeroCivico,
                 subUbicazione = x.subUbicazione,
                 scalaUbicazione = x.scalaUbicazione,
-                piano =  x.piano,
+                piano = x.piano,
                 interno = x.interno,
                 tipoUtenza = x.tipoUtenza,
                 cognome = x.cognome,
@@ -75,17 +94,17 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-       [HttpPost]
+        [HttpPost]
         public IActionResult Crea(
-            string cognome,
-            string nome,
-            string codice_fiscale,
-            string sesso,
-            DateTime? data_nascita,
-            string? comune_nascita,
-            string indirizzo_residenza,
-            string numero_civico,
-            int idEnte)
+             string cognome,
+             string nome,
+             string codice_fiscale,
+             string sesso,
+             DateTime? data_nascita,
+             string? comune_nascita,
+             string indirizzo_residenza,
+             string numero_civico,
+             int idEnte)
         {
             var nuovaPersona = new Dichiarante
             {
@@ -112,26 +131,26 @@ namespace BonusIdrici2.Controllers
         public IActionResult Modifica(int id)
         {
             ViewBag.id = id;
-            List<UtenzaIdrica> utenza = _context.UtenzeIdriche.Where(s=>s.id==id).ToList();
+            List<UtenzaIdrica> utenza = _context.UtenzeIdriche.Where(s => s.id == id).ToList();
             ViewBag.Utenza = utenza.First();
             return View();
         }
-        
+
         [HttpPost]
-        public IActionResult Update(int id, string idAcquedotto, int? stato, DateTime? periodoIniziale, DateTime? periodoFinale, string? matricolaContatore, string? indirizzo_ubicazione, string? numero_civico, string tipo_utenza, string? cognome, string? nome, string? sesso, string? codice_fiscale, string? partita_iva, int idEnte )
+        public IActionResult Update(int id, string idAcquedotto, int? stato, DateTime? periodoIniziale, DateTime? periodoFinale, string? matricolaContatore, string? indirizzo_ubicazione, string? numero_civico, string tipo_utenza, string? cognome, string? nome, string? sesso, string? codice_fiscale, string? partita_iva, int idEnte)
         {
             var UtenzaEsistente = _context.UtenzeIdriche.FirstOrDefault(t => t.id == id);
 
             if (UtenzaEsistente == null)
             {
-                return RedirectToAction("Index","Home"); // oppure restituisci una view con errore
+                return RedirectToAction("Index", "Home"); // oppure restituisci una view con errore
             }
 
             // Aggiorna le proprietà
-        
-            UtenzaEsistente.idAcquedotto=idAcquedotto;
-            UtenzaEsistente.stato=stato;
-            UtenzaEsistente.periodoIniziale= periodoIniziale;
+
+            UtenzaEsistente.idAcquedotto = idAcquedotto;
+            UtenzaEsistente.stato = stato;
+            UtenzaEsistente.periodoIniziale = periodoIniziale;
             UtenzaEsistente.periodoFinale = periodoFinale;
             UtenzaEsistente.matricolaContatore = matricolaContatore;
             UtenzaEsistente.codiceFiscale = codice_fiscale;
@@ -143,10 +162,29 @@ namespace BonusIdrici2.Controllers
             UtenzaEsistente.numeroCivico = numero_civico;
             UtenzaEsistente.tipoUtenza = tipo_utenza;
             UtenzaEsistente.data_aggiornamento = DateTime.Now;
-            
+
             _context.SaveChanges();
 
             return RedirectToAction("Show", "Utenze", new { selectedEnteId = idEnte });
+        }
+
+          // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            string username = HttpContext.Session.GetString("Username");
+            string ruolo = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
         }
 
     }

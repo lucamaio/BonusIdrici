@@ -20,6 +20,8 @@ namespace BonusIdrici2.Data
         public DbSet<Toponimo> Toponomi { get; set; }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<UserEnte> UserEnti { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,7 +94,7 @@ namespace BonusIdrici2.Data
             entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
             entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
             entity.Property(f => f.idToponimo).HasColumnName("id_toponimo");
-        }); 
+        });
 
             modelBuilder.Entity<Report>(entity =>
        {
@@ -122,7 +124,7 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
        });
 
-         // Configurazione per la classe Ente
+            // Configurazione per la classe Ente
             modelBuilder.Entity<Toponimo>(entity =>
             {
                 entity.ToTable("toponomi"); // Assicurati che il nome della tabella sia "enti"
@@ -149,7 +151,20 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.idRuolo).HasColumnName("id_ruolo").IsRequired();
             });
-            
+
+            // Configurazione per la clase UsersEnti
+
+           modelBuilder.Entity<UserEnte>(entity =>
+            {
+                entity.ToTable("users_enti");
+
+                entity.HasKey(e => new { e.idUser, e.idEnte }); // Chiave composta
+
+                entity.Property(f => f.idUser).HasColumnName("id_user").IsRequired();
+                entity.Property(f => f.idEnte).HasColumnName("id_ente").IsRequired();
+            });
+
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -23,10 +23,28 @@ namespace BonusIdrici2.Controllers
 
         // Pagine di navigazione
 
-         public IActionResult Index()
+        public IActionResult Index()
         {
-            // ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
+             if (!VerificaSessione())
+            {
+                //ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ruolo = HttpContext.Session.GetString("Role");
+            int idUser = (int)HttpContext.Session.GetInt32("idUser");
+            List<Ente> enti = new List<Ente>();
+
+            if (ruolo == "OPERATORE")
+            {
+                enti = FunzioniTrasversali.GetEnti(_context, idUser);
+                if (enti.Count == 1)
+                {
+                    return Show(enti[0].id);
+                }
+            }
+
+            enti = _context.Enti.OrderBy(e => e.nome).ToList();
             ViewBag.Enti = enti;
             return View();
         }
@@ -37,23 +55,24 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-        public IActionResult Modifica(int id, string denominazione, string? normalizzazione, DateTime data_creazione, int idEnte){
-            ViewBag.id=id;
-            ViewBag.denominazione=denominazione;
-            ViewBag.normalizzazione=normalizzazione;
-            ViewBag.data_creazione=data_creazione;
-            ViewBag.IdEnte=idEnte;
+        public IActionResult Modifica(int id, string denominazione, string? normalizzazione, DateTime data_creazione, int idEnte)
+        {
+            ViewBag.id = id;
+            ViewBag.denominazione = denominazione;
+            ViewBag.normalizzazione = normalizzazione;
+            ViewBag.data_creazione = data_creazione;
+            ViewBag.IdEnte = idEnte;
             return View();
         }
 
 
-       public IActionResult Show(int selectedEnteId)
+        public IActionResult Show(int selectedEnteId)
         {
             if (selectedEnteId == 0)
             {
                 ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("Index","Toponomi");
+                return View("Index", "Toponomi");
             }
 
             var dati = _context.Toponomi
@@ -63,7 +82,7 @@ namespace BonusIdrici2.Controllers
 
             var viewModelList = dati.Select(x => new ToponomiViewModel
             {
-                id= x.id,
+                id = x.id,
                 denominazione = x.denominazione,
                 normalizzazione = x.normalizzazione,
                 data_creazione = x.data_creazione,
@@ -86,7 +105,7 @@ namespace BonusIdrici2.Controllers
                 normalizzazione = normalizzazione.Trim().ToUpper(),
                 IdEnte = idEnte,
                 data_creazione = DateTime.Now,
-                data_aggiornamento =null
+                data_aggiornamento = null
             };
 
             _context.Toponomi.Add(nuovoToponimo);
@@ -102,7 +121,7 @@ namespace BonusIdrici2.Controllers
 
             if (toponimoEsistente == null)
             {
-                return RedirectToAction("Index","Home"); // oppure restituisci una view con errore
+                return RedirectToAction("Index", "Home"); // oppure restituisci una view con errore
             }
 
             // Aggiorna le proprietà
@@ -117,6 +136,24 @@ namespace BonusIdrici2.Controllers
             return RedirectToAction("Show", "Toponomi", new { selectedEnteId = idEnte });
         }
 
+          // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            string username = HttpContext.Session.GetString("Username");
+            string ruolo = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
 
     }

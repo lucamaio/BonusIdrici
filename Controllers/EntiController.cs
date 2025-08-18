@@ -21,12 +21,40 @@ namespace BonusIdrici2.Controllers
             _context = context;
         }
 
+        // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            string username = HttpContext.Session.GetString("Username");
+            string ruolo = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         // Pagine di navigazione
 
         public IActionResult Index()
         {
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.idUser = HttpContext.Session.GetString("idUser");
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
+
             var dati = _context.Enti.ToList();
-            // Console.WriteLine(dati.Count());
             var viewModelList = dati.Select(x => new EntiViewModel
             {
                 id = x.id,
@@ -44,6 +72,16 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Create()
         {
+            if (!VerificaSessione("ADMIN"))
+            {
+                 ViewBag.Message = "Utente non autorizzato ad creare un nuovo ente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.idUser = HttpContext.Session.GetString("idUser");
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
+
             return View();
         }
 
@@ -69,6 +107,16 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Modifica(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool? Nostro = true)
         {
+            if (!VerificaSessione("ADMIN"))
+            {
+                 ViewBag.Message = "Utente non autorizzato alla modifica dei dati del ente";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.idUser = HttpContext.Session.GetString("idUser");
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
+
             ViewBag.id = id;
             ViewBag.nome = nome;
             ViewBag.istat = istat;

@@ -31,8 +31,6 @@ namespace BonusIdrici2.Models
             return formatedString;
         }
 
-
-
         public static string FormattaNumeroCivico(string stringa)
         {
             // 1. Pulizia e normalizzazione iniziale
@@ -229,5 +227,28 @@ namespace BonusIdrici2.Models
             // 4. Nessuna corrispondenza significativa trovata → mantengo l'indirizzo originale
             return indirizzoUbicazione;
         }
+
+        public static List<Ente> GetEnti(ApplicationDbContext _context, int id)
+        {
+            // Mi ricavo gli id degli enti che gestisce l'utente
+            var idEnti = _context.UserEnti
+                .Where(s => s.idUser == id)
+                .Select(s => s.idEnte) // prendo solo l'idEnte
+                .ToList();
+
+            // Se non ha enti associati, ritorno una lista vuota
+            if (!idEnti.Any())
+            {
+                return new List<Ente>();
+            }
+
+            // Recupero direttamente gli enti dalla tabella Enti
+            var enti = _context.Enti
+                .Where(e => idEnti.Contains(e.id))
+                .ToList();
+
+            return enti;
+        }
+
     }
 }

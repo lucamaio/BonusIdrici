@@ -1,27 +1,32 @@
 @* Views/Azioni/GeneraEsitoCompetenza.cshtml *@
 @{
-    ViewData["Title"] = "Report"; // Titolo più appropriato per la pagina iniziale
+    ViewData["Title"] = "Report"; 
 }
 
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Seleziona Ente per Visualizzare Dati</h3>
+        <div class="col-lg-7 col-md-9">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header text-white text-center rounded-top-4" 
+                     style="background: linear-gradient(90deg, #0d6efd, #0a58ca);">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-building me-2"></i> Seleziona Ente
+                    </h3>
                 </div>
+
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="RiepilogoDatiEnte" method="post"> @* Azione POST modificata *@
+                    <form asp-controller="Azioni" asp-action="RiepilogoDatiEnte" method="post">
                         
-                        <div class="mb-3">
-                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
-                            <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
+                        <div class="mb-4">
+                            <label for="selectedEnteId" class="form-label fw-semibold">
+                                <i class="bi bi-list-ul me-1"></i> Scegli l'Ente
+                            </label>
+                            <select id="selectedEnteId" name="selectedEnteId" class="form-select shadow-sm" required>
                                 <option value="">-- Seleziona un Ente --</option>
                                 @if (ViewBag.Enti != null)
                                 {
                                     foreach (var ente in ViewBag.Enti)
                                     {
-                                        // Assicurati che "id" e "nome" siano le proprietà corrette del tuo oggetto ente
                                         <option value="@ente.id">@ente.nome</option> 
                                     }
                                 }
@@ -29,14 +34,16 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Visualizza Dati Ente</button> @* Testo del pulsante modificato *@
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="bi bi-search me-1"></i> Visualizza Dati Ente
+                            </button>
                         </div>
                     </form>
 
                     @if (!string.IsNullOrEmpty(ViewBag.Message))
                     {
-                        <div class="alert alert-info mt-3" role="alert">
-                            @ViewBag.Message
+                        <div class="alert alert-info mt-4 shadow-sm border-0 rounded-3">
+                            <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
                         </div>
                     }
                 </div>

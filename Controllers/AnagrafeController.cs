@@ -20,7 +20,29 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Index()
         {
-            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            if (!VerificaSessione())
+            {
+                //ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ruolo = HttpContext.Session.GetString("Role");
+            int idUser = (int) HttpContext.Session.GetInt32("idUser");
+            List<Ente> enti = new List<Ente>();
+
+            if (ruolo == "OPERATORE")
+            {
+                enti = FunzioniTrasversali.GetEnti(_context, idUser);
+                if (enti.Count == 1)
+                {
+                    return Show(enti[0].id);
+                }
+            }
+            else
+            {
+                enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            }            
+            
             ViewBag.Enti = enti;
             return View();
         }
@@ -98,11 +120,11 @@ namespace BonusIdrici2.Controllers
         public IActionResult Modifica(int id)
         {
             ViewBag.id = id;
-            List<Dichiarante> dichiarante = _context.Dichiaranti.Where(s=>s.id==id).ToList();
+            List<Dichiarante> dichiarante = _context.Dichiaranti.Where(s => s.id == id).ToList();
             ViewBag.Dichiarante = dichiarante.First();
             return View();
         }
-        
+
         [HttpPost]
         public IActionResult Update(int id, string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
         {
@@ -110,7 +132,7 @@ namespace BonusIdrici2.Controllers
 
             if (DichiaranteEsistente == null)
             {
-                return RedirectToAction("Index","Home"); // oppure restituisci una view con errore
+                return RedirectToAction("Index", "Home"); // oppure restituisci una view con errore
             }
 
             // Aggiorna le proprietà
@@ -123,10 +145,29 @@ namespace BonusIdrici2.Controllers
             DichiaranteEsistente.IndirizzoResidenza = FunzioniTrasversali.rimuoviVirgolette(indirizzo_residenza).ToUpper();
             DichiaranteEsistente.NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(numero_civico).ToUpper();
             DichiaranteEsistente.data_aggiornamento = DateTime.Now;
-            
+
             _context.SaveChanges();
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
+        }
+        
+        // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            string username = HttpContext.Session.GetString("Username");
+            string ruolo = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
         }
 
     }

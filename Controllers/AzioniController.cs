@@ -16,9 +16,38 @@ namespace BonusIdrici2.Controllers
             _context = context;
         }
 
+         // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            string username = HttpContext.Session.GetString("Username");
+            string ruolo = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
         // Pagine di navigazione
         public IActionResult LoadAnagrafica()
         {
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
+
             // Recupera tutti gli enti dal database
             List<Ente> enti = _context.Enti.ToList();
             // Passa la lista degli enti alla vista tramite ViewBag
@@ -35,12 +64,18 @@ namespace BonusIdrici2.Controllers
             return View(); // Assicurati che il nome della vista sia corretto (es. LoadFileINPS.cshtml)
         }
 
-        public IActionResult InsertEnte()
-        {
-            return View();
-        }
+    
         public IActionResult LoadFilePiranha()
         {
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
+
             List<Ente> enti = _context.Enti.ToList();
             // Passa la lista degli enti alla vista tramite ViewBag
             ViewBag.Enti = enti;

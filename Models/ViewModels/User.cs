@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using BonusIdrici2.Data;
 
 namespace BonusIdrici2.Models
 {
     public class User
     {
         [Key]
-        public int? id { get; set; }
+        public int id { get; set; }
 
         [Required]
 
@@ -39,10 +40,6 @@ namespace BonusIdrici2.Models
         public string ToString()
         {
             return $"Username: {Username} | Cognome: {Cognome} | Nome: {Nome} | Email: {Email} Ruolo {getRuolo()}";
-        }
-
-        public void getEnti(){
-            Console.WriteLine("Funzionalità da implementare!");
         }
 
     }

@@ -66,6 +66,78 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    font-size: 1.5rem;
+    font-size: 1.3Rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+    /* Effetto hover sulle card */
+    .hover-shadow:hover {
+        box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px);
+        transition: all 0.25s ease-in-out;
+    }
+
+    /* Riduzione spazi sotto al titolo */S
+    .page-header {
+        margin-bottom: 1.5rem; /* prima era troppo grande */
+    }
+
+    .page-header h1 {
+        margin-bottom: 0.5rem; /* meno spazio tra titolo e testo */
+    }
+
+  /* Stili per il form di login */
+.card {
+    border: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.icon-circle-large {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 2rem;
+    background-color: #0d6efd; /* Colore di sfondo grigio scuro */
+    color: #ffffff; /* Colore dell'icona (bianco) */
+}
+
+.form-control-lg {
+    height: calc(2.5rem + 2px);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Stili per il pulsante */
+.btn-action {
+    background-color: #0d6efd;
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.btn-action:hover {
+    background-color: #4a4a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #f8f9fa !important;
+}
+
+body.dark-mode .navbar {
+    background-color: #1f1f1f !important;
+}
+
+body.dark-mode .card {
+    background-color: #2a2a2a !important;
+    color: #f8f9fa !important;
+}
+
+body.dark-mode a {
+    color: #0d6efd !important;
 }

@@ -8,23 +8,26 @@
 
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Dati Disponibili per l'Ente: <span class="fw-bold">@selectedEnteNome</span></h3>
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header text-white text-center rounded-top-4"
+                     style="background: linear-gradient(90deg, #0d6efd, #0a58ca);">
+                    <h3 class="mb-1 fw-bold">
+                        <i class="bi bi-building me-2"></i> Dati Disponibili per l'Ente: 
+                        <span class="fw-semibold">@selectedEnteNome</span>
+                    </h3>
                     <small>ID Ente: @selectedEnteId</small>
                 </div>
+
                 <div class="card-body p-4">
 
                     @if (Model != null && Model.Any())
                     {
-                        <p class="lead">Seleziona una data di inserimento per scaricare i report correlati.</p>
-                        <div class="table-responsive">
-                            @* {{-- La tua tabella esistente, con l'ID per DataTables e le classi necessarie --}} *@
-                            <table id="riepilogoTable" class="table table-bordered table-responsive dataTable dtr-column collapsed" style="width: 100%;">
+                        <p class="lead mb-3">Seleziona una data di inserimento per scaricare i report correlati.</p>
+                        <div class="table-responsive shadow-sm rounded-3">
+                            <table id="riepilogoTable" class="table table-striped table-bordered table-hover align-middle" style="width:100%;">
                                 <thead class="table-primary">
                                     <tr>
-                                        @* {{-- Queste sono le intestazioni delle tue colonne reali --}} *@
                                         <th>Giorno Inserimento</th>
                                         <th>Numero Dati Inseriti</th>
                                         <th>Azioni</th>
@@ -33,20 +36,19 @@
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
+                                        var dataUrl = item.DataCreazione?.ToString("yyyy-MM-dd");
                                         <tr>
                                             <td>@item.DataCreazione?.ToString("dd/MM/yyyy")</td>
                                             <td>@item.NumeroDatiInseriti</td>
                                             <td>
-                                                @{
-                                                    // Anche qui, usa '?.ToString("yyyy-MM-dd")' per sicurezza e per il formato URL
-                                                    var dataUrl = item.DataCreazione?.ToString("yyyy-MM-dd");
-                                                }
                                                 <div class="btn-group" role="group" aria-label="Download options">
-                                                    <a href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })" class="btn btn-sm btn-success me-2">
-                                                        <i class="bi bi-download"></i> Scarica Esito Bonus Idrico
+                                                    <a href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })"
+                                                       class="btn btn-sm btn-success me-2">
+                                                        <i class="bi bi-download me-1"></i> Esito Bonus Idrico
                                                     </a>
-                                                    <a href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })" class="btn btn-sm btn-info">
-                                                        <i class="bi bi-download"></i> Scarica Esito Competenza Territoriale
+                                                    <a href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })"
+                                                       class="btn btn-sm btn-info">
+                                                        <i class="bi bi-download me-1"></i> Competenza Territoriale
                                                     </a>
                                                 </div>
                                             </td>
@@ -58,14 +60,17 @@
                     }
                     else
                     {
-                        <div class="alert alert-warning text-center" role="alert">
-                            Nessun dato di report trovato per l'ente selezionato.
+                        <div class="alert alert-warning text-center mt-3 shadow-sm rounded-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato di report trovato per l'ente selezionato.
                         </div>
                     }
 
                     <div class="d-grid mt-4">
-                        <a href="@Url.Action("Report", "Azioni")" class="btn btn-outline-secondary">Torna alla Selezione Ente</a>
+                        <a href="@Url.Action("Report", "Azioni")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
+                        </a>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -73,88 +78,38 @@
 </div>
 
 @section Scripts {
-    @* {{-- Includi QUI i riferimenti a jQuery, DataTables JS, e le sue estensioni,
-         se non sono già inclusi globalmente nel tuo _Layout.cshtml.
-         Questi sono gli stessi CDN che ti ho fornito in precedenza. --}} *@
-    @* <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.min.js"></script> *@
-    
     <script>
         $(document).ready(function () {
             $('#riepilogoTable').DataTable({
-                // Questa è la configurazione per replicare lo stile e le funzionalità
                 paging: true,
                 searching: true,
                 ordering: true,
-                info: false, 
+                info: false,
                 responsive: true,
-                // Traduzione in italiano
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" 
-                },
-                // Configurazione per i pulsanti di export
-                dom: 
-                    // Struttura DOM per replicare la disposizione della tua demo
-                    // 'l' - length changing input (show X entries)
-                    // 'f' - filtering input (search box)
-                    // 'B' - buttons
-                    // 't' - table
-                    // 'i' - information (showing X of Y entries)
-                    // 'p' - pagination
-                    '<"row card-header flex-column flex-md-row pb-0"<"d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0"l><"d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"Bf>>' +
-                    '<"row m-3 my-0 justify-content-between"<"d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0"i><"d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"p>>' +
-                    '<"justify-content-between dt-layout-table"t>',
+                language: { url: "//cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-end"Bf>>t<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6 text-end"p>>',
                 buttons: [
                     {
                         extend: 'collection',
-                        className: 'btn buttons-collection btn-label-primary dropdown-toggle me-4',
-                        text: '<span class="d-flex align-items-center gap-2"><i class="bx bx-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span></span>',
+                        className: 'btn btn-primary dropdown-toggle me-2',
+                        text: '<i class="bi bi-download me-1"></i> Export',
                         buttons: [
                             { extend: 'copy', text: 'Copia' },
                             { extend: 'excel', text: 'Excel' },
                             { extend: 'pdf', text: 'PDF' },
                             { extend: 'print', text: 'Stampa' },
-                            { extend: 'colvis', text: 'Visibilità Colonne' } // Per mostrare/nascondere colonne
+                            { extend: 'colvis', text: 'Visibilità Colonne' }
                         ]
-                    },
-                    @* {
-                        text: '<span class="d-flex align-items-center gap-2"><i class="bx bx-plus icon-sm"></i> <span class="d-none d-sm-inline-block">Aggiungi Nuovo Record</span></span>',
-                        className: 'btn create-new btn-primary',
-                        action: function ( e, dt, node, config ) {
-                            // Qui puoi aggiungere la logica per "Add New Record", ad esempio un reindirizzamento
-                            // window.location.href = '@Url.Action("Create", "NomeController")';
-                            alert('Aggiungi Nuovo Record cliccato!');
-                        }
-                    } *@
-                ],
-                // Mappa le tue colonne con le colonne di DataTables
-                // Se non hai bisogno di ordinamento/ricerca su colonne specifiche, puoi ometterlo
-                // o configurare colonne. Per un semplice caso, DataTables inferisce bene.
-                // columnDefs: [
-                //     { targets: [0, 1], searchable: true, orderable: true }, // Giorno Inserimento, Numero Dati
-                //     { targets: 2, searchable: false, orderable: false } // Azioni
-                // ]
+                    }
+                ]
             });
         });
     </script>
 }
 
-@* CSS per DataTables con Bootstrap 5 (aggiungi questi nel tuo _Layout.cshtml o qui in un @section Styles) *@
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.bootstrap5.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" />
-    @* {{-- Icone Bootstrap, se non già incluse --}} *@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 }

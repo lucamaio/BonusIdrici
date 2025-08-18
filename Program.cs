@@ -11,6 +11,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Il cookie di sessione è essenziale per l'applicazione
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
