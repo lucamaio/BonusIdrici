@@ -404,6 +404,12 @@ public class CSVReader
                     error = true;
                 }
 
+                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.FormattaNumeroCivico(campi[35])))
+                {
+                    errori.Add($"Attenzione: Data Nascita mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[0])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[12])}");
+                    error = true;
+                }
+
                 // j) Verifico se il campo numero civico è presente
 
                 if (string.IsNullOrWhiteSpace(FunzioniTrasversali.FormattaNumeroCivico(campi[16])))
@@ -522,8 +528,9 @@ public class CSVReader
                     interno = FunzioniTrasversali.rimuoviVirgolette(campi[20]),
                     tipoUtenza = FunzioniTrasversali.rimuoviVirgolette(campi[26]).ToUpper(),
                     cognome = FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper(),
-                    nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(),
+                    nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(), 
                     sesso = FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper(),
+                    DataNascita = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[35])),
                     codiceFiscale = cod_fisc,
                     partitaIva = FunzioniTrasversali.rimuoviVirgolette(campi[37]),
                     data_creazione = DateTime.Now,
@@ -615,11 +622,11 @@ public class CSVReader
         return datiComplessivi;
     }
 
-
+    // Funzione che genera i report finali a partire dal file csv INPS
     public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId)
     {
         var datiComplessivi = new DatiCsvCompilati();
-        FileLog logFile = new FileLog($"Elaborazione_INPS.log");
+        FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_INPS.log");
         List<string> errori = new List<string>();
         try
         {
@@ -641,10 +648,10 @@ public class CSVReader
 
                 var campi = riga.Split(CsvDelimiter);
 
-                // Verifico se la riga ha almeno 15 campi
-                if (campi.Length < 15)
+                // Verifico se la riga ha almeno 1 campi
+                if (campi.Length < 16)
                 {
-                    errori.Add($"Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 15.");
+                    errori.Add($"Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 16.");
                     error = true;
                 }
 
@@ -707,7 +714,7 @@ public class CSVReader
                     error = true;
                 }
 
-                // Verifico se il campo numero_civico è presente e non vuotO
+                // Verifico se il campo numero_civico è presente e non vuoto
                 if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[10])))
                 {
                     errori.Add($"Attenzione: Numero civico mancante, saltata. Riga {rigaCorrente}");
@@ -761,27 +768,27 @@ public class CSVReader
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
 
-                string idAto = FunzioniTrasversali.rimuoviVirgolette(campi[0]);
-                string codiceBonus = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper();
-                string codiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper();
+                string? idAto = FunzioniTrasversali.rimuoviVirgolette(campi[0]);
+                string? codiceBonus = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper();
+                string? codiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper();
 
-                string nomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper();
-                string cognomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[4]).ToUpper();
-                string[] codiciFiscaliFamigliari = FunzioniTrasversali.splitCodiceFiscale(campi[5]);
+                string? nomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper();
+                string? cognomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[4]).ToUpper();
+                string[]? codiciFiscaliFamigliari = FunzioniTrasversali.splitCodiceFiscale(campi[5]);
 
-                string annoValidita = FunzioniTrasversali.rimuoviVirgolette(campi[6]);
-                string dataInizioValidita = FunzioniTrasversali.rimuoviVirgolette(campi[7]);
-                string dataFineValidita = FunzioniTrasversali.rimuoviVirgolette(campi[8]);
+                string? annoValidita = FunzioniTrasversali.rimuoviVirgolette(campi[6]);
+                DateTime? dataInizioValidita = FunzioniTrasversali.ConvertiData(campi[7]);
+                DateTime? dataFineValidita = FunzioniTrasversali.ConvertiData(campi[8]);
 
-                string indirizzoAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[9]).ToUpper();
-                string numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[10]).ToUpper();
-                string istatAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[11]).ToUpper();
-                string capAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper();
-                string provinciaAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[13]).ToUpper();
+                string? indirizzoAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[9]).ToUpper();
+                string? numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[10]).ToUpper();
+                string? istatAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[11]).ToUpper();
+                string? capAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper();
+                string? provinciaAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[13]).ToUpper();
 
-                string presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
-                string numeroComponenti = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
-                DateTime dataCreazione = DateTime.Now;
+                string? presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
+                string? numeroComponenti = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
+                DateTime? dataCreazione = DateTime.Now;
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
                 string esitoStr = "No";
@@ -817,7 +824,7 @@ public class CSVReader
 
                         //3.a) verifica se il richiedente ha una fornitura idrica diretta 
 
-                        (string esitoRestituito, int? idFornituraTrovato) = FunzioniTrasversali.verificaEsisistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico);
+                        (string esitoRestituito, int? idFornituraTrovato) = FunzioniTrasversali.VerificaEsistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico, dichiarantiFiltratiPerNomeEnte[0].Cognome, dichiarantiFiltratiPerNomeEnte[0].Nome, dichiarantiFiltratiPerNomeEnte[0].DataNascita);
                         idFornituraIdrica = idFornituraTrovato;
                         if (esitoRestituito == "01")
                         {
@@ -837,7 +844,7 @@ public class CSVReader
                                     if (dichiaranteFamigliare.Count == 1)
                                     {
                                         // Verifico se il membro della famiglia ha una fornitura idrica diretta
-                                        (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.verificaEsisistenzaFornitura(codFisc, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico);
+                                        (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(codFisc, selectedEnteId, context, dichiaranteFamigliare[0].IndirizzoResidenza, dichiaranteFamigliare[0].NumeroCivico, dichiaranteFamigliare[0].Cognome, dichiaranteFamigliare[0].Nome, dichiaranteFamigliare[0].DataNascita);
                                         idFornituraIdrica = idFornituraMembro;
                                         if (esitoFamigliare == "01")
                                         {
@@ -867,8 +874,7 @@ public class CSVReader
                 }
                 else
                 {
-                    // Implementare logica per gestire il caso in cui i campi non corrispondono
-                    continue; // Salta la riga se i campi non corrispondono
+                    logFile.LogWarning($"Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: {istat} | Cap: {capAbitazione} | Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
                 }
 
                 // 4) Creo un nuovo report con i dati raccolti
@@ -881,8 +887,8 @@ public class CSVReader
                     nomeDichiarante = nomeDichiarante,
                     cognomeDichiarante = cognomeDichiarante,
                     annoValidita = annoValidita,
-                    dataInizioValidita = FunzioniTrasversali.ConvertiData(dataInizioValidita),
-                    dataFineValidita = FunzioniTrasversali.ConvertiData(dataFineValidita),
+                    dataInizioValidita = dataInizioValidita,
+                    dataFineValidita =dataFineValidita,
                     indirizzoAbitazione = indirizzoAbitazione,
                     numeroCivico = numeroCivico,
                     istat = istatAbitazione,
@@ -897,9 +903,6 @@ public class CSVReader
                 };
 
                 datiComplessivi.reports.Add(report);
-
-                // salvo il report nel contesto del database
-                //logFile.LogInfo($"Riga {rigaCorrente}: Report creato: idAto: {report.idAto}, CodiceBonus: {report.codiceBonus}, CodiceFiscale: {report.codiceFiscale}, NomeDichiarante: {report.nomeDichiarante}, CognomeDichiarante: {report.cognomeDichiarante}, Esito: {report.esitoStr}, Esito numerico: {report.esito}, DataInizioValidita: {report.dataInizioValidita}, DataFineValidita: {report.dataFineValidita}");
             }
             if (errori.Count > 0)
             {

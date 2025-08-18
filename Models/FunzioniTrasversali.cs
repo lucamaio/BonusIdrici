@@ -122,44 +122,77 @@ namespace BonusIdrici2.Models
         }
 
 
-        public static (string esito, int? idFornitura) verificaEsisistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, string IndirizzoResidenza, string NumeroCivico)
+        public static (string esito, int? idFornitura) VerificaEsistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, string indirizzoResidenza, string numeroCivico, string cognome, string? nome, DateTime? data_nascita)
         {
-            // Verifica se il richiedente ha una fornitura idrica diretta
-            var forniture = context.UtenzeIdriche.Where(s => s.codiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId).ToList();
-            if (forniture.Count == 1)
+            // Recupera le forniture associate al codice fiscale e all'ente selezionato
+            var forniture = context.UtenzeIdriche
+                .Where(s => (s.codiceFiscale == codiceFiscale || (s.cognome == cognome && s.nome == nome && s.DataNascita == data_nascita)) && s.IdEnte == selectedEnteId)
+                .ToList();
+
+            if (forniture.Count != 1)
             {
-                string? tipoUtenza = forniture[0].tipoUtenza;
-                int? idFornituraTrovata = int.Parse(forniture[0].idAcquedotto);       //  Aggiungo una variabile per salvare id della fornitura
+                // Nessuna fornitura o più forniture trovate
+                return ("04", null);
+            }
 
-                if (tipoUtenza.Equals("UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
+            var fornitura = forniture[0];
+            int? idFornituraTrovata = int.TryParse(fornitura.idAcquedotto, out int idF) ? idF : null;
+
+            // Verifica il tipo di utenza
+            if (!string.Equals(fornitura.tipoUtenza, "UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
+            {
+                return ("03", null);
+            }
+
+            // Recupera i dati dell'utenza
+            string? indirizzoUtenza = fornitura.indirizzoUbicazione;
+            string? numeroCivicoUtenza = fornitura.numeroCivico;
+            int? idToponimo = fornitura.idToponimo;
+
+            bool indirizzoCorrisponde = string.Equals(indirizzoUtenza, indirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
+                                        string.Equals(numeroCivicoUtenza, numeroCivico, StringComparison.OrdinalIgnoreCase);
+
+            // Se indirizzo e numero civico coincidono
+            if (indirizzoCorrisponde)
+            {
+                return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata);
+            }
+
+            // Se non coincidono, verifica se è disponibile una normalizzazione del toponimo
+            if (idToponimo.HasValue)
+            {
+                var toponimo = context.Toponomi
+                    .FirstOrDefault(t => t.id == idToponimo.Value && t.normalizzazione != null);
+
+                if (toponimo != null)
                 {
-                    // 3.c) adessso verifico se l'utenza è situata nello stesso indirizzo del richiedente
-                    string? indirizzoUtenza = forniture[0].indirizzoUbicazione;
-                    string? numeroCivicoUtenza = forniture[0].numeroCivico;    // N.B Crea una funzione per formattare il numero civico come in FormattaNumeroCivico
+                    indirizzoUtenza = toponimo.normalizzazione;
 
-                    if (indirizzoUtenza.Equals(IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
-                        numeroCivicoUtenza.Equals(NumeroCivico, StringComparison.OrdinalIgnoreCase))
+                    bool indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, indirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
+                                                        string.Equals(numeroCivicoUtenza, numeroCivico, StringComparison.OrdinalIgnoreCase);
+
+                    if (indirizzoToponimoCorrisponde)
                     {
-                        // 3.d) Adesso verifico se lo stato della fornitura e compresso tra 1 e 3
-                        if (forniture[0].stato >= 1 && forniture[0].stato <= 3)
-                        {
-                            // 3.e) se lo stato è compreso tra 1 e 3 allora esito è uguale a 01
-                            return ("01", idFornituraTrovata);
-                        }
-                        else
-                        {
-                            // 3.e.2) se lo stato non è compreso tra 1 e 3 allora esito è uguale a 03
-                            return ("03", idFornituraTrovata);
-                        }
-                    }
-                    else
-                    {
-                        // 3.c.2) se l'utenza non è situata nello stesso indirizzo allora esito è uguale a 03
-                        return ("03", idFornituraTrovata);
+                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata);
                     }
                 }
             }
-            return ("04", null); // Nessuna fornitura
+
+            // L’indirizzo non corrisponde
+            return ("03", idFornituraTrovata);
+        }
+
+        // Metodo ausiliario per verificare lo stato
+        private static (string esito, int? idFornitura) VerificaStatoFornitura(int? stato, int? idFornitura)
+        {
+            if (stato >= 1 && stato <= 3)
+            {
+                return ("01", idFornitura);
+            }
+            else
+            {
+                return ("03", idFornitura);
+            }
         }
 
         public static string? FormattaIndirizzo(ApplicationDbContext context, string indirizzo_ubicazione, string codiceFiscale, int IdEnte)

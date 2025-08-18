@@ -46,10 +46,18 @@ namespace BonusIdrici2.Models
 
         [Required]
         public required DateTime? dataFineValidita { get; set; }
-    
+
         public DateTime? DataCreazione { get; set; }
-        
+
         [Required]
         public required int IdEnte { get; set; }
+
+        public override string ToString()
+        {
+            return $"Report: id={id}, codiceBonus={codiceBonus}, esitoStr={esitoStr}, esito={esito}, idFornitura={idFornitura}, codiceFiscale={codiceFiscale}, "+
+                $"numeroComponenti ={numeroComponenti}, nomeDichiarante={nomeDichiarante}, cognomeDichiarante={cognomeDichiarante}, annoValidita={annoValidita}, "+
+                $"indirizzoAbitazione ={indirizzoAbitazione}, numeroCivico={numeroCivico}, istat={istat}, capAbitazione={capAbitazione}, provinciaAbitazione={provinciaAbitazione}, "+
+                $"presenzaPod ={presenzaPod}, dataInizioValidita={dataInizioValidita}, dataFineValidita={dataFineValidita}, DataCreazione={DataCreazione}, IdEnte={IdEnte}";
+        }
     }
 }

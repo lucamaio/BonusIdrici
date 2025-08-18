@@ -19,6 +19,8 @@ namespace BonusIdrici2.Data
         public DbSet<Report> Reports { get; set; }
         public DbSet<Toponimo> Toponomi { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configurazione per la classe Dichiarante
@@ -83,6 +85,7 @@ namespace BonusIdrici2.Data
             entity.Property(f => f.cognome).HasColumnName("cognome").IsRequired().HasMaxLength(100);
             entity.Property(f => f.nome).HasColumnName("nome").HasMaxLength(100);
             entity.Property(f => f.sesso).HasColumnName("sesso").HasMaxLength(1);
+            entity.Property(f => f.DataNascita).HasColumnName("data_nascita");
             entity.Property(f => f.codiceFiscale).HasColumnName("codice_fiscale").HasMaxLength(16);
             entity.Property(f => f.partitaIva).HasColumnName("partita_iva");
             entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
@@ -129,6 +132,22 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
                 entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+            });
+
+            // Configurazione per la clase User
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("users"); // Assicurati che il nome della tabella sia "enti"
+                entity.HasKey(f => f.id); // La chiave primaria è 'id'
+                entity.Property(f => f.Email).HasColumnName("email").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.Password).HasColumnName("password").HasMaxLength(255);
+                entity.Property(f => f.Cognome).HasColumnName("cognome");
+                entity.Property(f => f.Nome).HasColumnName("nome");
+                entity.Property(f => f.Username).HasColumnName("username").HasMaxLength(255);
+                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.idRuolo).HasColumnName("id_ruolo").IsRequired();
             });
             
             base.OnModelCreating(modelBuilder);

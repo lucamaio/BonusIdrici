@@ -48,6 +48,8 @@ namespace BonusIdrici2.Models
 
         public string? sesso { get; set; }
 
+        public DateTime? DataNascita { get; set; }
+
         [Required]
         public required string? codiceFiscale { get; set; }
         
