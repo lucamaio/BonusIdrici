@@ -168,6 +168,16 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.idEnte).HasColumnName("id_ente").IsRequired();
             });
 
+            // Configurazione per la classe Ruolo
+
+            modelBuilder.Entity<Ruolo>(entity =>
+            {
+                entity.ToTable("ruoli");
+                entity.HasKey(f => f.id);
+                entity.Property(f => f.nome).HasColumnName("nome").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
+            });
+
 
             base.OnModelCreating(modelBuilder);
         }
