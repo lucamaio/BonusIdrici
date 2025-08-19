@@ -5,7 +5,7 @@ namespace BonusIdrici2.Models.ViewModels
     public class UtenzeViewModel
     {
         public int? id { get; set; }
-        
+
         public string? idAcquedotto { get; set; }
 
         public int? stato { get; set; }
@@ -29,7 +29,7 @@ namespace BonusIdrici2.Models.ViewModels
         public string? interno { get; set; }
 
         public string? tipoUtenza { get; set; }
-        
+
         public string? cognome { get; set; }
 
         public string? nome { get; set; }
@@ -38,11 +38,13 @@ namespace BonusIdrici2.Models.ViewModels
 
         public string? codiceFiscale { get; set; }
 
-        public DateTime? data_creazione { get; set;}
-        
+        public DateTime? data_creazione { get; set; }
+
         public DateTime? data_aggiornamento { get; set; }
 
         public required int IdEnte { get; set; }
+        
+        public int? IdUser { get; set; }
         
     }
 }

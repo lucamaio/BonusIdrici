@@ -9,10 +9,10 @@ namespace BonusIdrici2.Models
         [Key]
         public int id { get; set; }
 
-        [required]
+        [Required]
         public required string nome { get; set;}
 
-        public DateTime? dataCrezione { get; set; }
+        public DateTime? dataCreazione { get; set; }
         
     }
 }

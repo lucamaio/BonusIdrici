@@ -62,6 +62,8 @@ namespace BonusIdrici2.Models
         [Required]
         public int IdEnte { get; set; }
 
+        public int IdUser { get; set; }
+
         public int? idToponimo { get; set; }
         
        public string? ToString()

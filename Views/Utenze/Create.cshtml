@@ -21,10 +21,15 @@
                     <h3 class="mb-0">Crea Nuova Utenza</h3>
                 </div>
                 <div class="card-body p-5">
-                    <form asp-controller="Utenze" asp-action="Create" method="POST" enctype="multipart/form-data">
+                    <form asp-controller="Utenze" asp-action="Crea" method="POST" enctype="multipart/form-data">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
                             <input type="hidden" name="idUser" value="@ViewBag.IdUser" />
+                            
+                            <div>
+                                <label for="idAcquedotto" class="form-label">idAcquedotto: *</label>
+                                <input type="text" class="form-control" id="idAcquedotto" name="idAcquedotto" required>
+                            </div>
                             <div>
                                 <label for="matricolaContatore" class="form-label">Matricola: *</label>
                                 <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" required>
@@ -85,6 +90,11 @@
                                         <option value="@sex">@sex</option>
                                     }
                                 </select>
+                            </div>
+
+                             <div>
+                                <label for="dataNascita" class="form-label">Data Nascità: *</label>
+                                <input class="form-control" type="date" id="dataNascita" name="dataNascita" required>
                             </div>
 
                             <div>

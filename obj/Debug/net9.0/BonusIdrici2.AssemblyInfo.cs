@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BonusIdrici2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3be23fc493af583845b8473cb294939136860994")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0363bdd4d9b9fc66eab8509bd7d95495ec08e3a9")]
 [assembly: System.Reflection.AssemblyProductAttribute("BonusIdrici2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BonusIdrici2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -399,7 +399,6 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\scopedcss\Views\Shar
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\scopedcss\bundle\BonusIdrici2.styles.css
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\scopedcss\projectbundle\BonusIdrici2.bundle.scp.css
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\2eh2bpy5t6-61n19gt1b8.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-xtxxf3hu2r.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\1m9b6tb3xa-bqjiyaj88i.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\mzhverrf52-c2jlpeoesf.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\m0atteg26z-erw9l3u2r3.gz
@@ -474,3 +473,5 @@ C:\Users\User000015\Documenti\Bonusidrici2\obj\Debug\net9.0\compressed\22ivjwqf8
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34j-s1xgkyej85.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-s1xgkyej85.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-uxqazc4f6j.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\kuhye7d3fm-peyzcavbpg.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-yljwar0xq7.gz

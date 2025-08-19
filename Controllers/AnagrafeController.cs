@@ -94,11 +94,8 @@ namespace BonusIdrici2.Controllers
                     return Show(enti[0].id);
                 }
             }
-            else
-            {
-                enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            }            
-            
+
+            enti = _context.Enti.OrderBy(e => e.nome).ToList();
             ViewBag.Enti = enti;
             return View();
         }
