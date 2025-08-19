@@ -39,12 +39,15 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.ComuneNascita).HasColumnName("ComuneNascita").HasMaxLength(250);
                 entity.Property(f => f.Sesso).HasColumnName("Sesso").IsRequired().HasMaxLength(1);
                 entity.Property(f => f.NumeroComponenti).HasColumnName("NumeroComponenti");
+                entity.Property(f => f.CodiceAbitante).HasColumnName("CodiceAbitante");
                 entity.Property(f => f.CodiceFamiglia).HasColumnName("CodiceFamiglia");
                 entity.Property(f => f.Parentela).HasColumnName("Parentela").HasMaxLength(128);
                 entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("CodiceFiscaleIntestatarioScheda").HasMaxLength(16);
                 entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
                 entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.data_cancellazione).HasColumnName("data_cancellazione");
                 entity.Property(f => f.IdEnte).HasColumnName("idEnte").IsRequired();
+                entity.Property(f => f.IdUser).HasColumnName("idUser").IsRequired();
             });
 
             // Configurazione per la classe Ente
@@ -122,6 +125,7 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.dataFineValidita).HasColumnName("data_fine_validita").IsRequired();
            entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
            entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+           entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
        });
 
             // Configurazione per la classe Ente

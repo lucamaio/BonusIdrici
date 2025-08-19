@@ -52,6 +52,9 @@ namespace BonusIdrici2.Models
         [Required]
         public required int IdEnte { get; set; }
 
+        [Required]
+        public required int IdUser { get; set; }
+
         public override string ToString()
         {
             return $"Report: id={id}, codiceBonus={codiceBonus}, esitoStr={esitoStr}, esito={esito}, idFornitura={idFornitura}, codiceFiscale={codiceFiscale}, "+

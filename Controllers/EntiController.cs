@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Diagnostics;
 using BonusIdrici2.Models; 
 using BonusIdrici2.Data;
@@ -15,18 +16,52 @@ namespace BonusIdrici2.Controllers
     {
         private readonly ILogger<EntiController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
+
+         private string? ruolo;
+        private int idUser;
+        private string? username;
+
         public EntiController(ILogger<EntiController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
+
+            if (VerificaSessione())
+            {
+                username = HttpContext.Session.GetString("Username");
+                ruolo = HttpContext.Session.GetString("Role");
+                idUser = (int) HttpContext.Session.GetInt32("idUser");
+            }
         }
 
-        // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        // Funzione che inizializza le variabili con i dati della sessione
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            // Ora HttpContext è disponibile
+            username = HttpContext.Session.GetString("Username");
+            ruolo = HttpContext.Session.GetString("Role");
+            idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+
+            if (!VerificaSessione())
+            {
+                username = null;
+                ruolo = null;
+                idUser = 0;
+            }
+
+            // Così le variabili sono disponibili in tutte le viste
+            ViewBag.idUser = idUser;
+            ViewBag.Username = username;
+            ViewBag.Ruolo = ruolo;
+        }
+
+        // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
+
         public bool VerificaSessione(string ruoloRichiesto = null)
         {
-            string username = HttpContext.Session.GetString("Username");
-            string ruolo = HttpContext.Session.GetString("Role");
-
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
             {
                 return false;
@@ -40,8 +75,9 @@ namespace BonusIdrici2.Controllers
             return true;
         }
 
-        // Pagine di navigazione
+        // Inizio - Pagine di navigazione
 
+        // Pagina home che consente la selezione del ente
         public IActionResult Index()
         {
             if (!VerificaSessione("ADMIN"))
@@ -70,6 +106,7 @@ namespace BonusIdrici2.Controllers
             return View("Index", viewModelList);
         }
 
+        // Pagina per la creazione di un nuovo Ente
         public IActionResult Create()
         {
             if (!VerificaSessione("ADMIN"))
@@ -85,25 +122,7 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-        // Funzione che viene eseguita dopo aver compilato il form per la creazione di un ente
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        [HttpPost]
-        public IActionResult Crea(Ente ente)
-        {
-            if (ModelState.IsValid)
-            {
-                // Logica per salvare l'ente nel database
-                _context.Enti.Add(ente);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Ente creato con successo.";
-                return RedirectToAction("Index", "Home"); // oppure una vista di conferma
-            }
-            // In caso di errore, ritorna la stessa vista con il modello
-            return View("Index", "Enti");
-        }
-
-        // Funzione che mostra le informazioni dell'ente da modificare
+        // Pagina 3: Pagina per la modificha dei dati di un ente
 
         public IActionResult Modifica(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool? Nostro = true)
         {
@@ -129,7 +148,29 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-         // Funzione che viene eseguita per aggiornare i dati del ente con queli inseriti nel form
+        // Fine - Pagine di Navigazione
+
+        // Inizio - Funzioni da eseguire a seconda della operazione
+
+        // Funzione che viene eseguita dopo aver compilato il form per la creazione di un ente
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [HttpPost]
+        public IActionResult Crea(Ente ente)
+        {
+            if (ModelState.IsValid)
+            {
+                // Logica per salvare l'ente nel database
+                _context.Enti.Add(ente);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Ente creato con successo.";
+                return RedirectToAction("Index", "Home"); // oppure una vista di conferma
+            }
+            // In caso di errore, ritorna la stessa vista con il modello
+            return View("Index", "Enti");
+        }
+        
+        // Funzione che viene eseguita per aggiornare i dati del ente con queli inseriti nel form
 
         [HttpPost]
         public IActionResult Update(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool? Nostro)
@@ -154,5 +195,8 @@ namespace BonusIdrici2.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index", "Enti");
         }
+        
+        // Fine - Funzioni da eseguire a seconda della operazione
+
     }
 }

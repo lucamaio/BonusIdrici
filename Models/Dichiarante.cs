@@ -31,6 +31,7 @@ namespace BonusIdrici2.Models
 
         public required string NumeroCivico { get; set; }
 
+        public int? CodiceAbitante {get; set; }
         public int? CodiceFamiglia { get; set; }
         public string? Parentela { get; set; }
         public string? CodiceFiscaleIntestatarioScheda { get; set; }
@@ -40,9 +41,14 @@ namespace BonusIdrici2.Models
        [Required]
         public required int IdEnte { get; set; } // ID dell'ente associato al dichiarante
 
+        [Required]
+        public required int IdUser { get; set; }
+
         public DateTime? data_creazione { get; set; }
 
         public DateTime? data_aggiornamento { get; set; }
+
+        public DateTime? data_cancellazione { get; set; }
 
         public string? toString()
         {

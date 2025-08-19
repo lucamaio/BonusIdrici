@@ -90,6 +90,15 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Create(int idEnte)
         {
+             if (!VerificaSessione())
+            {
+                //ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ruolo = HttpContext.Session.GetString("Role");
+            int idUser = (int)HttpContext.Session.GetInt32("idUser");
+            ViewBag.IdUser = idUser;
             ViewBag.IdEnte = idEnte;
             return View();
         }
@@ -104,7 +113,8 @@ namespace BonusIdrici2.Controllers
              string? comune_nascita,
              string indirizzo_residenza,
              string numero_civico,
-             int idEnte)
+             int idEnte,
+             int idUser)
         {
             var nuovaPersona = new Dichiarante
             {
@@ -117,6 +127,7 @@ namespace BonusIdrici2.Controllers
                 IndirizzoResidenza = FunzioniTrasversali.rimuoviVirgolette(indirizzo_residenza).ToUpper(),
                 NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(numero_civico)?.ToUpper(),
                 IdEnte = idEnte,
+                IdUser = idUser,
                 data_creazione = DateTime.Now,
                 data_aggiornamento = null
             };

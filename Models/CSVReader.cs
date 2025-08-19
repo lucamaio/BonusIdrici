@@ -19,7 +19,7 @@ public class CSVReader
 {
     private const char CsvDelimiter = ';';
 
-    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, List<Dichiarante> dichiaranti)
+    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, List<Dichiarante> dichiaranti, int idUser)
     {
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_Anagrafe.log");
@@ -45,7 +45,7 @@ public class CSVReader
 
                 // b) Verifico che il file contine tutti i vampi minimi per poter procedere
 
-                if (campi.Length < 19)
+                if (campi.Length < 16)
                 {
                     errori.Add($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
                     continue;
@@ -120,9 +120,13 @@ public class CSVReader
                     NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[8]),
                     Parentela = FunzioniTrasversali.rimuoviVirgolette(campi[10]).ToUpper(),
                     CodiceFamiglia = int.Parse(campi[11].Trim()),
+                    CodiceAbitante = int.Parse(campi[12]),
                     NumeroComponenti = int.Parse(campi[13].Trim()),
-                    CodiceFiscaleIntestatarioScheda = FunzioniTrasversali.rimuoviVirgolette(campi[19]),
-                    IdEnte = selectedEnteId
+                    CodiceFiscaleIntestatarioScheda = FunzioniTrasversali.rimuoviVirgolette(campi[14]),
+                    data_creazione = DateTime.Now,
+                    data_cancellazione = FunzioniTrasversali.ConvertiData(campi[15]),
+                    IdEnte = selectedEnteId,
+                    IdUser = idUser
                 };
 
                 var esiste = false;
@@ -623,7 +627,7 @@ public class CSVReader
     }
 
     // Funzione che genera i report finali a partire dal file csv INPS
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser)
     {
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_INPS.log");
@@ -899,6 +903,7 @@ public class CSVReader
                     esitoStr = esitoStr,
                     esito = esito,
                     IdEnte = selectedEnteId,
+                    IdUser = idUser,
                     DataCreazione = dataCreazione
                 };
 

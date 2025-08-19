@@ -23,7 +23,8 @@
                 <div class="card-body p-5">
                     <form asp-controller="Utenze" asp-action="Create" method="POST" enctype="multipart/form-data">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-
+                            <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
+                            <input type="hidden" name="idUser" value="@ViewBag.IdUser" />
                             <div>
                                 <label for="matricolaContatore" class="form-label">Matricola: *</label>
                                 <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" required>

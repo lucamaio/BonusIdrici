@@ -1,33 +1,89 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using BonusIdrici2.Models; 
 using BonusIdrici2.Data;
-
+using System.IO;
 using BonusIdrici2.Models.ViewModels;
 
 namespace BonusIdrici2.Controllers
 {
     public class AnagrafeController : Controller
     {
+        // Dichiarazione delle variabili di istanza
         private readonly ILogger<AnagrafeController> _logger;
         private readonly ApplicationDbContext _context;
+        
+        private string? ruolo;
+        private int idUser;
+        private string? username;
+
+        // Costruttore
         public AnagrafeController(ILogger<AnagrafeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
+            
+            if (VerificaSessione())
+            {
+                username = HttpContext.Session.GetString("Username");
+                ruolo = HttpContext.Session.GetString("Role");
+                idUser = (int) HttpContext.Session.GetInt32("idUser");
+            }
         }
 
-        // Pagine di navigazione
+        // Funzione che inizializza le variabili con i dati della sessione
 
-        public IActionResult Index()
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
+            base.OnActionExecuting(context);
+
+            // Ora HttpContext è disponibile
+            username = HttpContext.Session.GetString("Username");
+            ruolo = HttpContext.Session.GetString("Role");
+            idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+
             if (!VerificaSessione())
             {
-                //ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                username = null;
+                ruolo = null;
+                idUser = 0;
+            }
+
+            // Così le variabili sono disponibili in tutte le viste
+            ViewBag.idUser = idUser;
+            ViewBag.Username = username;
+            ViewBag.Ruolo = ruolo;
+        }
+
+        // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
+
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        // Inizio Pagine di navigazione
+
+        // Pagina home per la selezione del ente 
+        public IActionResult Index()
+        {
+            if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
 
-            var ruolo = HttpContext.Session.GetString("Role");
-            int idUser = (int) HttpContext.Session.GetInt32("idUser");
             List<Ente> enti = new List<Ente>();
 
             if (ruolo == "OPERATORE")
@@ -51,6 +107,12 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Show(int selectedEnteId)
         {
+             if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (selectedEnteId == 0)
             {
                 ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
@@ -87,14 +149,42 @@ namespace BonusIdrici2.Controllers
             return View("Show", viewModelList);
         }
 
+        // Pagina per la creazione di un nuovo dichiarante
         public IActionResult Create(int idEnte)
         {
+            if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             ViewBag.IdEnte = idEnte;
             return View();
         }
 
+        // Pagina per la modifica di un dichiarante
+
+        public IActionResult Modifica(int id)
+        {
+             if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+            
+            ViewBag.id = id;
+            List<Dichiarante> dichiarante = _context.Dichiaranti.Where(s => s.id == id).ToList();
+            ViewBag.Dichiarante = dichiarante.First();
+            return View();
+        }
+
+        // Fine - Pagine Navigazione
+
+        // Inizio - Funzioni da eseguire a seconda della operazione
+
+        // Funzione che consente di andare a creare un nuovo dichiarante da i dati provenienti dal form Anagrafe/Create.cshtml
         [HttpPost]
-        public IActionResult crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
+        public IActionResult crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte,int idUser)
         {
             var nuovaPersona = new Dichiarante
             {
@@ -107,6 +197,7 @@ namespace BonusIdrici2.Controllers
                 IndirizzoResidenza = indirizzo_residenza.ToUpper(),
                 NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(numero_civico).ToUpper(),
                 IdEnte = idEnte,
+                IdUser = idUser,
                 data_creazione = DateTime.Now,
                 data_aggiornamento = null
             };
@@ -117,13 +208,7 @@ namespace BonusIdrici2.Controllers
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
         }
 
-        public IActionResult Modifica(int id)
-        {
-            ViewBag.id = id;
-            List<Dichiarante> dichiarante = _context.Dichiaranti.Where(s => s.id == id).ToList();
-            ViewBag.Dichiarante = dichiarante.First();
-            return View();
-        }
+        // Funzione che consente di andare a creare un nuovo dichiarante da i dati provenienti dal form Anagrafe/Modifica.cshtml
 
         [HttpPost]
         public IActionResult Update(int id, string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
@@ -150,25 +235,8 @@ namespace BonusIdrici2.Controllers
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
         }
-        
-        // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
-        public bool VerificaSessione(string ruoloRichiesto = null)
-        {
-            string username = HttpContext.Session.GetString("Username");
-            string ruolo = HttpContext.Session.GetString("Role");
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
-            {
-                return false;
-            }
-
-            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
-            {
-                return false;
-            }
-
-            return true;
-        }
+        // Fine - Funzioni da eseguire a seconda della operazione
 
     }
 }

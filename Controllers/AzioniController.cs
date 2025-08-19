@@ -1,27 +1,53 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using BonusIdrici2.Models;
 using BonusIdrici2.Data;
 using System.Globalization;
 using BonusIdrici2.Models.ViewModels; // Aggiungi questo using
+using System.IO;
 
 namespace BonusIdrici2.Controllers
 {
     public class AzioniController : Controller
     {
         private readonly ILogger<AzioniController> _logger;
-        private readonly ApplicationDbContext _context; // Inietta il DbContext
+        private readonly ApplicationDbContext _context;
+
+        private string? ruolo;
+        private int idUser;
+        private string? username;
+
         public AzioniController(ILogger<AzioniController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
         }
 
-         // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            // Ora HttpContext è disponibile
+            username = HttpContext.Session.GetString("Username");
+            ruolo = HttpContext.Session.GetString("Role");
+            idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+
+            if (!VerificaSessione())
+            {
+                username = null;
+                ruolo = null;
+                idUser = 0;
+            }
+
+            // Così le variabili sono disponibili in tutte le viste
+            ViewBag.idUser = idUser;
+            ViewBag.Username = username;
+            ViewBag.Ruolo = ruolo;
+        }
+
+        // Funzione di validazione
         public bool VerificaSessione(string ruoloRichiesto = null)
         {
-            string username = HttpContext.Session.GetString("Username");
-            string ruolo = HttpContext.Session.GetString("Role");
-
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
             {
                 return false;
@@ -35,8 +61,7 @@ namespace BonusIdrici2.Controllers
             return true;
         }
 
-
-        // Pagine di navigazione
+        // Pagine
         public IActionResult LoadAnagrafica()
         {
             if (!VerificaSessione("ADMIN"))
@@ -45,26 +70,22 @@ namespace BonusIdrici2.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Username = HttpContext.Session.GetString("Username");
-            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
-
-            // Recupera tutti gli enti dal database
-            List<Ente> enti = _context.Enti.ToList();
-            // Passa la lista degli enti alla vista tramite ViewBag
-            ViewBag.Enti = enti;
+            ViewBag.Enti = _context.Enti.ToList();
             return View();
         }
 
         public IActionResult LoadFileINPS()
         {
-            // Recupera tutti gli enti dal database
-            List<Ente> enti = _context.Enti.ToList();
-            // Passa la lista degli enti alla vista tramite ViewBag
-            ViewBag.Enti = enti;
-            return View(); // Assicurati che il nome della vista sia corretto (es. LoadFileINPS.cshtml)
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Enti = _context.Enti.ToList();
+            return View();
         }
 
-    
         public IActionResult LoadFilePiranha()
         {
             if (!VerificaSessione("ADMIN"))
@@ -73,25 +94,32 @@ namespace BonusIdrici2.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Username = HttpContext.Session.GetString("Username");
-            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
-
-            List<Ente> enti = _context.Enti.ToList();
-            // Passa la lista degli enti alla vista tramite ViewBag
-            ViewBag.Enti = enti;
+            ViewBag.Enti = _context.Enti.ToList();
             return View();
         }
 
         public IActionResult Report()
         {
-            List<Ente> enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            ViewBag.Enti = enti;
+            if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
+           // Controllo se l'utente può accedere alla pagina desideratà
+            if (string.IsNullOrEmpty(ruolo) || ruolo!="ADMIN")
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
@@ -129,7 +157,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, dichiaranti);
+                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, dichiaranti, idUser);
 
                 // Inizia una transazione per assicurare che tutti i dati vengano salvati
                 // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
@@ -197,6 +225,13 @@ namespace BonusIdrici2.Controllers
        [HttpPost]
         public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
         {
+            // Controllo se l'utente può accedere alla pagina desideratà
+            if (string.IsNullOrEmpty(ruolo) || ruolo!="ADMIN")
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             // Validazione file
             if (csv_file == null || csv_file.Length == 0)
             {
@@ -340,6 +375,13 @@ namespace BonusIdrici2.Controllers
         [HttpPost]
         public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId)
         {
+            // Verifico se i dati non sono null
+            if (string.IsNullOrEmpty(ruolo) || string.IsNullOrEmpty(username) || idUser == 0)
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
@@ -379,7 +421,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId);
+                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser);
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -420,36 +462,43 @@ namespace BonusIdrici2.Controllers
 
             return View("LoadFileINPS"); // Torna alla pagina di upload con il messaggio di stato
         }
-        // POST: Gestisce la selezione dell'ente e reindirizza alla pagina di riepilogo
+
+       // POST: Gestisce la selezione dell'ente e reindirizza alla pagina di riepilogo
         [HttpPost]
         public IActionResult RiepilogoDatiEnte(int selectedEnteId)
         {
-            if (selectedEnteId == 0) // Controlla se l'ID è valido, 0 potrebbe essere il valore di default per "-- Seleziona un Ente --"
+            if (selectedEnteId == 0)
             {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList(); // Ricarica gli enti per la vista
+                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("GeneraEsitoCompetenza"); // Torna alla pagina di selezione
+                return View("GeneraEsitoCompetenza");
             }
 
-            // Recupera le date di inserimento uniche e il conteggio dei report per quell'ente
-            // Assumi che il tuo modello Report abbia idEnte e data_inserimento
+            // Raggruppa per utente + data di creazione
             var riepilogoDati = _context.Reports
                                         .Where(r => r.IdEnte == selectedEnteId)
-                                        .GroupBy(r => r.DataCreazione) // Raggruppa per data di inserimento
+                                        .GroupBy(r => new { r.IdUser, r.DataCreazione })
                                         .Select(g => new RiepilogoDatiViewModel
                                         {
-                                            DataCreazione = g.Key,
+                                            Iduser = g.Key.IdUser,
+                                            Username = _context.Users
+                                                            .Where(u => u.id == g.Key.IdUser)
+                                                            .Select(u => u.Username)
+                                                            .FirstOrDefault(),
+                                            DataCreazione = g.Key.DataCreazione,
                                             NumeroDatiInseriti = g.Count()
                                         })
-                                        .OrderByDescending(x => x.DataCreazione) // Ordina dalla data più recente
+                                        .OrderByDescending(x => x.DataCreazione)
                                         .ToList();
 
-            // Passa i dati alla vista, inclusa l'ID dell'ente selezionato
             ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+            ViewBag.SelectedEnteNome = _context.Enti
+                                            .FirstOrDefault(e => e.id == selectedEnteId)?.nome 
+                                            ?? "Ente Sconosciuto";
 
             return View("RiepilogoDatiEnte", riepilogoDati);
         }
+
 
         public async Task<IActionResult> ScaricaCsv(int enteId, string DataCreazione, string tipoReport)
         {

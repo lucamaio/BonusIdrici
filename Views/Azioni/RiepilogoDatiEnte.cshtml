@@ -1,4 +1,4 @@
-@model IEnumerable<BonusIdrici2.Models.ViewModels.RiepilogoDatiViewModel> 
+@model IEnumerable<BonusIdrici2.Models.ViewModels.RiepilogoDatiViewModel>
 
 @{
     ViewData["Title"] = "Riepilogo Dati Ente";
@@ -6,72 +6,82 @@
     var selectedEnteNome = ViewBag.SelectedEnteNome;
 }
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-md-12">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header text-white text-center rounded-top-4"
-                     style="background: linear-gradient(90deg, #0d6efd, #0a58ca);">
-                    <h3 class="mb-1 fw-bold">
-                        <i class="bi bi-building me-2"></i> Dati Disponibili per l'Ente: 
-                        <span class="fw-semibold">@selectedEnteNome</span>
-                    </h3>
-                    <small>ID Ente: @selectedEnteId</small>
-                </div>
+<div class="container-xxl flex-grow-1 py-5">
+    <div class="card shadow-sm border-0 rounded-4">
+        <!-- Header -->
+        <div class="card-header border-0 bg-gradient rounded-top-4 d-flex flex-column align-items-center p-4"
+             style="background: linear-gradient(90deg, #696cff, #2e3eff);">
+            <h3 class="mb-1 fw-bold">
+                <i class="bi bi-building me-2"></i> Report Disponibili - 
+                <span class="fw-semibold">@selectedEnteNome</span>
+            </h3>
+            <small>ID Ente: @selectedEnteId</small>
+        </div>
 
-                <div class="card-body p-4">
+        <!-- Body -->
+        <div class="card-body p-4">
+            @if (Model != null && Model.Any())
+            {
+                <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i report correlati.</p>
 
-                    @if (Model != null && Model.Any())
-                    {
-                        <p class="lead mb-3">Seleziona una data di inserimento per scaricare i report correlati.</p>
-                        <div class="table-responsive shadow-sm rounded-3">
-                            <table id="riepilogoTable" class="table table-striped table-bordered table-hover align-middle" style="width:100%;">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>Giorno Inserimento</th>
-                                        <th>Numero Dati Inseriti</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        var dataUrl = item.DataCreazione?.ToString("yyyy-MM-dd");
-                                        <tr>
-                                            <td>@item.DataCreazione?.ToString("dd/MM/yyyy")</td>
-                                            <td>@item.NumeroDatiInseriti</td>
-                                            <td>
-                                                <div class="btn-group" role="group" aria-label="Download options">
-                                                    <a href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })"
-                                                       class="btn btn-sm btn-success me-2">
-                                                        <i class="bi bi-download me-1"></i> Esito Bonus Idrico
+                <div class="table-responsive">
+                    <table id="riepilogoTable" class="table table-hover align-middle border-bottom">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Data Elaborazione</th>
+                                <th class="text-center">Elabotato da</th>
+                                <th class="text-center">Numero Record</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var dataUrl = item.DataCreazione?.ToString("yyyy-MM-dd");
+                                <tr>
+                                    <td><span class="fw-semibold">@item.DataCreazione?.ToString("dd/MM/yyyy")</span></td>
+                                    <td><span class="fw-semibold">@item.Username</span></td>
+                                    <td>
+                                        <span class="badge bg-label-primary rounded-pill px-3 py-2" style="color: #000">
+                                            @item.NumeroDatiInseriti
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
+                                                        <i class="bi bi-download me-2 text-success"></i> Esito Bonus Idrico
                                                     </a>
-                                                    <a href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })"
-                                                       class="btn btn-sm btn-info">
-                                                        <i class="bi bi-download me-1"></i> Competenza Territoriale
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
+                                                        <i class="bi bi-download me-2 text-info"></i> Competenza Territoriale
                                                     </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning text-center mt-3 shadow-sm rounded-3">
-                            <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato di report trovato per l'ente selezionato.
-                        </div>
-                    }
-
-                    <div class="d-grid mt-4">
-                        <a href="@Url.Action("Report", "Azioni")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
-                        </a>
-                    </div>
-
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center shadow-sm rounded-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato disponibile per l'ente selezionato.
+                </div>
+            }
+
+            <div class="d-grid mt-4">
+                <a href="@Url.Action("Report", "Azioni")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                    <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
+                </a>
             </div>
         </div>
     </div>
@@ -84,21 +94,19 @@
                 paging: true,
                 searching: true,
                 ordering: true,
-                info: false,
                 responsive: true,
                 language: { url: "//cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-end"Bf>>t<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6 text-end"p>>',
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
                 buttons: [
                     {
                         extend: 'collection',
-                        className: 'btn btn-primary dropdown-toggle me-2',
+                        className: 'btn btn-sm btn-primary dropdown-toggle me-2',
                         text: '<i class="bi bi-download me-1"></i> Export',
                         buttons: [
                             { extend: 'copy', text: 'Copia' },
                             { extend: 'excel', text: 'Excel' },
                             { extend: 'pdf', text: 'PDF' },
-                            { extend: 'print', text: 'Stampa' },
-                            { extend: 'colvis', text: 'Visibilità Colonne' }
+                            { extend: 'print', text: 'Stampa' }
                         ]
                     }
                 ]

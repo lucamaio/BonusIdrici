@@ -1,0 +1,109 @@
+@* Views/Account/Details.cshtml *@
+@{
+    ViewData["Title"] = "Dettagli Account";
+    var username = ViewBag.Username;
+    var email = ViewBag.Email;
+    var role    = ViewBag.Role;
+    var cognome = ViewBag.Cognome;
+    var nome = ViewBag.Nome;
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <!-- HEADER CON NUOVO GRADIENTE -->
+                <div class="card-img-top" style="height: 180px; background: linear-gradient(120deg, #0d6efd 0%, #20c997 100%);">
+                </div>
+
+                <div class="card-body mt-4 pt-2">
+                    <!-- NAV TABS MODERNE -->
+                    <ul class="nav nav-pills nav-justified mb-4 gap-2">
+                        <li class="nav-item">
+                            <a asp-controller="Account" asp-action="Dettagli" class="nav-link d-flex align-items-center gap-2">
+                                <i class="bi bi-person-lines-fill"></i>
+                                <span>Personale</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Account" asp-action="Sicurezza" class="nav-link active d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-lock"></i>
+                                <span>Sicurezza</span>
+                            </a>
+                        </li>
+                    </ul>
+                    </ul>
+
+                    <!-- DETTAGLI MODERNI -->
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-4 text-end text-muted fw-semibold">
+                            <i class="bi bi-person-circle me-2 text-primary"></i>Username
+                        </div>
+                        <div class="col-8">
+                            <span class="badge bg-light text-dark px-3 py-2 fs-6">@username</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-4 text-end text-muted fw-semibold">
+                            <i class="bi bi-envelope-at me-2 text-primary"></i>Email
+                        </div>
+                        <div class="col-8">
+                            <span class="badge bg-light text-dark px-3 py-2 fs-6">@email</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-4 text-end text-muted fw-semibold">
+                            <i class="bi bi-person-badge me-2 text-primary"></i>Ruolo
+                        </div>
+                        <div class="col-8">
+                            <span class="badge bg-light text-dark px-3 py-2 fs-6">@role</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-4 text-end text-muted fw-semibold">
+                            <i class="bi bi-person-vcard me-2 text-primary"></i>Cognome
+                        </div>
+                        <div class="col-8">
+                            <span class="badge bg-light text-dark px-3 py-2 fs-6">@cognome</span>
+                        </div>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-4 text-end text-muted fw-semibold">
+                            <i class="bi bi-person-vcard-fill me-2 text-primary"></i>Nome
+                        </div>
+                        <div class="col-8">
+                            <span class="badge bg-light text-dark px-3 py-2 fs-6">@nome</span>
+                        </div>
+                    </div>
+
+                    <!-- AZIONI MODERNE -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-controller="Account" asp-action="Edit" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-pencil-square me-2"></i> Modifica
+                        </a>
+                        <form asp-controller="Login" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-lg rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link.active {
+        background: linear-gradient(90deg, #0d6efd 60%, #20c997 100%);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.15);
+    }
+    .nav-pills .nav-link {
+        transition: background 0.2s, color 0.2s;
+    }
+    .nav-pills .nav-link:not(.active):hover {
+        background: #f0f4fa;
+        color: #0d6efd;
+    }
+</style>
