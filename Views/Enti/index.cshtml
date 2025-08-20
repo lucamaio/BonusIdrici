@@ -29,7 +29,7 @@
                         <p class="lead mb-4 text-muted">Di seguito sono elencati gli Enti Comunali.</p>
 
                         <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
-                            <table id="riepilogoTable" class="table table-hover align-middle border-bottom w-100">
+                            <table id="entiTable" class="table table-hover align-middle border-bottom w-100">
                                 <thead class="table-primary">
                                     <tr>
                                         <th>ID</th>
@@ -86,11 +86,6 @@
 </div>
 
 @section Scripts {
-    @* <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.min.js"></script> *@
-
     <script>
         $(document).ready(function () {
             // Mostra barra all'inizio
@@ -103,8 +98,8 @@
                 }
             }, 300);
 
-            var table = $('#riepilogoTable').DataTable({
-                paging: true,
+            var entiTable = $('#entiTable').DataTable({
+                paging: false,
                 searching: true,
                 ordering: true,
                 responsive: true,
@@ -122,7 +117,7 @@
             });
 
             // Quando la tabella è pronta → completa la barra e mostra tabella
-            table.on('init', function () {
+            entiTable.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
