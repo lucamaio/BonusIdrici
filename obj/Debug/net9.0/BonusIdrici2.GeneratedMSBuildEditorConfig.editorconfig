@@ -72,14 +72,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXppb25pXExvYWRGaWxlUGlyYW5oYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/User000015/Documents/BonusIdrici2/Views/Azioni/Report.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXppb25pXFJlcG9ydC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/User000015/Documents/BonusIdrici2/Views/Azioni/RiepilogoDatiEnte.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXppb25pXFJpZXBpbG9nb0RhdGlFbnRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/User000015/Documents/BonusIdrici2/Views/Enti/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50aVxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -102,6 +94,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/User000015/Documents/BonusIdrici2/Views/Login/index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5caW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/Show.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFNob3cuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User000015/Documents/BonusIdrici2/Views/Shared/Error.cshtml]

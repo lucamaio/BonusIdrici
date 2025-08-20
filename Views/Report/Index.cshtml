@@ -1,6 +1,5 @@
-@* Views/Azioni/GeneraEsitoCompetenza.cshtml *@
 @{
-    ViewData["Title"] = "Report"; 
+    ViewData["Title"] = "Selezione Ente"; 
 }
 
 <div class="container my-5">
@@ -15,7 +14,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="RiepilogoDatiEnte" method="post">
+                    <form asp-controller="Report" asp-action="Show" method="post">
                         
                         <div class="mb-4">
                             <label for="selectedEnteId" class="form-label fw-semibold">

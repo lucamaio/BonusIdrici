@@ -53,13 +53,18 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
                                                 <li>
-                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
+                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv",  new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
                                                         <i class="bi bi-download me-2 text-success"></i> Esito Bonus Idrico
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", "Azioni", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
+                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
                                                         <i class="bi bi-download me-2 text-info"></i> Competenza Territoriale
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Siscom" })">
+                                                        <i class="bi bi-download me-2 text-info"></i> File Siscom
                                                     </a>
                                                 </li>
                                             </ul>
@@ -78,11 +83,19 @@
                 </div>
             }
 
-            <div class="d-grid mt-4">
-                <a href="@Url.Action("Report", "Azioni")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                    <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
-                </a>
-            </div>
+            @if(ViewBag.Ruolo !="OPERATORE"){
+                        <div class="d-grid mt-4">
+                            <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
+                            </a>
+                        </div>
+                    }else{
+                        <div class="d-grid mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
+                        </a>
+                    </div>
+                    }      
         </div>
     </div>
 </div>

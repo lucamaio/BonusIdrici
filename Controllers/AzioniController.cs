@@ -98,18 +98,6 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-        public IActionResult Report()
-        {
-            if (!VerificaSessione()) 
-            {
-                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
-            }
-
-            ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-            return View();
-        }
-
         [HttpPost]
         public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
@@ -461,101 +449,6 @@ namespace BonusIdrici2.Controllers
             }
 
             return View("LoadFileINPS"); // Torna alla pagina di upload con il messaggio di stato
-        }
-
-       // POST: Gestisce la selezione dell'ente e reindirizza alla pagina di riepilogo
-        [HttpPost]
-        public IActionResult RiepilogoDatiEnte(int selectedEnteId)
-        {
-            if (selectedEnteId == 0)
-            {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-                ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("GeneraEsitoCompetenza");
-            }
-
-            // Raggruppa per utente + data di creazione
-            var riepilogoDati = _context.Reports
-                                        .Where(r => r.IdEnte == selectedEnteId)
-                                        .GroupBy(r => new { r.IdUser, r.DataCreazione })
-                                        .Select(g => new RiepilogoDatiViewModel
-                                        {
-                                            Iduser = g.Key.IdUser,
-                                            Username = _context.Users
-                                                            .Where(u => u.id == g.Key.IdUser)
-                                                            .Select(u => u.Username)
-                                                            .FirstOrDefault(),
-                                            DataCreazione = g.Key.DataCreazione,
-                                            NumeroDatiInseriti = g.Count()
-                                        })
-                                        .OrderByDescending(x => x.DataCreazione)
-                                        .ToList();
-
-            ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti
-                                            .FirstOrDefault(e => e.id == selectedEnteId)?.nome 
-                                            ?? "Ente Sconosciuto";
-
-            return View("RiepilogoDatiEnte", riepilogoDati);
-        }
-
-
-        public async Task<IActionResult> ScaricaCsv(int enteId, string DataCreazione, string tipoReport)
-        {
-            // 1. Validazione input
-            if (string.IsNullOrEmpty(DataCreazione) || string.IsNullOrEmpty(tipoReport))
-            {
-                return BadRequest("Parametri mancanti per il download del report.");
-            }
-
-            DateTime dataCreazioneParsed;
-            if (!DateTime.TryParseExact(DataCreazione, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataCreazioneParsed))
-            {
-                return BadRequest("Formato data non valido. Usare il formato AAAA-MM-GG.");
-            }
-
-            var ente = _context.Enti.Where(r => r.id == enteId).ToList();
-            var p_iva = ente[0].partitaIva;
-
-            // 2. Recupero dei dati dal database (una sola query per entrambi i tipi di report)
-            List<Report> datiDelReport = _context.Reports
-                                                .Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed)
-                                                .ToList();
-
-            byte[]? fileBytes;
-            string fileName = "";
-            string contentType = "text/csv";
-            DateTime timeStamp = DateTime.Now;
-            var pogressivo = "1";
-
-            // 3. Chiama la funzione di generazione CSV appropriata in base al tipo di report
-            if (tipoReport == "Esito Bonus Idrico")
-            {
-                // <PIVA_Utente>_BID_<AAAAMM>_EBI_<timestamp>_<progressivo>.csv
-                fileName = $"{p_iva}_BID_{dataCreazioneParsed:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
-                fileBytes = null;
-                fileBytes = CsvGenerator.GeneraCsvBonusIdrico(datiDelReport); // Chiamata alla funzione specifica
-            }
-            else if (tipoReport == "Esito Competenza Territoriale")
-            {
-                fileName = $"{p_iva}_BID_{dataCreazioneParsed:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
-                fileBytes = CsvGenerator.GeneraCsvCompetenzaTerritoriale(datiDelReport); // Chiamata alla funzione specifica
-            }
-            else
-            {
-                return NotFound("Tipo di report non riconosciuto o non supportato per la generazione CSV.");
-            }
-
-            // 4. Imposta l'header Content-Disposition
-            var contentDisposition = new System.Net.Mime.ContentDisposition
-            {
-                FileName = fileName,
-                Inline = false,
-            };
-            Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
-
-            // 5. Restituisci i byte come file
-            return File(fileBytes, contentType, fileName);
         }
     }   
 }
