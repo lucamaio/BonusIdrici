@@ -33,7 +33,7 @@
                         <p class="lead mb-4 text-muted">Di seguito sono elencati i toponimi associati all’ente selezionato.</p>
 
                         <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
-                            <table id="riepilogoTable" class="table table-hover align-middle border-bottom w-100">
+                            <table id="toponomiTable" class="table table-hover align-middle border-bottom w-100">
                                 <thead>
                                     <tr>
                                         <th>Denominazione</th>
@@ -70,11 +70,19 @@
                         </div>
                     }
 
-                    <div class="d-grid mt-4">
-                        <a href="@Url.Action("Index", "Toponomi")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
+                     @if(ViewBag.Ruolo != "OPERATORE"){
+                        <div class="d-grid mt-4">
+                            <a href="@Url.Action("Index", "Toponomi")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
+                            </a>
+                        </div>
+                    }else{
+                        <div class="d-grid mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
                         </a>
                     </div>
+                    }       
                 </div>
             </div>
         </div>
@@ -94,7 +102,7 @@
                 }
             }, 300);
 
-            var table = $('#riepilogoTable').DataTable({
+            var toponomiTable = $('#toponomiTable').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
@@ -113,7 +121,7 @@
             });
 
             // Quando la tabella è pronta → completa la barra e mostra tabella
-            table.on('init', function () {
+            toponomiTable.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {

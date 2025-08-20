@@ -104,7 +104,7 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Show(int selectedEnteId)
         {
-             if (!VerificaSessione()) 
+            if (!VerificaSessione()) 
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
@@ -163,7 +163,7 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Modifica(int id)
         {
-             if (!VerificaSessione()) 
+            if (!VerificaSessione()) 
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
