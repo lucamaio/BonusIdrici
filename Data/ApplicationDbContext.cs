@@ -122,6 +122,8 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.capAbitazione).HasColumnName("cap_abitazione");
            entity.Property(f => f.provinciaAbitazione).HasColumnName("provincia_abitazione");
            entity.Property(f => f.presenzaPod).HasColumnName("presenza_pod");
+           entity.Property(f => f.serie).HasColumnName("serie").IsRequired();
+           entity.Property(f => f.mc).HasColumnName("mc");
            entity.Property(f => f.dataInizioValidita).HasColumnName("data_inizio_validita").IsRequired();
            entity.Property(f => f.dataFineValidita).HasColumnName("data_fine_validita").IsRequired();
            entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");

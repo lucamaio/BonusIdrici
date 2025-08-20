@@ -63,13 +63,7 @@ public static class CsvGenerator
                 csvContent.AppendLine(riga.ToString());
             }
         }
-        else
-        {
-            // Se non ci sono dati, potresti voler aggiungere una riga vuota o un messaggio,
-            // oppure semplicemente restituire l'intestazione. Dipende dalla tua specifica.
-            // Per ora, restituisce solo l'intestazione se dati è null o vuoto.
-        }
-
+       
         return Encoding.UTF8.GetBytes(csvContent.ToString());
     }
 
@@ -87,6 +81,31 @@ public static class CsvGenerator
                 StringBuilder riga = new StringBuilder();
                 riga.Append(EscapeCsvField(report.codiceBonus.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esitoStr, Delimitatore)).Append(Delimitatore);
+                csvContent.AppendLine(riga.ToString());
+            }
+        }
+
+        return Encoding.UTF8.GetBytes(csvContent.ToString());
+    }
+
+    // Funzione 3: consente di generare il file x Siscom
+
+    public static byte[] GeneraCsvSiscom(List<Report> dati) // Nota: nome corretto "Territoriale"
+    {
+        StringBuilder csvContent = new StringBuilder();
+        List<string> headers = new List<string> { "ID_ACQUEDOTTO", "ANNO","SERIE","COMPONENTI","MC"};
+        csvContent.AppendLine(string.Join(Delimitatore, headers));
+
+        if (dati != null && dati.Any())
+        {
+            foreach (var report in dati)
+            {
+                StringBuilder riga = new StringBuilder();
+                riga.Append(EscapeCsvField(report.idFornitura.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.annoValidita.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.serie.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.numeroComponenti.ToString(), Delimitatore)).Append(Delimitatore);
+                 riga.Append(EscapeCsvField(report.mc.ToString(), Delimitatore)).Append(Delimitatore);      
                 csvContent.AppendLine(riga.ToString());
             }
         }

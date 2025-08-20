@@ -94,6 +94,13 @@ namespace BonusIdrici2.Controllers
          [HttpPost]
         public IActionResult Show(int selectedEnteId)
         {
+            // Verifica la sessione
+            if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (selectedEnteId == 0)
             {
                 ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
@@ -133,7 +140,7 @@ namespace BonusIdrici2.Controllers
         // Inzio - Funzioni
 
         // Funzione 1: Consente il download dei file di esportazione
-        
+
         public async Task<IActionResult> ScaricaCsv(int enteId, string DataCreazione, string tipoReport)
         {
             // 1. Validazione input
@@ -151,12 +158,16 @@ namespace BonusIdrici2.Controllers
             var ente = _context.Enti.Where(r => r.id == enteId).ToList();
             var p_iva = ente[0].partitaIva;
             var nomeEnte =ente[0].nome;
+            List<Report> datiDelReport = new List<Report>();
 
             // 2. Recupero dei dati dal database (una sola query per entrambi i tipi di report)
-            List<Report> datiDelReport = _context.Reports
-                                                .Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed)
-                                                .ToList();
-
+            if(tipoReport != "Siscom"){
+                datiDelReport = _context.Reports.Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed).ToList();
+            }else{
+                // datiDelReport = _context.Reports.Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed && (r.esito =="01" || r.esito =="02") && r.esitoStr=="Si").ToList();
+                datiDelReport = _context.Reports.Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed && r.esito =="01" && r.esitoStr=="Si").ToList();
+            }
+            
             byte[]? fileBytes;
             string fileName = "";
             string contentType = "text/csv";
@@ -168,7 +179,6 @@ namespace BonusIdrici2.Controllers
             {
                 // <PIVA_Utente>_BID_<AAAAMM>_EBI_<timestamp>_<progressivo>.csv
                 fileName = $"{p_iva}_BID_{dataCreazioneParsed:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
-                fileBytes = null;
                 fileBytes = CsvGenerator.GeneraCsvBonusIdrico(datiDelReport); // Chiamata alla funzione specifica
             }
             else if (tipoReport == "Esito Competenza Territoriale")
@@ -177,7 +187,7 @@ namespace BonusIdrici2.Controllers
                 fileBytes = CsvGenerator.GeneraCsvCompetenzaTerritoriale(datiDelReport); // Chiamata alla funzione specifica
             }else if(tipoReport == "Siscom"){
                 fileName= $"Esportazione Bonus Idrici {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
-                fileBytes = null;
+                fileBytes = CsvGenerator.GeneraCsvSiscom(datiDelReport);
             }
             else
             {

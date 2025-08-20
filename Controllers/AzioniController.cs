@@ -361,7 +361,7 @@ namespace BonusIdrici2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId)
+        public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, int serie)
         {
             // Verifico se i dati non sono null
             if (string.IsNullOrEmpty(ruolo) || string.IsNullOrEmpty(username) || idUser == 0)
@@ -409,7 +409,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser);
+                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser,serie);
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {

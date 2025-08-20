@@ -4,6 +4,7 @@
     ViewData["Title"] = "Riepilogo Dati Ente";
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
+    var ruolo = ViewBag.Ruolo;
 }
 
 <div class="container-xxl flex-grow-1 py-5">
@@ -47,27 +48,38 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="bi bi-three-dots-vertical"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li>
-                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv",  new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
-                                                        <i class="bi bi-download me-2 text-success"></i> Esito Bonus Idrico
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
-                                                        <i class="bi bi-download me-2 text-info"></i> Competenza Territoriale
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Siscom" })">
-                                                        <i class="bi bi-download me-2 text-info"></i> File Siscom
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                            <!-- Pulsante Dettaglio -->
+                                            <a class="btn btn-sm btn-light border" 
+                                            href="@Url.Action("DettaglioReport", new { enteId = selectedEnteId, DataCreazione = dataUrl })"
+                                            title="Visualizza dettaglio report">
+                                                <i class="bi bi-eye text-primary"></i>
+                                            </a>
+
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv",  new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
+                                                            <i class="bi bi-download me-2 text-success"></i> Esito Bonus Idrico
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
+                                                            <i class="bi bi-download me-2 text-info"></i> Competenza Territoriale
+                                                        </a>
+                                                    </li>
+                                                    @if( ruolo == "ADMIN"){
+                                                        <li>
+                                                            <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Siscom" })">
+                                                                <i class="bi bi-download me-2 text-info"></i> File Siscom
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -83,7 +95,7 @@
                 </div>
             }
 
-            @if(ViewBag.Ruolo !="OPERATORE"){
+            @if(ruolo !="OPERATORE"){
                         <div class="d-grid mt-4">
                             <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary btn-lg shadow-sm">
                                 <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente

@@ -627,7 +627,7 @@ public class CSVReader
     }
 
     // Funzione che genera i report finali a partire dal file csv INPS
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int serie = 0)
     {
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_INPS.log");
@@ -815,6 +815,7 @@ public class CSVReader
                 var istatEnte = ente.istat;
                 var capEnte = ente.Cap;
 
+                int? mc = null;
                 // 2.b) Verifico se i campi ISTAT, CAP e provincia corrispondono a l'ente selezionato il quale gestisce le utenze idriche
 
                 if (!(istatEnte != istatAbitazione || capEnte != capAbitazione || provinciaAbitazione != ente.Provincia))
@@ -881,6 +882,26 @@ public class CSVReader
                     logFile.LogWarning($"Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: {istat} | Cap: {capAbitazione} | Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
                 }
 
+                // Dati neccessari per l'esportazione siscom
+
+                if (esito == "01" || esito == "02")
+                {
+                    if (dataInizioValidita.HasValue && dataFineValidita.HasValue)
+                    {
+                        // Calcolo differenza giorni (arrotondati all’intero)
+                        int giorni = (int)(dataFineValidita.Value.Date - dataInizioValidita.Value.Date).TotalDays;
+
+                        // Evito valori negativi
+                        if (giorni < 0) giorni = 0;
+
+                        mc = CSVReader.calcolaMC(giorni, int.Parse(numeroComponenti));
+                    }
+                    else
+                    {
+                        logFile.LogWarning($"Impossibile calcolare i giorni: date non valide. Riga {rigaCorrente}");
+                    }
+                }
+
                 // 4) Creo un nuovo report con i dati raccolti
                 var report = new Report
                 {
@@ -902,6 +923,8 @@ public class CSVReader
                     numeroComponenti = int.Parse(numeroComponenti),
                     esitoStr = esitoStr,
                     esito = esito,
+                    serie = serie,
+                    mc = mc,
                     IdEnte = selectedEnteId,
                     IdUser = idUser,
                     DataCreazione = dataCreazione
@@ -932,6 +955,13 @@ public class CSVReader
         }
 
         return datiComplessivi;
+    }
+
+    public static int? calcolaMC(int giorniBonus, int componenti){
+        if(giorniBonus<= 0 || componenti <=0){
+            return null;
+        }
+        return (50*giorniBonus*componenti)/1000;
     }
 
 }
