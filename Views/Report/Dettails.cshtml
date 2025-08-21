@@ -1,0 +1,148 @@
+@model IEnumerable<BonusIdrici2.Models.ViewModels.RiepilogoDatiViewModel>
+
+@{
+    ViewData["Title"] = "Riepilogo Report";
+    var idEnte = ViewBag.SelectedEnteId;
+    var selectedEnteNome = ViewBag.SelectedEnteNome;
+
+    DateTime? data1 =ViewBag.Data != null ? ViewBag.Data : Model != null && Model.Any() ?  Model.First().DataCreazione : null;
+    string? data =  ViewBag.Data != null ? ViewBag.Data.ToString("dd/MM/yyyy") : null;
+
+    var ruolo = ViewBag.Ruolo;
+    string? idAto = ViewBag.idAto != null ? ViewBag.idAto : Model != null && Model.Any() ? Model.First().idAto : (string?) null;
+    
+}
+
+<div class="container-xxl flex-grow-1 py-5">
+    <div class="card shadow-sm border-0 rounded-4">
+        <!-- Header -->
+        <div class="card-header border-0 rounded-top-4 d-flex flex-column align-items-center p-4"
+             style="background: linear-gradient(90deg, rgb(13, 110, 253), rgb(7, 74, 175)); color: #fff; fill: #fff;">
+            <h3 class="mb-1 fw-bold">
+                <i class="bi bi-building me-2"></i> Dattagli Report - 
+                <span class="fw-semibold">
+                    @if(data != null){
+                        @data;
+                    }else{
+                       @idAto;
+                    }
+                </span>
+            </h3>
+            <small>Ente: @selectedEnteNome</small>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body p-4">
+            @if (Model != null && Model.Any())
+            {
+                <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i report correlati.</p>
+
+                <div class="table-responsive">
+                    <table id="dettagliReportTable" class="table table-hover align-middle border-bottom">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Id Fornitura</th>
+                                <th class="text-center">idAto</th>
+                                <th class="text-center">Codice Bonus</th>
+                                <th class="text-center">Codice Fiscale</th>
+                                <th class="text-center">Esito str</th>
+                                <th class="text-center">Esito</th>
+                                <th class="text-center">Componenti</th>
+                                <th class="text-center">Serie</th>
+                                <th class="text-center">MC</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td><span class="fw-semibold text-center">@item.idFornitura</span></td>
+                                    <td><span class="text-center">@item.idAto</span></td>
+                                    <td><span class="text-center">@item.codiceBonus</span></td>
+                                    <td><span class="fw-semibold">@item.codiceFiscale</span></td>
+                                    <td><span class="text-center">@item.esitoStr</span></td>
+                                    <td><span class="text-center">@item.esito</span></td>
+                                    <td><span class="text-center">@item.numeroComponenti</span></td>
+                                    <td><span class="text-center">@item.serie</span></td>
+                                    <td><span class="text-center">@item.mc</span></td>
+                                    <td class="text-center">
+                                        <a class="btn btn-sm btn-light border me-1" title="Varia"
+                                            href="@Url.Action("Varia", "Report", new { id = item.id })">
+                                            <i class="bi bi-pencil-square text-primary"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center shadow-sm rounded-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato disponibile per l'ente selezionato.
+                </div>
+            }
+
+            @if(ruolo !="OPERATORE"){
+                        <div class="d-grid mt-4">
+                            <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
+                            </a>
+                        </div>
+                    }else{
+                        <div class="d-grid mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
+                        </a>
+                    </div>
+                    }      
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Mostra barra all'inizio
+            $("#loadingBarContainer").show();
+            var progress = 0;
+            var interval = setInterval(function () {
+                if (progress < 90) {
+                    progress += 10;
+                    $("#loadingBar").css("width", progress + "%");
+                }
+            }, 300);
+            
+
+            var table = $('#dettagliReportTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                buttons: [
+                    {
+                        text: '<i class="bi bi-plus-circle me-1"></i> Varia Serie',
+                        className: 'btn btn-sm btn-success',
+                        action: function () {
+                            window.location.href = '@Url.Action("VariaSerie", "Report")'
+                                + '?idEnte=@idEnte&idAto=@idAto';
+                        }
+                    }
+                ]
+            });
+
+            // Quando la tabella è pronta → completa la barra e mostra tabella
+            table.on('init', function () {
+                clearInterval(interval);
+                $("#loadingBar").css("width", "100%");
+                setTimeout(function () {
+                    $("#loadingBarContainer").fadeOut();
+                    $("#tableWrapper").fadeIn(); // 🔹 mostra la tabella solo adesso
+                }, 500);
+            });
+        });
+    </script>
+}

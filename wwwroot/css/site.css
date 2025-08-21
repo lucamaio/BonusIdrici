@@ -1,26 +1,101 @@
+/* === GLOBALI (valgono per tutto il sito) === */
 html {
   font-size: 14px;
 }
-
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+  html { font-size: 16px; }
+}
+html { position: relative; min-height: 100%; }
+body { margin-bottom: 60px; }
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #f8f9fa !important;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+body.dark-mode .navbar {
+    background-color: #1f1f1f !important;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+body.dark-mode .card {
+    background-color: #2a2a2a !important;
+    color: #f8f9fa !important;
 }
 
-body {
-  margin-bottom: 60px;
+body.dark-mode a {
+    color: #0d6efd !important;
 }
 
+/* === SOLO PER VARIA REPORT === */
+.report-page .modern-card {
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.report-page .modern-card:hover {
+  transform: translateY(-3px);
+}
+.report-page .modern-card-header {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  color: white;
+  padding: 1.2rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+.report-page .modern-card-body {
+  padding: 2rem;
+}
+
+/* Campi input */
+.report-page .form-control {
+  border-radius: 0.6rem;
+  border: 1px solid #dee2e6;
+  padding: 0.65rem 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.report-page .form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.2);
+}
+
+/* Readonly evidenziati */
+.report-page .readonly-field {
+  background: #f8f9fa;
+  border: 1px dashed #ced4da;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Label e note */
+.report-page .form-label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.report-page .note {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: 400;
+}
+
+/* Pulsanti */
+.report-page .btn {
+  padding: 0.65rem 1.2rem;
+  font-weight: 500;
+}
+.report-page .btn-primary {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  border: none;
+}
+.report-page .btn-outline-secondary {
+  border: 1px solid #ced4da;
+}
+.report-page .btn-outline-secondary:hover {
+  background: #f1f1f1;
+}
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -30,7 +105,9 @@ body {
   text-align: start;
 }
 
-
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
 .btn-back{
   color: #fff !important;
   background-color: #44454b !important;
@@ -119,25 +196,7 @@ body {
 }
 
 .btn-action:hover {
-    background-color: #4a4a4a;
+    background-color: #0548ad;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-body.dark-mode {
-    background-color: #121212 !important;
-    color: #f8f9fa !important;
-}
-
-body.dark-mode .navbar {
-    background-color: #1f1f1f !important;
-}
-
-body.dark-mode .card {
-    background-color: #2a2a2a !important;
-    color: #f8f9fa !important;
-}
-
-body.dark-mode a {
-    color: #0d6efd !important;
 }

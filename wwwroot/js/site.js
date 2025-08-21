@@ -2,6 +2,25 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+// Dark Mode
+const toggleButton = document.getElementById("darkModeToggle");
+    toggleButton.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+
+        // cambia icona luna/sole
+        const icon = toggleButton.querySelector("i");
+        if (document.body.classList.contains("dark-mode")) {
+            icon.classList.remove("bi-moon-fill");
+            icon.classList.add("bi-sun-fill");
+        } else {
+            icon.classList.remove("bi-sun-fill");
+            icon.classList.add("bi-moon-fill");
+        }
+    });
+
+// Tabelle
+
 $(document).ready(function () {
     // Mostra barra all'inizio
     $("#loadingBarContainer").show();

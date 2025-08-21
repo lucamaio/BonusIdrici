@@ -53,6 +53,8 @@ namespace BonusIdrici2.Models
 
         public DateTime? DataCreazione { get; set; }
 
+        public DateTime? DataAggiornamento { get; set; }
+
         [Required]
         public required int IdEnte { get; set; }
 

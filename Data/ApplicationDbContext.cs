@@ -126,6 +126,7 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.mc).HasColumnName("mc");
            entity.Property(f => f.dataInizioValidita).HasColumnName("data_inizio_validita").IsRequired();
            entity.Property(f => f.dataFineValidita).HasColumnName("data_fine_validita").IsRequired();
+           entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
            entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
            entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
            entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();

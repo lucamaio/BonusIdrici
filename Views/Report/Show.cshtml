@@ -31,6 +31,7 @@
                             <tr>
                                 <th class="text-center">Data Elaborazione</th>
                                 <th class="text-center">Elabotato da</th>
+                                <th class="text-center">Anno Validità</th>
                                 <th class="text-center">Numero Record</th>
                                 <th class="text-center">Azioni</th>
                             </tr>
@@ -42,6 +43,7 @@
                                 <tr>
                                     <td><span class="fw-semibold">@item.DataCreazione?.ToString("dd/MM/yyyy")</span></td>
                                     <td><span class="fw-semibold">@item.Username</span></td>
+                                    <td><span class="fw-semibold">@item.annoValidita</span></td>
                                     <td>
                                         <span class="badge bg-label-primary rounded-pill px-3 py-2" style="color: #000">
                                             @item.NumeroDatiInseriti
@@ -51,7 +53,7 @@
                                         <div class="d-flex justify-content-center align-items-center gap-2">
                                             <!-- Pulsante Dettaglio -->
                                             <a class="btn btn-sm btn-light border" 
-                                            href="@Url.Action("DettaglioReport", new { enteId = selectedEnteId, DataCreazione = dataUrl })"
+                                            href="@Url.Action("Dettails", new { selectedEnteId = selectedEnteId, data = dataUrl })"
                                             title="Visualizza dettaglio report">
                                                 <i class="bi bi-eye text-primary"></i>
                                             </a>

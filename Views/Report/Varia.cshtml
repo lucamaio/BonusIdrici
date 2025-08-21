@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"] = "Varia Report";
+    var report = ViewBag.Report;
+    var esitoStr = report.esitoStr;
+    var pod = report.presenzaPod;
+    var esiti = new List<string>{
+        "Si",
+        "No"
+    };
+}
+
+<div class="report-page container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-11">
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h3 class="mb-0">Varia Report</h3>
+                </div>
+                <div class="modern-card-body">
+                    <form asp-controller="Report" asp-action="Update" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="@report.id" />
+                        <input type="hidden" name="idEnte" value="@report.IdEnte"/>
+
+                        <!-- Qui imposto 1 colonna su mobile, 3 da md in su -->
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                            <div class="col">
+                                <label for="id" class="form-label">Id: </label>
+                                <input type="text" class="form-control readonly-field" id="id" name="id" value="@report.id" readonly>
+                            </div>
+                            <div class="col">
+                                <label for="idFornitura" class="form-label">ID Fornitura: </label>
+                                <input type="text" class="form-control readonly-field" id="idFornitura" name="idFornitura" value="@report.idFornitura" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="codiceBonus" class="form-label">Codice Bonus: *</label>
+                                <input type="text" class="form-control readonly-field" id="CodiceBonus" name="CodiceBonus" value="@report.codiceBonus" readonly>
+                            </div>
+
+
+                            <div class="col">
+                                <label for="cognome" class="form-label">Cognome Dichiarante: *</label>
+                                <input type="text" class="form-control" id="cognome" name="cognome" value="@report.cognomeDichiarante" required>
+                            </div>
+
+                            <div class="col">
+                                <label for="nome" class="form-label">Nome Dichiarante: *</label>
+                                <input type="text" class="form-control" id="nome" name="nome" value="@report.nomeDichiarante" required>
+                            </div>
+
+                            <div class="col">
+                                <label for="codiceFiscale" class="form-label">Codice Fiscale: *</label>
+                                <input type="text" class="form-control" id="codiceFiscale" name="codiceFiscale" value="@report.codiceFiscale" minlength="16" maxlength="16" required>
+                            </div>
+
+                            <div class="col">
+                                <label for="indirizzo" class="form-label">Indirizzo Abitazione: <span class="note">(INPS)</span> *</label>
+                                <input type="text" class="form-control readonly-field" id="indirizzo" name="indirizzo" value="@report.indirizzoAbitazione" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="civico" class="form-label">Civico: <span class="note">(INPS)</span></label>
+                                <input type="text" class="form-control readonly-field" id="civico" name="civico" value="@report.numeroCivico" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="cap" class="form-label">CAP Abitazione: <span class="note">(INPS)</span></label>
+                                <input type="text" class="form-control readonly-field" id="cap" name="cap" value="@report.capAbitazione" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="istat" class="form-label">ISTAT: <span class="note">(INPS)</span></label>
+                                <input type="text" class="form-control readonly-field" id="istat" name="istat" value="@report.istat" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="provincia" class="form-label">Provincia Abitazione: <span class="note">(INPS)</span></label>
+                                <input type="text" class="form-control readonly-field" id="provincia" name="provincia" value="@report.provinciaAbitazione" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="componenti" class="form-label">Componenti: <span class="note">(INPS)</span></label>
+                                <input class="form-control readonly-field" type="number" id="componenti" name="componenti" min="1" value="@report.numeroComponenti" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="presenzaPod" class="form-label">Presenza POD</label>
+                                <input type="text" class="form-control readonly-field" id="presenzaPod" name="presenzaPod" value="@report.presenzaPod" readonly>
+                                 @* <select class="form-select" id="presenzaPod" name="presenzaPod" required>
+                                    @foreach (var pod1 in esiti)
+                                    {
+                                        <option value="@pod1" selected="@(pod1 == pod ? "selected" : null)">@pod1</option>
+                                    }
+                                </select> *@
+                            </div>
+
+                           <div class="col">
+                                <label for="esitoStr" class="form-label">Esito STR: ("Si" o "No") *</label>
+                                  <select class="form-select" id="esitoStr" name="esitoStr" required>
+                                    @foreach (var esito1 in esiti)
+                                    {
+                                        <option value="@esito1" selected="@(esito1 == esitoStr ? "selected" : null)">@esito1</option>
+                                    }
+                                </select>
+                            </div>
+
+
+                            <div class="col">
+                                <label for="esito" class="form-label">Esito *</label>
+                                <input class="form-control" type="number" id="esito" name="esito" min="1" max="4" value="@report.esito" required>
+                            </div>
+
+                            <div class="col">
+                                <label for="anno" class="form-label">Anno Validità: *</label>
+                                <input class="form-control readonly-field" type="text" id="anno" name="anno" value="@report.annoValidita" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="inizioValidita" class="form-label">Data Inizio: *</label>
+                                <input class="form-control readonly-field" type="date" id="inizioValidita" name="inizioValidita" value="@(report.dataInizioValidita?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="fineValidita" class="form-label">Data Fine: *</label>
+                                <input class="form-control readonly-field" type="date" id="fineValidita" name="fineValidita" value="@(report.dataFineValidita?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                            </div>                            
+
+                            <div class="col">
+                                <label for="serie" class="form-label">Serie</label>
+                                <input type="text" class="form-control readonly-field" id="serie" name="serie" value="@report.serie" readonly>
+                            </div>
+
+                            <div class="col">
+                                <label for="mc" class="form-label">MC</label>
+                                <input type="text" class="form-control readonly-field" id="mc" name="mc" value="@report.mc" readonly>
+                            </div>
+
+                             <div class="col">
+                                <label for="dataAggiornamento" class="form-label">Data Aggiornamento: *</label>
+                                <input class="form-control readonly-field" type="date" id="dataAggiornamento" name="dataAggiornamento" value="@(report.DataAggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Dettails","Report", new { selectedEnteId = report.IdEnte , data = report.DataCreazione })" class="btn btn-outline-secondary btn-lg rounded-3">
+                                <i class="bi bi-arrow-left"></i> Torna indietro
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3">
+                                <i class="bi bi-check2-circle"></i> Aggiorna
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
