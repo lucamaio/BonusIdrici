@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using BonusIdrici2.Models;
 using BonusIdrici2.Data;
-using System.Globalization;
 using BonusIdrici2.Models.ViewModels; // Aggiungi questo using
 using System.IO;
 
@@ -61,48 +60,85 @@ namespace BonusIdrici2.Controllers
             return true;
         }
 
-        // Pagine
+        // Inizio - Pagine di Navigazione
+
+        // Pagina 1: Consente di caricare un file csv contente l'anagrafe di un ente
         public IActionResult LoadAnagrafica()
         {
+            // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
             if (!VerificaSessione("ADMIN"))
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
 
+            // 2. Carico gli Enti
             ViewBag.Enti = _context.Enti.ToList();
             return View();
         }
 
-        public IActionResult LoadFileINPS()
-        {
-            if (!VerificaSessione("ADMIN"))
-            {
-                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
-            }
-
-            ViewBag.Enti = _context.Enti.ToList();
-            return View();
-        }
-
+        // Pagina 2: Consente di caricare i dati relative alle Utenze Idriche di un ente selezionato
         public IActionResult LoadFilePiranha()
         {
+            // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
             if (!VerificaSessione("ADMIN"))
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
 
+            // 2. Carico gli Enti
             ViewBag.Enti = _context.Enti.ToList();
             return View();
         }
+
+        // Pagina 3: Consente di andare a caricare i dati di un ente di cui si vogliono generare i vari report
+        public IActionResult LoadFileINPS()
+        {
+            // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
+            if (!VerificaSessione())
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+             // 2) Mi ricavo gli enti
+            List<Ente> enti = new List<Ente>();
+
+            if (ruolo == "OPERATORE")
+            {
+                // 2.a) Verifico se gestisce un solo ente
+                enti = FunzioniTrasversali.GetEnti(_context, idUser);
+                if (enti.Count == 1)
+                {
+                    ViewBag.Enti = enti;
+                    return View();
+                }
+
+                // 2.b)  Altrimenti mostro so gli enti su cui l'utente opera
+
+                ViewBag.Enti = enti;
+                return View();
+            }
+            // 2.c) Se sono amministratore me li mostri tutti
+            enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            ViewBag.Enti = enti;
+
+            ViewBag.Enti = _context.Enti.ToList();
+            return View();
+        }
+
+        // Fine - Pagnie di Navigazione
+
+        // Inizio - Funzioni
+
+        // Funzione 1: consente di caricare l'anagrafe di un ente partendo da un file csv
 
         [HttpPost]
         public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
-           // Controllo se l'utente può accedere alla pagina desideratà
-            if (string.IsNullOrEmpty(ruolo) || ruolo!="ADMIN")
+            // Controllo se l'utente può accedere alla pagina desideratà
+            if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
@@ -208,13 +244,14 @@ namespace BonusIdrici2.Controllers
             return View("LoadAnagrafica"); // Torna alla pagina di upload con il messaggio di stato
         }
 
+        // Funzione 2: consente di caricare le Utenze Idriche di un ente partendo da un file csv
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
-       [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> LoadFilePiranha(IFormFile csv_file, int selectedEnteId)
         {
             // Controllo se l'utente può accedere alla pagina desideratà
-            if (string.IsNullOrEmpty(ruolo) || ruolo!="ADMIN")
+            if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
@@ -272,7 +309,7 @@ namespace BonusIdrici2.Controllers
                     try
                     {
                         // Da Implementare aggiornamento dati UtenzeIdriche
-                        
+
                         // Controllo se sono presenti dei dati da caricare sul DB
                         if (datiComplessivi.UtenzeIdriche.Count > 0)
                         {
@@ -318,7 +355,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Associazione utenze senza idToponimo
-               var utenzeTopNull = _context.UtenzeIdriche.Where(s => s.idToponimo == null && s.IdEnte == selectedEnteId).ToList();
+                var utenzeTopNull = _context.UtenzeIdriche.Where(s => s.idToponimo == null && s.IdEnte == selectedEnteId).ToList();
 
                 if (utenzeTopNull.Count > 0)
                 {
@@ -359,6 +396,8 @@ namespace BonusIdrici2.Controllers
 
             return View("LoadFilePiranha", "Azioni");
         }
+
+        // Funzione 3: consente di caricare il file fornito mensilmente dal INPS per generare i Report
 
         [HttpPost]
         public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, int serie)
@@ -409,7 +448,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser,serie);
+                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser, serie);
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -450,5 +489,6 @@ namespace BonusIdrici2.Controllers
 
             return View("LoadFileINPS"); // Torna alla pagina di upload con il messaggio di stato
         }
-    }   
+        // Fine - Funzioni
+    }
 }
