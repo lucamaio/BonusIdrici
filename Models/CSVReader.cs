@@ -252,37 +252,62 @@ public class CSVReader
         return datiComplessivi;
     }
 
-    public static DatiCsvCompilati LeggiFilePhirana(string percorsoFile, int selectedEnteId, List<UtenzaIdrica> utenzeIdriche, ApplicationDbContext context)
+    public static DatiCsvCompilati LeggiFileUtenzeIdriche(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
     {
+        // Parte 1: Creazione della variabile da restituire e apertura file di log
+
         var datiComplessivi = new DatiCsvCompilati();
-        FileLog logFile = new FileLog($"wwwroot/log/Lettura_phirana.log");
+        FileLog logFile = new FileLog($"wwwroot/log/Lettura_UtenzeIdriche.log");  // Creo/Apro il file di log
         List<string> errori = new List<string>();
         List<string> warning = new List<string>();
+        // Inizializzo una variabile per tenere traccia del numero di Indirizzi mal formati trovatti
+        int countIndirizziMalFormati = 0;
+        // int countVariazioneToponomi = 0;
 
         try
         {
+            // Leggo il numero righe da processare escludendo l'intestazione
+
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
 
+            // Imposto la riga corrente ad 1 
             int rigaCorrente = 1;
+
+            // Stampo dei messagi informativi sul file di log. In modo da tenere traccia di tutte le operazioni che vengono effetuate
             logFile.LogInfo($"Nuovo caricamento dati phirana id Ente: {selectedEnteId}");
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()} ");
-            // Carico le toponimie esistenti dal database per l'ente specificato
-            var toponimi = context.Toponomi.Where(s => s.IdEnte == selectedEnteId).ToList();
 
-            // Inizializzazione sicura della lista dei toponimi
-            if (toponimi == null)
+            // Carico le toponimie esistenti dal database per l'ente specificato
+            var toponimi = _context.Toponomi.Where(s => s.IdEnte == selectedEnteId).ToList();
+
+            // Inizializzo in modo sicuro la lista dei toponimi
+            if (toponimi == null || toponimi.Count == 0)
             {
-                logFile.LogInfo($"AVVISO: La lista di toponimi per l'ente {selectedEnteId} è null. Ne creo una nuova.");
+                // logFile.LogInfo($"AVVISO: La lista di toponimi per l'ente {selectedEnteId} è null. Ne creo una nuova.");
                 toponimi = new List<Toponimo>();
             }
-            logFile.LogInfo($"Toponimi caricati per l'ente {selectedEnteId}: {toponimi.Count}");
+           
+
+            // Carico tutte le utenze idrciche asssociate al ente
+
+            var utenzeIdriche = _context.UtenzeIdriche.Where(s => s.IdEnte == selectedEnteId).ToList();
+
+            // Verifico che utenzeIdriche non sia null
+
+            if (utenzeIdriche == null)
+            {
+                // logFile.LogInfo($"AVVISO: La lista delle utenze Idriche per l'ente {selectedEnteId} è null. Ne creo una nuova.");
+                utenzeIdriche = new List<UtenzaIdrica>();
+            }
+
+            // Inizio - Lettura delle varie righe
 
             foreach (var riga in righe)
             {
                 var error = false;
                 rigaCorrente++;
 
-                // 1. VERIFICO CHE I CAMPI SONO VALIDI
+                // Parte 2: Verifiche Preliminari sui campi
 
                 // a) verifico se la riga è vuota
                 if (string.IsNullOrWhiteSpace(riga)) continue;
@@ -297,7 +322,6 @@ public class CSVReader
                     continue;
                 }
 
-
                 // c) Verifico che esiste il campo idAcquedotto è presente
 
                 if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[0])))
@@ -307,7 +331,6 @@ public class CSVReader
                 }
 
                 // d) Controllo se il campo Codice Fiscale è valido è != null
-                // logFile.LogInfo($"CODICE Fiscale {FunzioniTrasversali.rimuoviVirgolette(campi[36])} | Riga {rigaCorrente} | lunghezza {FunzioniTrasversali.rimuoviVirgolette(campi[36]).Length} ");
 
                 if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[36])))
                 {
@@ -324,7 +347,6 @@ public class CSVReader
                             string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[14])) &&
                             FunzioniTrasversali.rimuoviVirgolette(campi[34]).Equals("D", StringComparison.OrdinalIgnoreCase))
                     {
-                        // logFile.LogInfo("PIVA NULL && stato != 4, e sesso =D");
                         warning.Add($"Attenzione: Codice Fiscale e Partita IVA della ditta {FunzioniTrasversali.rimuoviVirgolette(campi[32])} non presente. (Questo non è un errore, ma una segnalazione). | Riga {rigaCorrente}");
                         error = true;
                     }
@@ -422,10 +444,12 @@ public class CSVReader
                     error = true;
                 }
 
-                // Formatto l'indirizzo sono uguali
+                // Parte 3: Verifica se l'indirizzo di ubicazione è associabile ad un toponimo
+
+                // Variabili di supporto
                 var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[36]).ToUpper();
                 var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
-                var indirizzoRicavato = FunzioniTrasversali.FormattaIndirizzo(context, indirizzoUbicazione, cod_fisc, selectedEnteId);
+                var indirizzoRicavato = FunzioniTrasversali.FormattaIndirizzo(_context, indirizzoUbicazione, cod_fisc, selectedEnteId);
                 int? idToponimo = null;
 
                 if (string.IsNullOrEmpty(indirizzoRicavato))
@@ -436,7 +460,7 @@ public class CSVReader
                         IdEnte = selectedEnteId,
                     };
 
-                    // Uso FirstOrDefault per trovare il toponimo esistente, che è l'approccio corretto.
+                    // Mi ricavo il primo toponimo esistente.
                     var toponimoEsistente = toponimi.FirstOrDefault(t => t.denominazione.Equals(findToponimo.denominazione, StringComparison.OrdinalIgnoreCase) && t.IdEnte == findToponimo.IdEnte);
 
                     if (toponimoEsistente == null)
@@ -448,14 +472,12 @@ public class CSVReader
 
                         toponimi.Add(findToponimo);
                         indirizzoRicavato = indirizzoUbicazione;
+
                         datiComplessivi.Toponimi.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
-                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' aggiunto.");
                     }
                     else
                     {
                         // Se esiste, lo utilizzo.
-                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
-                        idToponimo = toponimoEsistente.id;
                         if (toponimoEsistente.normalizzazione != null)
                         {
                             // Assegno l'indirizzo associato a quel toponimo
@@ -469,10 +491,9 @@ public class CSVReader
                 }
                 else if (indirizzoRicavato != indirizzoUbicazione)
                 {
-                    // ... La tua logica per i warning o l'aggiornamento continua qui
 
-                    warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
-
+                    //warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
+                    countIndirizziMalFormati++;
                     var findToponimo = new Toponimo
                     {
                         denominazione = indirizzoUbicazione,
@@ -492,31 +513,29 @@ public class CSVReader
                         toponimi.Add(findToponimo);
                         indirizzoRicavato = indirizzoUbicazione;
                         datiComplessivi.ToponimiDaAggiornare.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
-                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' aggiunto.");
                     }
                     else
                     {
                         // Se esiste, lo utilizzo.
-                        //logFile.LogInfo($"Riga {rigaCorrente}: Toponimo '{indirizzoUbicazione}' già esistente.");
                         idToponimo = toponimoEsistente.id;
                         if (toponimoEsistente.normalizzazione == null)
                         {
-                            //logFile.LogInfo($"Aggiornamento toponimo {toponimoEsistente.ToString()}");
                             // Assegno l'indirizzo associato a quel toponimo
                             toponimoEsistente.normalizzazione = indirizzoRicavato;
                             toponimoEsistente.data_aggiornamento = DateTime.Now;
                         }
                     }
                 }
-                //logFile.LogInfo($"Indirizzo ricavato: {indirizzoRicavato}");
-                // Controllo se sono presenti Errori
-                //logFile.LogInfo($"ERROR: {error}");
+
+                // Parte 4: Controllo se sono presenti Errori
+
                 if (error)
                 {
                     continue; // Salta la riga se ci sono errori
                 }
 
-                // 2) Verifico se l'utenza idrica è già presente
+                // Creo un utenza
+
                 var utenza = new UtenzaIdrica
                 {
                     idAcquedotto = FunzioniTrasversali.rimuoviVirgolette(campi[0]),
@@ -532,14 +551,17 @@ public class CSVReader
                     interno = FunzioniTrasversali.rimuoviVirgolette(campi[20]),
                     tipoUtenza = FunzioniTrasversali.rimuoviVirgolette(campi[26]).ToUpper(),
                     cognome = FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper(),
-                    nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(), 
+                    nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(),
                     sesso = FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper(),
                     DataNascita = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[35])),
                     codiceFiscale = cod_fisc,
                     partitaIva = FunzioniTrasversali.rimuoviVirgolette(campi[37]),
                     data_creazione = DateTime.Now,
                     IdEnte = selectedEnteId,
+                    idToponimo = idToponimo,
+                    IdUser = idUser
                 };
+
                 if (idToponimo != null)
                 {
                     utenza.idToponimo = idToponimo;
@@ -548,11 +570,158 @@ public class CSVReader
                 {
                     utenza.idToponimo = null;
                 }
-                // logFile.LogInfo($"Utenza: {utenza.ToString()}");
-                // 2.g) Se l'utenza non esiste, la aggiungo alla lista delle utenze idriche
-                datiComplessivi.UtenzeIdriche.Add(utenza);
+
+                // Parte 5: Verifico se l'utenza è gia presente
+
+                var utenzaEsistente = utenzeIdriche.FirstOrDefault(u =>
+                    u.idAcquedotto == utenza.idAcquedotto &&
+                    u.codiceFiscale == utenza.codiceFiscale);
+
+                // caso a) Se l'utenza non esiste allora la creo
+                if (utenzaEsistente == null)
+                {
+                    datiComplessivi.UtenzeIdriche.Add(utenza);
+                }
+                else
+                {
+                    // Caso b) se l'utenza esiste allora vado a verificare se ci sono campi da aggiornare
+                    bool aggiornare = false;
+                    // Inzio - Confronto tra i dati del db e quelli del csv
+                    // logFile.LogInfo($"Pre-Vertifica: {utenza.ToString()}");
+
+                    if (utenzaEsistente.stato != null && utenza.stato != null && utenzaEsistente.stato != utenza.stato)
+                    {
+                        // logFile.LogInfo($"Aggiorno lo stato da {utenzaEsistente.stato} a {utenza.stato}");
+                        utenzaEsistente.stato = utenza.stato;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.periodoIniziale != null && utenza.periodoIniziale != null && utenzaEsistente.periodoIniziale != utenza.periodoIniziale)
+                    {
+                        // logFile.LogInfo($"Aggiorno Periodo Iniziale da {utenzaEsistente.periodoIniziale} a {utenza.periodoIniziale}");
+                        utenzaEsistente.periodoIniziale = utenza.periodoIniziale;
+                        aggiornare = true;
+                    }
+
+                    if (utenza.periodoFinale != null && utenzaEsistente.periodoFinale != null && utenzaEsistente.periodoFinale != utenza.periodoFinale)
+                    {
+                        // logFile.LogInfo($"Aggiorno Periodo Finale da {utenzaEsistente.periodoFinale} a {utenza.periodoFinale}");
+                        utenzaEsistente.periodoFinale = utenza.periodoFinale;
+                        aggiornare = true;
+                    }
+
+                    if (string.IsNullOrEmpty(utenzaEsistente.matricolaContatore) && string.IsNullOrEmpty(utenza.matricolaContatore) && !string.Equals(utenzaEsistente.matricolaContatore, utenza.matricolaContatore, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno Matricola Contatre da {utenzaEsistente.matricolaContatore} a {utenza.matricolaContatore}");
+                        utenzaEsistente.matricolaContatore = utenza.matricolaContatore;
+                        aggiornare = true;
+                    }
+
+                    if (!string.Equals(utenzaEsistente.indirizzoUbicazione, utenza.indirizzoUbicazione, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno Indirizzo Ubicazione da {utenzaEsistente.indirizzoUbicazione} a {utenza.indirizzoUbicazione}");
+                        utenzaEsistente.indirizzoUbicazione = utenza.indirizzoUbicazione;
+                        aggiornare = true;
+                    }
+
+                    if (!string.Equals(utenzaEsistente.numeroCivico, utenza.numeroCivico, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno Numero Civico da {utenzaEsistente.numeroCivico} a {utenza.numeroCivico}");
+                        utenzaEsistente.numeroCivico = utenza.numeroCivico;
+                        aggiornare = true;
+                    }
+
+                    // if (!string.Equals(utenzaEsistente.subUbicazione, utenza.subUbicazione, StringComparison.OrdinalIgnoreCase))
+                    // {
+                    //     utenzaEsistente.subUbicazione = utenza.subUbicazione;
+                    //     aggiornare = true;
+                    // }
+
+                    // if (!string.Equals(utenzaEsistente.scalaUbicazione, utenza.scalaUbicazione, StringComparison.OrdinalIgnoreCase))
+                    // {
+                    //     utenzaEsistente.scalaUbicazione = utenza.scalaUbicazione;
+                    //     aggiornare = true;
+                    // }
+
+                    // if (!string.Equals(utenzaEsistente.piano, utenza.piano, StringComparison.OrdinalIgnoreCase))
+                    // {
+                    //     utenzaEsistente.piano = utenza.piano;
+                    //     aggiornare = true;
+                    // }
+
+                    // if (!string.Equals(utenzaEsistente.interno, utenza.interno, StringComparison.OrdinalIgnoreCase))
+                    // {
+                    //     utenzaEsistente.interno = utenza.interno;
+                    //     aggiornare = true;
+                    // }
+
+                    if (string.IsNullOrEmpty(utenzaEsistente.tipoUtenza) && string.IsNullOrEmpty(utenza.tipoUtenza) && !string.Equals(utenzaEsistente.tipoUtenza, utenza.tipoUtenza, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno Tipo Utenza da {utenzaEsistente.tipoUtenza} a {utenza.tipoUtenza}");
+                        utenzaEsistente.tipoUtenza = utenza.tipoUtenza;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.cognome != null && utenza.cognome != null && !string.Equals(utenzaEsistente.cognome, utenza.cognome, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno cognome da {utenzaEsistente.cognome} a {utenza.cognome}");
+                        utenzaEsistente.cognome = utenza.cognome;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.nome != null && utenza.nome != null && !string.Equals(utenzaEsistente.nome, utenza.nome, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno nome da {utenzaEsistente.nome} a {utenza.nome}");
+                        utenzaEsistente.nome = utenza.nome;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.sesso != null && utenza.sesso != null && !string.Equals(utenzaEsistente.sesso, utenza.sesso, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno sesso da {utenzaEsistente.sesso} a {utenza.sesso}");
+                        utenzaEsistente.sesso = utenza.sesso;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.codiceFiscale != null && utenza.codiceFiscale != null && !string.Equals(utenzaEsistente.codiceFiscale, utenza.codiceFiscale, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno Codice Fiscale da {utenzaEsistente.codiceFiscale} a {utenza.codiceFiscale}");
+                        utenzaEsistente.codiceFiscale = utenza.codiceFiscale;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.partitaIva != null && utenza.partitaIva != null && !string.Equals(utenzaEsistente.partitaIva, utenza.partitaIva, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // logFile.LogInfo($"Aggiorno Partita IVA da {utenzaEsistente.partitaIva} a {utenza.partitaIva}");
+                        utenzaEsistente.partitaIva = utenza.partitaIva;
+                        aggiornare = true;
+                    }
+
+                    if (utenzaEsistente.idToponimo != null && utenza.idToponimo != null && utenzaEsistente.idToponimo != utenza.idToponimo)
+                    {
+                        // countVariazioneToponomi++;
+                        // logFile.LogInfo($"Aggiorno idToponimo da {utenzaEsistente.idToponimo} a {utenza.idToponimo}");
+                        utenzaEsistente.idToponimo = utenza.idToponimo;
+                        aggiornare = true;
+                    }
+
+                    // Fine - Confronto tra i dati del db e quelli del csv
+
+                    // Infine verifico se devo aggiornare dei dati
+                    if (aggiornare)
+                    {
+                        // logFile.LogInfo($"Aggiorno: {utenzaEsistente.ToString()}");
+                        datiComplessivi.UtenzeIdricheEsistente.Add(utenzaEsistente);
+                    }
+
+                }
             }
 
+            // Fine - lettura delle righe
+
+            // Parte 6 : Scrittura dei log sul file corrispetivo
+
+            // a) Scrivo prima i log di errore se sono presenti
             if (errori.Count > 0)
             {
                 logFile.LogInfo($"Errori riscontrati durante l'elaborazione: {errori.Count} ");
@@ -566,7 +735,7 @@ public class CSVReader
                 logFile.LogInfo("Elaborazione completata senza errori.");
             }
 
-            // Faccio la stessa cosa per i warning
+            // b) succesivamente scrivo nel file di log i warning riscontrati se presenti
             if (warning.Count > 0)
             {
                 logFile.LogInfo($"Warning riscontrati durante l'elaborazione: {warning.Count} ");
@@ -580,24 +749,7 @@ public class CSVReader
                 logFile.LogInfo("Elaborazione completata senza warning.");
             }
 
-            if (datiComplessivi.UtenzeIdriche.Count > 0)
-            {
-                logFile.LogInfo($"Numero di utenze idriche aggiunte: {datiComplessivi.UtenzeIdriche.Count}");
-            }
-            else
-            {
-                logFile.LogInfo("Nessuna utenza nuova idrica trovata.");
-            }
-
-            if (datiComplessivi.UtenzeIdricheEsistente.Count > 0)
-            {
-                logFile.LogInfo($"Numero di utenze idriche esistenti aggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}");
-            }
-            else
-            {
-                logFile.LogInfo("Nessuna utenza idrica esistente trovata da aggiornare.");
-            }
-
+            // c) Scrivo il numero di toponimi aggiunti nel DB se presenti
             if (datiComplessivi.Toponimi.Count > 0)
             {
                 logFile.LogInfo($"Numero di Toponimi Aggiunti: {datiComplessivi.Toponimi.Count}");
@@ -607,12 +759,29 @@ public class CSVReader
                 logFile.LogInfo("Nessun toponimo aggiunto");
             }
 
+            // d) Scrivo il numero di toponomi aggiornati nel BD se presenti
             if (datiComplessivi.ToponimiDaAggiornare.Count > 0)
             {
                 logFile.LogInfo($"Toponimi Aggiornati: {datiComplessivi.ToponimiDaAggiornare.Count}");
-            }else{
+            }
+            else
+            {
                 logFile.LogInfo($"Nessun toponimo aggiornato!");
             }
+
+            // e) Stampo il numero totale di indirizzi mal formati trovati
+            // countIndirizziMalFormati = countIndirizziMalFormati - countVariazioneToponomi;
+            if (countIndirizziMalFormati > 0)
+            {
+                datiComplessivi.countIndirizziMalFormati = countIndirizziMalFormati;
+                logFile.LogInfo($"indirizzi malformati Trovato: {countIndirizziMalFormati}");
+            }
+            else
+            {
+                datiComplessivi.countIndirizziMalFormati = 0;
+                logFile.LogInfo($"Non sono stati riscontrati indirizzi mal formati!");
+            }
+
         }
         catch (FileNotFoundException)
         {
@@ -625,6 +794,7 @@ public class CSVReader
 
         return datiComplessivi;
     }
+    
 
     // Funzione che genera i report finali a partire dal file csv INPS
     public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int serie = 0)
@@ -913,7 +1083,7 @@ public class CSVReader
                     cognomeDichiarante = cognomeDichiarante,
                     annoValidita = annoValidita,
                     dataInizioValidita = dataInizioValidita,
-                    dataFineValidita =dataFineValidita,
+                    dataFineValidita = dataFineValidita,
                     indirizzoAbitazione = indirizzoAbitazione,
                     numeroCivico = numeroCivico,
                     istat = istatAbitazione,

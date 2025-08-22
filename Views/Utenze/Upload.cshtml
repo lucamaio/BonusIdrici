@@ -1,4 +1,3 @@
-@* Consolidato i due blocchi ViewData["Title"] in uno solo per chiarezza *@
 @{
     ViewData["Title"] = "Carica Utenze Idriche";
 }
@@ -11,7 +10,8 @@
                     <h3 class="mb-0">Carica Utenze Idriche</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="LoadFilePiranha" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Utenze" asp-action="Upload" 
+                          method="post" enctype="multipart/form-data" onsubmit="showLoader()">
                         
                         @* --- SELECT ENTE QUI --- *@
                         <div class="mb-3">
@@ -37,6 +37,14 @@
                         </div>
                     </form>
 
+                    <!-- Loader nascosto inizialmente -->
+                    <div id="loader" class="text-center mt-3" style="display:none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Caricamento...</span>
+                        </div>
+                        <p class="mt-2">Elaborazione in corso, attendere...</p>
+                    </div>
+
                     @if (!string.IsNullOrEmpty(ViewBag.Message))
                     {
                         <div class="alert alert-info mt-3" role="alert">
@@ -48,3 +56,11 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+    </script>
+}

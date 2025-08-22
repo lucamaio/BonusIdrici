@@ -73,14 +73,12 @@ namespace BonusIdrici2.Controllers
             return true;
         }
 
-
-
         // Inizio - Pagine di navigazione
 
         // Pagina 1: Pagina Home che consente la selezione di un ente per poi visualizzarne le utenze idriche
         public IActionResult Index()
         {
-           if (!VerificaSessione()) 
+            if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
@@ -88,7 +86,7 @@ namespace BonusIdrici2.Controllers
 
             List<Ente> enti = new List<Ente>();
 
-           if (ruolo == "OPERATORE")
+            if (ruolo == "OPERATORE")
             {
                 enti = FunzioniTrasversali.GetEnti(_context, idUser);
                 if (enti.Count == 1)
@@ -106,7 +104,7 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Show(int selectedEnteId)
         {
-             if (!VerificaSessione()) 
+            if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
@@ -155,7 +153,7 @@ namespace BonusIdrici2.Controllers
         // Pagina 3: Pagina che consente l'inserimento di una nuova utenza
         public IActionResult Create(int idEnte)
         {
-             if (!VerificaSessione()) 
+            if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
@@ -168,17 +166,34 @@ namespace BonusIdrici2.Controllers
         // Pagina 4: Pagina che consente di modificare i dati di una utenza
         public IActionResult Modifica(int id)
         {
-            if (!VerificaSessione()) 
+            if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
-            
+
             ViewBag.id = id;
             List<UtenzaIdrica> utenza = _context.UtenzeIdriche.Where(s => s.id == id).ToList();
             ViewBag.Utenza = utenza.First();
             return View();
         }
+
+        // Pagina 5: Consente il caricamento del file CSV contente i dati delle varie Utenze Idriche
+
+        public IActionResult Upload()
+        {
+            // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Carico gli Enti
+            ViewBag.Enti = _context.Enti.ToList();
+            return View();
+        }
+
 
         // Fine - Pagine di navigazione
 
@@ -186,7 +201,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 1: Consente la creazione di una Utenza 
         [HttpPost] // Da sistemare
-        public IActionResult Crea(string idAcquedotto,string matricolaContatore,int stato,DateTime periodoIniziale, DateTime? periodoFinale, string indirizzo_ubicazione, string numero_civico,DateTime? dataNascita, string tipo_utenza, string cognome, string nome, string sesso, string codice_fiscale, string? partita_iva, int idEnte, int idUser)
+        public IActionResult Crea(string idAcquedotto, string matricolaContatore, int stato, DateTime periodoIniziale, DateTime? periodoFinale, string indirizzo_ubicazione, string numero_civico, DateTime? dataNascita, string tipo_utenza, string cognome, string nome, string sesso, string codice_fiscale, string? partita_iva, int idEnte, int idUser)
         {
             var nuovaUtenza = new UtenzaIdrica
             {
@@ -250,6 +265,189 @@ namespace BonusIdrici2.Controllers
 
             return RedirectToAction("Show", "Utenze", new { selectedEnteId = idEnte });
         }
+
+        // Funzione 3: Consente di caricare le utenze del file csv sul db
+        
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+        [HttpPost]
+        public async Task<IActionResult> Upload(IFormFile csv_file, int selectedEnteId)
+        {
+            // Controllo se l'utente può accedere alla pagina desideratà
+            if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Validazione file
+            if (csv_file == null || csv_file.Length == 0)
+            {
+                ViewBag.Message = "Seleziona un file CSV da caricare.";
+                ViewBag.Enti = _context.Enti.ToList();
+                 return Upload();
+            }
+
+            if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
+            {
+                ViewBag.Enti = _context.Enti.ToList();
+                ViewBag.Message = "Il file selezionato non è un CSV valido.";
+                 return Upload();
+            }
+
+            // Verifico che l'ente selezionato è valido 
+            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
+
+            if (selectedEnte == null)
+            {
+                ViewBag.Message = "Ente selezionato non valido.";
+                ViewBag.Enti = _context.Enti.ToList();
+                return Upload();
+            }
+
+            string filePath = Path.GetTempFileName();
+
+            try
+            {
+                // Salva il file temporaneamente su disco
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await csv_file.CopyToAsync(stream);
+                }
+
+
+                // Lettura del file CSV
+                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche(filePath, selectedEnteId, _context, idUser);
+
+                if (datiComplessivi == null)
+                {
+                    ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
+                     return Upload();
+                }
+
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        // Da Implementare aggiornamento dati UtenzeIdriche
+                        var datiPresenti = false;
+
+                        // Controllo se sono presenti dei dati da caricare sul DB
+
+                        if (datiComplessivi.Toponimi.Count > 0)
+                        {
+                            datiPresenti = true;
+                            foreach (var top in datiComplessivi.Toponimi)
+                            {
+                                _context.Toponomi.Add(top);
+                            }
+                        }
+
+                        if (datiComplessivi.ToponimiDaAggiornare.Count > 0)
+                        {
+                            datiPresenti = true;
+                            foreach (var top in datiComplessivi.ToponimiDaAggiornare)
+                            {
+                                top.data_aggiornamento = DateTime.Now;
+                                _context.Toponomi.Update(top);
+                            }
+                        }
+
+                        if (datiComplessivi.UtenzeIdriche.Count > 0)
+                        {
+                            datiPresenti = true;
+                            // Inserimento nuove utenze
+                            foreach (var utenza in datiComplessivi.UtenzeIdriche)
+                            {
+                                _context.UtenzeIdriche.Add(utenza);
+                            }
+                        }
+
+                        if (datiComplessivi.UtenzeIdricheEsistente.Count > 0)
+                        {
+                            datiPresenti = true;
+                            foreach (var utenza in datiComplessivi.UtenzeIdricheEsistente)
+                            {
+                                utenza.data_aggiornamento = DateTime.Now;
+                                _context.UtenzeIdriche.Update(utenza);
+                            }
+                        }
+
+                        // Verifico se sono non sono presenti dei dati
+                        if (!datiPresenti)
+                        {
+                            ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
+                            return Upload();
+                        }
+
+                        // Salvataggio le modifiche iniziali
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();  // Confermo la transizione
+                    }
+                    catch (Exception dbEx)
+                    {
+                        transaction.Rollback();
+                        _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
+                        ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
+                        return Upload();
+                    }
+                }
+
+                // Associazione utenze senza idToponimo
+                var utenzeTopNull = _context.UtenzeIdriche.Where(s => s.idToponimo == null && s.IdEnte == selectedEnteId).ToList();
+
+                if (utenzeTopNull.Count > 0)
+                {
+                    // Dizionario dei toponimi già presenti, con denominazione normalizzata
+                    foreach (var utenza in utenzeTopNull)
+                    {
+                        // Normalizzo i valori per evitare mismatch dovuti a maiuscole/spazi/virgolette
+                        string indirizzoNorm = FunzioniTrasversali.rimuoviVirgolette(utenza.indirizzoUbicazione ?? "").ToUpper();
+
+                        var topRelativo = _context.Toponomi.FirstOrDefault(t => t.IdEnte == selectedEnteId && t.denominazione == indirizzoNorm);
+
+                        if (topRelativo == null)
+                        {
+                            continue;
+                        }
+
+                        // Aggiorno l'utenza con il nuovo idToponimo
+                        utenza.idToponimo = topRelativo.id != null ? topRelativo.id : null;
+                        
+                        _context.UtenzeIdriche.Update(utenza);
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
+                // Messaggio da stampare 
+                ViewBag.Message = $"File '{csv_file.FileName}' caricato con successo.\nNuove Utenze: {datiComplessivi.UtenzeIdriche.Count}.\tAggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}\n";
+
+                // Informo l'utente  se deve procedere ad Aggiornare i Toponomi
+
+                if (datiComplessivi.countIndirizziMalFormati == null || datiComplessivi.countIndirizziMalFormati == 0)
+                {
+                    ViewBag.Message = ViewBag.Message + "Non sono stati riscontrati indirizzi mal formati!";
+                }
+                else
+                {
+                    ViewBag.Message = ViewBag.Message + $"Sono stati trovati {datiComplessivi.countIndirizziMalFormati} indirizzi malformati si consiglia di andare ad aggiornare i toponimi in modo tale da prevenire eventuali incongruenze durante la generazione dei report";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
+                ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
+            }
+            finally
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+            return Upload();
+        }
+
         
         // Fine - Funzioni da eseguire a seconda della operazione
     }

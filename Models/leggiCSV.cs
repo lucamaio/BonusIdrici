@@ -14,6 +14,8 @@ namespace leggiCSV
 
         public List<UtenzaIdrica> UtenzeIdricheEsistente { get; set; }
 
+        public int? countIndirizziMalFormati { get; set; }
+
         public List<Atto.Atto> Atti { get; set; }
         
         public List<Report> reports { get; set; }
@@ -39,6 +41,8 @@ namespace leggiCSV
             Toponimi = new List<Toponimo>();
 
             ToponimiDaAggiornare = new List<Toponimo>();
+
+            countIndirizziMalFormati = null;
         }
     }
 }

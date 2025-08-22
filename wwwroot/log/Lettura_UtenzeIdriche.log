@@ -1,0 +1,8 @@
+2025-08-22 10:46:47 [INFO] Nuovo caricamento dati phirana id Ente: 1
+2025-08-22 10:46:47 [INFO] Numero di righe da elaborare: 2789 
+2025-08-22 10:47:02 [INFO] Errori riscontrati durante l'elaborazione: 1 
+2025-08-22 10:47:02 [ERROR] Attenzione: Matricola Contatore mancante, saltata. Riga 780 | Nominativo: D'ANTONI NUNZIO | Codice Fiscale: DNTNNZ63E20H982H
+2025-08-22 10:47:02 [INFO] Elaborazione completata senza warning.
+2025-08-22 10:47:02 [INFO] Nessun toponimo aggiunto
+2025-08-22 10:47:02 [INFO] Nessun toponimo aggiornato!
+2025-08-22 10:47:02 [INFO] indirizzi malformati Trovato: 468
