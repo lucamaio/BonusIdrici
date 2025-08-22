@@ -200,3 +200,9 @@ body.dark-mode a {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.header-report{
+  background: linear-gradient(90deg, rgb(13, 110, 253), rgb(7, 74, 175)); 
+  color: #fff;
+  fill: #fff
+}
