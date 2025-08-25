@@ -118,20 +118,20 @@ namespace BonusIdrici2.Controllers
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
                 ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFileINPS");
+                return LoadFileINPS();
             }
 
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
-                return View("LoadFileINPS"); // Torna alla pagina di upload con un messaggio
+                return LoadFileINPS(); // Torna alla pagina di upload con un messaggio
             }
 
             // Validazione del tipo di file (opzionale ma consigliata)
             if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
             {
                 ViewBag.Message = "Il file selezionato non è un CSV valido.";
-                return View("LoadFileINPS");
+                return LoadFileINPS();
             }
 
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
@@ -139,7 +139,7 @@ namespace BonusIdrici2.Controllers
             {
                 ViewBag.Message = "Ente selezionato non valido.";
                 ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadFileINPS");
+                return LoadFileINPS();
             }
 
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
@@ -159,13 +159,33 @@ namespace BonusIdrici2.Controllers
                 {
                     try
                     {
-                        // Salva i report nel database
-                        foreach (var report in datiComplessivi.reports)
+                        bool datiSalvati = false;
+
+                        if (datiComplessivi.repors.Count > 0)
                         {
-                            _context.Reports.Add(report);
+                            datiSalvati = true;
+                            foreach (var report in datiComplessivi.reports)
+                            {
+                                _context.Reports.Add(report);
+                            }
+                            await _context.SaveChangesAsync();
                         }
 
-                        await _context.SaveChangesAsync();
+                        if (datiComplessivi.reportsDaAggiornare.Count > 0)
+                        {
+                            datiSalvati = true;
+                            foreach (var report in datiComplessivi.reportsDaAggiornare)
+                            {
+                                _context.Reports.Update(report);
+                            }
+                            await _context.SaveChangesAsync();
+                        }
+
+                        if (!datiSalvati)
+                        {
+                            ViewBag.Message = "Nessun dato da salvare.";
+                            return LoadFileINPS();
+                        }
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
                         ViewBag.Message = $"Dati caricati e salvati con successo! Reports: {datiComplessivi.reports.Count}, ";
@@ -192,7 +212,7 @@ namespace BonusIdrici2.Controllers
                 }
             }
 
-            return View("LoadFileINPS"); // Torna alla pagina di upload con il messaggio di stato
+            return LoadFileINPS(); // Torna alla pagina di upload con il messaggio di stato
         }
         // Fine - Funzioni
     }

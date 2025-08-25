@@ -839,6 +839,7 @@ public class CSVReader
     // Funzione che genera i report finali a partire dal file csv INPS
     public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int serie = 0)
     {
+        // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_INPS.log");
         List<string> errori = new List<string>();
@@ -850,12 +851,12 @@ public class CSVReader
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
             var dichiaranti = context.Dichiaranti.ToList();
 
+            // Parte 2: Lettura delle varie righe
             foreach (var riga in righe)
             {
                 var error = false;
                 rigaCorrente++;
-
-                // 1. Verifico se i campi del file sono corretti e validi per effettuare le operazioni successive
+                // Parte 3: Verifiche Preliminari sui campi
 
                 // verifico se la riga è vuota
                 if (string.IsNullOrWhiteSpace(riga)) continue;
@@ -974,11 +975,14 @@ public class CSVReader
                     error = true;
                 }
 
+                // Parte 4: Controllo se sono presenti Errori
+
                 if (error)
                 {
                     continue; // Salta la riga se ci sono errori
                 }
 
+                // Parte 5: Elaborazione della riga
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
 
@@ -1140,8 +1144,96 @@ public class CSVReader
                     DataCreazione = dataCreazione
                 };
 
-                datiComplessivi.reports.Add(report);
+                // Parte 6: Verifico se il report è gia presente
+
+                var reportEsistente = context.Reports.FirstOrDefault(r => r.codiceBonus == report.codiceBonus && r.IdEnte == selectedEnteId);
+
+                if (reportEsistente == null)
+                {
+                    datiComplessivi.reports.Add(report);
+                }
+                else
+                {
+                    // Report esistente, verifico se ci sono campi da aggiornare
+                    bool aggiornare = false;
+
+                    // Inzio - Confronto tra i dati del db e quelli del csv
+                    // Verifico campo per campo se ci sono differenze per il campo idAto
+                    if (report.idAto != null && reportEsistente.idAto != null && reportEsistente.idAto != report.idAto)
+                    {
+                        reportEsistente.idAto = report.idAto;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo codiceFiscale
+                    
+                    if (report.codiceFiscale != null && reportEsistente.codiceFiscale != null && reportEsistente.codiceFiscale != report.codiceFiscale)
+                    {
+                        reportEsistente.codiceFiscale = report.codiceFiscale;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo esito
+
+                    if (report.esito != null && reportEsistente.esito != null && reportEsistente.esito != report.esito)
+                    {
+                        reportEsistente.esito = report.esito;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo esitoStr
+
+                    if (report.esitoStr != null && reportEsistente.esitoStr != null && reportEsistente.esitoStr != report.esitoStr)
+                    {
+                        reportEsistente.esitoStr = report.esitoStr;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo idFornitura
+
+                    if (report.idFornitura != null && reportEsistente.idFornitura != null && reportEsistente.idFornitura != report.idFornitura)
+                    {
+                        reportEsistente.idFornitura = report.idFornitura;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo mc
+
+                    if (report.mc != null && reportEsistente.mc != null && reportEsistente.mc != report.mc)
+                    {
+                        reportEsistente.mc = report.mc;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo inizioValidita
+
+                    if (report.dataInizioValidita != null && reportEsistente.dataInizioValidita != null && reportEsistente.dataInizioValidita != report.dataInizioValidita)
+                    {
+                        reportEsistente.dataInizioValidita = report.dataInizioValidita;
+                        aggiornare = true;
+                    }
+
+                    // Verifico campo per campo se ci sono differenze per il campo fineValidita
+
+                    if (report.dataFineValidita != null && reportEsistente.dataFineValidita != null && reportEsistente.dataFineValidita != report.dataFineValidita)
+                    {
+                        reportEsistente.dataFineValidita = report.dataFineValidita;
+                        aggiornare = true;
+                    }
+
+                    // Verifico se devo aggiornare dei dati
+
+                    if (aggiornare)
+                    {
+                        datiComplessivi.reportsDaAggiornare.Add(reportEsistente);
+                    }
+
+                }
+
+                
             }
+            // Fine - lettura delle righe
+            // Parte 7 : Scrittura dei log sul file corrispetivo
             if (errori.Count > 0)
             {
                 logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");

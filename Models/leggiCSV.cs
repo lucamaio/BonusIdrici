@@ -20,6 +20,8 @@ namespace leggiCSV
         
         public List<Report> reports { get; set; }
 
+        public List<Report> reportsDaAggiornare { get; set; }
+
         public List<Toponimo> Toponimi { get; set; }
 
         public List<Toponimo> ToponimiDaAggiornare { get; set; }
@@ -37,6 +39,8 @@ namespace leggiCSV
             Atti = new List<Atto.Atto>();
 
             reports = new List<Report>();
+
+            reportsDaAggiornare = new List<Report>();
 
             Toponimi = new List<Toponimo>();
 
