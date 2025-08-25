@@ -11,8 +11,7 @@
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
-                <div class="card-header border-0 rounded-top-4 d-flex flex-column align-items-center p-4"
-                     style="background: linear-gradient(90deg, rgb(13, 110, 253), rgb(7, 74, 175)); color: #fff; fill: #fff;">
+                <div class="card-header header-anagrafe border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
                     <h3 class="mb-1 fw-bold">
                         <i class="bi bi-people-fill me-2"></i> Anagrafe -
                         <span class="fw-semibold">@selectedEnteNome</span>
@@ -56,7 +55,7 @@
                                             <td>@item.IndirizzoResidenza</td>
                                             <td>@item.NumeroCivico</td>
                                             <td class="text-center">
-                                                <a class="btn btn-sm btn-light border me-1" title="Modifica Persona"
+                                                <a class="btn btn-sm btn-light border me-1" style="fill: #198754 !important; color: #198754 !important" title="Modifica Persona"
                                                    href="@Url.Action("Modifica", "Anagrafe", new { id = item.id })">
                                                     <i class="bi bi-pencil-square text-primary"></i>
                                                 </a>
@@ -111,7 +110,7 @@
                 ordering: true,
                 responsive: true,
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end anagrafe"p>>',
                 buttons: [
                     {
                         extend: 'collection',

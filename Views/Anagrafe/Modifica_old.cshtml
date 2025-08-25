@@ -1,5 +1,7 @@
+@model IEnumerable<BonusIdrici2.Models.ViewModels.AnagrafeViewModel>
 @{
-    ViewData["Title"] = "Aggiungi una persona";
+    ViewData["Title"] = "Modifica Persona";
+    var dichiarante = ViewBag.Dichiarante;
 }
 
 <div class="container my-5">
@@ -7,61 +9,67 @@
         <div class="col-12 col-lg-10">
             <div class="card shadow rounded-4 border-0">
                 <div class="card-header header-anagrafe text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Aggiungi una persona</h3>
+                    <h3 class="mb-0">Modifica Persona</h3>
                 </div>
                 <div class="card-body p-5">
-                    <form asp-controller="Anagrafe" asp-action="crea" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
+                    <form asp-controller="Anagrafe" asp-action="Update" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="@dichiarante.id" />
+                        <input type="hidden" name="idEnte" value="@dichiarante.IdEnte" />
 
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div>
                                 <label for="cognome" class="form-label">Cognome *</label>
-                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+                                <input type="text" class="form-control" id="cognome" name="cognome" value="@dichiarante.Cognome" required>
                             </div>
 
                             <div>
                                 <label for="nome" class="form-label">Nome *</label>
-                                <input type="text" class="form-control" id="nome" name="nome" required>
+                                <input type="text" class="form-control" id="nome" name="nome" value="@dichiarante.Nome" required>
                             </div>
 
                             <div>
                                 <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
                                 <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
-                                       maxlength="16" required>
+                                       value="@dichiarante.CodiceFiscale" maxlength="16" required>
                             </div>
 
                             <div>
                                 <label for="sesso" class="form-label">Sesso *</label>
-                                <input type="text" class="form-control" id="sesso" name="sesso" maxlength="1" required>
+                                <input type="text" class="form-control" id="sesso" name="sesso"
+                                       value="@dichiarante.Sesso" maxlength="1" required>
                             </div>
 
                             <div>
                                 <label for="data_nascita" class="form-label">Data di nascita *</label>
-                                <input class="form-control" type="date" id="data_nascita" name="data_nascita" required>
+                                <input class="form-control" type="date" id="data_nascita" name="data_nascita"
+                                       value="@(dichiarante.DataNascita?.ToString("yyyy-MM-dd") ?? "")" required>
                             </div>
 
                             <div>
                                 <label for="comune_nascita" class="form-label">Comune di nascita *</label>
-                                <input type="text" class="form-control" id="comune_nascita" name="comune_nascita" required>
+                                <input type="text" class="form-control" id="comune_nascita" name="comune_nascita"
+                                       value="@dichiarante.ComuneNascita" required>
                             </div>
 
                             <div>
                                 <label for="indirizzo_residenza" class="form-label">Indirizzo di residenza *</label>
-                                <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza" required>
+                                <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza"
+                                       value="@dichiarante.IndirizzoResidenza" required>
                             </div>
 
                             <div>
                                 <label for="numero_civico" class="form-label">Numero civico *</label>
-                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                                <input type="text" class="form-control" id="numero_civico" name="numero_civico"
+                                       value="@dichiarante.NumeroCivico" required>
                             </div>
                         </div>
 
                         <hr class="my-4" />
 
                         <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-anagrafe btn-lg rounded-3">Aggiungi Persona</button>
-                             <a class="btn btn-back btn-lg rounded-3"
-                               href="@Url.Action("Show", "Anagrafe", new { selectedEnteId = ViewBag.IdEnte })">
+                            <button type="submit" class="btn btn-anagrafe btn-lg rounded-3">Aggiorna</button>
+                            <a class="btn btn-back btn-lg rounded-3"
+                               href="@Url.Action("Show", "Anagrafe", new { selectedEnteId = dichiarante.IdEnte })">
                                 Torna alla consultazione
                             </a>
                         </div>
