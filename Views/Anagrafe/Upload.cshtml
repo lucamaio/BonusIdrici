@@ -6,11 +6,11 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow rounded-4 border-0">
-                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                <div class="card-header header-anagrafe text-white text-center rounded-top-4">
                     <h3 class="mb-0">Carica Anagrafe</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="LoadAnagrafe" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Anagrafe" asp-action="Upload" method="post" enctype="multipart/form-data">
                            @* --- SELECT ENTE QUI --- *@
                         <div class="mb-3">
                             <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
@@ -27,13 +27,21 @@
                         </div>
 
                           <div class="mb-3">
-                            <label for="csv_file" class="form-label">Seleziona file CSV Anagrafe</label>
+                            <label for="csv_file" class="form-label">Seleziona file Anagrafe (formato CSV)</label>
                             <input type="file" name="csv_file" class="form-control" required accept=".csv">
                         </div>
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Carica File</button>
+                            <button type="submit" class="btn btn-anagrafe">Carica File</button>
                         </div>
                     </form>
+
+                      <!-- Loader nascosto inizialmente -->
+                    <div id="loader" class="text-center mt-3" style="display:none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Caricamento...</span>
+                        </div>
+                        <p class="mt-2">Elaborazione in corso, attendere...</p>
+                    </div>
 
                     @if (!string.IsNullOrEmpty(ViewBag.Message))
                     {
@@ -46,3 +54,10 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+    </script>
+}

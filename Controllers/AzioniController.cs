@@ -62,22 +62,7 @@ namespace BonusIdrici2.Controllers
 
         // Inizio - Pagine di Navigazione
 
-        // Pagina 1: Consente di caricare un file csv contente l'anagrafe di un ente
-        public IActionResult LoadAnagrafica()
-        {
-            // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
-            if (!VerificaSessione("ADMIN"))
-            {
-                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
-            }
-
-            // 2. Carico gli Enti
-            ViewBag.Enti = _context.Enti.ToList();
-            return View();
-        }
-
-        // Pagina 2: Consente di andare a caricare i dati di un ente di cui si vogliono generare i vari report
+        // Pagina 1: Consente di andare a caricare i dati di un ente di cui si vogliono generare i vari report
         public IActionResult LoadFileINPS()
         {
             // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
@@ -116,121 +101,8 @@ namespace BonusIdrici2.Controllers
         // Fine - Pagnie di Navigazione
 
         // Inizio - Funzioni
-
-        // Funzione 1: consente di caricare l'anagrafe di un ente partendo da un file csv
-
-        [HttpPost]
-        public async Task<IActionResult> LoadAnagrafe(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
-        {
-            // Controllo se l'utente può accedere alla pagina desideratà
-            if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
-            {
-                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (csv_file == null || csv_file.Length == 0)
-            {
-                ViewBag.Message = "Seleziona un file CSV da caricare.";
-                return View("LoadAnagrafica"); // Torna alla pagina di upload con un messaggio
-            }
-
-            // Validazione del tipo di file (opzionale ma consigliata)
-            if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
-            {
-                ViewBag.Message = "Il file selezionato non è un CSV valido.";
-                return View("LoadAnagrafica");
-            }
-
-            var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
-
-            if (selectedEnte == null)
-            {
-                ViewBag.Message = "Ente selezionato non valido.";
-                ViewBag.Enti = _context.Enti.ToList();
-                return View("LoadAnagrafica", "Azioni");
-            }
-            List<Dichiarante> dichiaranti = _context.Dichiaranti.Where(d => d.IdEnte == selectedEnteId).ToList();
-            if (dichiaranti == null)
-            {
-                dichiaranti = new List<Dichiarante>();
-            }
-            string filePath = Path.GetTempFileName(); // Crea un file temporaneo
-
-            try
-            {
-                // Salva il file caricato su disco
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await csv_file.CopyToAsync(stream);
-                }
-
-                // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, dichiaranti, idUser);
-
-                // Inizia una transazione per assicurare che tutti i dati vengano salvati
-                // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
-                using (var transaction = _context.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        if (datiComplessivi.Dichiaranti.Count > 0)
-                        {
-                            // Salva i nuovi dichiaranti nel database
-                            foreach (var dichiarante in datiComplessivi.Dichiaranti)
-                            {
-                                _context.Dichiaranti.Add(dichiarante);
-                            }
-                        }
-                        else if (datiComplessivi.DichiarantiDaAggiornare.Count > 0)
-                        {
-                            // Aggiorna i dichiaranti esistenti
-                            foreach (var dichiarante in datiComplessivi.DichiarantiDaAggiornare)
-                            {
-                                _context.Dichiaranti.Update(dichiarante);
-                            }
-                        }
-                        else
-                        {
-                            ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
-                            return View("LoadAnagrafica"); // Torna alla pagina di upload con un messaggio
-                        }
-                        if (datiComplessivi.Dichiaranti.Count > 0 || datiComplessivi.DichiarantiDaAggiornare.Count > 0)
-                        {
-                            // Salva le modifiche al database
-                            await _context.SaveChangesAsync();
-                        }
-
-                        transaction.Commit(); // Conferma la transazione se tutto è andato bene
-                        ViewBag.Message = $"File '{csv_file.FileName}' caricato e dati salvati con successo! Dichiaranti: {datiComplessivi.Dichiaranti.Count}, "; //Atti: {datiComplessivi.Atti.Count}";
-                    }
-                    catch (Exception dbEx)
-                    {
-                        transaction.Rollback(); // Annulla la transazione in caso di errore
-                        _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
-                        ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Errore durante l'elaborazione del file CSV.");
-                ViewBag.Message = $"Errore durante l'elaborazione del file CSV: {ex.Message}";
-            }
-            finally
-            {
-                // Assicurati di eliminare il file temporaneo
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-            }
-
-            return View("LoadAnagrafica"); // Torna alla pagina di upload con il messaggio di stato
-        }
-
         
-        // Funzione 2: consente di caricare il file fornito mensilmente dal INPS per generare i Report
+        // Funzione 1: consente di caricare il file fornito mensilmente dal INPS per generare i Report
 
         [HttpPost]
         public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, int serie)

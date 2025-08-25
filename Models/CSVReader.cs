@@ -19,24 +19,27 @@ public class CSVReader
 {
     private const char CsvDelimiter = ';';
 
-    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, List<Dichiarante> dichiaranti, int idUser)
-    {
+    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
+    {   
+        // Parte 1: Creazione della variabile da restituire e apertura file di log
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_Anagrafe.log");
         List<string> errori = new List<string>();
         try
         {
+            // Leggo il numero righe da processare escludendo l'intestazione
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
             int rigaCorrente = 1;
             logFile.LogInfo($"Nuovo caricamento dati Anagrafe ID ENTE: {selectedEnteId}");
             logFile.LogInfo($"Numero di righe da caricare: {righe.Count()}");
 
+            // Inizio - Lettura delle varie righe
             foreach (var riga in righe)
             {
                 rigaCorrente++;
                 var error = false;
 
-                // 1. VERIFICO CHE I CAMPI SONO VALIDI
+                // Parte 2: Verifiche Preliminari sui campi
 
                 // a) verifico se la riga è vuota
                 if (string.IsNullOrWhiteSpace(riga)) continue;
@@ -47,7 +50,7 @@ public class CSVReader
 
                 if (campi.Length < 16)
                 {
-                    errori.Add($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 39.");
+                    errori.Add($"Attenzione: Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 16.");
                     continue;
                 }
 
@@ -99,14 +102,14 @@ public class CSVReader
                     error = true;
                 }
 
-                // Controllo se sono presenti Errori
+                //  Parte 3: Controllo se sono presenti Errori
 
                 if (error)
                 {
                     continue; // Salta la riga se ci sono errori
                 }
 
-                // 2) Creo una istanza di Dichiarante
+                // Creo una istanza di Dichiarante
 
                 var dichiarante = new Dichiarante
                 {
@@ -129,87 +132,120 @@ public class CSVReader
                     IdUser = idUser
                 };
 
-                var esiste = false;
-                var aggiornare = false;
+                // Parte 4: Aggiungo il dichiarante alla lista dei dichiaranti da aggiungere se non esiste già
 
-                if (dichiaranti != null && dichiarante != null)
-                {
-                    var dichiaranteEsistente = dichiaranti.Find(d => d.CodiceFiscale == dichiarante.CodiceFiscale);
-                    if (dichiaranteEsistente != null)
-                    {
-                        esiste = true;
-                        dichiarante.id = dichiaranteEsistente.id;
-                        // Dichiarante già presente, controllo se devo aggiornare i campi
-                        if (dichiarante.Nome != dichiaranteEsistente.Nome)
-                        {
-                            //dichiarante.Nome = dichiaranteEsistente.Nome;
-                            aggiornare = true;
-                        }
+                var dichiaranteEsistente = _context.Dichiaranti.FirstOrDefault(d => d.CodiceFiscale == dichiarante.CodiceFiscale && d.IdEnte == selectedEnteId);
 
-                        if (dichiarante.Cognome != dichiaranteEsistente.Cognome)
-                        {
-                            //dichiarante.Cognome = dichiaranteEsistente.Cognome;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.Sesso != dichiaranteEsistente.Sesso)
-                        {
-                            //dichiarante.Sesso = dichiaranteEsistente.Sesso;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.DataNascita != dichiaranteEsistente.DataNascita)
-                        {
-                            //dichiarante.DataNascita = dichiaranteEsistente.DataNascita;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.ComuneNascita != dichiaranteEsistente.ComuneNascita)
-                        {
-                            //dichiarante.ComuneNascita = dichiaranteEsistente.ComuneNascita;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.IndirizzoResidenza != dichiaranteEsistente.IndirizzoResidenza)
-                        {
-                            //dichiarante.IndirizzoResidenza = dichiaranteEsistente.IndirizzoResidenza;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.NumeroCivico != dichiaranteEsistente.NumeroCivico)
-                        {
-                            //dichiarante.NumeroCivico = dichiaranteEsistente.NumeroCivico;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.Parentela != dichiaranteEsistente.Parentela)
-                        {
-                            //dichiarante.Parentela = dichiaranteEsistente.Parentela;
-                            aggiornare = true;
-                        }
-
-                        if (dichiarante.CodiceFamiglia != dichiaranteEsistente.CodiceFamiglia)
-                        {
-                            //dichiarante.CodiceFamiglia = dichiaranteEsistente.CodiceFamiglia;
-                            aggiornare = true;
-                        }
-                    }
-                }
-
-                if (!esiste)
-                {
-                    // Aggiungo il nuovo Dichiarante alla lista
+                if(dichiaranteEsistente == null){
                     datiComplessivi.Dichiaranti.Add(dichiarante);
                 }
-                else if (aggiornare)
+                else
                 {
-                    // Aggiorno il Dichiarante esistente
-                    datiComplessivi.DichiarantiDaAggiornare.Add(dichiarante);
-                }
+                    // Se il dichiarante esiste già, verifico se è necessario aggiornarlo
+                    bool aggiornare = false;
 
+                    // Verifico ogni campo e aggiorno se necessario
+                    
+                    // 1. Verifico il cognome
 
+                    if(dichiaranteEsistente.Cognome != null && dichiarante.Cognome != null && dichiaranteEsistente.Cognome != dichiarante.Cognome){
+                        dichiaranteEsistente.Cognome = dichiarante.Cognome;
+                        aggiornare = true;
+                    }
+                    // 2. Verifico il nome
+
+                    if(dichiaranteEsistente.Nome != null && dichiarante.Nome != null && dichiaranteEsistente.Nome != dichiarante.Nome){
+                        dichiaranteEsistente.Nome = dichiarante.Nome;
+                        aggiornare = true;
+                    }
+
+                    // 3. Verifico il sesso
+
+                    if(dichiaranteEsistente.Sesso != null && dichiarante.Sesso != null && dichiaranteEsistente.Sesso != dichiarante.Sesso){
+                        dichiaranteEsistente.Sesso = dichiarante.Sesso;
+                        aggiornare = true;
+                    }
+
+                    // 4. Verifico la data di nascita
+
+                    if(dichiaranteEsistente.DataNascita != null && dichiarante.DataNascita != null && dichiaranteEsistente.DataNascita != dichiarante.DataNascita){
+                        dichiaranteEsistente.DataNascita = dichiarante.DataNascita;
+                        aggiornare = true;
+                    }
+
+                    // 5. Verifico il comune di nascita
+
+                    if(dichiaranteEsistente.ComuneNascita != null && dichiarante.ComuneNascita != null && dichiaranteEsistente.ComuneNascita != dichiarante.ComuneNascita){
+                        dichiaranteEsistente.ComuneNascita = dichiarante.ComuneNascita;
+                        aggiornare = true;
+                    }
+
+                    // 6. Verifico l'indirizzo di residenza
+
+                    if(dichiaranteEsistente.IndirizzoResidenza != null && dichiarante.IndirizzoResidenza != null && dichiaranteEsistente.IndirizzoResidenza != dichiarante.IndirizzoResidenza){
+                        dichiaranteEsistente.IndirizzoResidenza = dichiarante.IndirizzoResidenza;
+                        aggiornare = true;
+                    }
+
+                    // 7. Verifico il numero civico
+
+                    if(dichiaranteEsistente.NumeroCivico != null && dichiarante.NumeroCivico != null && dichiaranteEsistente.NumeroCivico != dichiarante.NumeroCivico){
+                        dichiaranteEsistente.NumeroCivico = dichiarante.NumeroCivico;
+                        aggiornare = true;
+                    }
+
+                    // 8. Verifico la parentela
+
+                    if(dichiaranteEsistente.Parentela != null && dichiarante.Parentela != null && dichiaranteEsistente.Parentela != dichiarante.Parentela){
+                        dichiaranteEsistente.Parentela = dichiarante.Parentela;
+                        aggiornare = true;
+                    }
+
+                    // 9. Verifico il codice famiglia
+
+                    if(dichiaranteEsistente.CodiceFamiglia != dichiarante.CodiceFamiglia){
+                        dichiaranteEsistente.CodiceFamiglia = dichiarante.CodiceFamiglia;
+                        aggiornare = true;
+                    }
+
+                    // 10. Verifico il codice abitante
+
+                    if(dichiaranteEsistente.CodiceAbitante != dichiarante.CodiceAbitante){
+                        dichiaranteEsistente.CodiceAbitante = dichiarante.CodiceAbitante;
+                        aggiornare = true;
+                    }
+
+                    // 11. Verifico il numero componenti
+
+                    if(dichiaranteEsistente.NumeroComponenti != dichiarante.NumeroComponenti){
+                        dichiaranteEsistente.NumeroComponenti = dichiarante.NumeroComponenti;
+                        aggiornare = true;
+                    }
+
+                    // 12. Verifico il codice fiscale intestatario scheda
+
+                    if(dichiaranteEsistente.CodiceFiscaleIntestatarioScheda != null && dichiarante.CodiceFiscaleIntestatarioScheda != null && dichiaranteEsistente.CodiceFiscaleIntestatarioScheda != dichiarante.CodiceFiscaleIntestatarioScheda){
+                        dichiaranteEsistente.CodiceFiscaleIntestatarioScheda = dichiarante.CodiceFiscaleIntestatarioScheda;
+                        aggiornare = true;
+                    }
+
+                    // 13. Verifico la data di cancellazione
+                    
+                    if(dichiaranteEsistente.data_cancellazione != null && dichiarante.data_cancellazione != null && dichiaranteEsistente.data_cancellazione != dichiarante.data_cancellazione){
+                        dichiaranteEsistente.data_cancellazione = dichiarante.data_cancellazione;
+                        aggiornare = true;
+                    }
+
+                    // Se è necessario aggiornare il dichiarante esistente
+                    if(aggiornare){
+                        datiComplessivi.DichiarantiDaAggiornare.Add(dichiaranteEsistente);
+                    }
+                }       
             }
 
+            // Fine - Lettura delle varie righe
+            // Parte 5: Stampo i messaggi di riepilogo sul file di log
+            // Stampo gli errori riscontrati
             if (errori.Count > 0)
             {
                 logFile.LogInfo($"Errori riscontrati {errori.Count} durante l'elaborazione:");
@@ -223,6 +259,7 @@ public class CSVReader
                 logFile.LogInfo("Elaborazione completata senza errori.");
             }
 
+            // Stampo il numero di dichiaranti trovati
             if (datiComplessivi.Dichiaranti.Count > 0)
             {
                 logFile.LogInfo($"Trovati {datiComplessivi.Dichiaranti.Count} dichiaranti da aggiungere.");
@@ -231,6 +268,8 @@ public class CSVReader
             {
                 logFile.LogInfo("Nessun dichiarante trovato da aggiungere.");
             }
+
+            // Stampo il numero di dichiaranti da aggiornare   
             if (datiComplessivi.DichiarantiDaAggiornare.Count > 0)
             {
                 logFile.LogInfo($"Trovati {datiComplessivi.DichiarantiDaAggiornare.Count} dichiaranti da aggiornare.");
@@ -239,6 +278,7 @@ public class CSVReader
             {
                 logFile.LogInfo("Nessun dichiarante trovato da aggiornare.");
             }
+
         }
         catch (FileNotFoundException)
         {
