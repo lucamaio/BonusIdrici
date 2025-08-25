@@ -1,0 +1,116 @@
+@{
+    ViewData["Title"] = "Aggiungi un Utente";
+    var ruoli = ViewBag.Ruoli;
+    var enti = ViewBag.Enti;
+}
+
+<div class="report-page container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-account border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Aggiungi un Utente</span>
+                    </h3>
+                </div>
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
+                    <form asp-controller="Account" asp-action="Crea" method="POST" enctype="multipart/form-data">
+
+
+                        <div class="accordion" id="accordionDichiarante">
+
+                            <!-- SEZIONE 1 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionDichiarante">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="cognome" class="form-label">Cognome: *</label>
+                                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="nome" class="form-label">Nome: *</label>
+                                                <input type="text" class="form-control" id="nome" name="nome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="email" class="form-label">Email: *</label>
+                                                <input type="email" class="form-control" id="email" name="email" required>
+                                            </div>
+
+                                             <div class="col">
+                                                <label for="password" class="form-label">Password: *</label>
+                                                <input type="password" class="form-control" id="password" name="password" required>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="ruolo" class="form-label">Ruolo: *</label>
+                                                <select class="form-select" id="ruolo" name="ruolo" required>
+                                                    @foreach (var role in ruoli)
+                                                    {
+                                                        <option value="@role.id">@role.nome</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 2 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-home me-2"></i> Enti gestiti
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionDichiarante">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                              <div class="col">
+                                                <label for="enti" class="form-label">Enti: *</label>
+                                                <select class="form-select" id="enti" name="enti" multiple required>
+                                                    @foreach (var ente in enti)
+                                                    {
+                                                        <option value="@ente.id">@ente.nome</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        <!-- BOTTONI -->
+                        <hr class="my-4" />
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Show","Account")"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                <i class="fa-solid fa-check"></i> Crea
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
