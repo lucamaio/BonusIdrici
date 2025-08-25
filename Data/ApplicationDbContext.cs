@@ -21,7 +21,7 @@ namespace BonusIdrici2.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserEnte> UserEnti { get; set; }
-
+        public DbSet<Ruolo> Ruoli { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
