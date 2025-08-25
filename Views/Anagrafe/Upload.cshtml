@@ -10,7 +10,7 @@
                     <h3 class="mb-0">Carica Anagrafe</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Anagrafe" asp-action="Upload" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Anagrafe" asp-action="Upload" method="post" enctype="multipart/form-data" onsubmit="showLoader()">
                            @* --- SELECT ENTE QUI --- *@
                         <div class="mb-3">
                             <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
