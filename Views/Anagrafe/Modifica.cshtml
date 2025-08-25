@@ -1,6 +1,6 @@
 @model IEnumerable<BonusIdrici2.Models.ViewModels.AnagrafeViewModel>
 @{
-    ViewData["Title"] = "Varia Report";
+    ViewData["Title"] = "Modifica Persona";
     var dichiarante = ViewBag.Dichiarante;
     var sesso = dichiarante.Sesso;
     var sessi = new List<string> { "M", "F" };
@@ -53,7 +53,7 @@
                                             <div>
                                                 <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
                                                 <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
-                                                    value="@dichiarante.CodiceFiscale" maxlength="16" required>
+                                                    value="@dichiarante.CodiceFiscale" minlength="16" maxlength="16" required>
                                             </div>
 
                                              <div class="col">

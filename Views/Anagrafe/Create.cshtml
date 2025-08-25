@@ -1,72 +1,138 @@
 @{
-    ViewData["Title"] = "Aggiungi una persona";
+    ViewData["Title"] = "Aggiungi una Persona";
+    var sessi = new List<string> { "M", "F" };
 }
 
-<div class="container my-5">
+<div class="report-page container my-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header header-anagrafe text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Aggiungi una persona</h3>
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-anagrafe border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Aggiungi una Persona</span>
+                    </h3>
                 </div>
-                <div class="card-body p-5">
-                    <form asp-controller="Anagrafe" asp-action="crea" method="POST" enctype="multipart/form-data">
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
+                    <form asp-controller="Anagrafe" asp-action="Crea" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
 
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            <div>
-                                <label for="cognome" class="form-label">Cognome *</label>
-                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+
+                        <div class="accordion" id="accordionDichiarante">
+
+                            <!-- SEZIONE 1 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionDichiarante">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="cognome" class="form-label">Cognome *</label>
+                                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="nome" class="form-label">Nome *</label>
+                                                <input type="text" class="form-control" id="nome" name="nome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
+                                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" minlength="16" maxlength="16" required>
+                                            </div>
+
+                                             <div class="col">
+                                                <label for="sesso" class="form-label">Sesso: *</label>
+                                                <select class="form-select" id="sesso" name="sesso" required>
+                                                    @foreach (var sex in sessi)
+                                                    {
+                                                        <option value="@sex">@sex</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col">
+                                                <label for="data_nascita" class="form-label">Data di nascita *</label>
+                                                <input class="form-control" type="date" id="data_nascita" name="data_nascita"  required>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="comune_nascita" class="form-label">Comune di nascita *</label>
+                                                <input type="text" class="form-control" id="comune_nascita" name="comune_nascita" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="nome" class="form-label">Nome *</label>
-                                <input type="text" class="form-control" id="nome" name="nome" required>
+                            <!-- SEZIONE 2 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-home me-2"></i> Residenza
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionDichiarante">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div>
+                                                <label for="indirizzo_residenza" class="form-label">Indirizzo di residenza *</label>
+                                                <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="numero_civico" class="form-label">Numero civico *</label>
+                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
-                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
-                                       maxlength="16" required>
-                            </div>
-
-                            <div>
-                                <label for="sesso" class="form-label">Sesso *</label>
-                                <input type="text" class="form-control" id="sesso" name="sesso" maxlength="1" required>
-                            </div>
-
-                            <div>
-                                <label for="data_nascita" class="form-label">Data di nascita *</label>
-                                <input class="form-control" type="date" id="data_nascita" name="data_nascita" required>
-                            </div>
-
-                            <div>
-                                <label for="comune_nascita" class="form-label">Comune di nascita *</label>
-                                <input type="text" class="form-control" id="comune_nascita" name="comune_nascita" required>
-                            </div>
-
-                            <div>
-                                <label for="indirizzo_residenza" class="form-label">Indirizzo di residenza *</label>
-                                <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza" required>
-                            </div>
-
-                            <div>
-                                <label for="numero_civico" class="form-label">Numero civico *</label>
-                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
-                            </div>
-                        </div>
-
+                        <!-- SEZIONE 3 -->
+                            <!-- <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading3">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                             <i class="fa-solid fa-users"></i> Parenti
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
+                                     data-bs-parent="#accordionDichiarante">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                           @* // Da Implementare la visualizzazione dei parenti *@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                        
+                        <!-- BOTTONI -->
                         <hr class="my-4" />
-
-                        <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-anagrafe btn-lg rounded-3">Aggiungi Persona</button>
-                             <a class="btn btn-back btn-lg rounded-3"
-                               href="@Url.Action("Show", "Anagrafe", new { selectedEnteId = ViewBag.IdEnte })">
-                                Torna alla consultazione
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Show","Anagrafe", new { selectedEnteId = ViewBag.IdEnte})"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
                             </a>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                <i class="fa-solid fa-check"></i> Aggiorna
+                            </button>
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

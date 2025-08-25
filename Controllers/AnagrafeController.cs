@@ -181,7 +181,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione che consente di andare a creare un nuovo dichiarante da i dati provenienti dal form Anagrafe/Create.cshtml
         [HttpPost]
-        public IActionResult crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte,int idUser)
+        public IActionResult Crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte,int idUser)
         {
             var nuovaPersona = new Dichiarante
             {
