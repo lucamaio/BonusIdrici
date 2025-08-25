@@ -214,6 +214,18 @@ namespace BonusIdrici2.Controllers
             return Show();
         }
 
+        public IActionResult HandleError(int code)
+        {
+            if (code == 404)
+                return View("Error404");
+
+            if (code == 403)
+                return View("Error403");
+
+            return View("Error");
+        }
+
+
         // Funzione 2: Reset/Modifica password
 
         // ....

@@ -55,14 +55,17 @@ namespace BonusIdrici2.Controllers
             return View();
         }
         
-        public IActionResult HandleError(int code)
+       public IActionResult HandleError(int code)
         {
             if (code == 404)
-                return View("Error404"); // la tua view personalizzata
+                return View("Error404");
 
-            // 🔹 puoi gestire altri codici (403, 500, ecc.)
+            if (code == 403)
+                return View("Error403");
+
             return View("Error");
         }
+
 
         // Aggiungere una pagina info
     }
