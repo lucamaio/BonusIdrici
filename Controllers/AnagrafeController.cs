@@ -264,7 +264,7 @@ namespace BonusIdrici2.Controllers
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
-                return Upload() // Torna alla pagina di upload con un messaggio
+                return Upload(); // Torna alla pagina di upload con un messaggio
             }
 
             // Validazione del tipo di file (opzionale ma consigliata)
