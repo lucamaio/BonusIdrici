@@ -14,7 +14,7 @@
                     <form asp-controller="Anagrafe" asp-action="Show" method="post"> @* Azione POST modificata *@
                         
                         <div class="mb-3">
-                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
+                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente:</label>
                             <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
                                 <option value="">-- Seleziona un Ente --</option>
                                 @if (ViewBag.Enti != null)
