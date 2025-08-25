@@ -281,11 +281,7 @@ namespace BonusIdrici2.Controllers
                 ViewBag.Message = "Ente selezionato non valido.";
                 return Upload();
             }
-            List<Dichiarante> dichiaranti = _context.Dichiaranti.Where(d => d.IdEnte == selectedEnteId).ToList();
-            if (dichiaranti == null)
-            {
-                dichiaranti = new List<Dichiarante>();
-            }
+            
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
 
             try
@@ -297,7 +293,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, dichiaranti, idUser);
+                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, _context, idUser);
 
                 // Inizia una transazione per assicurare che tutti i dati vengano salvati
                 // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
