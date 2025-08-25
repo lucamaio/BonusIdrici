@@ -281,7 +281,7 @@ namespace BonusIdrici2.Controllers
                 ViewBag.Message = "Ente selezionato non valido.";
                 return Upload();
             }
-            
+
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
 
             try
@@ -301,7 +301,7 @@ namespace BonusIdrici2.Controllers
                 {
                     try
                     {
-                        var trovati =false;
+                        bool trovati = false;
                         // 1. Verifico se ci sono dati da salvare
                         if (datiComplessivi.Dichiaranti.Count > 0)
                         {
@@ -315,7 +315,7 @@ namespace BonusIdrici2.Controllers
                         // 2. Verifico se ci sono dichiaranti da aggiornare
                         if (datiComplessivi.DichiarantiDaAggiornare.Count > 0)
                         {
-                            var trovati= true;
+                            trovati = true;
                             // Aggiorna i dichiaranti esistenti
                             foreach (var dichiarante in datiComplessivi.DichiarantiDaAggiornare)
                             {
