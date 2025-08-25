@@ -4,6 +4,28 @@
     var enti = ViewBag.Enti;
 }
 
+<style>
+    /* 🔹 Stile custom per la select multipla Enti */
+    #enti {
+        height: 200px;
+        border: 2px solid #0d6efd;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+    }
+
+    #enti option {
+        padding: 8px;
+        margin: 2px 0;
+        border-radius: 4px;
+    }
+
+    #enti option:checked {
+        background-color: #0d6efd !important;
+        color: #fff !important;
+    }
+</style>
+
 <div class="report-page container my-5">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-11">
@@ -21,7 +43,6 @@
                 <div class="modern-card-body p-4 small">
                     <form asp-controller="Account" asp-action="Crea" method="POST" enctype="multipart/form-data">
 
-
                         <div class="accordion" id="accordionDichiarante">
 
                             <!-- SEZIONE 1 -->
@@ -32,8 +53,7 @@
                                         <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
                                     </button>
                                 </h2>
-                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
-                                     data-bs-parent="#accordionDichiarante">
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div>
@@ -51,7 +71,7 @@
                                                 <input type="email" class="form-control" id="email" name="email" required>
                                             </div>
 
-                                             <div class="col">
+                                            <div class="col">
                                                 <label for="password" class="form-label">Password: *</label>
                                                 <input type="password" class="form-control" id="password" name="password" required>
                                             </div>
@@ -73,16 +93,16 @@
                             <!-- SEZIONE 2 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading2">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
                                         <i class="fa-solid fa-home me-2"></i> Enti gestiti
                                     </button>
                                 </h2>
-                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
-                                     data-bs-parent="#accordionDichiarante">
+                                <!-- 🔹 RIMOSSO data-bs-parent, aggiunto show -->
+                                <div id="collapse2" class="accordion-collapse collapse show" aria-labelledby="heading2">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
-                                              <div class="col">
+                                            <div class="col">
                                                 <label for="enti" class="form-label">Enti: *</label>
                                                 <select class="form-select" id="enti" name="enti" multiple required>
                                                     @foreach (var ente in enti)
