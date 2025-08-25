@@ -46,11 +46,11 @@
                                             <td><span class="fw-semibold">@utente.Cognome</span></td>
                                             <td><span class="fw-semibold">@utente.Nome</span></td>
                                             <td class="text-center">
-                                                @if (utente.Ruolo == "ADMIN")
+                                                @if (utente.getRuolo() == "ADMIN")
                                                 {
                                                     <span class="badge bg-danger">ADMIN</span>
                                                 }
-                                                else if (utente.Ruolo == "OPERATORE")
+                                                else if (utente.getRuolo() == "OPERATORE")
                                                 {
                                                     <span class="badge bg-success">OPERATORE</span>
                                                 }
