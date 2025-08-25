@@ -335,7 +335,7 @@ namespace BonusIdrici2.Controllers
                         await _context.SaveChangesAsync();
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
-                        ViewBag.Message = $"Dati salvati con successo!\ Aggiunti: {datiComplessivi.Dichiaranti.Count}, Aggiornati: {datiComplessivi.DichiarantiDaAggiornare.Count}";
+                        ViewBag.Message = $"Dati salvati con successo!\nAggiunti: {datiComplessivi.Dichiaranti.Count}, Aggiornati: {datiComplessivi.DichiarantiDaAggiornare.Count}";
                     }
                     catch (Exception dbEx)
                     {
@@ -361,7 +361,7 @@ namespace BonusIdrici2.Controllers
                 }
             }
 
-            return Upload() // Torna alla pagina di upload con il messaggio di stato
+            return Upload(); // Torna alla pagina di upload con il messaggio di stato
         }
 
         // Fine - Funzioni da eseguire a seconda della operazione
