@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using BonusIdrici2.Models.ViewModels;
 using BonusIdrici2.Models; 
 using BonusIdrici2.Data;
 using System.IO;
