@@ -68,16 +68,6 @@ namespace BonusIdrici2.Controllers
             return RedirectToAction("Index", "Login"); // torna alla pagina di login
         }
 
-        public IActionResult HandleError(int code)
-        {
-            if (code == 404)
-                return View("Error404");
-
-            if (code == 403)
-                return View("Error403");
-
-            return View("Error");
-        }
 
     }
     
