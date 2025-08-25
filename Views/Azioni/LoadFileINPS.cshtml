@@ -7,11 +7,11 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow rounded-4 border-0">
-                <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Carica il file CSV fornito INPS</h3>
+                <div class="card-header header-report text-white text-center rounded-top-4">
+                    <h3 class="mb-0">Carica il file INPS</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="LoadFileINPS" method="post" enctype="multipart/form-data">
+                    <form asp-controller="Azioni" asp-action="LoadFileINPS" method="post" enctype="multipart/form-data" onsubmit="showLoader()">
                         
                         @* --- INIZIO AGGIUNTA SELECT ENTE QUI --- *@
                         <div class="mb-3">
@@ -44,9 +44,17 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Carica File</button>
+                            <button type="submit" class="btn btn-report">Carica File</button>
                         </div>
                     </form>
+
+                    <div id="loader" class="text-center mt-3" style="display:none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Caricamento...</span>
+                        </div>
+                        <p class="mt-2">Elaborazione in corso, attendere...</p>
+                    </div>
+
 
                     @if (!string.IsNullOrEmpty(ViewBag.Message))
                     {
@@ -59,3 +67,11 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+    </script>
+}

@@ -214,7 +214,7 @@ body.dark-mode a {
 }
 
 .header-report{
-  background: linear-gradient(90deg, rgb(255, 193, 7), rgb(204, 154, 6));
+  background: linear-gradient(90deg, rgb(212, 8, 32), rgb(161, 11, 19));
   color: #fff;
   fill: #fff;
 }
@@ -279,5 +279,5 @@ body.dark-mode a {
 } */
 
 .btn-report{
-  background-color: rgb(255, 193, 7);
+  background-color: rgb(212, 8, 32);
 }
