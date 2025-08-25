@@ -1,3 +1,135 @@
 @{
     ViewData["Title"] = "Esplora tutti gli Account";
+    var utenti = ViewBag.Utenti;
+}
+<div class="container-xxl flex-grow-1 py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4 w-100">
+                <!-- Header -->
+                <div class="card-header header-account border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold">
+                        <i class="bi bi-people-fill me-2"></i> Esplora Utenti
+                    </h3>
+                </div>
+
+                <!-- Barra di caricamento -->
+                <div id="loadingBarContainer" class="progress rounded-0" style="height: 6px; display: none;">
+                    <div id="loadingBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                         role="progressbar" style="width: 0%"></div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4 position-relative">
+                    @if (utenti != null && utenti.Count > 0)
+                    {
+                        <p class="lead mb-4 text-muted">Di seguito trovi tutti gli utenti rdegistrati.</p>
+
+                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> <!-- 🔹 nascosta finché carica -->
+                            <table id="accountTable" class="table table-hover align-middle border-bottom w-100">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Username</th>
+                                        <th class="text-center">Cognome</th>
+                                        <th class="text-center">Nome</th>
+                                        <th class="text-center">Email</th>
+                                        <th class="text-center">Ruolo</th>
+                                        <th class="text-center">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var utente in utenti)
+                                    {
+                                        <tr>
+                                            <td><span class="fw-semibold">@utente.Username</span></td>
+                                            <td><span class="fw-semibold">@utente.Email</span></td>
+                                            <td><span class="fw-semibold">@utente.Cognome</span></td>
+                                            <td><span class="fw-semibold">@utente.Nome</span></td>
+                                            <td class="text-center">
+                                                @if (utente.Ruolo == "ADMIN")
+                                                {
+                                                    <span class="badge bg-danger">ADMIN</span>
+                                                }
+                                                else if (utente.Ruolo == "OPERATORE")
+                                                {
+                                                    <span class="badge bg-success">OPERATORE</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                }
+                                            
+                                            <td class="text-center">
+                                                <a class="btn btn-sm btn-light border me-1" style="fill: #198754 !important; color: #198754 !important" title="Modifica Persona"
+                                                   href="@Url.Action("Modifica", "Account", new { id = utente.id })">
+                                                    <i class="bi bi-pencil-square text-primary"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                          <div class="alert alert-warning text-center shadow-sm rounded-3 mb-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i> Nessun Utente trovato!.
+                            </div>
+
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="@Url.Action("Create", "Account")"
+                                class="btn btn-account btn-sm shadow-sm">
+                                    <i class="bi bi-plus-circle me-1"></i> Aggiungi
+                                </a>
+                            </div>
+                    }      
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Mostra barra all'inizio
+            $("#loadingBarContainer").show();
+            var progress = 0;
+            var interval = setInterval(function () {
+                if (progress < 90) {
+                    progress += 10;
+                    $("#loadingBar").css("width", progress + "%");
+                }
+            }, 300);
+
+            var accountTable = $('#accountTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end anagrafe"p>>',
+                buttons: [
+                    {
+                        text: '<i class="bi bi-plus-circle me-1"></i> Aggiungi',
+                        className: 'btn btn-sm btn-success',
+                        action: function () {
+                            window.location.href = '@Url.Action("Create", "Account")';
+                        }
+                    }
+                ]
+            });
+
+            // Quando la tabella è pronta → completa la barra e mostra tabella
+            accountTable.on('init', function () {
+                clearInterval(interval);
+                $("#loadingBar").css("width", "100%");
+                setTimeout(function () {
+                    $("#loadingBarContainer").fadeOut();
+                    $("#tableWrapper").fadeIn(); 
+                }, 500);
+            });
+        });
+    </script>
 }

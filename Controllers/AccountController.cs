@@ -30,6 +30,8 @@ namespace BonusIdrici2.Controllers
             }
             
             // c) Mostro la pagina
+            var utenti = _context.Users.OrderBy(u => u.Username).ToList();
+            ViewBag.Utenti = utenti;
             return View();
         }
 
