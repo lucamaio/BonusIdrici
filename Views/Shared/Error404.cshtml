@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Pagina non trovata";
+}
+
+<div class="error-page d-flex align-items-center justify-content-center vh-100 text-center">
+    <div class="container">
+        <h1 class="display-1 fw-bold text-404">404</h1>
+        <h2 class="mb-3 fw-semibold">Ops! Pagina non trovata</h2>
+        <p class="text-muted mb-4">
+            La pagina che stai cercando potrebbe essere stata rimossa, rinominata o non è momentaneamente disponibile.
+        </p>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg shadow-sm">
+            <i class="fa-solid fa-house me-2"></i> Torna alla Home
+        </a>
+    </div>
+</div>
+
+<style>
+    .error-page {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    }
+
+    .text-404 {
+        font-size: 8rem;
+        color: #dc3545; /* rosso Bootstrap danger */
+        text-shadow: 3px 3px 0 #fff, 6px 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .error-page h2 {
+        color: #343a40;
+    }
+
+    .error-page p {
+        font-size: 1.1rem;
+    }
+</style>

@@ -7,42 +7,93 @@ namespace BonusIdrici2.Controllers
 {
     public class AccountController : Controller
     {
+        // Inietto il logger e il DbContext
         private readonly ILogger<AccountController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
+
+        // Variabili per la gestione dell'utente
+        private string? ruolo;
+        private int idUser;
+        private string? username;
 
         public AccountController(ILogger<AccountController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
+
+            if (VerificaSessione())
+            {
+                username = HttpContext.Session.GetString("Username");
+                ruolo = HttpContext.Session.GetString("Role");
+                idUser = (int) HttpContext.Session.GetInt32("idUser");
+            }
         }
 
+        // Funzione che inizializza le variabili con i dati della sessione
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            // Ora HttpContext è disponibile
+            username = HttpContext.Session.GetString("Username");
+            ruolo = HttpContext.Session.GetString("Role");
+            idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+
+            if (!VerificaSessione())
+            {
+                username = null;
+                ruolo = null;
+                idUser = 0;
+            }
+
+            // Così le variabili sono disponibili in tutte le viste
+            ViewBag.idUser = idUser;
+            ViewBag.Username = username;
+            ViewBag.Ruolo = ruolo;
+        }
+
+        // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
+
+        public bool VerificaSessione(string ruoloRichiesto = null)
+        {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        // Inizio - Pagine di navigazione
+
+        // Pagina 1: Lista utenti 
         public IActionResult Show(){
              // a) Verifico se esiste una sessione
-            if(!VerificaSessione()){
+            if(!VerificaSessione("ADMIN")){
+                ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
                return RedirectToAction("Index", "Login");
             }
 
-            // b) Verifico se l'utente è Admin
-            var role=HttpContext.Session.GetString("Role");
-            if(role !="ADMIN"){
-                ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
-            }
-            
             // c) Mostro la pagina
             var utenti = _context.Users.OrderBy(u => u.Username).ToList();
             ViewBag.Utenti = utenti;
             return View();
         }
 
+        // Pagina 2: Dettagli account
+
         public IActionResult Dettagli(){
             // a) Verifico se esiste una sessione
             if(!VerificaSessione()){
                return RedirectToAction("Index", "Login");
             }
-
-            // b) Mi salvo User
-            var idUser=HttpContext.Session.GetInt32("idUser");
 
             // c) Cerco l'utente sul DB
             var utente = _context.Users.Where(s=> s.id==idUser).ToList();
@@ -59,6 +110,8 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
+        // Pagina 3: Pagina di sicurezza consente di cambiare password
+
         public IActionResult Sicurezza(){
              // a) Verifico se esiste una sessione
             if(!VerificaSessione()){
@@ -67,6 +120,8 @@ namespace BonusIdrici2.Controllers
 
             return View();
         }
+
+        // Pagina 4: Pagina di impostazioni consente di modificare le impostazioni dell'account
 
         public IActionResult Impostazioni(){
              // a) Verifico se esiste una sessione
@@ -77,18 +132,14 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
+        // Pagina 5: Pagina di creazione nuovo utente
+
         public IActionResult Create()
         {
             // a) Verifico se esiste una sessione
-            if(!VerificaSessione()){
-               return RedirectToAction("Index", "Login");
-            }
-
-            // b) Verifico se l'utente è Admin
-            var role=HttpContext.Session.GetString("Role");
-            if(role !="ADMIN"){
+            if(!VerificaSessione("ADMIN")){
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
+               return RedirectToAction("Index", "Login");
             }
 
             // c) Mostro la pagina
@@ -99,21 +150,16 @@ namespace BonusIdrici2.Controllers
             ViewBag.Enti = enti;
             return View();
         }
+        // Fine - Pagine di navigazione
+        // Inizio - Funzioni
 
-        // Funzione per creare un nuovo utente
-
+        // Funzione 1: Crea nuovo utente
         [HttpPost]
         public IActionResult Crea(string username, string email, string? cognome, string? nome, int ruolo, List<int> enti){
             // a) Verifico se esiste una sessione
-            if(!VerificaSessione()){
-               return RedirectToAction("Index", "Login"); // Ritorno alla pagina di login
-            }
-
-            // b) Verifico se l'utente è Admin
-            var role=HttpContext.Session.GetString("Role");
-            if(role !="ADMIN"){
+            if(!VerificaSessione("ADMIN")){
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");  // Ritorno alla home
+               return RedirectToAction("Index", "Login"); // Ritorno alla pagina di login
             }
 
             // c) Controllo che i dati siano stati inseriti correttamente
@@ -168,29 +214,13 @@ namespace BonusIdrici2.Controllers
             return Show();
         }
 
-
-        // Da implementare reset password e modifica account
+        // Funzione 2: Reset/Modifica password
 
         // ....
 
-        // Funzione che controlla se esiste una funzione e se il ruolo e uguale a quello richiesto per accedere alla pagina desiderata
-        public bool VerificaSessione(string ruoloRichiesto = null)
-        {
-            string username = HttpContext.Session.GetString("Username");
-            string ruolo = HttpContext.Session.GetString("Role");
+        // Funzione 3: Modifica dati utente
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
-            {
-                return false;
-            }
-
-            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
-            {
-                return false;
-            }
-
-            return true;
-        }
+        // ....
 
     }
 }

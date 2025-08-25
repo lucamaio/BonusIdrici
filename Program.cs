@@ -32,8 +32,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
+    // Mostra la pagina di errore generica per eccezioni
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+
+    // 🔹 intercetta i codici di stato (404, 403, ecc.)
+    app.UseStatusCodePagesWithReExecute("/Home/HandleError", "?code={0}");
 }
 
 app.UseHttpsRedirection();
