@@ -124,7 +124,7 @@ namespace BonusIdrici2.Controllers
 
         // Pagina 3: Pagina per la modificha dei dati di un ente
 
-        public IActionResult Modifica(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool? Nostro = true)
+        public IActionResult Modifica(int id)
         {
             if (!VerificaSessione("ADMIN"))
             {
@@ -136,15 +136,16 @@ namespace BonusIdrici2.Controllers
             ViewBag.Username = HttpContext.Session.GetString("Username");
             ViewBag.Ruolo = HttpContext.Session.GetString("Role");
 
+            var ente = _context.Enti.FirstOrDefault(s => s.id == id);
+            if (ente == null)
+            {
+                ViewBag.Message = "Ente non trovato";
+                return RedirectToAction("Index", "Home");
+            }
+            var usernameCreatore = _context.Users.FirstOrDefault(u => u.id == ente.IdUser)?.Username ?? "Sconosciuto";
+            ViewBag.UsernameCreatore = usernameCreatore;
             ViewBag.id = id;
-            ViewBag.nome = nome;
-            ViewBag.istat = istat;
-            ViewBag.partitaIva = partitaIva;
-            ViewBag.Cap = cap;
-            ViewBag.provincia = provincia;
-            ViewBag.regione = regione;
-            ViewBag.CodiceFiscale = CodiceFiscale;
-            ViewBag.Nostro = Nostro;
+            ViewBag.Ente = ente;
             return View();
         }
 
@@ -156,19 +157,37 @@ namespace BonusIdrici2.Controllers
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [HttpPost]
-        public IActionResult Crea(Ente ente)
+        public IActionResult Crea(String nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool Piranha, bool Selene)
         {
-            if (ModelState.IsValid)
+            if (!VerificaSessione("ADMIN"))
             {
-                // Logica per salvare l'ente nel database
-                _context.Enti.Add(ente);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Ente creato con successo.";
-                return RedirectToAction("Index", "Home"); // oppure una vista di conferma
+                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
             }
-            // In caso di errore, ritorna la stessa vista con il modello
-            return View("Index", "Enti");
+
+            ViewBag.idUser = HttpContext.Session.GetString("idUser");
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+            ViewBag.Ruolo = HttpContext.Session.GetString("Role");
+
+            var ente = new Ente
+            {
+                nome = nome.Trim().ToUpper(),
+                istat = istat.Trim().ToUpper(),
+                partitaIva = partitaIva.Trim().ToUpper(),
+                Cap = cap.Trim(),
+                Provincia = provincia?.Trim().ToUpper(),
+                Regione = regione?.Trim().ToUpper(),
+                CodiceFiscale = CodiceFiscale?.Trim().ToUpper(),
+                Piranha = Piranha,
+                Selene = Selene,
+                DataCreazione = DateTime.Now,
+                IdUser = idUser,
+            };
+            
+            ViewBag.Message = "Ente creato con successo";
+            return Index();
         }
+       
         
         // Funzione che viene eseguita per aggiornare i dati del ente con queli inseriti nel form
 
@@ -186,14 +205,14 @@ namespace BonusIdrici2.Controllers
             enteEsistente.istat = istat.Trim().ToUpper();
             enteEsistente.partitaIva = partitaIva.Trim().ToUpper();
             enteEsistente.Cap = cap.Trim();
-            enteEsistente.Provincia = provincia.Trim().ToUpper();
-            enteEsistente.Regione = regione.Trim().ToUpper();
-            enteEsistente.CodiceFiscale = CodiceFiscale.Trim().ToUpper();
-            enteEsistente.Nostro = Nostro;
-            enteEsistente.data_aggiornamento = DateTime.Now;
+            enteEsistente.Provincia = provincia?.Trim().ToUpper();
+            enteEsistente.Regione = regione?.Trim().ToUpper();
+            enteEsistente.CodiceFiscale = CodiceFiscale?.Trim().ToUpper();
+            enteEsistente.DataAggiornamento = DateTime.Now;
 
             _context.SaveChanges();
-            return RedirectToAction("Index", "Enti");
+            ViewBag.Message = "Dati ente aggiornati con successo";
+            return Index();
         }
         
         // Fine - Funzioni da eseguire a seconda della operazione

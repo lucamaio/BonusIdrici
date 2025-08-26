@@ -81,63 +81,7 @@
                                 <h2 class="accordion-header" id="heading2">
                                     <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                        <i class="fa-solid fa-home me-2"></i> Ubicazione
-                                    </button>
-                                </h2>
-                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
-                                     data-bs-parent="#accordionUtenza">
-                                    <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-3 g-4">
-                                             <div>
-                                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo: *</label>
-                                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione" required>
-                                            </div>
-
-                                            <div>
-                                                <label for="numero_civico" class="form-label">Civico: *</label>
-                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        <!-- SEZIONE 3 -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading2">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                        <i class="fa-solid fa-home me-2"></i> Stato
-                                    </button>
-                                </h2>
-                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
-                                     data-bs-parent="#accordionUtenza">
-                                    <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-3 g-4">
-                                             <div>
-                                                <label for="stato" class="form-label">Stato: *</label>
-                                                <input type="number" class="form-control" id="stato" name="stato" min="1" max="5" required>
-                                            </div>
-
-                                            <div>
-                                                <label for="periodoIniziale" class="form-label">Periodo Iniziale: *</label>
-                                                <input class="form-control" type="date" id="periodoIniziale" name="periodoIniziale" required>
-                                            </div>
-
-                                            <div>
-                                                <label for="periodoFinale" class="form-label">Periodo Finale:</label>
-                                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <!-- Sezione 4-->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading2">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                        <i class="fa-solid fa-home me-2"></i> Utente
+                                        <i class="fa-solid fa-user me-2"></i> Utente
                                     </button>
                                 </h2>
                                 <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
@@ -182,7 +126,65 @@
                                     </div>
                                 </div>
                             </div>
-                        
+
+                            <!-- SEZIONE 3 -->
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading3">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        <i class="fa-solid fa-house me-2"></i> Ubicazione
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div>
+                                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo: *</label>
+                                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="numero_civico" class="form-label">Civico: *</label>
+                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <!-- SEZIONE 4 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading4">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                        <i class="fa-solid fa-calendar-days me-2"></i> Date
+                                    </button>
+                                </h2>
+                                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div>
+                                                <label for="stato" class="form-label">Stato: *</label>
+                                                <input type="number" class="form-control" id="stato" name="stato" min="1" max="5" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="periodoIniziale" class="form-label">Periodo Iniziale: *</label>
+                                                <input class="form-control" type="date" id="periodoIniziale" name="periodoIniziale" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="periodoFinale" class="form-label">Periodo Finale:</label>
+                                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                      
                         <!-- BOTTONI -->
                         <hr class="my-4" />
 

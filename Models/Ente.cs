@@ -24,17 +24,21 @@ namespace BonusIdrici2.Models
         public string? CodiceFiscale { get; set; }
 
         [Required]
-
         public required string Cap { get; set; }
 
         public string? Provincia { get; set; }
 
         public string? Regione { get; set; }
 
-        public bool? Nostro { get; set; }
+        [Required]
+        public required bool Piranha { get; set; }
+        [Required]
+        public required bool Selene { get; set; }
+
+        public required int IdUser { get; set; }
         
-        public DateTime? data_creazione { get; set;}
+        public DateTime? DataCreazione { get; set; }
         
-        public DateTime? data_aggiornamento { get; set; }
+        public DateTime? DataAggiornamento { get; set; }
     }
 }

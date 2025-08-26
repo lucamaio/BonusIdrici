@@ -267,7 +267,7 @@ namespace BonusIdrici2.Controllers
         }
 
         // Funzione 3: Consente di caricare le utenze del file csv sul db
-        
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         [HttpPost]
@@ -285,14 +285,14 @@ namespace BonusIdrici2.Controllers
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
                 ViewBag.Enti = _context.Enti.ToList();
-                 return Upload();
+                return Upload();
             }
 
             if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
             {
                 ViewBag.Enti = _context.Enti.ToList();
                 ViewBag.Message = "Il file selezionato non è un CSV valido.";
-                 return Upload();
+                return Upload();
             }
 
             // Verifico che l'ente selezionato è valido 
@@ -322,7 +322,7 @@ namespace BonusIdrici2.Controllers
                 if (datiComplessivi == null)
                 {
                     ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
-                     return Upload();
+                    return Upload();
                 }
 
                 using (var transaction = _context.Database.BeginTransaction())
@@ -413,7 +413,7 @@ namespace BonusIdrici2.Controllers
 
                         // Aggiorno l'utenza con il nuovo idToponimo
                         utenza.idToponimo = topRelativo.id != null ? topRelativo.id : null;
-                        
+
                         _context.UtenzeIdriche.Update(utenza);
                     }
                     await _context.SaveChangesAsync();
@@ -448,7 +448,7 @@ namespace BonusIdrici2.Controllers
             return Upload();
         }
 
-        
+
         // Fine - Funzioni da eseguire a seconda della operazione
     }
 }

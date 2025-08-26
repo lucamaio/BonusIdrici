@@ -17,165 +17,161 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BonusIdrici2
 build_property.RootNamespace = BonusIdrici2
-build_property.ProjectDir = C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\
+build_property.ProjectDir = C:\Users\User000015\Documents\BonusIdrici2\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici
+build_property.MSBuildProjectDirectory = C:\Users\User000015\Documents\BonusIdrici2
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Account/Create.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Account/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Account/Dettagli.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Account/Dettagli.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxEZXR0YWdsaS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Account/Impostazioni.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Account/Impostazioni.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxJbXBvc3RhemlvbmkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Account/Show.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Account/Show.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaG93LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Account/Sicurezza.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Account/Sicurezza.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaWN1cmV6emEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Anagrafe/Create.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Anagrafe/Index.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Anagrafe/Modifica.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Modifica.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcTW9kaWZpY2EuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Anagrafe/Show.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Show.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcU2hvdy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Anagrafe/Upload.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Upload.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcVXBsb2FkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Azioni/LoadFileINPS.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Azioni/LoadFileINPS.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXppb25pXExvYWRGaWxlSU5QUy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Enti/Create.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Enti/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50aVxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Enti/index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50aVxpbmRleC5jc2h0bWw=
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Enti/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50aVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Enti/Modifica.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Enti/Modifica.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50aVxNb2RpZmljYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Home/Index.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Home/Privacy.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Login/index.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Login/index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5caW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Report/Dettails.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/Dettails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XERldHRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Report/Index.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Report/Show.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/Show.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFNob3cuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Report/Varia.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/Varia.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFZhcmlhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Report/VariaSerie.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Report/VariaSerie.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0XFZhcmlhU2VyaWUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Shared/Error.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Shared/Error404.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Shared/Error404.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yNDA0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Toponomi/Create.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Toponomi/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVG9wb25vbWlcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Toponomi/Index.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Toponomi/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVG9wb25vbWlcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Toponomi/Modifica.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Toponomi/Modifica.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVG9wb25vbWlcTW9kaWZpY2EuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Toponomi/Show.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Toponomi/Show.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVG9wb25vbWlcU2hvdy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Utenze/Create.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Utenze/Create_old.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXENyZWF0ZV9vbGQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Utenze/Index.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Utenze/Modifica.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Modifica.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXE1vZGlmaWNhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Utenze/Show.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Show.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXFNob3cuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Utenze/Upload.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Upload.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXFVwbG9hZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/_ViewImports.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/_ViewStart.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Antonella/OneDrive - unime.it/Desktop/BonusIdrici/BonusIdrici/Views/Shared/_Layout.cshtml]
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-xrv69dks3l

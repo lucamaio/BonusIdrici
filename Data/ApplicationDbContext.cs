@@ -58,14 +58,15 @@ namespace BonusIdrici2.Data
                 entity.Property(f => f.nome).HasColumnName("nome").IsRequired();
                 entity.Property(f => f.istat).HasColumnName("istat").IsRequired();
                 entity.Property(f => f.partitaIva).HasColumnName("partita_iva").IsRequired();
-                entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").HasMaxLength(16);
-                entity.Property(f => f.Cap).HasColumnName("cap").IsRequired().HasMaxLength(10);
-                entity.Property(f => f.Provincia).HasColumnName("provincia").HasMaxLength(50);
+                entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").HasMaxLength(11);
+                entity.Property(f => f.Cap).HasColumnName("cap").IsRequired().IsRequired().HasMaxLength(5);
+                entity.Property(f => f.Provincia).HasColumnName("provincia").IsRequired().HasMaxLength(2);
                 entity.Property(f => f.Regione).HasColumnName("regione").HasMaxLength(50);
-                entity.Property(f => f.Nostro).HasColumnName("nostro").HasMaxLength(50);
-                entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
-                entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
-
+                entity.Property(f => f.Piranha).HasColumnName("piranha").IsRequired();
+                entity.Property(f => f.Selene).HasColumnName("selene").IsRequired();
+                entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.IdUser).HasColumnName("idUser").IsRequired();
             });
 
 

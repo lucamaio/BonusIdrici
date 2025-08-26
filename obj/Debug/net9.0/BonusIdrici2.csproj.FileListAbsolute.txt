@@ -473,8 +473,6 @@ C:\Users\User000015\Documenti\Bonusidrici2\obj\Debug\net9.0\compressed\22ivjwqf8
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34j-s1xgkyej85.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-s1xgkyej85.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\kuhye7d3fm-peyzcavbpg.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-pz7zkoqfdi.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-adcretjodo.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdrici2.csproj.AssemblyReference.cache
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\rpswa.dswa.cache.json
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdrici2.GeneratedMSBuildEditorConfig.editorconfig
@@ -714,3 +712,5 @@ C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdr.493C5E79.Up2Date
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdrici2.genruntimeconfig.cache
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\ref\BonusIdrici2.dll
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-9g64oz73f9.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-wwt882bmns.gz

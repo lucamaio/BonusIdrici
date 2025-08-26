@@ -1,5 +1,4 @@
 @model IEnumerable<BonusIdrici2.Models.ViewModels.EntiViewModel>
-
 @{
     ViewData["Title"] = "Enti";
 }
@@ -9,10 +8,9 @@
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
-                <div class="card-header border-0 rounded-top-4 d-flex flex-column align-items-center p-4"
-                     style="background: linear-gradient(90deg, rgb(13, 110, 253), rgb(7, 74, 175)); color: #fff;">
+                <div class="card-header header-enti border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
                     <h3 class="mb-1 fw-bold">
-                        <i class="bi bi-building me-2"></i> Enti
+                        <i class="bi bi-people-fill me-2"></i> Enti
                     </h3>
                 </div>
 
@@ -22,39 +20,42 @@
                          role="progressbar" style="width: 0%"></div>
                 </div>
 
+                @if (!string.IsNullOrEmpty(ViewBag.Message))
+                    {
+                        <div class="alert alert-info mt-3" role="alert">
+                            @ViewBag.Message
+                        </div>
+                    }
+
                 <!-- Body -->
                 <div class="card-body p-4 position-relative">
                     @if (Model != null && Model.Any())
                     {
-                        <p class="lead mb-4 text-muted">Di seguito sono elencati gli Enti Comunali.</p>
+                        <p class="lead mb-4 text-muted">Di seguito trovi l'anagrafe del ente selezionato.</p>
 
-                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
+                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> <!-- 🔹 nascosta finché carica -->
                             <table id="entiTable" class="table table-hover align-middle border-bottom w-100">
-                                <thead class="table-primary">
+                                <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>ISTAT</th>
-                                        <th>Codice Fiscale</th>
-                                        <th>Partita IVA</th>
-                                        <th>CAP</th>
-                                        <th>Provincia</th>
-                                        <th>Regione</th>
-                                        <th>Azioni</th>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center">Nome</th>
+                                        <th class="text-center">Istat</th>
+                                        <th class="text-center">Codice Fiscale</th>
+                                        <th class="text-center">P.IVA</th>
+                                        <th class="text-center">CAP</th>
+                                        <th class="text-center">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>@item.id</td>
-                                            <td>@item.nome</td>
-                                            <td>@item.istat</td>
+                                            <td><span class="fw-semibold">@item.id</span></td>
+                                            <td><span class="fw-semibold">@item.nome</span></td>
+                                            <td>@item.istat</td>    
                                             <td>@item.CodiceFiscale</td>
                                             <td>@item.partitaIva</td>
                                             <td>@item.Cap</td>
-                                            <td>@item.Provincia</td>
-                                            <td>@item.Regione</td>
                                             <td class="text-center">
                                                 <a class="btn btn-sm btn-light border me-1" title="Modifica Ente"
                                                    href="@Url.Action("Modifica", "Enti", new { id = item.id, nome = item.nome, istat = item.istat, partitaIva = item.partitaIva, CodiceFiscale = item.CodiceFiscale, Cap = item.Cap, Provincia = item.Provincia, Regione = item.Regione, Nostro = item.Nostro })">
@@ -69,16 +70,23 @@
                     }
                     else
                     {
-                        <div class="alert alert-warning text-center shadow-sm rounded-3">
-                            <i class="bi bi-exclamation-triangle me-2"></i> Nessun Ente trovato.
-                        </div>
-                    }
+                          <div class="alert alert-warning text-center shadow-sm rounded-3 mb-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato trovato per l'ente selezionato.
+                            </div>
 
-                    <div class="d-grid mt-4">
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="@Url.Action("Create", "Ente")"
+                                class="btn btn-anagrafe btn-sm shadow-sm">
+                                    <i class="bi bi-plus-circle me-1"></i> Aggiungi
+                                </a>
+                            </div>
+                    }
+                         <div class="d-grid mt-4">
                         <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
                             <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
                         </a>
                     </div>
+                                
                 </div>
             </div>
         </div>

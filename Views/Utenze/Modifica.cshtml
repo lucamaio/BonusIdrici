@@ -1,4 +1,4 @@
-@* @model IEnumerable<BonusIdrici2.Models.ViewModels.UtenzeViewModel> *@
+@model IEnumerable<BonusIdrici2.Models.ViewModels.UtenzeViewModel>
 @{
     ViewData["Title"] = "Modifica Utenza";
     var utenza = ViewBag.Utenza;
@@ -16,117 +16,198 @@
     var sessoUtenza = new List<string> { "M", "F", "D" };
 }
 
-<div class="container my-5">
+<div class="report-page container my-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Modifica Utenza</h3>
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-utenze border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Modifica Utenza</span>
+                    </h3>
                 </div>
-                <div class="card-body p-5">
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
                     <form asp-controller="Utenze" asp-action="Update" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="@utenza.id" />
                         <input type="hidden" name="idEnte" value="@utenza.IdEnte" />
 
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="accordion" id="accordionUtenza">
 
-                            @* <div>
-                                <label for="idAcquedotto" class="form-label">ID Acquedotto: *</label>
-                                <input type="text" class="form-control" id="idAcquedotto" name="idAcquedotto" value="@utenza.idAcquedotto" readonly>
-                            </div> *@
+                            <!-- SEZIONE 1: Dati Identificativi -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="idAcquedotto" class="form-label">ID Acquedotto *</label>
+                                                <input type="text" class="form-control readonly-field" id="idAcquedotto" name="idAcquedotto" value="@utenza.idAcquedotto" readonly>
+                                            </div>
 
-                            <div>
-                                <label for="matricolaContatore" class="form-label">Matricola: *</label>
-                                <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" value="@utenza.matricolaContatore" required>
+                                            <div>
+                                                <label for="matricolaContatore" class="form-label">Matricola *</label>
+                                                <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" value="@utenza.matricolaContatore" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="tipo_utenza" class="form-label">Tipo Utenza *</label>
+                                                <select class="form-select" id="tipo_utenza" name="tipo_utenza" required>
+                                                    @foreach (var tipo in tipiDisponibili)
+                                                    {
+                                                        <option value="@tipo" selected="@(tipo == tipoUtenza ? "selected" : null)">@tipo</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for="stato" class="form-label">Stato *</label>
+                                                <input type="number" class="form-control" id="stato" name="stato"
+                                                       value="@utenza.stato" min="1" max="5" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="stato" class="form-label">Stato: *</label>
-                                <input type="number" class="form-control" id="stato" name="stato"
-                                       value="@utenza.stato" min="1" max="5" required>
+                            <!-- SEZIONE 2: Utente -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-user me-2"></i> Utente
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="cognome" class="form-label">Cognome *</label>
+                                                <input type="text" class="form-control" id="cognome" name="cognome" value="@utenza.cognome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="nome" class="form-label">Nome *</label>
+                                                <input type="text" class="form-control" id="nome" name="nome" value="@utenza.nome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="sesso" class="form-label">Sesso *</label>
+                                                <select class="form-select" id="sesso" name="sesso" required>
+                                                    @foreach (var sex in sessoUtenza)
+                                                    {
+                                                        <option value="@sex" selected="@(sex == sesso ? "selected" : null)">@sex</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for="data_nascita" class="form-label">Data di nascita *</label>
+                                                <input class="form-control" type="date" id="data_nascita" name="data_nascita"
+                                                       value="@(utenza.DataNascita?.ToString("yyyy-MM-dd") ?? "")" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
+                                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
+                                                       value="@utenza.codiceFiscale" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="partita_iva" class="form-label">Partita IVA</label>
+                                                <input type="text" class="form-control" id="partita_iva" name="partita_iva" value="@utenza.partitaIva">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="periodoIniziale" class="form-label">Periodo Iniziale: *</label>
-                                <input class="form-control" type="date" id="periodoIniziale" name="periodoIniziale"
-                                       value="@(utenza.periodoIniziale?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                            <!-- SEZIONE 3: Ubicazione -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading3">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        <i class="fa-solid fa-house me-2"></i> Ubicazione
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                                            <div>
+                                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo *</label>
+                                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione"
+                                                       value="@utenza.indirizzoUbicazione" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="numero_civico" class="form-label">Civico *</label>
+                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico"
+                                                       value="@utenza.numeroCivico" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="piano" class="form-label">Piano *</label>
+                                                <input type="text" class="form-control" id="piano" name="piano" value="@utenza.piano" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="periodoFinale" class="form-label">Periodo Finale: </label>
-                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale"
-                                       value="@(utenza.periodoFinale?.ToString("yyyy-MM-dd") ?? "")">
-                            </div>
+                            <!-- SEZIONE 4: Date -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading4">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                        <i class="fa-solid fa-calendar-days me-2"></i> Date
+                                    </button>
+                                </h2>
+                                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                                            <div>
+                                                <label for="periodoIniziale" class="form-label">Periodo Iniziale *</label>
+                                                <input class="form-control readonly-field" type="date" id="periodoIniziale" name="periodoIniziale"
+                                                       value="@(utenza.periodoIniziale?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
 
-                            <div>
-                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo: *</label>
-                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione"
-                                       value="@utenza.indirizzoUbicazione" required>
+                                            <div>
+                                                <label for="periodoFinale" class="form-label">Periodo Finale</label>
+                                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale"
+                                                       value="@(utenza.periodoFinale?.ToString("yyyy-MM-dd") ?? "")">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div>
-                                <label for="numero_civico" class="form-label">Civico: *</label>
-                                <input type="text" class="form-control" id="numero_civico" name="numero_civico"
-                                       value="@utenza.numeroCivico" required>
-                            </div>
-
-                           <div>
-                                <label for="tipo_utenza" class="form-label">Tipo Utenza: *</label>
-                                <select class="form-select" id="tipo_utenza" name="tipo_utenza" required>
-                                    @foreach (var tipo in tipiDisponibili)
-                                    {
-                                        <option value="@tipo" selected="@(tipo == tipoUtenza ? "selected" : null)">@tipo</option>
-                                    }
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="cognome" class="form-label">Cognome: *</label>
-                                <input type="text" class="form-control" id="cognome" name="cognome"
-                                       value="@utenza.cognome" required>
-                            </div>
-
-                            <div>
-                                <label for="nome" class="form-label">Nome: *</label>
-                                <input type="text" class="form-control" id="nome" name="nome"
-                                       value="@utenza.nome" required>
-                            </div>
-
-                            <div>
-                                <label for="sesso" class="form-label">Sesso: *</label>
-                                <select class="form-select" id="sesso" name="sesso" required>
-                                    @foreach (var sex in sessoUtenza)
-                                    {
-                                        <option value="@sex" selected="@(sex == sesso ? "selected" : null)">@sex</option>
-                                    }
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="codice_fiscale" class="form-label">Codice Fiscale: *</label>
-                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
-                                       value="@utenza.codiceFiscale" required>
-                            </div>
-
-                            <div>
-                                <label for="partita_iva" class="form-label">Partita IVA: </label>
-                                <input type="text" class="form-control" id="partita_iva" name="partita_iva"
-                                       value="@utenza.partitaIva">
-                            </div>
-
                         </div>
 
+                        <!-- BOTTONI -->
                         <hr class="my-4" />
-
-                        <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-3">Aggiorna</button>
-                            <a class="btn btn-back btn-lg rounded-3"
-                               href="@Url.Action("Show", "Utenze", new { selectedEnteId = utenza.IdEnte })">
-                                Torna alla consultazione
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Show", "Utenze", new { selectedEnteId = utenza.IdEnte })"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
                             </a>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                <i class="fa-solid fa-check"></i> Aggiorna
+                            </button>
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

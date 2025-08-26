@@ -201,7 +201,7 @@ body.dark-mode a {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.header-report{
+.header-utenze{
   background: linear-gradient(90deg, rgb(13, 110, 253), rgb(7, 74, 175)); 
   color: #fff;
   fill: #fff
@@ -221,6 +221,12 @@ body.dark-mode a {
 
 .header-account{
   background: linear-gradient(90deg, rgb(30, 30, 30), rgb(0, 0, 0));
+  color: #fff;
+  fill: #fff;
+}
+
+.header-enti {
+  background: linear-gradient(90deg, rgb(255, 193, 7), rgb(204, 142, 0));
   color: #fff;
   fill: #fff;
 }
