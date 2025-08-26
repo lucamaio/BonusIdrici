@@ -1221,10 +1221,18 @@ public class CSVReader
                         aggiornare = true;
                     }
 
+                    // Verifico se il campo serie e diverso 
+
+                    if (report.serie != reportEsistente.serie)
+                    {
+                        reportEsistente.serie = report.serie;
+                        aggiornare = true;
+                    }
                     // Verifico se devo aggiornare dei dati
 
                     if (aggiornare)
                     {
+                        reportEsistente.DataAggiornamento = DateTime.Now;
                         datiComplessivi.reportsDaAggiornare.Add(reportEsistente);
                     }
 

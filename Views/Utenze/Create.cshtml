@@ -13,112 +13,191 @@
     var sessoUtenza = new List<string> { "M", "F", "D" };
 }
 
-<div class="container my-5">
+@{
+    ViewData["Title"] = "Aggiungi una Persona";
+    var sessi = new List<string> { "M", "F" };
+}
+
+<div class="report-page container my-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header bg-primary text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Crea Nuova Utenza</h3>
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-utenze border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Aggiungi una Utenza</span>
+                    </h3>
                 </div>
-                <div class="card-body p-5">
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
                     <form asp-controller="Utenze" asp-action="Crea" method="POST" enctype="multipart/form-data">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
-                            <input type="hidden" name="idUser" value="@ViewBag.IdUser" />
-                            
-                            <div>
-                                <label for="idAcquedotto" class="form-label">idAcquedotto: *</label>
-                                <input type="text" class="form-control" id="idAcquedotto" name="idAcquedotto" required>
-                            </div>
-                            <div>
-                                <label for="matricolaContatore" class="form-label">Matricola: *</label>
-                                <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" required>
-                            </div>
+                        <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
+                        <input type="hidden" name="idUser" value="@ViewBag.IdUser" />
 
-                            <div>
-                                <label for="stato" class="form-label">Stato: *</label>
-                                <input type="number" class="form-control" id="stato" name="stato" min="1" max="5" required>
-                            </div>
+                        <div class="accordion" id="accordionUtenza">
 
-                            <div>
-                                <label for="periodoIniziale" class="form-label">Periodo Iniziale: *</label>
-                                <input class="form-control" type="date" id="periodoIniziale" name="periodoIniziale" required>
-                            </div>
+                            <!-- SEZIONE 1 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="idAcquedotto" class="form-label">idAcquedotto: *</label>
+                                                <input type="text" class="form-control" id="idAcquedotto" name="idAcquedotto" required>
+                                            </div>
+                                            <div>
+                                                <label for="matricolaContatore" class="form-label">Matricola: *</label>
+                                                <input type="text" class="form-control" id="matricolaContatore" name="matricolaContatore" required>
+                                            </div>
 
-                            <div>
-                                <label for="periodoFinale" class="form-label">Periodo Finale:</label>
-                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale">
-                            </div>
+                                             <div>
+                                                <label for="tipo_utenza" class="form-label">Tipo Utenza: *</label>
+                                                <select class="form-select" id="tipo_utenza" name="tipo_utenza" required>
+                                                    <option value="" disabled selected>Seleziona tipo utenza</option>
+                                                    @foreach (var tipo in tipiDisponibili)
+                                                    {
+                                                        <option value="@tipo">@tipo</option>
+                                                    }
+                                                </select>
+                                            </div>
 
-                            <div>
-                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo: *</label>
-                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione" required>
-                            </div>
-
-                            <div>
-                                <label for="numero_civico" class="form-label">Civico: *</label>
-                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
-                            </div>
-
-                            <div>
-                                <label for="tipo_utenza" class="form-label">Tipo Utenza: *</label>
-                                <select class="form-select" id="tipo_utenza" name="tipo_utenza" required>
-                                    <option value="" disabled selected>Seleziona tipo utenza</option>
-                                    @foreach (var tipo in tipiDisponibili)
-                                    {
-                                        <option value="@tipo">@tipo</option>
-                                    }
-                                </select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="cognome" class="form-label">Cognome: *</label>
-                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+                            <!-- SEZIONE 2 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-home me-2"></i> Ubicazione
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div>
+                                                <label for="indirizzo_ubicazione" class="form-label">Indirizzo: *</label>
+                                                <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="numero_civico" class="form-label">Civico: *</label>
+                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="nome" class="form-label">Nome: *</label>
-                                <input type="text" class="form-control" id="nome" name="nome" required>
+                        <!-- SEZIONE 3 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-home me-2"></i> Stato
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div>
+                                                <label for="stato" class="form-label">Stato: *</label>
+                                                <input type="number" class="form-control" id="stato" name="stato" min="1" max="5" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="periodoIniziale" class="form-label">Periodo Iniziale: *</label>
+                                                <input class="form-control" type="date" id="periodoIniziale" name="periodoIniziale" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="periodoFinale" class="form-label">Periodo Finale:</label>
+                                                <input class="form-control" type="date" id="periodoFinale" name="periodoFinale">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        <!-- Sezione 4-->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-home me-2"></i> Utente
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionUtenza">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div>
+                                                <label for="cognome" class="form-label">Cognome: *</label>
+                                                <input type="text" class="form-control" id="cognome" name="cognome" required>
+                                            </div>
 
-                            <div>
-                                <label for="sesso" class="form-label">Sesso: *</label>
-                                <select class="form-select" id="sesso" name="sesso" required>
-                                    <option value="" disabled selected>Seleziona sesso</option>
-                                    @foreach (var sex in sessoUtenza)
-                                    {
-                                        <option value="@sex">@sex</option>
-                                    }
-                                </select>
+                                            <div>
+                                                <label for="nome" class="form-label">Nome: *</label>
+                                                <input type="text" class="form-control" id="nome" name="nome" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="sesso" class="form-label">Sesso: *</label>
+                                                <select class="form-select" id="sesso" name="sesso" required>
+                                                    <option value="" disabled selected>Seleziona sesso</option>
+                                                    @foreach (var sex in sessoUtenza)
+                                                    {
+                                                        <option value="@sex">@sex</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for="dataNascita" class="form-label">Data Nascità: *</label>
+                                                <input class="form-control" type="date" id="dataNascita" name="dataNascita" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="codice_fiscale" class="form-label">Codice Fiscale: *</label>
+                                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" required>
+                                            </div>
+                                            <div>
+                                                <label for="partita_iva" class="form-label">Partita IVA:</label>
+                                                <input type="text" class="form-control" id="partita_iva" name="partita_iva">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
-                             <div>
-                                <label for="dataNascita" class="form-label">Data Nascità: *</label>
-                                <input class="form-control" type="date" id="dataNascita" name="dataNascita" required>
-                            </div>
-
-                            <div>
-                                <label for="codice_fiscale" class="form-label">Codice Fiscale: *</label>
-                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" required>
-                            </div>
-
-                            <div>
-                                <label for="partita_iva" class="form-label">Partita IVA:</label>
-                                <input type="text" class="form-control" id="partita_iva" name="partita_iva">
-                            </div>
-
-                        </div>
-
+                        
+                        <!-- BOTTONI -->
                         <hr class="my-4" />
 
-                        <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-3">Crea</button>
-                            <a class="btn btn-back btn-lg rounded-3" href="@Url.Action("Index", "Utenze")">
-                                Annulla
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Show","Utenze", new { selectedEnteId = ViewBag.IdEnte})"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
                             </a>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                <i class="fa-solid fa-check"></i> Crea
+                            </button>
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

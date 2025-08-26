@@ -161,7 +161,7 @@ namespace BonusIdrici2.Controllers
                     {
                         bool datiSalvati = false;
 
-                        if (datiComplessivi.repors.Count > 0)
+                        if (datiComplessivi.reports.Count > 0)
                         {
                             datiSalvati = true;
                             foreach (var report in datiComplessivi.reports)
@@ -188,7 +188,7 @@ namespace BonusIdrici2.Controllers
                         }
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
-                        ViewBag.Message = $"Dati caricati e salvati con successo! Reports: {datiComplessivi.reports.Count}, ";
+                        ViewBag.Message = $"Dati caricati e salvati con successo!\n Aggiunti: {datiComplessivi.reports.Count}, Aggiornati: {datiComplessivi.reportsDaAggiornare.Count}";
                     }
                     catch (Exception dbEx)
                     {
