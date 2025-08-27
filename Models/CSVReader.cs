@@ -1035,10 +1035,12 @@ public class CSVReader
 
                         (string esitoRestituito, int? idFornituraTrovato, string? messagge) = FunzioniTrasversali.VerificaEsistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiaranteTrovato, indirizzoAbitazione, numeroCivico);
                         idFornituraIdrica = idFornituraTrovato;
-                        note = note + messagge;
+                        if (messagge != "Nessuna fornitura trovata per il dichiarante.")
+                        {
+                            note = note + messagge;
+                        }
                         if (esitoRestituito == "01")
                         {
-                            note = null;
                             esito = "01";
                         }
                         else if (esitoRestituito == "03")
@@ -1089,7 +1091,10 @@ public class CSVReader
                                     {
                                         (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro.CodiceFiscale, selectedEnteId, context, membro,indirizzoAbitazione, numeroCivico);
                                         idFornituraIdrica = idFornituraMembro;
-                                        note = note + messaggeFamigliare;
+                                        if(messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
+                                        {
+                                            note = note + messaggeFamigliare;
+                                        }
                                         if (esitoFamigliare == "01")
                                         {
                                             note = null;
@@ -1114,12 +1119,7 @@ public class CSVReader
 
                             }
                         }
-                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
-                        // if(esito == "01"  && note != null)
-                        // {
-                        //     note = null;
-                        // }
-                            // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
+                        // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
                         if(dichiaranteTrovato.NumeroComponenti != int.Parse(numeroComponenti))
                         {
                             note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). ";
@@ -1136,12 +1136,10 @@ public class CSVReader
                 }
 
                 // Aggiungo eventuali messaggi a note
-                if(note != null && string.IsNullOrWhiteSpace(note))
+                if(note != null && !string.IsNullOrWhiteSpace(note))
                 {
                     verificare = true;
                     note = note + messaggio;
-                }else{
-                    verificare = false;
                 }
 
                 // Dati neccessari per l'esportazione siscom

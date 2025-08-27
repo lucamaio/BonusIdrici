@@ -4,6 +4,8 @@
     var esitoStr = report.esitoStr;
     var pod = report.presenzaPod;
     var esiti = new List<string> { "Si", "No" };
+    var incongruenza = report.incongruenze.ToString();
+    var datiBool = new List<string> {"True","False"};
 }
 
 <div class="report-page container my-5">
@@ -58,12 +60,12 @@
                             <!-- SEZIONE 2 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading2">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
                                         <i class="fa-solid fa-user me-2"></i> Dati Dichiarante
                                     </button>
                                 </h2>
-                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                <div id="collapse2" class="accordion-collapse collapse show" aria-labelledby="heading2"
                                      data-bs-parent="#accordionReport">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -88,12 +90,12 @@
                         <!-- SEZIONE 3 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading3">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
                                             <i class="fa-solid fa-home me-2"></i>  Indirizzo Abitazione (INPS)
                                     </button>
                                 </h2>
-                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
+                                <div id="collapse3" class="accordion-collapse collapse show" aria-labelledby="heading3"
                                      data-bs-parent="#accordionReport">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -129,12 +131,12 @@
                         <!-- SEZIONE 4 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading4">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
                                             <i class="fa-regular fa-thumbs-up me-2"></i> Esiti
                                     </button>
                                 </h2>
-                                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4"
+                                <div id="collapse4" class="accordion-collapse collapse show" aria-labelledby="heading4"
                                      data-bs-parent="#accordionReport">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -163,7 +165,7 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading5">
                                     <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                            data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">
                                             <i class="fa-regular fa-calendar-days me-2"></i>   Validità
                                     </button>
                                 </h2>
@@ -211,10 +213,46 @@
                                                 <input type="text" class="form-control readonly-field" id="mc" name="mc" value="@report.mc" readonly>
                                             </div>
                                             <div class="col">
+                                                <label for="dataCreazione" class="form-label">Data Creazione</label>
+                                                <input class="form-control readonly-field" type="date" id="dataCreazione" name="dataCreazione"
+                                                    value="@(report.DataCreazione?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
+                                            <div class="col">
                                                 <label for="dataAggiornamento" class="form-label">Data Aggiornamento</label>
                                                 <input class="form-control readonly-field" type="date" id="dataAggiornamento" name="dataAggiornamento"
                                                     value="@(report.DataAggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <!-- SEZIONE 7 -->
+                         <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading7">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+                                            <i class="fa-solid fa-triangle-exclamation me-2"></i> Incongruenze
+                                    </button>
+                                </h2>
+                                <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7"
+                                     data-bs-parent="#accordionReport">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                             <div class="col">
+                                                <label for="incongruenze" class="form-label">Incongruenze</label>
+                                                <select class="form-select" id="incongruenze" name="incongruenze" required>
+                                                    @foreach (var valore in datiBool)
+                                                    {
+                                                        <option value="@valore" selected="@(valore == incongruenza ? "selected" : null)">@valore</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col">
+                                                <label for="note" class="form-label">Note</label>
+                                                <textarea class="form-control readonly-field" id="note" name="note" rows="3" readonly>@report.note</textarea>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>

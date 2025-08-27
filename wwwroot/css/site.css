@@ -24,7 +24,7 @@ body.dark-mode .card {
 }
 
 body.dark-mode a {
-    color: #0d6efd !important;
+    color: #032f81 !important;
 }
 
 /* === SOLO PER VARIA REPORT === */
@@ -39,7 +39,7 @@ body.dark-mode a {
   transform: translateY(-3px);
 } */
 .report-page .modern-card-header {
-  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  background: linear-gradient(135deg, #032f81, #113f94);
   color: white;
   padding: 1.2rem;
   text-align: center;
@@ -58,7 +58,7 @@ body.dark-mode a {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .report-page .form-control:focus {
-  border-color: #0d6efd;
+  border-color: #032f81;
   box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.2);
 }
 
@@ -87,8 +87,8 @@ body.dark-mode a {
   font-weight: 500;
 }
 .report-page .btn-primary {
-  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-  border: none;
+  background: linear-gradient(135deg, #032f81, #113f94) !important;
+  border: none !important;
 }
 .report-page .btn-outline-secondary {
   border: 1px solid #ced4da;
@@ -106,7 +106,7 @@ body.dark-mode a {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #113f94 !important;
 }
 .btn-back{
   color: #fff !important;
@@ -133,7 +133,7 @@ body.dark-mode a {
 }
 
 .card-action:hover .card-title {
-    color: #0d6efd; /* Colore link Bootstrap al passaggio del mouse */
+    color: #032f81; /* Colore link Bootstrap al passaggio del mouse */
 }
 
 .icon-circle {
@@ -167,6 +167,8 @@ body.dark-mode a {
 .card {
     border: none;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-radius: 2rem;
 }
 
 .icon-circle-large {
@@ -177,7 +179,7 @@ body.dark-mode a {
     align-items: center;
     border-radius: 50%;
     font-size: 2rem;
-    background-color: #0d6efd; /* Colore di sfondo grigio scuro */
+    background-color: #032f81; /* Colore di sfondo grigio scuro */
     color: #ffffff; /* Colore dell'icona (bianco) */
 }
 
@@ -189,16 +191,16 @@ body.dark-mode a {
 
 /* Stili per il pulsante */
 .btn-action {
-    background-color: #0d6efd;
-    color: #ffffff;
-    border: none;
-    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    background-color: #032f81 !important;
+    color: #ffffff !important;
+    border: none !important;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out !important;
 }
 
 .btn-action:hover {
-    background-color: #0548ad;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #0548ad !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 .header-utenze{
@@ -278,6 +280,20 @@ body.dark-mode a {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.text-primary{
+  color: #113f94 !important;
+  fill: #113f94 !important;
+}
+
+.text-report{
+  color: rgb(212, 8, 32);
+  fill: rgb(212, 8, 32);
+}
+.text-anagrafe{
+  color: #157347;
+  fill: #157347;
+}
 /* .btn-anagrafe :active{
   color: #fff !important;
   background-color: #157347 !important;
@@ -303,10 +319,141 @@ body.dark-mode a {
   fill: rgb(25, 135, 84);
 }
 .text-toponomi{
-  color: rgb(13, 110, 253);
-  fill: rgb(13, 110, 253);
+  color: #113f94;
+  fill: #113f94;
 }
 .text-toponomi-danger{
   color: rgb(220, 53, 69);
   fill: rgb(220, 53, 69);
+}
+
+/* stile homePage */
+
+.page-header {
+      background: linear-gradient(135deg, #193f87, #032f81);
+      color: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .page-header h1 {
+      font-weight: 700;
+      letter-spacing: 0.5px;
+  }
+
+  .card-home:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+  .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .card-home:hover .icon-circle {
+        transform: scale(1.1);
+    }
+
+    .card-text .text-secondary {
+  color: #000; /* colore di default in light mode */
+  margin-top: 0.25rem;
+}
+
+  @media (prefers-color-scheme: dark) {
+  .card-text .text-secondary {
+    color: #fff; /* colore per dark mode */
+  }
+}
+
+.bg-dark{
+    background: linear-gradient(135deg, #343a40, #23272b);
+    color: #fff;
+    fill: #fff;
+}
+
+.bg-third {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: #fff;
+    fill: #fff;
+}
+
+/* Accordion - Sezione Note e Incongruenze */
+.accordion-item {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+}
+
+.accordion-button {
+    font-weight: 600;
+    color: #032f81; /* Verde Bootstrap */
+    background: #f8f9fa;
+    transition: background 0.2s ease-in-out;
+}
+
+.accordion-button:not(.collapsed) {
+    background: #193f87;
+    color: #fff;
+}
+
+.accordion-body {
+    background: #fff;
+    padding: 1.2rem;
+    border-top: 1px solid #eaeaea;
+}
+
+/* Etichette dei campi */
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+/* Input normali */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    border-color: #193f87;
+    /* box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.25); */
+}
+
+/* Campo Note in sola lettura */
+.readonly-field {
+    background-color: #f5f5f5;
+    border: 1px dashed #bbb;
+    border-radius: 8px; 
+    color: #555;
+    cursor: not-allowed;
+}
+
+/* Stile per textarea readonly */
+
+/* Focus disabilitato per readonly */
+.readonly-field:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #bbb;
+    background-color: #f5f5f5;
+}
+
+.bg-primary{
+  background-color: #193f87 !important;
+  color: #fff !important;
 }

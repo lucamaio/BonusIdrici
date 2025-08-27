@@ -160,7 +160,7 @@ namespace BonusIdrici2.Models
                 return ("04", null, "Nessuna fornitura trovata per il dichiarante.");
             }else if(forniture.Count > 1){
                 // Più forniture trovate
-                return ("04", null, "Attenzione: Più di una fornitura trovata per il dichiarante.");
+                return ("04", null, "Attenzione: piu' di una fornitura trovata per il dichiarante.");
 
             }
 
@@ -170,7 +170,7 @@ namespace BonusIdrici2.Models
             // Verifica il tipo di utenza
             if (!string.Equals(fornitura.tipoUtenza, "UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
             {
-                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.");
+                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.\n");
             }
 
             // Recupera i dati dell'utenza
@@ -186,13 +186,13 @@ namespace BonusIdrici2.Models
             if (indirizzoCorrisponde)
             {
                 if(dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS){
-                    message = "Attenzione: L'indirizzo di ubicazione o il numero civico della fornitura corrisponde esattamente all'indirizzo di residenza del dichiarante, ma non corrisponde a quello fornito dal INPS.";
+                    message = message + "Attenzione: L'indirizzo di ubicazione o il numero civico della fornitura corrisponde esattamente all'indirizzo di residenza del dichiarante, ma non corrisponde a quello fornito dal INPS. \n";
                 }
 
                 return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message);
             }else{
                 if(dichiarante.IndirizzoResidenza == indirizzoUtenza && ( dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS)){
-                    message = "Attenzione: L'indirizzo di ubicazione o il numero civico  non corrisponde esattamente all'indirizzo di residenza del dichiarante, fornito dal INPS.";
+                    message = message +"Attenzione: L'indirizzo di ubicazione o il numero civico non corrisponde esattamente all'indirizzo di residenza del dichiarante, fornito dal INPS.\n";
                 }
             }
 
@@ -210,7 +210,7 @@ namespace BonusIdrici2.Models
                     if (indirizzoToponimoCorrisponde)
                     {
                         if(toponimo.normalizzazione != indirizzoINPS){
-                            message = "Attenzione: L'indirizzo di ubicazione della toponimo non corrisponde a quello fornito dal INPS.";
+                            message = message + "Attenzione: L'indirizzo di ubicazione del toponimo non corrisponde a quello fornito dal INPS.\n";
                         }
                         return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message);
                     }

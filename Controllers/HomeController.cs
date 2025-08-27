@@ -26,7 +26,7 @@ namespace BonusIdrici2.Controllers
 
             // Recupera il nome utente
             string username = HttpContext.Session.GetString("Username");
-            
+
             // Recupera il ruolo dell'utente
             string ruolo = HttpContext.Session.GetString("Role");
 
@@ -54,8 +54,8 @@ namespace BonusIdrici2.Controllers
         {
             return View();
         }
-        
-       public IActionResult HandleError(int code)
+
+        public IActionResult HandleError(int code)
         {
             if (code == 404)
                 return View("Error404");
@@ -65,7 +65,6 @@ namespace BonusIdrici2.Controllers
 
             return View("Error");
         }
-
 
         // Aggiungere una pagina info
     }

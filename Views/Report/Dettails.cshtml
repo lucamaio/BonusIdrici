@@ -34,7 +34,82 @@
         <div class="card-body p-4">
             @if (Model != null && Model.Any())
             {
-                <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i report correlati.</p>
+                <div style="background-color: #f8f9fa; border-radius: 12px;">
+                        <div class="row g-3">
+                            <!-- Stat Box 1 -->
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <i class="fa-solid fa-file fa-2x text-primary mb-2"></i>
+                                        @* <i class="fa-solid fa-city fa-2x "></i> *@
+                                        <h6>Totale Domande</h6>
+                                        <h4>@ViewBag.TotaleDomande</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stat Box 2 -->
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <i class="fa-solid fa-xmark fa-2x text-danger mb-2"></i>
+                                        @* <i class="fa-solid fa-check-to-slot fa-2x text-success mb-2"></i> *@
+                                        <h6>Incongruenze Trovate</h6>
+                                        <h4>@ViewBag.IncongruenzeTrovate</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Stat Box 3 -->
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
+                                        <h6>Domande Esito 1</h6>
+                                        <h4>@ViewBag.TotaleAccettate</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row g-3">
+                            <!-- Esito 2 -->
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <i class="fa-solid fa-lightbulb fa-2x text-primary mb-2"></i>
+                                        <h6>Esito 2</h6>
+                                        <h4>@ViewBag.TotaleEsito2</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Esito 3 -->
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <i class="fa-solid fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                        <h6>Esito 3</h6>
+                                        <h4>@ViewBag.TotaleEsito3</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Esito 4 -->
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <i class="fa-solid fa-times-circle fa-2x text-danger mb-2"></i>
+                                        <h6>Esito 4</h6>
+                                        <h4>@ViewBag.TotaleEsito4</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                 
+                <hr class="my-4" />
+                 <p class="lead mb-4 text-muted">Consulta tutte le domande relative al Report selezionato</p>
+                 <br>
 
                 <div class="table-responsive">
                     <table id="dettagliReportTable" class="table table-hover align-middle border-bottom">
@@ -47,8 +122,9 @@
                                 <th class="text-center">Esito str</th>
                                 <th class="text-center">Esito</th>
                                 <th class="text-center">Componenti</th>
-                                <th class="text-center">Serie</th>
-                                <th class="text-center">MC</th>
+                                <th class="text-center">Incongruente</th>
+                                @* <th class="text-center">Serie</th>
+                                <th class="text-center">MC</th> *@
                                 <th class="text-center">Azioni</th>
                             </tr>
                         </thead>
@@ -56,15 +132,65 @@
                             @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td><span class="fw-semibold text-center">@item.idFornitura</span></td>
-                                    <td><span class="text-center">@item.idAto</span></td>
-                                    <td><span class="text-center">@item.codiceBonus</span></td>
-                                    <td><span class="fw-semibold">@item.codiceFiscale</span></td>
-                                    <td><span class="text-center">@item.esitoStr</span></td>
-                                    <td><span class="text-center">@item.esito</span></td>
+                                    <td class="text-center"><span>@item.idFornitura</span></td>
+                                    <td class="text-center"><span>@item.idAto</span></td>
+                                    <td class="fw-semibold text-center"><span >@item.codiceBonus</span></td>
+                                    <td class="fw-semibold text-center"><span>@item.codiceFiscale</span></td>
+                                    <td class="text-center">
+                                            @if (string.IsNullOrEmpty(item.esitoStr))
+                                            {
+                                                <span class="badge bg-secondary">N/A</span>
+                                            }
+                                            else if (item.esitoStr.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-success">Si</span>
+                                            }
+                                            else if (item.esitoStr.Equals("No", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-danger">No</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">@item.esitoStr</span>
+                                            }
+                                    </td>
+                                    <td class="text-center">
+                                        @switch (item.esito)
+                                        {
+                                            case "01":
+                                                <span class="badge bg-success">1</span>
+                                                break;
+                                            case "02":
+                                                <span class="badge bg-primary">2</span>
+                                                break;
+                                            case "03":
+                                                <span class="badge bg-warning text-dark">3</span>
+                                                break;
+                                            case "04":
+                                                <span class="badge bg-danger">4</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">N/A</span>
+                                                break;
+                                        }
+                                    </td>
                                     <td><span class="text-center">@item.numeroComponenti</span></td>
-                                    <td><span class="text-center">@item.serie</span></td>
-                                    <td><span class="text-center">@item.mc</span></td>
+                                    <td class="text-center">
+                                         @if (item.incongruenze == false)
+                                            {
+                                                <span class="badge bg-danger">Falso</span>
+                                            }
+                                            else if (item.incongruenze == true)
+                                            {
+                                                <span class="badge bg-success">Vero</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">N/A</span>
+                                            }
+                                    </td>
+                                    @* <td class="text-center"><span>@item.serie</span></td>
+                                    <td class="text-center"><span>@item.mc</span></td> *@
                                     <td class="text-center">
                                         <a class="btn btn-sm btn-light border me-1" title="Varia"
                                             href="@Url.Action("Varia", "Report", new { id = item.id })">
@@ -83,6 +209,7 @@
                     <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato disponibile per l'ente selezionato.
                 </div>
             }
+            <hr class="my-4" />
 
             @if(ruolo !="OPERATORE"){
                         <div class="d-grid mt-4">

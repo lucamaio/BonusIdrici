@@ -183,6 +183,7 @@ namespace BonusIdrici2.Controllers
                         numeroComponenti = g.numeroComponenti,
                         serie = g.serie,
                         mc = g.mc,
+                        incongruenze = g.incongruenze,
                         DataCreazione = g.DataCreazione,
                         Iduser = g.IdUser,
                         Username = _context.Users
@@ -192,7 +193,7 @@ namespace BonusIdrici2.Controllers
                         NumeroDatiInseriti = 1
                     })
                     .ToList();
-
+                
                 ViewBag.Message = "Data e idAto mancanti o non validi";
                 return RedirectToAction("Index", "Report");
             }
@@ -216,6 +217,7 @@ namespace BonusIdrici2.Controllers
                         numeroComponenti = r.numeroComponenti,
                         serie = r.serie,
                         mc = r.mc,
+                        incongruenze = r.incongruenze,
                         DataCreazione = r.DataCreazione,
                         Iduser = r.IdUser,
                         Username = _context.Users
@@ -244,6 +246,7 @@ namespace BonusIdrici2.Controllers
                         numeroComponenti = r.numeroComponenti,
                         serie = r.serie,
                         mc = r.mc,
+                        incongruenze = r.incongruenze,
                         DataCreazione = r.DataCreazione,
                         Iduser = r.IdUser,
                         Username = _context.Users
@@ -257,6 +260,14 @@ namespace BonusIdrici2.Controllers
             {
                 return RedirectToAction("Show", "Report", new { id = selectedEnteId });
             }
+
+            ViewBag.TotaleDomande = riepilogoDati.Count;
+            ViewBag.TotaleAccettate = riepilogoDati.Count(r => r.esito == "01" && r.esitoStr == "Si");
+            ViewBag.TotaleRifiutate = riepilogoDati.Count(r => r.esitoStr == "No");
+            ViewBag.TotaleEsito2 = riepilogoDati.Count(r => r.esito == "02" && r.esitoStr == "Si");
+            ViewBag.TotaleEsito3 = riepilogoDati.Count(r => r.esito == "03" && r.esitoStr == "Si");
+            ViewBag.TotaleEsito4 = riepilogoDati.Count(r => r.esito == "04");
+            ViewBag.IncongruenzeTrovate = _context.Reports.Count(r => r.IdEnte == selectedEnteId && r.DataCreazione == data && r.incongruenze == true);
 
             // ✅ ViewBag info
             ViewBag.SelectedEnteId = selectedEnteId;

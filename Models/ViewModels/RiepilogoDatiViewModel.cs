@@ -23,6 +23,8 @@ namespace BonusIdrici2.Models.ViewModels
 
         public string? annoValidita { get; set; }
 
+        public bool? incongruenze { get; set; }
+
         public int? serie { get; set; }
 
         public int? mc { get; set; }
