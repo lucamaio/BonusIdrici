@@ -1,0 +1,237 @@
+@{
+    ViewData["Title"] = "Statistiche";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <!-- HEADER -->
+        <div class="card-header header-enti">
+            <h5 class="mb-0 text-white">
+                <i class="fa-solid fa-chart-line me-2"></i> Statistiche
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <p class="text-muted mb-4">
+                In questa sezione puoi visualizzare le principali statistiche sugli enti e sulle utenze idriche.
+            </p>
+
+            <!-- GRIGLIA STATISTICHE -->
+            <div class="row g-3">
+
+                <!-- Stat Box 1 -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-city fa-2x text-ente mb-2"></i>
+                            <h6>Totale Enti</h6>
+                            <h4>@ViewBag.TotaleEnti</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat Box 2 -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-droplet fa-2x text-utenza mb-2"></i>
+                            <h6>Totale Utenze Idriche</h6>
+                            <h4>@ViewBag.TotaleUtenze</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat Box 3 -->
+                @* <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-users fa-2x text-warning mb-2"></i>
+                            <h6>Utenti Registrati</h6>
+                            <h4>@ViewBag.TotaleUtenti</h4>
+                        </div>
+                    </div>
+                </div> *@
+
+                <!-- Stat Box 4 -->
+                @* <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-file-lines fa-2x text-info mb-2"></i>
+                            <h6>Totale Dichiaranti</h6>
+                            <h4>@ViewBag.TotaleDichiaranti</h4>
+                        </div>
+                    </div>
+                </div> *@
+
+                <!-- Stat Box 5 -->
+                @* <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-file-circle-check fa-2x text-success mb-2"></i>
+                            <h6>Totale Domande</h6>
+                            <h4>@ViewBag.TotaleDomande</h4>
+                        </div>
+                    </div>
+                </div> *@
+
+                <!-- Stat Box 6 -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-map-location-dot fa-2x text-toponomi mb-2"></i>
+                            <h6>Totale Toponomi</h6>
+                            <h4>@ViewBag.TotaleToponomi</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat Box 7 -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fa-solid fa-map-pin fa-2x text-toponomi-danger mb-2"></i>
+                            <h6>Toponomi da Sistemare</h6>
+                            <h4>@ViewBag.TotaleToponomiDaSistemare</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRAFICI -->
+            <div class="row mt-4 g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm p-3">
+                        <h6 class="text-center mb-3">
+                             <i class="fa-solid fa-file-circle-check fa-2x text-report mb-2"></i> Report per Ente
+                        </h6>
+                        <canvas id="reportEnteChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm p-3">
+                        <h6 class="text-center mb-3">
+                             <i class="fa-solid fa-droplet fa-2x text-utenza mb-2"></i> Utenze Per Ente
+                        </h6>
+                        <canvas id="utenzeEnteChart"></canvas>
+                    </div>
+                </div>
+
+                 <div class="col-md-6">
+                    <div class="card border-0 shadow-sm p-3">
+                        <h6 class="text-center mb-3">
+                            <i class="fa-solid fa-file-lines fa-2x text-anagrafe mb-2"></i> Anagrafe Per Ente
+                        </h6>
+                        <canvas id="anagrafeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm p-3">
+                        <h6 class="text-center mb-3">
+                             <i class="fa-solid fa-file-circle-check fa-2x text-report mb-2"></i> Toponimi Per Ente
+                        </h6>
+                        <canvas id="toponomiChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm p-3">
+                        <h6 class="text-center mb-3">
+                            <i class="fa-solid fa-pie-chart fa-2x me-2"></i> Domande per Esito
+                        </h6>
+                        <canvas id="domandeEsitoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Grafico a barre: report per ente
+        const ctxReport = document.getElementById('reportEnteChart').getContext('2d');
+        new Chart(ctxReport, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.ReportLabels)),
+                datasets: [{
+                    label: 'Report effettuati',
+                    data: @Html.Raw(Json.Serialize(ViewBag.ReportValues)),
+                    backgroundColor: 'rgb(212, 8, 32)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        const ctxUtenzeIdriche = document.getElementById('utenzeEnteChart').getContext('2d');
+        new Chart(ctxUtenzeIdriche, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.UtenzeIdricheLabels)),
+                datasets: [{
+                    label: 'Utenze Idriche Ente: ',
+                    data: @Html.Raw(Json.Serialize(ViewBag.UtenzeIdricheValues)),
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        const ctxAnagrafe = document.getElementById('anagrafeChart').getContext('2d');
+        new Chart(ctxAnagrafe, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.AnagrafeLabels)),
+                datasets: [{
+                    label: 'Anagrafe Ente:',
+                    data: @Html.Raw(Json.Serialize(ViewBag.AnagrafeValues)),
+                    backgroundColor: '#198754'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        const ctxToponomi = document.getElementById('toponomiChart').getContext('2d');
+        new Chart(ctxToponomi, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.ToponimiLabels)),
+                datasets: [{
+                    label: 'Toponimi Ente:',
+                    data: @Html.Raw(Json.Serialize(ViewBag.ToponimiValues)),
+                    backgroundColor: '#198754'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Grafico a torta: domande per esito
+        const ctxDomande = document.getElementById('domandeEsitoChart').getContext('2d');
+        new Chart(ctxDomande, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.DomandeLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(ViewBag.DomandeValues)),
+                    backgroundColor: ['#28a745', '#FFD700', '#B20000',"#000000"]
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+}

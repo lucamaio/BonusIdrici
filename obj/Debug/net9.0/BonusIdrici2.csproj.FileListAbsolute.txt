@@ -713,4 +713,4 @@ C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdrici2.genruntimeconfig.cache
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\ref\BonusIdrici2.dll
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-9g64oz73f9.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-wwt882bmns.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-v2oyiwj4rp.gz

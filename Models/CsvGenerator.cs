@@ -39,7 +39,7 @@ public static class CsvGenerator
                 
                 riga.Append(EscapeCsvField(report.codiceBonus, Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esito, Delimitatore)).Append(Delimitatore);
-                
+                //Console.WriteLine("Codice Bonus: " + report.codiceBonus + " Codice Fiscale: " + report.codiceFiscale + " Esito: " + report.esito);
                 if (!string.IsNullOrEmpty(codiceFornitua) && report.esito == "01")
                 {
                     riga.Append(EscapeCsvField(codiceFornitua, Delimitatore)).Append(Delimitatore);

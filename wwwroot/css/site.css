@@ -288,3 +288,25 @@ body.dark-mode a {
   background-color: rgb(212, 8, 32);
   color: #fff;
 }
+
+.text-enti{
+  color: rgb(255, 193, 7);
+  fill: rgb(255, 193, 7);
+}
+
+.text-ente{
+  color: rgb(255, 193, 7);
+  fill: rgb(255, 193, 7);
+}
+.text-utenza{
+  color: rgb(25, 135, 84);
+  fill: rgb(25, 135, 84);
+}
+.text-toponomi{
+  color: rgb(13, 110, 253);
+  fill: rgb(13, 110, 253);
+}
+.text-toponomi-danger{
+  color: rgb(220, 53, 69);
+  fill: rgb(220, 53, 69);
+}
