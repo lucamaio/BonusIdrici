@@ -58,7 +58,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
 
-        public bool VerificaSessione(string ruoloRichiesto = null)
+        public bool VerificaSessione(string? ruoloRichiesto = null)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
             {

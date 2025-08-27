@@ -94,6 +94,7 @@ namespace BonusIdrici2.Data
             entity.Property(f => f.DataNascita).HasColumnName("data_nascita");
             entity.Property(f => f.codiceFiscale).HasColumnName("codice_fiscale").HasMaxLength(16);
             entity.Property(f => f.partitaIva).HasColumnName("partita_iva");
+            entity.Property(f => f.IdDichiarante).HasColumnName("id_dichiarante");
             entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
             entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
             entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
@@ -123,6 +124,8 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.capAbitazione).HasColumnName("cap_abitazione");
            entity.Property(f => f.provinciaAbitazione).HasColumnName("provincia_abitazione");
            entity.Property(f => f.presenzaPod).HasColumnName("presenza_pod");
+           entity.Property(f => f.note).HasColumnName("note");
+           entity.Property(f => f.incongruenze).HasColumnName("incongruenze");
            entity.Property(f => f.serie).HasColumnName("serie").IsRequired();
            entity.Property(f => f.mc).HasColumnName("mc");
            entity.Property(f => f.dataInizioValidita).HasColumnName("data_inizio_validita").IsRequired();

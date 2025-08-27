@@ -64,18 +64,23 @@
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li>
                                                         <a class="dropdown-item" href="@Url.Action("ScaricaCsv",  new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
-                                                            <i class="bi bi-download me-2 text-success"></i> Esito Bonus Idrico
+                                                            <i class="bi bi-download me-2 text-anagrafe"></i> Esito Bonus Idrico
                                                         </a>
                                                     </li>
                                                     <li>
                                                         <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
-                                                            <i class="bi bi-download me-2 text-info"></i> Competenza Territoriale
+                                                            <i class="bi bi-download me-2 text-report"></i> Competenza Territoriale
                                                         </a>
                                                     </li>
                                                     @if( ruolo == "ADMIN"){
                                                         <li>
                                                             <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Siscom" })">
-                                                                <i class="bi bi-download me-2 text-info"></i> File Siscom
+                                                                <i class="bi bi-download me-2 text-utenza"></i> File Siscom
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Debug" })">
+                                                                <i class="bi bi-download me-2 text-info"></i> Debug
                                                             </a>
                                                         </li>
                                                     }
@@ -112,3 +117,16 @@
         </div>
     </div>
 </div>
+<style>
+    html, body {
+        overflow-x: hidden !important; /* niente barra orizzontale */
+    }
+
+    dropdown-menu {
+        position: absolute !important;
+        inset: auto !important;
+        transform: none !important; /* annulla il translate3d */
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+</style>

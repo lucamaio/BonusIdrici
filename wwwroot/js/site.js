@@ -86,17 +86,17 @@ $(document).ready(function () {
         },
         dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
         buttons: [
-            {
-                extend: 'collection',
-                className: 'btn btn-sm btn-primary dropdown-toggle me-2',
-                text: '<i class="bi bi-download me-1"></i> Export',
-                buttons: [
-                    { extend: 'copy', text: 'Copia' },
-                    { extend: 'excel', text: 'Excel' },
-                    { extend: 'pdf', text: 'PDF' },
-                    { extend: 'print', text: 'Stampa' }
-                ]
-            }
+            // {
+            //     extend: 'collection',
+            //     className: 'btn btn-sm btn-primary dropdown-toggle me-2',
+            //     text: '<i class="bi bi-download me-1"></i> Export',
+            //     buttons: [
+            //         { extend: 'copy', text: 'Copia' },
+            //         { extend: 'excel', text: 'Excel' },
+            //         { extend: 'pdf', text: 'PDF' },
+            //         { extend: 'print', text: 'Stampa' }
+            //     ]
+            // }
         ]
     });
 });

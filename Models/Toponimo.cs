@@ -21,6 +21,8 @@ namespace BonusIdrici2.Models
         [Required]
         public required int IdEnte { get; set; }
 
+        // [Required]
+        // public required int IdUser { get; set; }
         // Aggiungere identificativo all'utente che effetua la modifica
 
         public string? ToString()

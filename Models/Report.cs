@@ -41,6 +41,10 @@ namespace BonusIdrici2.Models
 
         public string? presenzaPod { get; set; }
 
+        public string? note { get; set; }
+
+        public bool? incongruenze { get; set; }
+
         public int serie { get; set; }
 
         public int? mc { get; set; }

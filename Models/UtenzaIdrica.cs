@@ -55,6 +55,8 @@ namespace BonusIdrici2.Models
         
         public string? partitaIva { get; set; }
 
+        public int? IdDichiarante { get; set; }
+
         public DateTime? data_creazione { get; set; }
         
         public DateTime? data_aggiornamento { get; set; }
@@ -66,7 +68,7 @@ namespace BonusIdrici2.Models
 
         public int? idToponimo { get; set; }
         
-       public string? ToString()
+       public string ToString()
         {
             return $"UtenzaIdrica: Acquedotto: {idAcquedotto}, Stato: {stato}, " +
                 $"Periodo Iniziale: {(periodoIniziale.HasValue ? periodoIniziale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " +

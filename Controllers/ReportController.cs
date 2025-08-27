@@ -46,7 +46,7 @@ namespace BonusIdrici2.Controllers
         }
 
         // Funzione di validazione
-        public bool VerificaSessione(string ruoloRichiesto = null)
+        public bool VerificaSessione(string? ruoloRichiesto = null)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
             {
@@ -408,6 +408,11 @@ namespace BonusIdrici2.Controllers
             {
                 fileName = $"Esportazione Bonus Idrici {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
                 fileBytes = CsvGenerator.GeneraCsvSiscom(datiDelReport);
+            }
+            else if (tipoReport == "Debug")
+            {
+                fileName = $"Debug Report {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
+                fileBytes = CsvGenerator.GeneraCsvDebug(datiDelReport);
             }
             else
             {

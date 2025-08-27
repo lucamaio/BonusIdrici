@@ -21,7 +21,8 @@ namespace BonusIdrici2.Models
         public required string Sesso { get; set; }
 
         [Required]
-        public required DateTime? DataNascita { get; set; }
+        public required DateTime DataNascita { get; set; }
+
         public string? ComuneNascita { get; set; }
 
         [Required]
@@ -53,7 +54,7 @@ namespace BonusIdrici2.Models
         public string? toString()
         {
             return $"Dichiarante: {Cognome}, {Nome}, Codice Fiscale: {CodiceFiscale}, " +
-                   $"Sesso: {Sesso}, Data Nascita: {(DataNascita.HasValue ? DataNascita.Value.ToString("dd/MM/yyyy") : "")}, " +
+                   $"Sesso: {Sesso}, " +
                    $"Indirizzo Residenza: {IndirizzoResidenza}, Numero Civico: {NumeroCivico}";
         }
     }

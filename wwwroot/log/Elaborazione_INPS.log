@@ -43,3 +43,261 @@
 2025-08-25 16:04:51 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
 2025-08-25 16:04:52 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
 2025-08-25 16:04:57 [INFO] Elaborazione completata senza errori.
+2025-08-27 12:00:54 [INFO] Numero di righe da elaborare: 357
+2025-08-27 12:00:54 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239788727 | Codice Fiscale: RNRFNC57R03I199Z
+2025-08-27 12:00:54 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (1). Codice Bonus: 202412239774008 | Codice Fiscale: DSTCCT71D54B804D
+2025-08-27 12:00:55 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239447233 | Codice Fiscale: SRBSVT62L28I199A
+2025-08-27 12:00:55 [WARNING] Attenzione: Il numero di componenti fornito (6) non corrisponde a quello effettivo (3). Codice Bonus: 202412239683330 | Codice Fiscale: SCVNNT84R42C351A
+2025-08-27 12:00:56 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239850539 | Codice Fiscale: CTVMNN88E57Z129D
+2025-08-27 12:00:56 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239563956 | Codice Fiscale: MCLLMR82M63I199E
+2025-08-27 12:00:56 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
+2025-08-27 12:00:56 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (3). Codice Bonus: 202412239796267 | Codice Fiscale: MZZNNN70A52B695W
+2025-08-27 12:00:57 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239395756 | Codice Fiscale: LBBNCT68T66H982L
+2025-08-27 12:00:57 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
+2025-08-27 12:00:57 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546823 | Codice Fiscale: GNLCML75C46I199R
+2025-08-27 12:00:57 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546260 | Codice Fiscale: FBAGRT98C43F158S
+2025-08-27 12:00:57 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239565230 | Codice Fiscale: GMMSFO03D65I199C
+2025-08-27 12:00:57 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (4). Codice Bonus: 202412239626844 | Codice Fiscale: LTACNO95B41I199Y
+2025-08-27 12:00:57 [WARNING] Attenzione: Il numero di componenti fornito (5) non corrisponde a quello effettivo (4). Codice Bonus: 202412239691780 | Codice Fiscale: CRNRFL72M29H703S
+2025-08-27 12:00:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239772896 | Codice Fiscale: SNFFNC78P42I199K
+2025-08-27 12:00:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239870972 | Codice Fiscale: MLTNMR94H46F251L
+2025-08-27 12:00:58 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239498859 | Codice Fiscale: CVLGNN51E21H982F
+2025-08-27 12:00:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239517438 | Codice Fiscale: VRZCLL00R51L219P
+2025-08-27 12:00:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239701929 | Codice Fiscale: PNSGPP76P02I199R
+2025-08-27 12:00:58 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239700115 | Codice Fiscale: DMNLCR85A48Z129M
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239908090 | Codice Fiscale: CTTGTN36M21D861C
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239904557 | Codice Fiscale: SNFGTN83A13I199K
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239517352 | Codice Fiscale: SRGNMR59E57F251E
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239532995 | Codice Fiscale: PZZCGR46C10H982S
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239612836 | Codice Fiscale: DNRRSR74M45E536J
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239636206 | Codice Fiscale: SCRLCL00M60I199J
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239776908 | Codice Fiscale: HRDVTR85D59Z144G
+2025-08-27 12:00:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239775232 | Codice Fiscale: VTLGRG02H68F158X
+2025-08-27 12:01:00 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239762124 | Codice Fiscale: MLTTNA74T64I199O
+2025-08-27 12:01:00 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239444643 | Codice Fiscale: LGGJSC84B46Z112R
+2025-08-27 12:01:00 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239563465 | Codice Fiscale: LPDNZT49C60I199T
+2025-08-27 12:01:00 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239665472 | Codice Fiscale: GRNFNC50S17Z600H
+2025-08-27 12:01:00 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239902646 | Codice Fiscale: LGLFNC76T01I199M
+2025-08-27 12:01:01 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239593951 | Codice Fiscale: FRNRMR94R71I199Y
+2025-08-27 12:01:01 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239683624 | Codice Fiscale: SPNFRC84L03I199E
+2025-08-27 12:01:01 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239376537 | Codice Fiscale: STRGPP60M31I199H
+2025-08-27 12:01:02 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239499105 | Codice Fiscale: RMLNNN57T02H982U
+2025-08-27 12:01:02 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239695454 | Codice Fiscale: PRTWTR92H25G273L
+2025-08-27 12:01:02 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239715918 | Codice Fiscale: MSSLND38H68B666U
+2025-08-27 12:01:02 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239659843 | Codice Fiscale: SCLMCL67M26I199L
+2025-08-27 12:01:02 [INFO] Elaborazione completata senza errori.
+2025-08-27 12:09:42 [INFO] Numero di righe da elaborare: 357
+2025-08-27 12:09:43 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239788727 | Codice Fiscale: RNRFNC57R03I199Z
+2025-08-27 12:09:43 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (1). Codice Bonus: 202412239774008 | Codice Fiscale: DSTCCT71D54B804D
+2025-08-27 12:09:43 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239447233 | Codice Fiscale: SRBSVT62L28I199A
+2025-08-27 12:09:44 [WARNING] Attenzione: Il numero di componenti fornito (6) non corrisponde a quello effettivo (3). Codice Bonus: 202412239683330 | Codice Fiscale: SCVNNT84R42C351A
+2025-08-27 12:09:44 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239850539 | Codice Fiscale: CTVMNN88E57Z129D
+2025-08-27 12:09:44 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239563956 | Codice Fiscale: MCLLMR82M63I199E
+2025-08-27 12:09:44 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
+2025-08-27 12:09:45 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (3). Codice Bonus: 202412239796267 | Codice Fiscale: MZZNNN70A52B695W
+2025-08-27 12:09:45 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239395756 | Codice Fiscale: LBBNCT68T66H982L
+2025-08-27 12:09:45 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
+2025-08-27 12:09:45 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546823 | Codice Fiscale: GNLCML75C46I199R
+2025-08-27 12:09:45 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546260 | Codice Fiscale: FBAGRT98C43F158S
+2025-08-27 12:09:45 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239565230 | Codice Fiscale: GMMSFO03D65I199C
+2025-08-27 12:09:46 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (4). Codice Bonus: 202412239626844 | Codice Fiscale: LTACNO95B41I199Y
+2025-08-27 12:09:46 [WARNING] Attenzione: Il numero di componenti fornito (5) non corrisponde a quello effettivo (4). Codice Bonus: 202412239691780 | Codice Fiscale: CRNRFL72M29H703S
+2025-08-27 12:09:46 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239772896 | Codice Fiscale: SNFFNC78P42I199K
+2025-08-27 12:09:46 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239870972 | Codice Fiscale: MLTNMR94H46F251L
+2025-08-27 12:09:46 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239498859 | Codice Fiscale: CVLGNN51E21H982F
+2025-08-27 12:09:47 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239517438 | Codice Fiscale: VRZCLL00R51L219P
+2025-08-27 12:09:47 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239701929 | Codice Fiscale: PNSGPP76P02I199R
+2025-08-27 12:09:47 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239700115 | Codice Fiscale: DMNLCR85A48Z129M
+2025-08-27 12:09:47 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239908090 | Codice Fiscale: CTTGTN36M21D861C
+2025-08-27 12:09:47 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239904557 | Codice Fiscale: SNFGTN83A13I199K
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239517352 | Codice Fiscale: SRGNMR59E57F251E
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239532995 | Codice Fiscale: PZZCGR46C10H982S
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239612836 | Codice Fiscale: DNRRSR74M45E536J
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239636206 | Codice Fiscale: SCRLCL00M60I199J
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239776908 | Codice Fiscale: HRDVTR85D59Z144G
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239775232 | Codice Fiscale: VTLGRG02H68F158X
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239762124 | Codice Fiscale: MLTTNA74T64I199O
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239444643 | Codice Fiscale: LGGJSC84B46Z112R
+2025-08-27 12:09:48 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239563465 | Codice Fiscale: LPDNZT49C60I199T
+2025-08-27 12:09:49 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239665472 | Codice Fiscale: GRNFNC50S17Z600H
+2025-08-27 12:09:49 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239902646 | Codice Fiscale: LGLFNC76T01I199M
+2025-08-27 12:09:50 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239593951 | Codice Fiscale: FRNRMR94R71I199Y
+2025-08-27 12:09:50 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239683624 | Codice Fiscale: SPNFRC84L03I199E
+2025-08-27 12:09:50 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239376537 | Codice Fiscale: STRGPP60M31I199H
+2025-08-27 12:09:51 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239499105 | Codice Fiscale: RMLNNN57T02H982U
+2025-08-27 12:09:51 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239695454 | Codice Fiscale: PRTWTR92H25G273L
+2025-08-27 12:09:51 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239715918 | Codice Fiscale: MSSLND38H68B666U
+2025-08-27 12:09:51 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239659843 | Codice Fiscale: SCLMCL67M26I199L
+2025-08-27 12:09:51 [INFO] Elaborazione completata senza errori.
+2025-08-27 12:12:53 [INFO] Numero di righe da elaborare: 357
+2025-08-27 12:12:54 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239788727 | Codice Fiscale: RNRFNC57R03I199Z
+2025-08-27 12:12:54 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (1). Codice Bonus: 202412239774008 | Codice Fiscale: DSTCCT71D54B804D
+2025-08-27 12:12:54 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239447233 | Codice Fiscale: SRBSVT62L28I199A
+2025-08-27 12:12:54 [WARNING] Attenzione: Il numero di componenti fornito (6) non corrisponde a quello effettivo (3). Codice Bonus: 202412239683330 | Codice Fiscale: SCVNNT84R42C351A
+2025-08-27 12:12:55 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239850539 | Codice Fiscale: CTVMNN88E57Z129D
+2025-08-27 12:12:55 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239563956 | Codice Fiscale: MCLLMR82M63I199E
+2025-08-27 12:12:55 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
+2025-08-27 12:12:56 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (3). Codice Bonus: 202412239796267 | Codice Fiscale: MZZNNN70A52B695W
+2025-08-27 12:12:56 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239395756 | Codice Fiscale: LBBNCT68T66H982L
+2025-08-27 12:12:56 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
+2025-08-27 12:12:56 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546823 | Codice Fiscale: GNLCML75C46I199R
+2025-08-27 12:12:56 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546260 | Codice Fiscale: FBAGRT98C43F158S
+2025-08-27 12:12:56 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239565230 | Codice Fiscale: GMMSFO03D65I199C
+2025-08-27 12:12:56 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (4). Codice Bonus: 202412239626844 | Codice Fiscale: LTACNO95B41I199Y
+2025-08-27 12:12:57 [WARNING] Attenzione: Il numero di componenti fornito (5) non corrisponde a quello effettivo (4). Codice Bonus: 202412239691780 | Codice Fiscale: CRNRFL72M29H703S
+2025-08-27 12:12:57 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239772896 | Codice Fiscale: SNFFNC78P42I199K
+2025-08-27 12:12:57 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239870972 | Codice Fiscale: MLTNMR94H46F251L
+2025-08-27 12:12:57 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239498859 | Codice Fiscale: CVLGNN51E21H982F
+2025-08-27 12:12:57 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239517438 | Codice Fiscale: VRZCLL00R51L219P
+2025-08-27 12:12:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239701929 | Codice Fiscale: PNSGPP76P02I199R
+2025-08-27 12:12:58 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239700115 | Codice Fiscale: DMNLCR85A48Z129M
+2025-08-27 12:12:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239908090 | Codice Fiscale: CTTGTN36M21D861C
+2025-08-27 12:12:58 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239904557 | Codice Fiscale: SNFGTN83A13I199K
+2025-08-27 12:12:58 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239517352 | Codice Fiscale: SRGNMR59E57F251E
+2025-08-27 12:12:58 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239532995 | Codice Fiscale: PZZCGR46C10H982S
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239612836 | Codice Fiscale: DNRRSR74M45E536J
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239636206 | Codice Fiscale: SCRLCL00M60I199J
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239776908 | Codice Fiscale: HRDVTR85D59Z144G
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239775232 | Codice Fiscale: VTLGRG02H68F158X
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239762124 | Codice Fiscale: MLTTNA74T64I199O
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239444643 | Codice Fiscale: LGGJSC84B46Z112R
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239563465 | Codice Fiscale: LPDNZT49C60I199T
+2025-08-27 12:12:59 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239665472 | Codice Fiscale: GRNFNC50S17Z600H
+2025-08-27 12:13:00 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239902646 | Codice Fiscale: LGLFNC76T01I199M
+2025-08-27 12:13:00 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239593951 | Codice Fiscale: FRNRMR94R71I199Y
+2025-08-27 12:13:01 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239683624 | Codice Fiscale: SPNFRC84L03I199E
+2025-08-27 12:13:01 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239376537 | Codice Fiscale: STRGPP60M31I199H
+2025-08-27 12:13:01 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239499105 | Codice Fiscale: RMLNNN57T02H982U
+2025-08-27 12:13:01 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239695454 | Codice Fiscale: PRTWTR92H25G273L
+2025-08-27 12:13:01 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239715918 | Codice Fiscale: MSSLND38H68B666U
+2025-08-27 12:13:02 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239659843 | Codice Fiscale: SCLMCL67M26I199L
+2025-08-27 12:13:02 [INFO] Elaborazione completata senza errori.
+2025-08-27 12:14:40 [INFO] Numero di righe da elaborare: 357
+2025-08-27 12:14:40 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239788727 | Codice Fiscale: RNRFNC57R03I199Z
+2025-08-27 12:14:40 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (1). Codice Bonus: 202412239774008 | Codice Fiscale: DSTCCT71D54B804D
+2025-08-27 12:14:40 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239447233 | Codice Fiscale: SRBSVT62L28I199A
+2025-08-27 12:14:41 [WARNING] Attenzione: Il numero di componenti fornito (6) non corrisponde a quello effettivo (3). Codice Bonus: 202412239683330 | Codice Fiscale: SCVNNT84R42C351A
+2025-08-27 12:14:42 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239850539 | Codice Fiscale: CTVMNN88E57Z129D
+2025-08-27 12:14:42 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239563956 | Codice Fiscale: MCLLMR82M63I199E
+2025-08-27 12:14:42 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
+2025-08-27 12:14:42 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (3). Codice Bonus: 202412239796267 | Codice Fiscale: MZZNNN70A52B695W
+2025-08-27 12:14:43 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239395756 | Codice Fiscale: LBBNCT68T66H982L
+2025-08-27 12:14:43 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
+2025-08-27 12:14:43 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546823 | Codice Fiscale: GNLCML75C46I199R
+2025-08-27 12:14:43 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546260 | Codice Fiscale: FBAGRT98C43F158S
+2025-08-27 12:14:43 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239565230 | Codice Fiscale: GMMSFO03D65I199C
+2025-08-27 12:14:43 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (4). Codice Bonus: 202412239626844 | Codice Fiscale: LTACNO95B41I199Y
+2025-08-27 12:14:43 [WARNING] Attenzione: Il numero di componenti fornito (5) non corrisponde a quello effettivo (4). Codice Bonus: 202412239691780 | Codice Fiscale: CRNRFL72M29H703S
+2025-08-27 12:14:44 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239772896 | Codice Fiscale: SNFFNC78P42I199K
+2025-08-27 12:14:44 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239870972 | Codice Fiscale: MLTNMR94H46F251L
+2025-08-27 12:14:44 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239498859 | Codice Fiscale: CVLGNN51E21H982F
+2025-08-27 12:14:44 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239517438 | Codice Fiscale: VRZCLL00R51L219P
+2025-08-27 12:14:44 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239701929 | Codice Fiscale: PNSGPP76P02I199R
+2025-08-27 12:14:44 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239700115 | Codice Fiscale: DMNLCR85A48Z129M
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239908090 | Codice Fiscale: CTTGTN36M21D861C
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239904557 | Codice Fiscale: SNFGTN83A13I199K
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239517352 | Codice Fiscale: SRGNMR59E57F251E
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239532995 | Codice Fiscale: PZZCGR46C10H982S
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239612836 | Codice Fiscale: DNRRSR74M45E536J
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239636206 | Codice Fiscale: SCRLCL00M60I199J
+2025-08-27 12:14:45 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239776908 | Codice Fiscale: HRDVTR85D59Z144G
+2025-08-27 12:14:46 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239775232 | Codice Fiscale: VTLGRG02H68F158X
+2025-08-27 12:14:46 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239762124 | Codice Fiscale: MLTTNA74T64I199O
+2025-08-27 12:14:46 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239444643 | Codice Fiscale: LGGJSC84B46Z112R
+2025-08-27 12:14:46 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239563465 | Codice Fiscale: LPDNZT49C60I199T
+2025-08-27 12:14:46 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239665472 | Codice Fiscale: GRNFNC50S17Z600H
+2025-08-27 12:14:47 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239902646 | Codice Fiscale: LGLFNC76T01I199M
+2025-08-27 12:14:47 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239593951 | Codice Fiscale: FRNRMR94R71I199Y
+2025-08-27 12:14:47 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239683624 | Codice Fiscale: SPNFRC84L03I199E
+2025-08-27 12:14:48 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239376537 | Codice Fiscale: STRGPP60M31I199H
+2025-08-27 12:14:48 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239499105 | Codice Fiscale: RMLNNN57T02H982U
+2025-08-27 12:14:48 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239695454 | Codice Fiscale: PRTWTR92H25G273L
+2025-08-27 12:14:48 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239715918 | Codice Fiscale: MSSLND38H68B666U
+2025-08-27 12:14:48 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239659843 | Codice Fiscale: SCLMCL67M26I199L
+2025-08-27 12:14:48 [INFO] Elaborazione completata senza errori.
+2025-08-27 12:40:19 [INFO] Numero di righe da elaborare: 357
+2025-08-27 12:40:20 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239788727 | Codice Fiscale: RNRFNC57R03I199Z
+2025-08-27 12:40:20 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (1). Codice Bonus: 202412239774008 | Codice Fiscale: DSTCCT71D54B804D
+2025-08-27 12:40:20 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239447233 | Codice Fiscale: SRBSVT62L28I199A
+2025-08-27 12:40:21 [WARNING] Attenzione: Il numero di componenti fornito (6) non corrisponde a quello effettivo (3). Codice Bonus: 202412239683330 | Codice Fiscale: SCVNNT84R42C351A
+2025-08-27 12:40:21 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239850539 | Codice Fiscale: CTVMNN88E57Z129D
+2025-08-27 12:40:21 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239563956 | Codice Fiscale: MCLLMR82M63I199E
+2025-08-27 12:40:21 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
+2025-08-27 12:40:22 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (3). Codice Bonus: 202412239796267 | Codice Fiscale: MZZNNN70A52B695W
+2025-08-27 12:40:22 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239395756 | Codice Fiscale: LBBNCT68T66H982L
+2025-08-27 12:40:22 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
+2025-08-27 12:40:22 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546823 | Codice Fiscale: GNLCML75C46I199R
+2025-08-27 12:40:22 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546260 | Codice Fiscale: FBAGRT98C43F158S
+2025-08-27 12:40:22 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239565230 | Codice Fiscale: GMMSFO03D65I199C
+2025-08-27 12:40:22 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (4). Codice Bonus: 202412239626844 | Codice Fiscale: LTACNO95B41I199Y
+2025-08-27 12:40:23 [WARNING] Attenzione: Il numero di componenti fornito (5) non corrisponde a quello effettivo (4). Codice Bonus: 202412239691780 | Codice Fiscale: CRNRFL72M29H703S
+2025-08-27 12:40:23 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239772896 | Codice Fiscale: SNFFNC78P42I199K
+2025-08-27 12:40:23 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239870972 | Codice Fiscale: MLTNMR94H46F251L
+2025-08-27 12:40:23 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239498859 | Codice Fiscale: CVLGNN51E21H982F
+2025-08-27 12:40:24 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239517438 | Codice Fiscale: VRZCLL00R51L219P
+2025-08-27 12:40:24 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239701929 | Codice Fiscale: PNSGPP76P02I199R
+2025-08-27 12:40:24 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239700115 | Codice Fiscale: DMNLCR85A48Z129M
+2025-08-27 12:40:24 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239908090 | Codice Fiscale: CTTGTN36M21D861C
+2025-08-27 12:40:24 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239904557 | Codice Fiscale: SNFGTN83A13I199K
+2025-08-27 12:40:24 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239517352 | Codice Fiscale: SRGNMR59E57F251E
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239532995 | Codice Fiscale: PZZCGR46C10H982S
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239612836 | Codice Fiscale: DNRRSR74M45E536J
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239636206 | Codice Fiscale: SCRLCL00M60I199J
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239776908 | Codice Fiscale: HRDVTR85D59Z144G
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239775232 | Codice Fiscale: VTLGRG02H68F158X
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239762124 | Codice Fiscale: MLTTNA74T64I199O
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239444643 | Codice Fiscale: LGGJSC84B46Z112R
+2025-08-27 12:40:25 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239563465 | Codice Fiscale: LPDNZT49C60I199T
+2025-08-27 12:40:26 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239665472 | Codice Fiscale: GRNFNC50S17Z600H
+2025-08-27 12:40:26 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239902646 | Codice Fiscale: LGLFNC76T01I199M
+2025-08-27 12:40:26 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239593951 | Codice Fiscale: FRNRMR94R71I199Y
+2025-08-27 12:40:27 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239683624 | Codice Fiscale: SPNFRC84L03I199E
+2025-08-27 12:40:27 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239376537 | Codice Fiscale: STRGPP60M31I199H
+2025-08-27 12:40:27 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239499105 | Codice Fiscale: RMLNNN57T02H982U
+2025-08-27 12:40:27 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239695454 | Codice Fiscale: PRTWTR92H25G273L
+2025-08-27 12:40:27 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239715918 | Codice Fiscale: MSSLND38H68B666U
+2025-08-27 12:40:27 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239659843 | Codice Fiscale: SCLMCL67M26I199L
+2025-08-27 12:40:27 [INFO] Elaborazione completata senza errori.
+2025-08-27 12:46:09 [INFO] Numero di righe da elaborare: 357
+2025-08-27 12:46:09 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239788727 | Codice Fiscale: RNRFNC57R03I199Z
+2025-08-27 12:46:09 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (1). Codice Bonus: 202412239774008 | Codice Fiscale: DSTCCT71D54B804D
+2025-08-27 12:46:10 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239447233 | Codice Fiscale: SRBSVT62L28I199A
+2025-08-27 12:46:10 [WARNING] Attenzione: Il numero di componenti fornito (6) non corrisponde a quello effettivo (3). Codice Bonus: 202412239683330 | Codice Fiscale: SCVNNT84R42C351A
+2025-08-27 12:46:11 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239850539 | Codice Fiscale: CTVMNN88E57Z129D
+2025-08-27 12:46:11 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239563956 | Codice Fiscale: MCLLMR82M63I199E
+2025-08-27 12:46:11 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239620890 | Codice Fiscale: GRGGPP81R60I199O
+2025-08-27 12:46:11 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (3). Codice Bonus: 202412239796267 | Codice Fiscale: MZZNNN70A52B695W
+2025-08-27 12:46:12 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239395756 | Codice Fiscale: LBBNCT68T66H982L
+2025-08-27 12:46:12 [WARNING] Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: 083108 | Cap: 95030 | Codice Bonus: 202412239493544 | Codice Fiscale: MLCCML81D29Z112Q
+2025-08-27 12:46:12 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546823 | Codice Fiscale: GNLCML75C46I199R
+2025-08-27 12:46:12 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239546260 | Codice Fiscale: FBAGRT98C43F158S
+2025-08-27 12:46:12 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239565230 | Codice Fiscale: GMMSFO03D65I199C
+2025-08-27 12:46:12 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (4). Codice Bonus: 202412239626844 | Codice Fiscale: LTACNO95B41I199Y
+2025-08-27 12:46:12 [WARNING] Attenzione: Il numero di componenti fornito (5) non corrisponde a quello effettivo (4). Codice Bonus: 202412239691780 | Codice Fiscale: CRNRFL72M29H703S
+2025-08-27 12:46:13 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239772896 | Codice Fiscale: SNFFNC78P42I199K
+2025-08-27 12:46:13 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239870972 | Codice Fiscale: MLTNMR94H46F251L
+2025-08-27 12:46:13 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239498859 | Codice Fiscale: CVLGNN51E21H982F
+2025-08-27 12:46:13 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239517438 | Codice Fiscale: VRZCLL00R51L219P
+2025-08-27 12:46:13 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239701929 | Codice Fiscale: PNSGPP76P02I199R
+2025-08-27 12:46:13 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239700115 | Codice Fiscale: DMNLCR85A48Z129M
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239908090 | Codice Fiscale: CTTGTN36M21D861C
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239904557 | Codice Fiscale: SNFGTN83A13I199K
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239517352 | Codice Fiscale: SRGNMR59E57F251E
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239532995 | Codice Fiscale: PZZCGR46C10H982S
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239612836 | Codice Fiscale: DNRRSR74M45E536J
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (4). Codice Bonus: 202412239636206 | Codice Fiscale: SCRLCL00M60I199J
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239776908 | Codice Fiscale: HRDVTR85D59Z144G
+2025-08-27 12:46:14 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (3). Codice Bonus: 202412239775232 | Codice Fiscale: VTLGRG02H68F158X
+2025-08-27 12:46:15 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239762124 | Codice Fiscale: MLTTNA74T64I199O
+2025-08-27 12:46:15 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239444643 | Codice Fiscale: LGGJSC84B46Z112R
+2025-08-27 12:46:15 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239563465 | Codice Fiscale: LPDNZT49C60I199T
+2025-08-27 12:46:15 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239665472 | Codice Fiscale: GRNFNC50S17Z600H
+2025-08-27 12:46:15 [WARNING] Attenzione: Il numero di componenti fornito (4) non corrisponde a quello effettivo (3). Codice Bonus: 202412239902646 | Codice Fiscale: LGLFNC76T01I199M
+2025-08-27 12:46:16 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239593951 | Codice Fiscale: FRNRMR94R71I199Y
+2025-08-27 12:46:16 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239683624 | Codice Fiscale: SPNFRC84L03I199E
+2025-08-27 12:46:17 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (2). Codice Bonus: 202412239376537 | Codice Fiscale: STRGPP60M31I199H
+2025-08-27 12:46:17 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239499105 | Codice Fiscale: RMLNNN57T02H982U
+2025-08-27 12:46:17 [WARNING] Attenzione: Il numero di componenti fornito (1) non corrisponde a quello effettivo (2). Codice Bonus: 202412239695454 | Codice Fiscale: PRTWTR92H25G273L
+2025-08-27 12:46:17 [WARNING] Attenzione: Il numero di componenti fornito (2) non corrisponde a quello effettivo (1). Codice Bonus: 202412239715918 | Codice Fiscale: MSSLND38H68B666U
+2025-08-27 12:46:17 [WARNING] Attenzione: Il numero di componenti fornito (3) non corrisponde a quello effettivo (4). Codice Bonus: 202412239659843 | Codice Fiscale: SCLMCL67M26I199L
+2025-08-27 12:46:17 [INFO] Elaborazione completata senza errori.

@@ -45,7 +45,7 @@ namespace BonusIdrici2.Controllers
         }
 
         // Funzione di validazione
-        public bool VerificaSessione(string ruoloRichiesto = null)
+        public bool VerificaSessione(string? ruoloRichiesto = null)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
             {

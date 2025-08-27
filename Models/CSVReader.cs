@@ -117,7 +117,7 @@ public class CSVReader
                     Nome = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper(),
                     CodiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper(),
                     Sesso = FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper(),
-                    DataNascita = FunzioniTrasversali.ConvertiData(campi[4]),
+                    DataNascita = FunzioniTrasversali.ConvertiData(campi[4], DateTime.MinValue),
                     ComuneNascita = FunzioniTrasversali.rimuoviVirgolette(campi[5]).ToUpper(),
                     IndirizzoResidenza = FunzioniTrasversali.rimuoviVirgolette(campi[7]).ToUpper(),
                     NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[8]),
@@ -168,7 +168,7 @@ public class CSVReader
 
                     // 4. Verifico la data di nascita
 
-                    if(dichiaranteEsistente.DataNascita != null && dichiarante.DataNascita != null && dichiaranteEsistente.DataNascita != dichiarante.DataNascita){
+                    if(dichiaranteEsistente.DataNascita != dichiarante.DataNascita){
                         dichiaranteEsistente.DataNascita = dichiarante.DataNascita;
                         aggiornare = true;
                     }
@@ -486,88 +486,67 @@ public class CSVReader
 
                 // Parte 3: Verifica se l'indirizzo di ubicazione è associabile ad un toponimo
 
-                // Variabili di supporto
+                //  a) Variabili di supporto
                 var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[36]).ToUpper();
                 var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
-                var indirizzoRicavato = FunzioniTrasversali.FormattaIndirizzo(_context, indirizzoUbicazione, cod_fisc, selectedEnteId);
+                var indirizzoFormattato = FunzioniTrasversali.FormattaIndirizzo(_context, indirizzoUbicazione, cod_fisc, selectedEnteId);
+                string? indirizzoRicavato = indirizzoFormattato != null ? indirizzoFormattato.ToUpper() : null;
+
                 int? idToponimo = null;
 
-                if (string.IsNullOrEmpty(indirizzoRicavato))
+                // b) Controllo nel DB se esiste già il toponimo
+                var toponimoTrova = _context.Toponomi
+                    .FirstOrDefault(s => s.denominazione == indirizzoUbicazione && s.IdEnte == selectedEnteId);
+
+                if (toponimoTrova != null)
                 {
-                    var findToponimo = new Toponimo
+                    idToponimo = toponimoTrova.id;
+
+                    // c) Aggiorno solo se non è già normalizzato e se ho un indirizzo ricavato valido
+                    if (toponimoTrova.normalizzazione == null && indirizzoRicavato != null)
                     {
-                        denominazione = indirizzoUbicazione,
-                        IdEnte = selectedEnteId,
-                    };
+                        toponimoTrova.normalizzazione = indirizzoRicavato;
+                        toponimoTrova.data_aggiornamento = DateTime.Now;
+                        datiComplessivi.ToponimiDaAggiornare.Add(toponimoTrova);
+                    }
+                }
+                else
+                {
+                     var toponimoLista = datiComplessivi.Toponimi?.FirstOrDefault(t => t.denominazione == indirizzoUbicazione && t.IdEnte == selectedEnteId);
 
-                    // Mi ricavo il primo toponimo esistente.
-                    var toponimoEsistente = toponimi.FirstOrDefault(t => t.denominazione.Equals(findToponimo.denominazione, StringComparison.OrdinalIgnoreCase) && t.IdEnte == findToponimo.IdEnte);
-
-                    if (toponimoEsistente == null)
+                    if (toponimoLista != null)
                     {
-                        // Se non esiste, lo aggiungo.
-                        findToponimo.normalizzazione = null;
-                        findToponimo.data_creazione = DateTime.Now;
-                        findToponimo.data_aggiornamento = null;
-
-                        toponimi.Add(findToponimo);
-                        indirizzoRicavato = indirizzoUbicazione;
-
-                        datiComplessivi.Toponimi.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
+                        // Caso: esiste già nella lista → aggiorno solo i campi mancanti
+                        if (toponimoLista.normalizzazione == null && indirizzoRicavato != null)
+                        {
+                            toponimoLista.normalizzazione = indirizzoRicavato;
+                            toponimoLista.data_aggiornamento = DateTime.Now;
+                        }
                     }
                     else
                     {
-                        // Se esiste, lo utilizzo.
-                        if (toponimoEsistente.normalizzazione != null)
+                        // Caso: completamente nuovo → lo aggiungo alla lista
+                        var nuovoToponimo = new Toponimo
                         {
-                            // Assegno l'indirizzo associato a quel toponimo
-                            indirizzoRicavato = toponimoEsistente.normalizzazione;
-                        }
-                        else
-                        {
-                            indirizzoRicavato = indirizzoUbicazione;
-                        }
-                    }
-                }
-                else if (indirizzoRicavato != indirizzoUbicazione)
-                {
+                            denominazione = indirizzoUbicazione,
+                            IdEnte = selectedEnteId,
+                            data_creazione = DateTime.Now,
+                            normalizzazione = indirizzoRicavato // valorizzo subito se disponibile
+                        };
 
-                    //warning.Add($"Attenzione indirizzo mal formato per il dichiarante con codice fiscale {cod_fisc} si consiglia di aggiornarlo");
-                    countIndirizziMalFormati++;
-                    var findToponimo = new Toponimo
-                    {
-                        denominazione = indirizzoUbicazione,
-                        IdEnte = selectedEnteId,
-                    };
-
-                    // Uso FirstOrDefault per trovare il toponimo esistente, che è l'approccio corretto.
-                    var toponimoEsistente = toponimi.FirstOrDefault(t => t.denominazione.Equals(findToponimo.denominazione, StringComparison.OrdinalIgnoreCase) && t.IdEnte == findToponimo.IdEnte);
-
-                    if (toponimoEsistente == null)
-                    {
-                        // Se non esiste, lo aggiungo.
-                        findToponimo.normalizzazione = indirizzoRicavato;
-                        findToponimo.data_creazione = DateTime.Now;
-                        findToponimo.data_aggiornamento = null;
-
-                        toponimi.Add(findToponimo);
-                        indirizzoRicavato = indirizzoUbicazione;
-                        datiComplessivi.ToponimiDaAggiornare.Add(findToponimo); // Aggiungo alla lista per il DTO di ritorno
-                    }
-                    else
-                    {
-                        // Se esiste, lo utilizzo.
-                        idToponimo = toponimoEsistente.id;
-                        if (toponimoEsistente.normalizzazione == null)
-                        {
-                            // Assegno l'indirizzo associato a quel toponimo
-                            toponimoEsistente.normalizzazione = indirizzoRicavato;
-                            toponimoEsistente.data_aggiornamento = DateTime.Now;
-                        }
+                        datiComplessivi.Toponimi.Add(nuovoToponimo);
                     }
                 }
 
-                // Parte 4: Controllo se sono presenti Errori
+                // Parte 4: Mi ricavo l'id del dichiarante associato all'utenza
+
+                var cognome = FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper();
+                var nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper();
+
+                var dichiaranteTrovato = _context.Dichiaranti.FirstOrDefault(d => d.Cognome == cognome && d.Nome == nome && d.CodiceFiscale == cod_fisc && d.IdEnte == selectedEnteId);
+                int? idDichiarante = dichiaranteTrovato != null ? dichiaranteTrovato.id : (int?)null;
+
+                // Parte 5: Controllo se sono presenti Errori
 
                 if (error)
                 {
@@ -583,15 +562,15 @@ public class CSVReader
                     periodoIniziale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[13])),
                     periodoFinale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[14])),
                     matricolaContatore = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper(),
-                    indirizzoUbicazione = indirizzoRicavato.ToUpper(),
+                    indirizzoUbicazione = indirizzoUbicazione,
                     numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[16]).ToUpper(),
                     subUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[17]).ToUpper(),
                     scalaUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[18]),
                     piano = FunzioniTrasversali.rimuoviVirgolette(campi[19]),
                     interno = FunzioniTrasversali.rimuoviVirgolette(campi[20]),
                     tipoUtenza = FunzioniTrasversali.rimuoviVirgolette(campi[26]).ToUpper(),
-                    cognome = FunzioniTrasversali.rimuoviVirgolette(campi[32]).ToUpper(),
-                    nome = FunzioniTrasversali.rimuoviVirgolette(campi[33]).ToUpper(),
+                    cognome = cognome,
+                    nome = nome,
                     sesso = FunzioniTrasversali.rimuoviVirgolette(campi[34]).ToUpper(),
                     DataNascita = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[35])),
                     codiceFiscale = cod_fisc,
@@ -599,7 +578,8 @@ public class CSVReader
                     data_creazione = DateTime.Now,
                     IdEnte = selectedEnteId,
                     idToponimo = idToponimo,
-                    IdUser = idUser
+                    IdUser = idUser,
+                    IdDichiarante = idDichiarante,
                 };
 
                 if (idToponimo != null)
@@ -611,7 +591,7 @@ public class CSVReader
                     utenza.idToponimo = null;
                 }
 
-                // Parte 5: Verifico se l'utenza è gia presente
+                // Parte 6: Verifico se l'utenza è gia presente
 
                 var utenzaEsistente = utenzeIdriche.FirstOrDefault(u =>
                     u.idAcquedotto == utenza.idAcquedotto &&
@@ -745,6 +725,13 @@ public class CSVReader
                         aggiornare = true;
                     }
 
+                    if(utenzaEsistente.IdDichiarante != null && utenza.IdDichiarante != null && utenzaEsistente.IdDichiarante != utenza.IdDichiarante)
+                    {
+                        // logFile.LogInfo($"Aggiorno IdDichiarante da {utenzaEsistente.IdDichiarante} a {utenza.IdDichiarante}");
+                        utenzaEsistente.IdDichiarante = utenza.IdDichiarante;
+                        aggiornare = true;
+                    }
+
                     // Fine - Confronto tra i dati del db e quelli del csv
 
                     // Infine verifico se devo aggiornare dei dati
@@ -755,11 +742,11 @@ public class CSVReader
                     }
 
                 }
-            }
+        }
 
             // Fine - lettura delle righe
 
-            // Parte 6 : Scrittura dei log sul file corrispetivo
+            // Parte 7 : Scrittura dei log sul file corrispetivo
 
             // a) Scrivo prima i log di errore se sono presenti
             if (errori.Count > 0)
@@ -849,7 +836,7 @@ public class CSVReader
 
             int rigaCorrente = 1;
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
-            var dichiaranti = context.Dichiaranti.ToList();
+            // var dichiaranti = context.Dichiaranti.ToList();
 
             // Parte 2: Lettura delle varie righe
             foreach (var riga in righe)
@@ -1012,6 +999,7 @@ public class CSVReader
                 string esitoStr = "No";
                 string esito = "04"; // 01 = fornitura diretta, 02 = fornitura indiretta, 03 = fornitura diretta non rispetta requisiti, 04 =  fornitura indiretta non rispetta requisiti 
                 int? idFornituraIdrica = null;
+                string? note = null;
 
                 // 2.a) mi salvo i campi relativi all'ente in modo da poter effetuare le operazioni successive
 
@@ -1028,25 +1016,29 @@ public class CSVReader
                 var codiceFiscaleEnte = ente.CodiceFiscale;
                 var istatEnte = ente.istat;
                 var capEnte = ente.Cap;
-
+                
+                string? messaggio = null;
                 int? mc = null;
+                bool verificare = false;
                 // 2.b) Verifico se i campi ISTAT, CAP e provincia corrispondono a l'ente selezionato il quale gestisce le utenze idriche
 
                 if (!(istatEnte != istatAbitazione || capEnte != capAbitazione || provinciaAbitazione != ente.Provincia))
                 {
                     // 2.c) se i campi corispondono verifico se il richiedente è residente nel comune selezionato
-                    var dichiarantiFiltratiPerNomeEnte = dichiaranti.Where(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId).ToList();
-                    if (dichiarantiFiltratiPerNomeEnte.Count == 1)
+                    var dichiaranteTrovato = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId);
+                    if (dichiaranteTrovato != null )
                     {
                         // 2.c.1) se è residente nel comune selzionato allora esito è uguale a Si
                         esitoStr = "Si";
 
                         //3.a) verifica se il richiedente ha una fornitura idrica diretta 
 
-                        (string esitoRestituito, int? idFornituraTrovato) = FunzioniTrasversali.VerificaEsistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiarantiFiltratiPerNomeEnte[0].IndirizzoResidenza, dichiarantiFiltratiPerNomeEnte[0].NumeroCivico, dichiarantiFiltratiPerNomeEnte[0].Cognome, dichiarantiFiltratiPerNomeEnte[0].Nome, dichiarantiFiltratiPerNomeEnte[0].DataNascita);
+                        (string esitoRestituito, int? idFornituraTrovato, string? messagge) = FunzioniTrasversali.VerificaEsistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiaranteTrovato, indirizzoAbitazione, numeroCivico);
                         idFornituraIdrica = idFornituraTrovato;
+                        note = note + messagge;
                         if (esitoRestituito == "01")
                         {
+                            note = null;
                             esito = "01";
                         }
                         else if (esitoRestituito == "03")
@@ -1055,18 +1047,52 @@ public class CSVReader
                         }
                         else if (esitoRestituito == "04")
                         {
-                            if (codiciFiscaliFamigliari.Length > 0)
+                            // Vecchia Funzione che verifica solo i membri forniti dal INPS tramite i codici fiscali
+                            // if (codiciFiscaliFamigliari.Length > 0)
+                            // {
+                            //     foreach (var codFisc in codiciFiscaliFamigliari)
+                            //     {
+                            //         var dichiaranteFamigliare = dichiaranti.Where(s => s.CodiceFiscale == codFisc && s.IdEnte == selectedEnteId).ToList();
+                            //         DateTime dataNascita = dichiaranteFamigliare[0].DataNascita;
+                            //         if (dichiaranteFamigliare.Count == 1 && (FunzioniTrasversali.CalcolaEta(dataNascita) >= 18)) // Verifico che il membro della famiglia esista e abbia almeno 18 anni
+                            //         {
+                            //             // Verifico se il membro della famiglia ha una fornitura idrica diretta
+                            //             (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(codFisc, selectedEnteId, context, dichiaranteFamigliare[0].IndirizzoResidenza, dichiaranteFamigliare[0].NumeroCivico, dichiaranteFamigliare[0].Cognome, dichiaranteFamigliare[0].Nome, dichiaranteFamigliare[0].DataNascita);
+                            //             idFornituraIdrica = idFornituraMembro;
+                            //             if (esitoFamigliare == "01")
+                            //             {
+                            //                 esito = "01"; // Se uno dei membri della famiglia ha una fornitura diretta, l'esito è 01
+                            //                 break;
+                            //             }
+                            //             else if (esitoFamigliare == "03")
+                            //             {
+                            //                 esito = "03";
+                            //                 break;
+                            //             }
+                            //             else if (esitoFamigliare == "04")
+                            //             {
+                            //                 // 3.g) Verifico se Presenza_POD è SI
+                            //                 if (presenzaPod.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                            //                 {
+                            //                     esito = "02"; // Se nessun membro della famiglia ha una fornitura diretta, ma Presenza_POD è SI, l'esito è 02
+                            //                 }
+                            //             }
+                            //         }
+                            //     }
+                            var famigliari = context.Dichiaranti.Where(s => s.CodiceFamiglia == dichiaranteTrovato.CodiceFamiglia && s.CodiceFiscale == dichiaranteTrovato.CodiceFiscale && s.IdEnte == selectedEnteId).ToList();
+
+                            if(famigliari.Count > 0)
                             {
-                                foreach (var codFisc in codiciFiscaliFamigliari)
+                                foreach(var membro in famigliari)
                                 {
-                                    var dichiaranteFamigliare = dichiaranti.Where(s => s.CodiceFiscale == codFisc && s.IdEnte == selectedEnteId).ToList();
-                                    if (dichiaranteFamigliare.Count == 1)
+                                    if(FunzioniTrasversali.CalcolaEta(membro.DataNascita) >= 18)
                                     {
-                                        // Verifico se il membro della famiglia ha una fornitura idrica diretta
-                                        (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(codFisc, selectedEnteId, context, dichiaranteFamigliare[0].IndirizzoResidenza, dichiaranteFamigliare[0].NumeroCivico, dichiaranteFamigliare[0].Cognome, dichiaranteFamigliare[0].Nome, dichiaranteFamigliare[0].DataNascita);
+                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro.CodiceFiscale, selectedEnteId, context, membro,indirizzoAbitazione, numeroCivico);
                                         idFornituraIdrica = idFornituraMembro;
+                                        note = note + messaggeFamigliare;
                                         if (esitoFamigliare == "01")
                                         {
+                                            note = null;
                                             esito = "01"; // Se uno dei membri della famiglia ha una fornitura diretta, l'esito è 01
                                             break;
                                         }
@@ -1088,12 +1114,34 @@ public class CSVReader
 
                             }
                         }
+                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
+                        // if(esito == "01"  && note != null)
+                        // {
+                        //     note = null;
+                        // }
+                            // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
+                        if(dichiaranteTrovato.NumeroComponenti != int.Parse(numeroComponenti))
+                        {
+                            note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). ";
 
+                            logFile.LogWarning($"Attenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
+                        }
                     }
+                    
                 }
                 else
                 {
+                    note = "Attenzione: I campi ISTAT o CAP non coincido con l'ente selezionato. ";
                     logFile.LogWarning($"Attenzone i campi ISTAT o CAP non coincido con l'ente selezionato. ISTAT: {istat} | Cap: {capAbitazione} | Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
+                }
+
+                // Aggiungo eventuali messaggi a note
+                if(note != null && string.IsNullOrWhiteSpace(note))
+                {
+                    verificare = true;
+                    note = note + messaggio;
+                }else{
+                    verificare = false;
                 }
 
                 // Dati neccessari per l'esportazione siscom
@@ -1115,6 +1163,8 @@ public class CSVReader
                         logFile.LogWarning($"Impossibile calcolare i giorni: date non valide. Riga {rigaCorrente}");
                     }
                 }
+
+               
 
                 // 4) Creo un nuovo report con i dati raccolti
                 var report = new Report
@@ -1139,6 +1189,8 @@ public class CSVReader
                     esito = esito,
                     serie = serie,
                     mc = mc,
+                    incongruenze = verificare,
+                    note = note,
                     IdEnte = selectedEnteId,
                     IdUser = idUser,
                     DataCreazione = dataCreazione
@@ -1228,6 +1280,21 @@ public class CSVReader
                         reportEsistente.serie = report.serie;
                         aggiornare = true;
                     }
+
+                    // Verifico se il campo incongruenze è diverso
+                    if (report.incongruenze != reportEsistente.incongruenze)
+                    {
+                        reportEsistente.incongruenze = report.incongruenze;
+                        aggiornare = true;
+                    }
+
+                    // Verifico se il campo note è diverso
+                    if (reportEsistente.note != report.note)
+                    {
+                        reportEsistente.note = report.note;
+                        aggiornare = true;
+                    }
+
                     // Verifico se devo aggiornare dei dati
 
                     if (aggiornare)

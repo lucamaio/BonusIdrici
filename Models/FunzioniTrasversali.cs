@@ -119,18 +119,49 @@ namespace BonusIdrici2.Models
             return null;
         }
 
+        public static DateTime ConvertiData(string dataStringa, DateTime defaultValue = default)
+        {
+            if (string.IsNullOrWhiteSpace(dataStringa))
+            {
+                return defaultValue; // Restituisce un valore di default
+            }
 
-        public static (string esito, int? idFornitura) VerificaEsistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, string indirizzoResidenza, string numeroCivico, string cognome, string? nome, DateTime? data_nascita)
+            // Formato comune italiano: "gg/MM/aaaa"
+            if (DateTime.TryParseExact(dataStringa, "dd/MM/yyyy", new CultureInfo("it-IT"), DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return parsedDate;
+            }
+
+            // Altro formato comune: "aaaa-MM-gg"
+            if (DateTime.TryParseExact(dataStringa, "yyyy-MM-dd", new CultureInfo("it-IT"), DateTimeStyles.None, out parsedDate))
+            {
+                return parsedDate;
+            }
+
+            // Se nessun formato corrisponde
+            Console.WriteLine($"Attenzione: Impossibile convertire la data '{dataStringa}' nel formato atteso. Verrà restituito il valore di default.");
+            return defaultValue;
+        }
+
+
+        
+
+
+        public static (string esito, int? idFornitura, string? messaggio) VerificaEsistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, Dichiarante dichiarante, string indirizzoINPS, string numeroCivicoINPS)
         {
             // Recupera le forniture associate al codice fiscale e all'ente selezionato
             var forniture = context.UtenzeIdriche
-                .Where(s => (s.codiceFiscale == codiceFiscale || (s.cognome == cognome && s.nome == nome && s.DataNascita == data_nascita)) && s.IdEnte == selectedEnteId)
+                .Where(s => ((s.codiceFiscale == dichiarante.CodiceFiscale || (s.cognome == dichiarante.Cognome && s.nome == dichiarante.Nome && s.DataNascita == dichiarante.DataNascita)) && (s.stato != 5 && s.stato != 4)) && s.IdEnte == selectedEnteId)
                 .ToList();
 
-            if (forniture.Count != 1)
+            if(forniture.Count == 0)
             {
-                // Nessuna fornitura o più forniture trovate
-                return ("04", null);
+                // Nessuna fornitura trovata
+                return ("04", null, "Nessuna fornitura trovata per il dichiarante.");
+            }else if(forniture.Count > 1){
+                // Più forniture trovate
+                return ("04", null, "Attenzione: Più di una fornitura trovata per il dichiarante.");
+
             }
 
             var fornitura = forniture[0];
@@ -139,57 +170,67 @@ namespace BonusIdrici2.Models
             // Verifica il tipo di utenza
             if (!string.Equals(fornitura.tipoUtenza, "UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
             {
-                return ("03", null);
+                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.");
             }
 
             // Recupera i dati dell'utenza
             string? indirizzoUtenza = fornitura.indirizzoUbicazione;
             string? numeroCivicoUtenza = fornitura.numeroCivico;
             int? idToponimo = fornitura.idToponimo;
+            string? message = null;
 
-            bool indirizzoCorrisponde = string.Equals(indirizzoUtenza, indirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
-                                        string.Equals(numeroCivicoUtenza, numeroCivico, StringComparison.OrdinalIgnoreCase);
+            bool indirizzoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
+                                        string.Equals(numeroCivicoUtenza, dichiarante.NumeroCivico, StringComparison.OrdinalIgnoreCase);
 
             // Se indirizzo e numero civico coincidono
             if (indirizzoCorrisponde)
             {
-                return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata);
+                if(dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS){
+                    message = "Attenzione: L'indirizzo di ubicazione o il numero civico della fornitura corrisponde esattamente all'indirizzo di residenza del dichiarante, ma non corrisponde a quello fornito dal INPS.";
+                }
+
+                return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message);
+            }else{
+                if(dichiarante.IndirizzoResidenza == indirizzoUtenza && ( dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS)){
+                    message = "Attenzione: L'indirizzo di ubicazione o il numero civico  non corrisponde esattamente all'indirizzo di residenza del dichiarante, fornito dal INPS.";
+                }
             }
 
             // Se non coincidono, verifica se è disponibile una normalizzazione del toponimo
-            if (idToponimo.HasValue)
+            if (idToponimo != null)
             {
-                var toponimo = context.Toponomi
-                    .FirstOrDefault(t => t.id == idToponimo.Value && t.normalizzazione != null);
+                var toponimo = context.Toponomi.FirstOrDefault(t => t.id == idToponimo && t.normalizzazione != null);
 
                 if (toponimo != null)
                 {
                     indirizzoUtenza = toponimo.normalizzazione;
 
-                    bool indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, indirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
-                                                        string.Equals(numeroCivicoUtenza, numeroCivico, StringComparison.OrdinalIgnoreCase);
+                    bool indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) && string.Equals(numeroCivicoUtenza, dichiarante.NumeroCivico, StringComparison.OrdinalIgnoreCase);
 
                     if (indirizzoToponimoCorrisponde)
                     {
-                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata);
+                        if(toponimo.normalizzazione != indirizzoINPS){
+                            message = "Attenzione: L'indirizzo di ubicazione della toponimo non corrisponde a quello fornito dal INPS.";
+                        }
+                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message);
                     }
                 }
             }
 
             // L’indirizzo non corrisponde
-            return ("03", idFornituraTrovata);
+            return ("03", idFornituraTrovata, message);
         }
 
         // Metodo ausiliario per verificare lo stato
-        private static (string esito, int? idFornitura) VerificaStatoFornitura(int? stato, int? idFornitura)
+        private static (string esito, int? idFornitura, string? messaggio) VerificaStatoFornitura(int? stato, int? idFornitura, string? messaggio)
         {
             if (stato >= 1 && stato <= 3)
             {
-                return ("01", idFornitura);
+                return ("01", idFornitura, messaggio);
             }
             else
             {
-                return ("03", idFornitura);
+                return ("03", idFornitura, messaggio);
             }
         }
 
@@ -248,6 +289,20 @@ namespace BonusIdrici2.Models
                 .ToList();
 
             return enti;
+        }
+
+        public static int CalcolaEta(DateTime dataNascita)
+        {
+            var oggi = DateTime.Today;
+            int eta = oggi.Year - dataNascita.Year;
+
+            // Se il compleanno non è ancora passato quest'anno, tolgo 1
+            if (dataNascita.Date > oggi.AddYears(-eta)) 
+            {
+                eta--;
+            }
+
+            return eta;
         }
 
     }

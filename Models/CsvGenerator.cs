@@ -112,4 +112,48 @@ public static class CsvGenerator
 
         return Encoding.UTF8.GetBytes(csvContent.ToString());
     }
+
+     public static byte[] GeneraCsvDebug(List<Report> dati) // Nota: nome corretto "Territoriale"
+    {
+        StringBuilder csvContent = new StringBuilder();
+        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale", "Nome Dichiarante", "Cognome Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "SERIE","MC", "Incongruenze", "Note", "Numero Componenti", "Data Creazione", "Data Aggiornamento", "IdEnte", "IdUser" };
+        csvContent.AppendLine(string.Join(Delimitatore, headers));
+
+        if (dati != null && dati.Any())
+        {
+            foreach (var report in dati)
+            {
+                StringBuilder riga = new StringBuilder();
+                riga.Append(EscapeCsvField(report.id.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.idAto.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.codiceBonus.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.idFornitura.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.esitoStr.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.esito.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.codiceFiscale.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.nomeDichiarante.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.cognomeDichiarante.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.annoValidita.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.indirizzoAbitazione.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.numeroCivico.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.istat.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.capAbitazione.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.provinciaAbitazione.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.dataInizioValidita?.ToString("yyyy-MM-dd"), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.dataFineValidita?.ToString("yyyy-MM-dd") ?? "", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.serie.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.mc.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.incongruenze.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.note?.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.numeroComponenti.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.DataCreazione?.ToString("yyyy-MM-dd HH:mm:ss"), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.DataAggiornamento?.ToString("yyyy-MM-dd HH:mm:ss") ?? "", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.IdEnte.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.IdUser.ToString(), Delimitatore)).Append(Delimitatore);                
+                csvContent.AppendLine(riga.ToString());
+            }
+        }
+
+        return Encoding.UTF8.GetBytes(csvContent.ToString());
+    }
 }

@@ -57,7 +57,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
 
-        public bool VerificaSessione(string ruoloRichiesto = null)
+        public bool VerificaSessione(string? ruoloRichiesto = null)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
             {
@@ -197,7 +197,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 1: che consente di andare a creare un nuovo dichiarante da i dati provenienti dal form Anagrafe/Create.cshtml
         [HttpPost]
-        public IActionResult Crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
+        public IActionResult Crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
         {
             var nuovaPersona = new Dichiarante
             {
@@ -224,7 +224,7 @@ namespace BonusIdrici2.Controllers
         // Funzione che consente di andare a creare un nuovo dichiarante da i dati provenienti dal form Anagrafe/Modifica.cshtml
 
         [HttpPost]
-        public IActionResult Update(int id, string cognome, string nome, string codice_fiscale, string sesso, DateTime? data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
+        public IActionResult Update(int id, string cognome, string nome, string codice_fiscale, string sesso, DateTime data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
         {
             var DichiaranteEsistente = _context.Dichiaranti.FirstOrDefault(t => t.id == id);
 
