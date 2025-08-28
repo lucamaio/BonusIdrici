@@ -30,27 +30,66 @@
                 <div class="card-body p-4 position-relative">
                     @if (Model != null && Model.Any())
                     {
+                        <div style="background-color: #f8f9fa; border-radius: 12px;"></div>
+                            <div class="row g-3">
+                                <!-- Stat Box 1 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-file fa-2x text-primary mb-2"></i>
+                                            @* <i class="fa-solid fa-city fa-2x "></i> *@
+                                            <h6>Totale Toponomi</h6>
+                                            <h4>@ViewBag.TotaleToponomi</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Stat Box 2 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-xmark fa-2x text-danger mb-2"></i>
+                                            @* <i class="fa-solid fa-check-to-slot fa-2x text-success mb-2"></i> *@
+                                            <h6>Toponomi senza normalizzazione</h6>
+                                            <h4>@ViewBag.ToponomiNoNormalizzazione</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Stat Box 3 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
+                                            <h6>Toponomi Normalizzati</h6>
+                                            <h4>@ViewBag.ToponomiNormalizzati</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <hr class="my-4" />
                         <p class="lead mb-4 text-muted">Di seguito sono elencati i toponimi associati all’ente selezionato.</p>
 
                         <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
                             <table id="toponomiTable" class="table table-hover align-middle border-bottom w-100">
                                 <thead>
                                     <tr>
-                                        <th>Denominazione</th>
-                                        <th>Normalizzazione</th>
-                                        <th>Data Creazione</th>
-                                        <th>Data Aggiornamento</th>
-                                        <th>Azioni</th>
+                                        <th class="text-center">Id</th>
+                                        <th class="text-center">Denominazione</th>
+                                        <th class="text-center">Normalizzazione</th>
+                                        <th class="text-center">Data Creazione</th>
+                                        <th class="text-center">Data Aggiornamento</th>
+                                        <th class="text-center">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>@item.denominazione</td>
-                                            <td>@item.normalizzazione</td>
-                                            <td>@item.data_creazione?.ToString("dd/MM/yyyy")</td>
-                                            <td>@item.data_aggiornamento?.ToString("dd/MM/yyyy")</td>
+                                            <td class="text-center"><span>@item.id</span></td>
+                                            <td><span>@item.denominazione</span></td>
+                                            <td><span>@item.normalizzazione</span></td>
+                                            <td class="text-center"><span>@item.data_creazione?.ToString("dd/MM/yyyy")</span></td>
+                                            <td class="text-center"><span>@item.data_aggiornamento?.ToString("dd/MM/yyyy")</span></td>
                                             <td class="text-center">
                                                 <a class="btn btn-sm btn-light border me-1" title="Modifica Toponimo"
                                                    href="@Url.Action("Modifica", "Toponomi", new { id = item.id, denominazione = item.denominazione, normalizzazione = item.normalizzazione, data_creazione = item.data_creazione, IdEnte = item.IdEnte })">

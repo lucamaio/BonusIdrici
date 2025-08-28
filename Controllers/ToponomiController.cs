@@ -131,6 +131,11 @@ namespace BonusIdrici2.Controllers
                 IdEnte = x.IdEnte
             }).ToList();
 
+            ViewBag.TotaleToponomi = viewModelList.Count;
+            ViewBag.ToponomiNoNormalizzazione = viewModelList.Count(r => r.normalizzazione == null);
+            ViewBag.ToponomiNormalizzati = viewModelList.Count(r => r.normalizzazione != null);
+
+
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
 
