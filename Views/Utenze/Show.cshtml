@@ -29,6 +29,79 @@
                 <div class="card-body p-4 position-relative">
                     @if (Model != null && Model.Any())
                     {
+                        <div style="background-color: #f8f9fa; border-radius: 12px;">
+                            <div class="row g-3">
+                                <!-- Stat Box 1 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-droplet fa-2x text-primary mb-2"></i>
+                                            <h6>Totale Utenze</h6>
+                                            <h4>@ViewBag.TotaleUtenze</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Stat Box 2 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-user-plus fa-2x text-success mb-2"></i>
+                                            <h6>Utenze Iscrivendo/Iscritti</h6>
+                                            <h4>@ViewBag.UtenzeIscrivendo</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Stat Box 3 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-user-minus fa-2x text-danger mb-2"></i>
+                                            <h6>Utenze Cancellando e Cancellato</h6>
+                                            <h4>@ViewBag.UtenzeCancellate</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Stat Box 4 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-arrows-rotate fa-2x text-warning mb-2"></i>
+                                            <h6>Utenze Iscrivendo/Cancellando</h6>
+                                            <h4>@ViewBag.UtenzeIscrivendoCancellando</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Stat Box 5 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-house fa-2x text-primary mb-2"></i>
+                                            <h6>Utenze Domestiche</h6>
+                                            <h4>@ViewBag.UtenzeDomestiche</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Stat Box 6 -->
+                                <div class="col-md-4">
+                                    <div class="card border-0 shadow-sm text-center">
+                                        <div class="card-body">
+                                            <i class="fa-solid fa-building fa-2x text-secondary mb-2"></i>
+                                            <h6>Utenze non Domestiche</h6>
+                                            <h4>@ViewBag.UtenzeNonDomestiche</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
                         <p class="lead mb-4 text-muted">Di seguito trovi le utenze registrate per l'ente selezionato.</p>
 
                         <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> <!-- nascosta finché carica -->

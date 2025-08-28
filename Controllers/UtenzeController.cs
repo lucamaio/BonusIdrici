@@ -143,6 +143,12 @@ namespace BonusIdrici2.Controllers
                 IdEnte = x.IdEnte
             }).ToList();
 
+            ViewBag.TotaleUtenze = viewModelList.Count;
+            ViewBag.UtenzeIscrivendo = viewModelList.Count(s => s.stato == 1 || s.stato == 2);
+            ViewBag.UtenzeCancellate = viewModelList.Count(s => s.stato == 4 || s.stato == 5);
+            ViewBag.UtenzeIscrivendoCancellando = viewModelList.Count(s => s.stato == 3);
+            ViewBag.UtenzeDomestiche = viewModelList.Count(s => s.tipoUtenza == "UTENZA DOMESTICA");
+            ViewBag.UtenzeNonDomestiche = viewModelList.Count(s => s.tipoUtenza != "UTENZA DOMESTICA");
 
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
