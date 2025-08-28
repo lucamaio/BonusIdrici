@@ -14,6 +14,7 @@ using ZstdSharp.Unsafe;
 using Org.BouncyCastle.Bcpg;
 using BonusIdrici2.Models;
 using Mysqlx.Notice;
+using System.Linq.Expressions;
 
 public class CSVReader
 {
@@ -824,7 +825,7 @@ public class CSVReader
     
 
     // Funzione che genera i report finali a partire dal file csv INPS
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int serie = 0)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int? serie)
     {
         // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
@@ -993,7 +994,7 @@ public class CSVReader
 
                 string? presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
                 string? numeroComponenti = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
-                DateTime? dataCreazione = DateTime.Now;
+                DateTime dataCreazione = DateTime.Now;
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
                 string esitoStr = "No";
@@ -1016,7 +1017,7 @@ public class CSVReader
                 var codiceFiscaleEnte = ente.CodiceFiscale;
                 var istatEnte = ente.istat;
                 var capEnte = ente.Cap;
-                
+
                 string? messaggio = null;
                 int? mc = null;
                 bool verificare = false;
@@ -1026,7 +1027,7 @@ public class CSVReader
                 {
                     // 2.c) se i campi corispondono verifico se il richiedente è residente nel comune selezionato
                     var dichiaranteTrovato = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId);
-                    if (dichiaranteTrovato != null )
+                    if (dichiaranteTrovato != null)
                     {
                         // 2.c.1) se è residente nel comune selzionato allora esito è uguale a Si
                         esitoStr = "Si";
@@ -1083,15 +1084,15 @@ public class CSVReader
                             //     }
                             var famigliari = context.Dichiaranti.Where(s => s.CodiceFamiglia == dichiaranteTrovato.CodiceFamiglia && s.CodiceFiscale == dichiaranteTrovato.CodiceFiscale && s.IdEnte == selectedEnteId).ToList();
 
-                            if(famigliari.Count > 0)
+                            if (famigliari.Count > 0)
                             {
-                                foreach(var membro in famigliari)
+                                foreach (var membro in famigliari)
                                 {
-                                    if(FunzioniTrasversali.CalcolaEta(membro.DataNascita) >= 18)
+                                    if (FunzioniTrasversali.CalcolaEta(membro.DataNascita) >= 18)
                                     {
-                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro.CodiceFiscale, selectedEnteId, context, membro,indirizzoAbitazione, numeroCivico);
+                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro.CodiceFiscale, selectedEnteId, context, membro, indirizzoAbitazione, numeroCivico);
                                         idFornituraIdrica = idFornituraMembro;
-                                        if(messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
+                                        if (messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
                                         {
                                             note = note + messaggeFamigliare;
                                         }
@@ -1120,14 +1121,14 @@ public class CSVReader
                             }
                         }
                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
-                        if(dichiaranteTrovato.NumeroComponenti != int.Parse(numeroComponenti))
+                        if (dichiaranteTrovato.NumeroComponenti != int.Parse(numeroComponenti))
                         {
                             note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). ";
 
                             logFile.LogWarning($"Attenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
                         }
                     }
-                    
+
                 }
                 else
                 {
@@ -1136,7 +1137,7 @@ public class CSVReader
                 }
 
                 // Aggiungo eventuali messaggi a note
-                if(note != null && !string.IsNullOrWhiteSpace(note))
+                if (note != null && !string.IsNullOrWhiteSpace(note))
                 {
                     verificare = true;
                     note = note + messaggio;
@@ -1162,7 +1163,19 @@ public class CSVReader
                     }
                 }
 
-               
+                // Se il check è attivo allore imposto come valore di serie quello di default della scheda ente
+                int valueSerie;
+                if (serie == null)
+                {
+                    valueSerie = context.Enti
+                                        .Where(s => s.id == selectedEnteId)
+                                        .Select(s => s.Serie)
+                                        .FirstOrDefault();
+                }
+                else
+                {
+                    valueSerie = (int) serie;
+                }
 
                 // 4) Creo un nuovo report con i dati raccolti
                 var report = new Report
@@ -1185,7 +1198,7 @@ public class CSVReader
                     numeroComponenti = int.Parse(numeroComponenti),
                     esitoStr = esitoStr,
                     esito = esito,
-                    serie = serie,
+                    serie = valueSerie,
                     mc = mc,
                     incongruenze = verificare,
                     note = note,
@@ -1216,7 +1229,7 @@ public class CSVReader
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo codiceFiscale
-                    
+
                     if (report.codiceFiscale != null && reportEsistente.codiceFiscale != null && reportEsistente.codiceFiscale != report.codiceFiscale)
                     {
                         reportEsistente.codiceFiscale = report.codiceFiscale;
@@ -1303,7 +1316,7 @@ public class CSVReader
 
                 }
 
-                
+
             }
             // Fine - lettura delle righe
             // Parte 7 : Scrittura dei log sul file corrispetivo

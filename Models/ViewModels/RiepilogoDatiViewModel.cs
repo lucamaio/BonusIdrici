@@ -5,7 +5,7 @@ namespace BonusIdrici2.Models.ViewModels
     public class RiepilogoDatiViewModel
     {
         public int? id { get; set; }
-        public DateTime? DataCreazione { get; set; }
+        public required DateTime DataCreazione { get; set; }
 
         public string idAto { get; set; }
 
@@ -15,7 +15,7 @@ namespace BonusIdrici2.Models.ViewModels
 
         public string? esito { get; set; }  // (1<valore>5) 
 
-         public int? idFornitura { get; set; }
+        public int? idFornitura { get; set; }
 
         public string? codiceFiscale { get; set; }
 
@@ -29,12 +29,15 @@ namespace BonusIdrici2.Models.ViewModels
 
         public int? mc { get; set; }
 
+
         public int? NumeroDatiInseriti { get; set; }
 
         public int? Iduser { get; set; }
 
         public int? IdEnte { get; set; }
         public string? Username { get; set; }
+        
+        public int? count { get; set; }
 
     }
 }

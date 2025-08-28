@@ -115,13 +115,13 @@
                     <table id="dettagliReportTable" class="table table-hover align-middle border-bottom">
                         <thead>
                             <tr>
-                                <th class="text-center">Id Fornitura</th>
-                                <th class="text-center">idAto</th>
+                                 <th class="text-center">idAto</th>
                                 <th class="text-center">Codice Bonus</th>
                                 <th class="text-center">Codice Fiscale</th>
+                                <th class="text-center">Id Fornitura</th>
+                                <th class="text-center">Componenti</th>
                                 <th class="text-center">Esito str</th>
                                 <th class="text-center">Esito</th>
-                                <th class="text-center">Componenti</th>
                                 <th class="text-center">Incongruente</th>
                                 @* <th class="text-center">Serie</th>
                                 <th class="text-center">MC</th> *@
@@ -132,10 +132,11 @@
                             @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td class="text-center"><span>@item.idFornitura</span></td>
                                     <td class="text-center"><span>@item.idAto</span></td>
-                                    <td class="fw-semibold text-center"><span >@item.codiceBonus</span></td>
+                                     <td class="fw-semibold text-center"><span >@item.codiceBonus</span></td>
                                     <td class="fw-semibold text-center"><span>@item.codiceFiscale</span></td>
+                                    <td class="text-center"><span>@item.idFornitura</span></td>
+                                    <td class="text-center"><span>@item.numeroComponenti</span></td>
                                     <td class="text-center">
                                             @if (string.IsNullOrEmpty(item.esitoStr))
                                             {
@@ -174,7 +175,6 @@
                                                 break;
                                         }
                                     </td>
-                                    <td><span class="text-center">@item.numeroComponenti</span></td>
                                     <td class="text-center">
                                          @if (item.incongruenze == false)
                                             {

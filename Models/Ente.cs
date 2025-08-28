@@ -6,19 +6,15 @@ namespace BonusIdrici2.Models
     public class Ente
     {
         [Key]
-
         public int id { get; set; }
 
         [Required]
-
         public required string nome { get; set; }
 
         [Required]
-
         public required string istat { get; set; }
 
         [Required]
-
         public required string partitaIva { get; set; }
 
         public string? CodiceFiscale { get; set; }
@@ -31,13 +27,19 @@ namespace BonusIdrici2.Models
         public string? Regione { get; set; }
 
         [Required]
+        public required int Serie { get; set; }
+
+        [Required]
         public required bool Piranha { get; set; }
+
         [Required]
         public required bool Selene { get; set; }
 
+        [Required]
         public required int IdUser { get; set; }
         
-        public DateTime? DataCreazione { get; set; }
+        [Required]
+        public required DateTime DataCreazione { get; set; }
         
         public DateTime? DataAggiornamento { get; set; }
     }

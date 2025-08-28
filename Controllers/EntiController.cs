@@ -101,6 +101,11 @@ namespace BonusIdrici2.Controllers
                 Cap = x.Cap,
                 Provincia = x.Provincia,
                 Regione = x.Regione,
+                Serie = x.Serie,
+                Piranha = x.Piranha,
+                Selene = x.Selene,
+                DataCreazione = x.DataCreazione,
+                DataAggiornamento = x.DataAggiornamento
             }).ToList();
 
             return View("Index", viewModelList);
@@ -157,7 +162,7 @@ namespace BonusIdrici2.Controllers
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [HttpPost]
-        public IActionResult Crea(String nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool Piranha, bool Selene)
+        public IActionResult Crea(String nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione,int serie, bool Piranha, bool Selene)
         {
             if (!VerificaSessione("ADMIN"))
             {
@@ -178,6 +183,7 @@ namespace BonusIdrici2.Controllers
                 Provincia = provincia?.Trim().ToUpper(),
                 Regione = regione?.Trim().ToUpper(),
                 CodiceFiscale = CodiceFiscale?.Trim().ToUpper(),
+                Serie = serie,
                 Piranha = Piranha,
                 Selene = Selene,
                 DataCreazione = DateTime.Now,
@@ -192,7 +198,7 @@ namespace BonusIdrici2.Controllers
         // Funzione che viene eseguita per aggiornare i dati del ente con queli inseriti nel form
 
         [HttpPost]
-        public IActionResult Update(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, bool? Nostro)
+        public IActionResult Update(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, int serie,bool Piranha, bool Selene)
         {
             var enteEsistente = _context.Enti.FirstOrDefault(s => s.id == id);
 
@@ -209,6 +215,21 @@ namespace BonusIdrici2.Controllers
             enteEsistente.Regione = regione?.Trim().ToUpper();
             enteEsistente.CodiceFiscale = CodiceFiscale?.Trim().ToUpper();
             enteEsistente.DataAggiornamento = DateTime.Now;
+
+            if (serie != enteEsistente.Serie)
+            {
+                enteEsistente.Serie = serie;
+            }
+
+            if (Piranha != enteEsistente.Piranha)
+            {
+                enteEsistente.Piranha = Piranha;
+            }
+            
+            if (Selene != enteEsistente.Selene)
+            {
+                enteEsistente.Selene = Selene;
+            }
 
             _context.SaveChanges();
             ViewBag.Message = "Dati ente aggiornati con successo";

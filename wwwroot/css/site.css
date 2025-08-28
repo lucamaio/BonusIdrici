@@ -457,3 +457,13 @@ body.dark-mode a {
   background-color: #193f87 !important;
   color: #fff !important;
 }
+
+.info-text {
+    background-color: #f8f9fa;   /* grigio chiaro */
+    border-left: 4px solid #2558b8; /* verde Bootstrap */
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #212529;
+}

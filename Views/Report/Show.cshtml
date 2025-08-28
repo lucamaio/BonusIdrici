@@ -1,10 +1,10 @@
 @model IEnumerable<BonusIdrici2.Models.ViewModels.RiepilogoDatiViewModel>
-
 @{
     ViewData["Title"] = "Riepilogo Dati Ente";
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
     var ruolo = ViewBag.Ruolo;
+    var reports = ViewBag.Report;
 }
 
 <div class="container-xxl flex-grow-1 py-5">
@@ -20,7 +20,7 @@
 
         <!-- Body -->
         <div class="card-body p-4">
-            @if (Model != null && Model.Any())
+            @if (reports != null)
             {
                 <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i report correlati.</p>
 
@@ -28,6 +28,7 @@
                     <table id="riepilogoTableReport" class="table table-hover align-middle border-bottom">
                         <thead>
                             <tr>
+                                <th class="text-center">ID ATO</th>
                                 <th class="text-center">Data Elaborazione</th>
                                 <th class="text-center">Elabotato da</th>
                                 <th class="text-center">Anno Validità</th>
@@ -36,18 +37,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model)
+                            @foreach (var report in reports)
                             {
-                                var dataUrl = item.DataCreazione?.ToString("yyyy-MM-dd");
-                                <tr>
-                                    <td><span class="fw-semibold">@item.DataCreazione?.ToString("dd/MM/yyyy")</span></td>
-                                    <td><span class="fw-semibold">@item.Username</span></td>
-                                    <td><span class="fw-semibold">@item.annoValidita</span></td>
-                                    <td>
+                                var dataUrl = report.DataCreazione.ToString("yyyy-MM-dd");
+
+                                  <tr>
+                                    <td class="text-center"><span>@report.idAto</span></td>
+                                    <td class="text-center"><span>@report.DataCreazione.ToString("dd/MM/yyyy")</span></td>
+                                    <td class="text-center"><span>@report.Username</span></td>
+                                    <td class="text-center"><span>@report.annoValidita</span></td>
+                                    <td class="text-center"><span>@report.count</span></td>
+                                    @* <td>
                                         <span class="badge bg-label-primary rounded-pill px-3 py-2" style="color: #000">
-                                            @item.NumeroDatiInseriti
+                                            @report.Count
                                         </span>
-                                    </td>
+                                    </td> *@
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center gap-2">
                                             <!-- Pulsante Dettaglio -->

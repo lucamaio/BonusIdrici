@@ -146,7 +146,7 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(report.incongruenze.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.note?.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.numeroComponenti.ToString(), Delimitatore)).Append(Delimitatore);
-                riga.Append(EscapeCsvField(report.DataCreazione?.ToString("yyyy-MM-dd HH:mm:ss"), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.DataCreazione.ToString("yyyy-MM-dd HH:mm:ss"), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.DataAggiornamento?.ToString("yyyy-MM-dd HH:mm:ss") ?? "", Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.IdEnte.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.IdUser.ToString(), Delimitatore)).Append(Delimitatore);                

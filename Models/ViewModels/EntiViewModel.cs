@@ -6,25 +6,28 @@ namespace BonusIdrici2.Models.ViewModels
     {
         public int id { get; set; }
         
-        public string nome { get; set; }
+        public required string nome { get; set; }
 
-        public string istat { get; set; }
+        public required string istat { get; set; }
 
-        public string? partitaIva { get; set; }
+        public required string partitaIva { get; set; }
 
         public string? CodiceFiscale { get; set; }
 
-        public string Cap { get; set; }
+        public required string Cap { get; set; }
 
         public string? Provincia { get; set; }
 
         public string? Regione { get; set; }
         
-        public bool? Nostro { get; set; }
-
-        public DateTime? data_creazione { get; set;}
+        public required int Serie { get; set; }
+        public required bool Selene { get; set; }
         
-        public DateTime? data_aggiornamento { get; set; }
+        public required bool Piranha { get; set; }
+
+        public required DateTime DataCreazione { get; set; }
+        
+        public DateTime? DataAggiornamento { get; set; }
         
     }
 }

@@ -55,7 +55,7 @@ namespace BonusIdrici2.Models
         [Required]
         public required DateTime? dataFineValidita { get; set; }
 
-        public DateTime? DataCreazione { get; set; }
+        public required DateTime DataCreazione { get; set; }
 
         public DateTime? DataAggiornamento { get; set; }
 

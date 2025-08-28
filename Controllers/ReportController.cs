@@ -5,6 +5,7 @@ using BonusIdrici2.Data;
 using System.Globalization;
 using BonusIdrici2.Models.ViewModels; // Aggiungi questo using
 using System.IO;
+using System.Collections.Generic; 
 
 namespace BonusIdrici2.Controllers
 {
@@ -116,29 +117,30 @@ namespace BonusIdrici2.Controllers
                 return View("Index", "Report");
             }
 
-            // Raggruppa per utente + data di creazione
-            var riepilogoDati = _context.Reports
-                                        .Where(r => r.IdEnte == selectedEnteId)
-                                        .GroupBy(r => new { r.IdUser, r.DataCreazione })
-                                        .Select(g => new RiepilogoDatiViewModel
-                                        {
-                                            Iduser = g.Key.IdUser,
-                                            Username = _context.Users
-                                                            .Where(u => u.id == g.Key.IdUser)
-                                                            .Select(u => u.Username)
-                                                            .FirstOrDefault(),
-                                            DataCreazione = g.Key.DataCreazione,
-                                            NumeroDatiInseriti = g.Count()
-                                        })
-                                        .OrderByDescending(x => x.DataCreazione)
-                                        .ToList();
+           // ✅ Raggruppa per utente + data di creazione e ordina in senso inverso
 
+            ViewBag.Report = _context.Reports
+                .Where(r => r.IdEnte == selectedEnteId)
+                .GroupBy(r => r.DataCreazione)
+                .Select(g => new RiepilogoDatiViewModel
+                {
+                    DataCreazione = g.Key,
+                    idAto = g.FirstOrDefault().idAto,
+                    count = g.Count(),
+                    annoValidita = g.FirstOrDefault().annoValidita,
+                    Username = _context.Users
+                                .Where(u => u.id == g.FirstOrDefault().IdUser)
+                                .Select(u => u.Username)
+                                .FirstOrDefault()
+                })
+                .OrderByDescending(x => x.DataCreazione)
+                .ToList();
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti
                                             .FirstOrDefault(e => e.id == selectedEnteId)?.nome
                                             ?? "Ente Sconosciuto";
 
-            return View("Show", riepilogoDati);
+            return View();
         }
 
         // Pagina 3: Consente la visualizzazione dei dati associati a un Report
@@ -320,6 +322,7 @@ namespace BonusIdrici2.Controllers
             {
                 IdEnte = idEnte,
                 idAto = idAto,
+                DataCreazione = report.DataCreazione,
                 serie = report.serie
             };
             // 6) Apro la pagina
