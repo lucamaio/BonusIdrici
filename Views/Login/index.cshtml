@@ -15,10 +15,10 @@
                         <p class="text-secondary">Inserisci le tue credenziali per accedere al pannello di controllo.</p>
                     </div>
 
-                     @if (!string.IsNullOrEmpty(ViewBag.Message))
+                    @if (!string.IsNullOrEmpty(TempData["Message"] as string))
                     {
                         <div class="alert alert-info mt-4 shadow-sm border-0">
-                            <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
+                            <i class="bi bi-info-circle me-2"></i> @TempData["Message"]
                         </div>
                     }
 
