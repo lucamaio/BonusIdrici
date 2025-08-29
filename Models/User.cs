@@ -32,7 +32,7 @@ namespace BonusIdrici2.Models
             {
                 case 1: return "ADMIN";
                 case 2: return "OPERATORE";
-                default: return null;
+                default: return "N/A";
 
             }
         }

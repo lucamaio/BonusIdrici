@@ -152,6 +152,44 @@ namespace BonusIdrici2.Controllers
             ViewBag.Enti = enti;
             return View();
         }
+
+        // Pagina 6: Modifica di un utente
+
+        public IActionResult Modifica(int id)
+        {
+            if (!VerificaSessione()) 
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+            
+            ViewBag.id = id;
+            User? utente = _context.Users.FirstOrDefault(s => s.id == id);
+            if (utente == null) {
+                ViewBag.Message = "Utente non trovato!";
+                return Show();
+            }
+            List<Ruolo> ruoli=  _context.Ruoli.ToList();
+            List<Ente> enti = _context.Enti.ToList();
+
+            List<int> selectedEntiIds = new List<int>();
+            if (utente.idRuolo == 2)
+            {
+                selectedEntiIds = _context.UserEnti
+                                        .Where(s => s.idUser == utente.id)
+                                        .Select(s => s.idEnte)
+                                        .ToList();
+            }
+
+            ViewBag.SelectedEntiIds = selectedEntiIds; // usato dalla vista per il ListBox
+            ViewBag.idRuolo = utente.idRuolo;
+            ViewBag.Enti = enti;
+            ViewBag.Ruoli = ruoli;
+            ViewBag.Utente = utente;
+            return View();
+        }
+
+
         // Fine - Pagine di navigazione
         // Inizio - Funzioni
 
@@ -222,8 +260,29 @@ namespace BonusIdrici2.Controllers
         // ....
 
         // Funzione 3: Modifica dati utente
+ [HttpPost]
+        public IActionResult Update(int id, string username, string cognome, string nome, string email, string password )
+        {
+            var UtenteEsistente = _context.Users.FirstOrDefault(t => t.id == id);
 
-        // ....
+            if (UtenteEsistente == null)
+            {
+                return RedirectToAction("Index", "Home"); // oppure restituisci una view con errore
+            }
+
+            // Aggiorna le proprietà
+            UtenteEsistente.Cognome = FunzioniTrasversali.rimuoviVirgolette(cognome);
+            UtenteEsistente.Nome = FunzioniTrasversali.rimuoviVirgolette(nome);
+            UtenteEsistente.Username = FunzioniTrasversali.rimuoviVirgolette(username);
+            UtenteEsistente.Email = FunzioniTrasversali.rimuoviVirgolette(email);
+            UtenteEsistente.Password = FunzioniTrasversali.rimuoviVirgolette(password);
+            UtenteEsistente.dataAggiornamento = DateTime.Now;
+
+            _context.SaveChanges();
+
+            return Show();
+        }
+
 
     }
 }
