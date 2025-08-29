@@ -198,7 +198,7 @@ namespace BonusIdrici2.Controllers
         // Funzione che viene eseguita per aggiornare i dati del ente con queli inseriti nel form
 
         [HttpPost]
-        public IActionResult Update(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, int serie,bool Piranha, bool Selene)
+        public IActionResult Update(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, int serie, bool? Piranha, bool? Selene)
         {
             var enteEsistente = _context.Enti.FirstOrDefault(s => s.id == id);
 
@@ -221,20 +221,15 @@ namespace BonusIdrici2.Controllers
                 enteEsistente.Serie = serie;
             }
 
-            if (Piranha != enteEsistente.Piranha)
-            {
-                enteEsistente.Piranha = Piranha;
-            }
-            
-            if (Selene != enteEsistente.Selene)
-            {
-                enteEsistente.Selene = Selene;
-            }
+            // Se il checkbox non è selezionato, il valore sarà null, quindi impostiamo a false
+            enteEsistente.Piranha = Piranha ?? false;
+            enteEsistente.Selene = Selene ?? false;
 
             _context.SaveChanges();
             ViewBag.Message = "Dati ente aggiornati con successo";
             return Index();
         }
+
         
         // Fine - Funzioni da eseguire a seconda della operazione
 
