@@ -993,7 +993,8 @@ public class CSVReader
                 string? provinciaAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[13]).ToUpper();
 
                 string? presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
-                string? numeroComponenti = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
+                string numeroComponenti_str = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
+                int numeroComponenti = int.Parse(numeroComponenti_str);
                 DateTime dataCreazione = DateTime.Now;
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
@@ -1121,10 +1122,10 @@ public class CSVReader
                             }
                         }
                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
-                        if (dichiaranteTrovato.NumeroComponenti != int.Parse(numeroComponenti))
+                        if (dichiaranteTrovato.NumeroComponenti != numeroComponenti)
                         {
-                            note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). ";
-
+                            note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). é stato impostato come valore quello ricavato dal anagrafe.";
+                            numeroComponenti = dichiaranteTrovato.NumeroComponenti;
                             logFile.LogWarning($"Attenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
                         }
                     }
@@ -1155,7 +1156,7 @@ public class CSVReader
                         // Evito valori negativi
                         if (giorni < 0) giorni = 0;
 
-                        mc = CSVReader.calcolaMC(giorni, int.Parse(numeroComponenti));
+                        mc = CSVReader.calcolaMC(giorni, numeroComponenti);
                     }
                     else
                     {
@@ -1195,7 +1196,7 @@ public class CSVReader
                     capAbitazione = capAbitazione,
                     provinciaAbitazione = provinciaAbitazione,
                     presenzaPod = presenzaPod,
-                    numeroComponenti = int.Parse(numeroComponenti),
+                    numeroComponenti = numeroComponenti,
                     esitoStr = esitoStr,
                     esito = esito,
                     serie = valueSerie,

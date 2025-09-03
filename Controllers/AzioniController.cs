@@ -141,6 +141,7 @@ namespace BonusIdrici2.Controllers
                 ViewBag.Enti = _context.Enti.ToList();
                 return LoadFileINPS();
             }
+            
 
             string filePath = Path.GetTempFileName(); // Crea un file temporaneo
 
@@ -154,7 +155,7 @@ namespace BonusIdrici2.Controllers
 
                 // Leggi il file CSV con la tua classe CSVReader
                 var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser, serie);
-
+                AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");
                 using (var transaction = _context.Database.BeginTransaction())
                 {
                     try

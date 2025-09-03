@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using BonusIdrici2.Models; 
 using BonusIdrici2.Data;
 
@@ -9,21 +10,70 @@ namespace BonusIdrici2.Controllers
         private readonly ILogger<LoginController> _logger;
         private readonly ApplicationDbContext _context;
 
+
+         // Variabili per la gestione dell'utente
+        private string? ruolo;
+        private int idUser;
+        private string? username;
+
+
         public LoginController(ILogger<LoginController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
+
+             if (VerificaSessione())
+            {
+                username = HttpContext.Session.GetString("Username");
+                ruolo = HttpContext.Session.GetString("Role");
+                idUser = (int)HttpContext.Session.GetInt32("idUser");
+            }
         }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            // Ora HttpContext è disponibile
+            username = HttpContext.Session.GetString("Username");
+            ruolo = HttpContext.Session.GetString("Role");
+            idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+
+            if (!VerificaSessione())
+            {
+                username = null;
+                ruolo = null;
+                idUser = 0;
+            }
+
+            // Così le variabili sono disponibili in tutte le viste
+            ViewBag.idUser = idUser;
+            ViewBag.Username = username;
+            ViewBag.Ruolo = ruolo;
+        }
+
+        // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
+
+        public bool VerificaSessione(string? ruoloRichiesto = null)
+        {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(ruolo))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(ruoloRichiesto) && ruolo != ruoloRichiesto)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
 
         // Pagina di login
         public IActionResult Index()
         {
-            // Controlla se l'utente è già loggato
-            string username = HttpContext.Session.GetString("Username");
-            string ruolo = HttpContext.Session.GetString("Role");
-
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(ruolo))
-            {
+            if(VerificaSessione()){
                 return RedirectToAction("Index", "Home");
             }
 
@@ -48,6 +98,8 @@ namespace BonusIdrici2.Controllers
                 TempData["Message"] = "Username o password errati.";
                 return RedirectToAction("Index");
             }
+            // Salvo il messagio di un nuovo accesso
+            AccountController.logFile.LogInfo($"Utente logato: {utente.Username} ");
 
             // Salva i dati dell'utente in sessione
             HttpContext.Session.SetInt32("idUser", utente.id);
@@ -56,9 +108,10 @@ namespace BonusIdrici2.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
+    
         public IActionResult Logout()
         {
+            AccountController.logFile.LogInfo($"Utente disconesso: {username} ");
             HttpContext.Session.Clear(); // Pulisce la sessione
             TempData["Message"] = "Logout effettuato con successo!";
             return RedirectToAction("Index");

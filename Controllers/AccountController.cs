@@ -18,6 +18,9 @@ namespace BonusIdrici2.Controllers
         private int idUser;
         private string? username;
 
+        // File di Log accessi 
+        public static FileLog logFile = new FileLog($"wwwroot/log/utenti.log");
+
         public AccountController(ILogger<AccountController> logger, ApplicationDbContext context)
         {
             _logger = logger;
@@ -27,7 +30,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
-                idUser = (int) HttpContext.Session.GetInt32("idUser");
+                idUser = (int)HttpContext.Session.GetInt32("idUser");
             }
         }
 
@@ -195,63 +198,79 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 1: Crea nuovo utente
         [HttpPost]
-        public IActionResult Crea(string username, string email, string? cognome, string? nome, int ruolo, List<int> enti){
+        public IActionResult Crea(string username, string email, string password, string? cognome, string? nome, int ruolo, List<int> enti){
+           
             // a) Verifico se esiste una sessione
-            if(!VerificaSessione("ADMIN")){
+            if (!VerificaSessione("ADMIN"))
+            {
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
-               return RedirectToAction("Index", "Login"); // Ritorno alla pagina di login
+                return RedirectToAction("Index", "Login"); // Ritorno alla pagina di login
             }
-
+            
             // c) Controllo che i dati siano stati inseriti correttamente
-            if(string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(cognome) || string.IsNullOrEmpty(nome) || ruolo==0 || enti.Count==0){
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(cognome) || string.IsNullOrEmpty(nome) || ruolo == 0 || enti.Count == 0)
+            {
                 ViewBag.Error = "Tutti i campi contrassegnati con * sono obbligatori";
-                return Create(); // Ritorno alla pagina di creazione
+                return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
             // d) Controllo che l'username non esista già
             var userExists = _context.Users.Any(u => u.Username == username);
             if(userExists){
                 ViewBag.Error = "L'username esiste già. Scegliere un altro username.";
-                return Create(); // Ritorno alla pagina di creazione
+                return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
             // e) Controllo che l'email non esista già
             var emailExists = _context.Users.Any(u => u.Email == email);
             if(emailExists){
                 ViewBag.Error = "L'email esiste già. Scegliere un'altra email.";
-                return Create(); // Ritorno alla pagina di creazione
+                return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
+           
             // f) Creo l'utente
             var newUser = new User{
                 Username = username,
                 Email = email,
                 Cognome = cognome,
+                Password = password,
                 Nome = nome,
                 idRuolo = ruolo,
                 dataCreazione = DateTime.Now
             };
+            
 
             _context.Users.Add(newUser);
             _context.SaveChanges();
+            //Console.WriteLine("Utente creato!");
 
             // g) Associo l'utente agli enti selezionati
-            foreach(var enteId in enti){
-                var ente = _context.Enti.Find(enteId);
-                if(ente != null){
-                    // Qui puoi implementare la logica per associare l'utente all'ente
-                    // Ad esempio, se hai una tabella di associazione UserEnte, puoi aggiungere una nuova voce lì
-                    var userEnte = new UserEnte{
-                        idUser = newUser.id,
-                        idEnte = enteId
-                    };
-                    _context.UserEnti.Add(userEnte);
+            //Console.WriteLine($"Username : {username} | Password: {password} | email: {email} | Cognome: {cognome} | Nome: {nome} | ruolo {ruolo}");
+            if (ruolo == 2)
+            {
+                foreach (var enteId in enti)
+                {
+                    var ente = _context.Enti.Find(enteId);
+                    //Console.WriteLine(ente.ToString());
+                    if (ente != null)
+                    {
+                        // Qui puoi implementare la logica per associare l'utente all'ente
+                        // Ad esempio, se hai una tabella di associazione UserEnte, puoi aggiungere una nuova voce lì
+                        var userEnte = new UserEnte
+                        {
+                            idUser = newUser.id,
+                            idEnte = enteId
+                        };
+                        _context.UserEnti.Add(userEnte);
+                    }
+                    _context.SaveChanges();
+                    //Console.WriteLine("Enti Collegati!");
                 }
-                 _context.SaveChanges();
             }
 
             ViewBag.Message = "Utente creato con successo";
-            return Show();
+            return RedirectToAction("Show");
         }
 
 
@@ -260,7 +279,7 @@ namespace BonusIdrici2.Controllers
         // ....
 
         // Funzione 3: Modifica dati utente
- [HttpPost]
+        [HttpPost]
         public IActionResult Update(int id, string username, string cognome, string nome, string email, string password )
         {
             var UtenteEsistente = _context.Users.FirstOrDefault(t => t.id == id);
@@ -273,14 +292,27 @@ namespace BonusIdrici2.Controllers
             // Aggiorna le proprietà
             UtenteEsistente.Cognome = FunzioniTrasversali.rimuoviVirgolette(cognome);
             UtenteEsistente.Nome = FunzioniTrasversali.rimuoviVirgolette(nome);
-            UtenteEsistente.Username = FunzioniTrasversali.rimuoviVirgolette(username);
-            UtenteEsistente.Email = FunzioniTrasversali.rimuoviVirgolette(email);
-            UtenteEsistente.Password = FunzioniTrasversali.rimuoviVirgolette(password);
+
+            if (UtenteEsistente.Username != username)
+            {
+                UtenteEsistente.Username = FunzioniTrasversali.rimuoviVirgolette(username);
+            }
+
+            if (UtenteEsistente.Email != email)
+            {
+                UtenteEsistente.Email = FunzioniTrasversali.rimuoviVirgolette(email);
+            }
+
+            if (UtenteEsistente.Password != password)
+            {
+                UtenteEsistente.Password = FunzioniTrasversali.rimuoviVirgolette(password);
+            }
+
             UtenteEsistente.dataAggiornamento = DateTime.Now;
 
             _context.SaveChanges();
 
-            return Show();
+            return RedirectToAction("Show");
         }
 
 

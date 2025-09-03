@@ -14,7 +14,7 @@
             <div class="modern-card shadow rounded-4 border-0">
 
                 <!-- HEADER -->
-                <div class="card-header header-enti border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                <div class="card-header header-account border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
                     <h3 class="mb-1 fw-bold fs-4">
                         <i class="fa-solid fa-pen-to-square me-2"></i>
                         <span class="fw-semibold">Modifica Utente</span>
@@ -23,7 +23,7 @@
 
                 <!-- FORM -->
                 <div class="modern-card-body p-4 small">
-                    <form asp-controller="Enti" asp-action="Update" method="POST" enctype="multipart/form-data">
+                    <form asp-controller="Account" asp-action="Update" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="@utente?.id" />
 
                         <div class="accordion" id="accordionEnte">
@@ -91,7 +91,7 @@
                             @* SEZIONE ENTI: visibile solo se utente attualmente ha ruolo == 2 *@
                             @if (idRuolo == 2)
                             {
-                                <div class="accordion-item">
+                                @* <div class="accordion-item">
                                     <h2 class="accordion-header" id="heading2">
                                         <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
                                                 data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
@@ -112,7 +112,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
                             }
 
                             <!-- METADATI -->

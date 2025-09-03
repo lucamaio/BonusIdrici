@@ -37,7 +37,7 @@ namespace BonusIdrici2.Models
         public string? Parentela { get; set; }
         public string? CodiceFiscaleIntestatarioScheda { get; set; }
 
-        public int? NumeroComponenti { get; set; }
+        public int NumeroComponenti { get; set; }
        
        [Required]
         public required int IdEnte { get; set; } // ID dell'ente associato al dichiarante
