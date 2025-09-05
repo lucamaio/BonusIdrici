@@ -147,7 +147,7 @@ namespace BonusIdrici2.Controllers
         }
 
         // Pagina per la creazione di un nuovo dichiarante
-        public IActionResult Create(int idEnte)
+        public IActionResult Create(int idEnte, int? codiceFamiglia, string? codiceIntestarioScheda, string? indirizzoResidenza, string? civico)
         {
             if (!VerificaSessione()) 
             {
@@ -156,6 +156,14 @@ namespace BonusIdrici2.Controllers
             }
 
             ViewBag.IdEnte = idEnte;
+            ViewBag.codiceFamiglia = codiceFamiglia;
+            ViewBag.indirizzoResidenza = indirizzoResidenza;
+            ViewBag.NumeroCivico = civico;
+            if (codiceFamiglia != null)
+            {
+                ViewBag.Parentele = _context.Dichiaranti.Select(s => s.Parentela).Distinct().ToList();
+                ViewBag.codiceIntestarioScheda = codiceIntestarioScheda;
+            }
             return View();
         }
 
@@ -170,8 +178,10 @@ namespace BonusIdrici2.Controllers
             }
             
             ViewBag.id = id;
-            List<Dichiarante> dichiarante = _context.Dichiaranti.Where(s => s.id == id).ToList();
-            ViewBag.Dichiarante = dichiarante.First();
+            var dichiarante = _context.Dichiaranti.FirstOrDefault(s => s.id == id);
+            var parenti = _context.Dichiaranti.Where(s => s.CodiceFamiglia == dichiarante.CodiceFamiglia && s.id != id);
+            ViewBag.Dichiarante = dichiarante;
+            ViewBag.Parenti = parenti;
             return View();
         }
 
@@ -197,7 +207,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 1: che consente di andare a creare un nuovo dichiarante da i dati provenienti dal form Anagrafe/Create.cshtml
         [HttpPost]
-        public IActionResult Crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte)
+        public IActionResult Crea(string cognome, string nome, string codice_fiscale, string sesso, DateTime data_nascita, string? comune_nascita, string indirizzo_residenza, string numero_civico, int idEnte, int? codiceFamiglia, string? parentela, string? codiceIntestarioScheda)
         {
             var nuovaPersona = new Dichiarante
             {
@@ -210,12 +220,28 @@ namespace BonusIdrici2.Controllers
                 IndirizzoResidenza = indirizzo_residenza.ToUpper(),
                 NumeroCivico = FunzioniTrasversali.FormattaNumeroCivico(numero_civico).ToUpper(),
                 IdEnte = idEnte,
+                CodiceFamiglia = codiceFamiglia,
+                Parentela = parentela,
+                CodiceFiscaleIntestatarioScheda = codiceIntestarioScheda,
                 IdUser = idUser,
                 data_creazione = DateTime.Now,
                 data_aggiornamento = null
             };
 
             _context.Dichiaranti.Add(nuovaPersona);
+            _context.SaveChanges();
+            if (codiceFamiglia == null)
+            {
+                return RedirectToAction("Modifica", "Anagrafe", new { id = nuovaPersona.id });
+            }
+            var dichiarantiNucleo = _context.Dichiaranti.Where(s => s.CodiceFamiglia == codiceFamiglia).ToList();
+            // aggiorno il numero dei componeti del nucleo
+            foreach (var membro in dichiarantiNucleo)
+            {
+                membro.NumeroComponenti = membro.NumeroComponenti + 1;
+                membro.data_aggiornamento = DateTime.Now;
+            }
+            _context.Dichiaranti.Update(nuovaPersona);
             _context.SaveChanges();
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });

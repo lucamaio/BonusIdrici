@@ -21,11 +21,17 @@ namespace BonusIdrici2.Models
 
         public int? idFornitura { get; set; }
 
-        public string? codiceFiscale { get; set; }
+        public string? codiceFiscaleRichiedente { get; set; }
+
+        public string? codiceFiscaleUtenzaTrovata { get; set; }
+
+        public int? idUtenza { get; set; }
 
         public int? numeroComponenti { get; set; }
         public string? nomeDichiarante { get; set; }
         public string? cognomeDichiarante { get; set; }
+
+        public int? idDichiarante { get; set; }
 
         public string? annoValidita { get; set; }
 
@@ -67,7 +73,7 @@ namespace BonusIdrici2.Models
 
         public override string ToString()
         {
-            return $"Report: id={id}, codiceBonus={codiceBonus}, esitoStr={esitoStr}, esito={esito}, idFornitura={idFornitura}, codiceFiscale={codiceFiscale}, "+
+            return $"Report: id={id}, codiceBonus={codiceBonus}, esitoStr={esitoStr}, esito={esito}, idFornitura={idFornitura}, codiceFiscale={codiceFiscaleRichiedente}, "+
                 $"numeroComponenti ={numeroComponenti}, nomeDichiarante={nomeDichiarante}, cognomeDichiarante={cognomeDichiarante}, annoValidita={annoValidita}, "+
                 $"indirizzoAbitazione ={indirizzoAbitazione}, numeroCivico={numeroCivico}, istat={istat}, capAbitazione={capAbitazione}, provinciaAbitazione={provinciaAbitazione}, "+
                 $"presenzaPod ={presenzaPod}, dataInizioValidita={dataInizioValidita}, dataFineValidita={dataFineValidita}, DataCreazione={DataCreazione}, IdEnte={IdEnte}";

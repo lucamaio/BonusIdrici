@@ -4,6 +4,9 @@
     var dichiarante = ViewBag.Dichiarante;
     var sesso = dichiarante.Sesso;
     var sessi = new List<string> { "M", "F" };
+    var parenti = ViewBag.Parenti;
+    @* var componenti= parenti.Count + 1; *@
+    var componenti = dichiarante.NumeroComponenti;
 }
 
 <div class="report-page container my-5">
@@ -111,22 +114,62 @@
                             </div>
 
                         <!-- SEZIONE 3 -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading3">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
-                                             <i class="fa-solid fa-users"></i> Parenti
-                                    </button>
-                                </h2>
-                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
-                                     data-bs-parent="#accordionDichiarante">
-                                    <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-3 g-4">
-                                           @* // Da Implementare la visualizzazione dei parenti *@
-                                        </div>
+                       <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading3">
+                                <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    <i class="fa-solid fa-users me-2"></i> Parenti
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
+                                data-bs-parent="#accordionDichiarante">
+                                <div class="accordion-body">
+
+                                    <!-- Pulsante aggiungi parente -->
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="fw-bold text-secondary mb-0">
+                                            <i class="fa-solid fa-people-group me-2"></i> Elenco Parenti
+                                        </h6>
+                                        <span>Componenti Nucleo: @componenti</span>
+                                        <a href="@Url.Action("Create", "Anagrafe", new { idEnte = dichiarante.IdEnte, codiceFamiglia = dichiarante.CodiceFamiglia, codiceIntestarioScheda = dichiarante.CodiceFiscaleIntestatarioScheda, indirizzoResidenza = dichiarante.IndirizzoResidenza, civico = dichiarante.NumeroCivico})"
+                                        class="btn btn-sm btn-success rounded-3 shadow-sm">
+                                            <i class="fa-solid fa-user-plus me-1"></i> Aggiungi Parente
+                                        </a>
                                     </div>
+
+                                    <!-- Elenco schede parente -->
+                                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                                        @foreach (var membro in parenti)
+                                        {
+                                            <div class="col">
+                                                <div class="card shadow-sm rounded-3 border-0 h-100">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title mb-3 d-flex justify-content-between align-items-center">
+                                                            <span>
+                                                                <i class="fa-solid fa-user me-2 text-primary"></i>
+                                                                <a href="@Url.Action("Modifica", "Anagrafe", new { id = membro.id })" 
+                                                                class="text-decoration-none text-dark fw-semibold">
+                                                                    @membro.Cognome @membro.Nome
+                                                                </a>
+                                                            </span>
+                                                            <span class="badge bg-light text-dark border">@membro.Parentela</span>
+                                                        </h6>
+                                                        <ul class="list-unstyled small mb-0">
+                                                            <li><strong>Sesso:</strong> @membro.Sesso</li>
+                                                            <li><strong>Codice Fiscale:</strong> @membro.CodiceFiscale</li>
+                                                            <li><strong>Data di nascita:</strong> @(membro.DataNascita?.ToString("dd/MM/yyyy"))</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
+
+
                         
                         @* Metadati *@
                         <div class="accordion-item">

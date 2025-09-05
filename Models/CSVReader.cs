@@ -21,7 +21,7 @@ public class CSVReader
     private const char CsvDelimiter = ';';
 
     public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
-    {   
+    {
         // Parte 1: Creazione della variabile da restituire e apertura file di log
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_Anagrafe.log");
@@ -137,7 +137,8 @@ public class CSVReader
 
                 var dichiaranteEsistente = _context.Dichiaranti.FirstOrDefault(d => d.CodiceFiscale == dichiarante.CodiceFiscale && d.IdEnte == selectedEnteId);
 
-                if(dichiaranteEsistente == null){
+                if (dichiaranteEsistente == null)
+                {
                     datiComplessivi.Dichiaranti.Add(dichiarante);
                 }
                 else
@@ -146,102 +147,116 @@ public class CSVReader
                     bool aggiornare = false;
 
                     // Verifico ogni campo e aggiorno se necessario
-                    
+
                     // 1. Verifico il cognome
 
-                    if(dichiaranteEsistente.Cognome != null && dichiarante.Cognome != null && dichiaranteEsistente.Cognome != dichiarante.Cognome){
+                    if (dichiaranteEsistente.Cognome != null && dichiarante.Cognome != null && dichiaranteEsistente.Cognome != dichiarante.Cognome)
+                    {
                         dichiaranteEsistente.Cognome = dichiarante.Cognome;
                         aggiornare = true;
                     }
                     // 2. Verifico il nome
 
-                    if(dichiaranteEsistente.Nome != null && dichiarante.Nome != null && dichiaranteEsistente.Nome != dichiarante.Nome){
+                    if (dichiaranteEsistente.Nome != null && dichiarante.Nome != null && dichiaranteEsistente.Nome != dichiarante.Nome)
+                    {
                         dichiaranteEsistente.Nome = dichiarante.Nome;
                         aggiornare = true;
                     }
 
                     // 3. Verifico il sesso
 
-                    if(dichiaranteEsistente.Sesso != null && dichiarante.Sesso != null && dichiaranteEsistente.Sesso != dichiarante.Sesso){
+                    if (dichiaranteEsistente.Sesso != null && dichiarante.Sesso != null && dichiaranteEsistente.Sesso != dichiarante.Sesso)
+                    {
                         dichiaranteEsistente.Sesso = dichiarante.Sesso;
                         aggiornare = true;
                     }
 
                     // 4. Verifico la data di nascita
 
-                    if(dichiaranteEsistente.DataNascita != dichiarante.DataNascita){
+                    if (dichiaranteEsistente.DataNascita != dichiarante.DataNascita)
+                    {
                         dichiaranteEsistente.DataNascita = dichiarante.DataNascita;
                         aggiornare = true;
                     }
 
                     // 5. Verifico il comune di nascita
 
-                    if(dichiaranteEsistente.ComuneNascita != null && dichiarante.ComuneNascita != null && dichiaranteEsistente.ComuneNascita != dichiarante.ComuneNascita){
+                    if (dichiaranteEsistente.ComuneNascita != null && dichiarante.ComuneNascita != null && dichiaranteEsistente.ComuneNascita != dichiarante.ComuneNascita)
+                    {
                         dichiaranteEsistente.ComuneNascita = dichiarante.ComuneNascita;
                         aggiornare = true;
                     }
 
                     // 6. Verifico l'indirizzo di residenza
 
-                    if(dichiaranteEsistente.IndirizzoResidenza != null && dichiarante.IndirizzoResidenza != null && dichiaranteEsistente.IndirizzoResidenza != dichiarante.IndirizzoResidenza){
+                    if (dichiaranteEsistente.IndirizzoResidenza != null && dichiarante.IndirizzoResidenza != null && dichiaranteEsistente.IndirizzoResidenza != dichiarante.IndirizzoResidenza)
+                    {
                         dichiaranteEsistente.IndirizzoResidenza = dichiarante.IndirizzoResidenza;
                         aggiornare = true;
                     }
 
                     // 7. Verifico il numero civico
 
-                    if(dichiaranteEsistente.NumeroCivico != null && dichiarante.NumeroCivico != null && dichiaranteEsistente.NumeroCivico != dichiarante.NumeroCivico){
+                    if (dichiaranteEsistente.NumeroCivico != null && dichiarante.NumeroCivico != null && dichiaranteEsistente.NumeroCivico != dichiarante.NumeroCivico)
+                    {
                         dichiaranteEsistente.NumeroCivico = dichiarante.NumeroCivico;
                         aggiornare = true;
                     }
 
                     // 8. Verifico la parentela
 
-                    if(dichiaranteEsistente.Parentela != null && dichiarante.Parentela != null && dichiaranteEsistente.Parentela != dichiarante.Parentela){
+                    if (dichiaranteEsistente.Parentela != null && dichiarante.Parentela != null && dichiaranteEsistente.Parentela != dichiarante.Parentela)
+                    {
                         dichiaranteEsistente.Parentela = dichiarante.Parentela;
                         aggiornare = true;
                     }
 
                     // 9. Verifico il codice famiglia
 
-                    if(dichiaranteEsistente.CodiceFamiglia != dichiarante.CodiceFamiglia){
+                    if (dichiaranteEsistente.CodiceFamiglia != dichiarante.CodiceFamiglia)
+                    {
                         dichiaranteEsistente.CodiceFamiglia = dichiarante.CodiceFamiglia;
                         aggiornare = true;
                     }
 
                     // 10. Verifico il codice abitante
 
-                    if(dichiaranteEsistente.CodiceAbitante != dichiarante.CodiceAbitante){
+                    if (dichiaranteEsistente.CodiceAbitante != dichiarante.CodiceAbitante)
+                    {
                         dichiaranteEsistente.CodiceAbitante = dichiarante.CodiceAbitante;
                         aggiornare = true;
                     }
 
                     // 11. Verifico il numero componenti
 
-                    if(dichiaranteEsistente.NumeroComponenti != dichiarante.NumeroComponenti){
+                    if (dichiaranteEsistente.NumeroComponenti != dichiarante.NumeroComponenti)
+                    {
                         dichiaranteEsistente.NumeroComponenti = dichiarante.NumeroComponenti;
                         aggiornare = true;
                     }
 
                     // 12. Verifico il codice fiscale intestatario scheda
 
-                    if(dichiaranteEsistente.CodiceFiscaleIntestatarioScheda != null && dichiarante.CodiceFiscaleIntestatarioScheda != null && dichiaranteEsistente.CodiceFiscaleIntestatarioScheda != dichiarante.CodiceFiscaleIntestatarioScheda){
+                    if (dichiaranteEsistente.CodiceFiscaleIntestatarioScheda != null && dichiarante.CodiceFiscaleIntestatarioScheda != null && dichiaranteEsistente.CodiceFiscaleIntestatarioScheda != dichiarante.CodiceFiscaleIntestatarioScheda)
+                    {
                         dichiaranteEsistente.CodiceFiscaleIntestatarioScheda = dichiarante.CodiceFiscaleIntestatarioScheda;
                         aggiornare = true;
                     }
 
                     // 13. Verifico la data di cancellazione
-                    
-                    if(dichiaranteEsistente.data_cancellazione != null && dichiarante.data_cancellazione != null && dichiaranteEsistente.data_cancellazione != dichiarante.data_cancellazione){
+
+                    if (dichiaranteEsistente.data_cancellazione != null && dichiarante.data_cancellazione != null && dichiaranteEsistente.data_cancellazione != dichiarante.data_cancellazione)
+                    {
                         dichiaranteEsistente.data_cancellazione = dichiarante.data_cancellazione;
                         aggiornare = true;
                     }
 
                     // Se è necessario aggiornare il dichiarante esistente
-                    if(aggiornare){
+                    if (aggiornare)
+                    {
                         datiComplessivi.DichiarantiDaAggiornare.Add(dichiaranteEsistente);
                     }
-                }       
+                }
             }
 
             // Fine - Lettura delle varie righe
@@ -327,7 +342,7 @@ public class CSVReader
                 // logFile.LogInfo($"AVVISO: La lista di toponimi per l'ente {selectedEnteId} è null. Ne creo una nuova.");
                 toponimi = new List<Toponimo>();
             }
-           
+
 
             // Carico tutte le utenze idrciche asssociate al ente
 
@@ -513,7 +528,7 @@ public class CSVReader
                 }
                 else
                 {
-                     var toponimoLista = datiComplessivi.Toponimi?.FirstOrDefault(t => t.denominazione == indirizzoUbicazione && t.IdEnte == selectedEnteId);
+                    var toponimoLista = datiComplessivi.Toponimi?.FirstOrDefault(t => t.denominazione == indirizzoUbicazione && t.IdEnte == selectedEnteId);
 
                     if (toponimoLista != null)
                     {
@@ -726,7 +741,7 @@ public class CSVReader
                         aggiornare = true;
                     }
 
-                    if(utenzaEsistente.IdDichiarante != null && utenza.IdDichiarante != null && utenzaEsistente.IdDichiarante != utenza.IdDichiarante)
+                    if (utenzaEsistente.IdDichiarante != null && utenza.IdDichiarante != null && utenzaEsistente.IdDichiarante != utenza.IdDichiarante)
                     {
                         // logFile.LogInfo($"Aggiorno IdDichiarante da {utenzaEsistente.IdDichiarante} a {utenza.IdDichiarante}");
                         utenzaEsistente.IdDichiarante = utenza.IdDichiarante;
@@ -743,7 +758,7 @@ public class CSVReader
                     }
 
                 }
-        }
+            }
 
             // Fine - lettura delle righe
 
@@ -822,10 +837,10 @@ public class CSVReader
 
         return datiComplessivi;
     }
-    
+
 
     // Funzione che genera i report finali a partire dal file csv INPS
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int? serie)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int? serie, bool confrontoCivico)
     {
         // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
@@ -837,6 +852,7 @@ public class CSVReader
 
             int rigaCorrente = 1;
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
+            // logFile.LogInfo($"Confranto Numero civico: {confrontoCivico.ToString()}");
             // var dichiaranti = context.Dichiaranti.ToList();
 
             // Parte 2: Lettura delle varie righe
@@ -1022,6 +1038,9 @@ public class CSVReader
                 string? messaggio = null;
                 int? mc = null;
                 bool verificare = false;
+                int? idDichiarante = null;
+                string? codiceFiscaleDichiarateTrovato = null;
+                int? idUtenza = null;
                 // 2.b) Verifico se i campi ISTAT, CAP e provincia corrispondono a l'ente selezionato il quale gestisce le utenze idriche
 
                 if (!(istatEnte != istatAbitazione || capEnte != capAbitazione || provinciaAbitazione != ente.Provincia))
@@ -1032,100 +1051,121 @@ public class CSVReader
                     {
                         // 2.c.1) se è residente nel comune selzionato allora esito è uguale a Si
                         esitoStr = "Si";
-
+                        idDichiarante = dichiaranteTrovato.id;
                         //3.a) verifica se il richiedente ha una fornitura idrica diretta 
 
-                        (string esitoRestituito, int? idFornituraTrovato, string? messagge) = FunzioniTrasversali.VerificaEsistenzaFornitura(codiceFiscale, selectedEnteId, context, dichiaranteTrovato, indirizzoAbitazione, numeroCivico);
+                        (string esitoRestituito, int? idFornituraTrovato, string? messagge, int? idUtenzaDichiarante) = FunzioniTrasversali.VerificaEsistenzaFornitura(dichiaranteTrovato, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
                         idFornituraIdrica = idFornituraTrovato;
+
+                        // Resetto il messaggio
+
                         if (messagge != "Nessuna fornitura trovata per il dichiarante.")
                         {
                             note = note + messagge;
                         }
+
+                        // Verifico l'esito ottenuto e lo salco nella variabile solo se è diverso da 04
                         if (esitoRestituito == "01")
                         {
                             esito = "01";
+                            idUtenza = idUtenzaDichiarante;
+                            codiceFiscaleDichiarateTrovato = codiceFiscale;
                         }
                         else if (esitoRestituito == "03")
                         {
                             esito = "03";
+                            idUtenza = idUtenzaDichiarante;
+                            codiceFiscaleDichiarateTrovato = codiceFiscale;
                         }
                         else if (esitoRestituito == "04")
                         {
-                            // Vecchia Funzione che verifica solo i membri forniti dal INPS tramite i codici fiscali
-                            // if (codiciFiscaliFamigliari.Length > 0)
-                            // {
-                            //     foreach (var codFisc in codiciFiscaliFamigliari)
-                            //     {
-                            //         var dichiaranteFamigliare = dichiaranti.Where(s => s.CodiceFiscale == codFisc && s.IdEnte == selectedEnteId).ToList();
-                            //         DateTime dataNascita = dichiaranteFamigliare[0].DataNascita;
-                            //         if (dichiaranteFamigliare.Count == 1 && (FunzioniTrasversali.CalcolaEta(dataNascita) >= 18)) // Verifico che il membro della famiglia esista e abbia almeno 18 anni
-                            //         {
-                            //             // Verifico se il membro della famiglia ha una fornitura idrica diretta
-                            //             (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(codFisc, selectedEnteId, context, dichiaranteFamigliare[0].IndirizzoResidenza, dichiaranteFamigliare[0].NumeroCivico, dichiaranteFamigliare[0].Cognome, dichiaranteFamigliare[0].Nome, dichiaranteFamigliare[0].DataNascita);
-                            //             idFornituraIdrica = idFornituraMembro;
-                            //             if (esitoFamigliare == "01")
-                            //             {
-                            //                 esito = "01"; // Se uno dei membri della famiglia ha una fornitura diretta, l'esito è 01
-                            //                 break;
-                            //             }
-                            //             else if (esitoFamigliare == "03")
-                            //             {
-                            //                 esito = "03";
-                            //                 break;
-                            //             }
-                            //             else if (esitoFamigliare == "04")
-                            //             {
-                            //                 // 3.g) Verifico se Presenza_POD è SI
-                            //                 if (presenzaPod.Equals("Si", StringComparison.OrdinalIgnoreCase))
-                            //                 {
-                            //                     esito = "02"; // Se nessun membro della famiglia ha una fornitura diretta, ma Presenza_POD è SI, l'esito è 02
-                            //                 }
-                            //             }
-                            //         }
-                            //     }
-                            var famigliari = context.Dichiaranti.Where(s => s.CodiceFamiglia == dichiaranteTrovato.CodiceFamiglia && s.CodiceFiscale == dichiaranteTrovato.CodiceFiscale && s.IdEnte == selectedEnteId).ToList();
-
-                            if (famigliari.Count > 0)
+                            if (dichiaranteTrovato.NumeroComponenti > 1)
                             {
-                                foreach (var membro in famigliari)
+                                // Cerco tra i famigliari
+                                var today = DateTime.Today;
+                                var cutoff = today.AddYears(-18);
+
+                                var famigliari = context.Dichiaranti
+                                    .Where(s =>
+                                        (s.CodiceFamiglia == dichiaranteTrovato.CodiceFamiglia
+                                        || s.CodiceFiscaleIntestatarioScheda == dichiaranteTrovato.CodiceFiscaleIntestatarioScheda)
+                                        && s.IdEnte == selectedEnteId
+                                        && s.CodiceFiscale != dichiaranteTrovato.CodiceFiscale
+                                        && s.DataNascita <= cutoff
+                                    )
+                                    .ToList();
+
+                                if (famigliari.Count > 0)
                                 {
-                                    if (FunzioniTrasversali.CalcolaEta(membro.DataNascita) >= 18)
+                                    foreach (var membro in famigliari)
                                     {
-                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro.CodiceFiscale, selectedEnteId, context, membro, indirizzoAbitazione, numeroCivico);
+
+                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare, int? idUtenzaMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
                                         idFornituraIdrica = idFornituraMembro;
+
                                         if (messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
                                         {
                                             note = note + messaggeFamigliare;
                                         }
+
                                         if (esitoFamigliare == "01")
                                         {
+                                            idUtenza = idUtenzaMembro;
+                                            codiceFiscaleDichiarateTrovato = membro.CodiceFiscale;
                                             note = null;
                                             esito = "01"; // Se uno dei membri della famiglia ha una fornitura diretta, l'esito è 01
                                             break;
                                         }
                                         else if (esitoFamigliare == "03")
                                         {
+                                            idUtenza = idUtenzaMembro;
+                                            codiceFiscaleDichiarateTrovato = membro.CodiceFiscale;
                                             esito = "03";
                                             break;
                                         }
                                         else if (esitoFamigliare == "04")
                                         {
+                                            //codiceFiscaleDichiarateTrovato = codiceFiscale;
                                             // 3.g) Verifico se Presenza_POD è SI
                                             if (presenzaPod.Equals("Si", StringComparison.OrdinalIgnoreCase))
                                             {
                                                 esito = "02"; // Se nessun membro della famiglia ha una fornitura diretta, ma Presenza_POD è SI, l'esito è 02
                                             }
                                         }
+
+                                    }
+
+                                }
+                                else
+                                {
+                                    if (presenzaPod.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        esito = "02"; // Se nessun membro della famiglia ha una fornitura diretta, ma Presenza_POD è SI, l'esito è 02
                                     }
                                 }
 
                             }
+                            else
+                            {
+                                if (presenzaPod.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    esito = "02"; // Se nessun membro della famiglia ha una fornitura diretta, ma Presenza_POD è SI, l'esito è 02
+                                }
+                            }
                         }
+
                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
                         if (dichiaranteTrovato.NumeroComponenti != numeroComponenti)
                         {
-                            note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). é stato impostato come valore quello ricavato dal anagrafe.";
-                            numeroComponenti = dichiaranteTrovato.NumeroComponenti;
+                            if (ente.Piranha == true)
+                            {
+                                note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). é stato impostato come valore quello ricavato dal anagrafe.";
+                                numeroComponenti = dichiaranteTrovato.NumeroComponenti;
+                            }
+                            else
+                            {
+                                note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}).";
+                            }
                             logFile.LogWarning($"Attenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
                         }
                     }
@@ -1168,14 +1208,11 @@ public class CSVReader
                 int valueSerie;
                 if (serie == null)
                 {
-                    valueSerie = context.Enti
-                                        .Where(s => s.id == selectedEnteId)
-                                        .Select(s => s.Serie)
-                                        .FirstOrDefault();
+                    valueSerie = context.Enti.Where(s => s.id == selectedEnteId).Select(s => s.Serie).FirstOrDefault();
                 }
                 else
                 {
-                    valueSerie = (int) serie;
+                    valueSerie = (int)serie;
                 }
 
                 // 4) Creo un nuovo report con i dati raccolti
@@ -1184,9 +1221,12 @@ public class CSVReader
                     idAto = idAto,
                     codiceBonus = codiceBonus,
                     idFornitura = idFornituraIdrica,
-                    codiceFiscale = codiceFiscale,
+                    codiceFiscaleRichiedente = codiceFiscale,
+                    codiceFiscaleUtenzaTrovata = codiceFiscaleDichiarateTrovato,
+                    idUtenza = idUtenza,
                     nomeDichiarante = nomeDichiarante,
                     cognomeDichiarante = cognomeDichiarante,
+                    idDichiarante = idDichiarante,
                     annoValidita = annoValidita,
                     dataInizioValidita = dataInizioValidita,
                     dataFineValidita = dataFineValidita,
@@ -1229,11 +1269,18 @@ public class CSVReader
                         aggiornare = true;
                     }
 
-                    // Verifico campo per campo se ci sono differenze per il campo codiceFiscale
+                    // Verifico campo per campo se ci sono differenze per il campo codiceFiscaleRichiedente
 
-                    if (report.codiceFiscale != null && reportEsistente.codiceFiscale != null && reportEsistente.codiceFiscale != report.codiceFiscale)
+                    if (report.codiceFiscaleRichiedente != null && reportEsistente.codiceFiscaleRichiedente != null && reportEsistente.codiceFiscaleRichiedente != report.codiceFiscaleRichiedente)
                     {
-                        reportEsistente.codiceFiscale = report.codiceFiscale;
+                        reportEsistente.codiceFiscaleRichiedente = report.codiceFiscaleRichiedente;
+                        aggiornare = true;
+                    }
+
+                    // Verifico il campo codiceFiscaleUtenzaTrovata
+                    if (reportEsistente.codiceFiscaleUtenzaTrovata != report.codiceFiscaleUtenzaTrovata)
+                    {
+                        reportEsistente.codiceFiscaleUtenzaTrovata = report.codiceFiscaleUtenzaTrovata;
                         aggiornare = true;
                     }
 
@@ -1263,7 +1310,7 @@ public class CSVReader
 
                     // Verifico campo per campo se ci sono differenze per il campo mc
 
-                    if (report.mc != null && reportEsistente.mc != null && reportEsistente.mc != report.mc)
+                    if (reportEsistente.mc != report.mc)
                     {
                         reportEsistente.mc = report.mc;
                         aggiornare = true;
@@ -1307,6 +1354,23 @@ public class CSVReader
                         aggiornare = true;
                     }
 
+                    // Verifico il campo idDichiarante
+
+                    if (report.idDichiarante != reportEsistente.idDichiarante)
+                    {
+                        reportEsistente.idDichiarante = report.idDichiarante;
+                        aggiornare = true;
+                    }
+
+                    // Verifico il campo idUtenza
+
+                    if (report.idUtenza != reportEsistente.idUtenza)
+                    {
+                        reportEsistente.idUtenza = report.idUtenza;
+                        aggiornare = true;
+                    }
+
+
                     // Verifico se devo aggiornare dei dati
 
                     if (aggiornare)
@@ -1316,7 +1380,6 @@ public class CSVReader
                     }
 
                 }
-
 
             }
             // Fine - lettura delle righe
@@ -1346,11 +1409,47 @@ public class CSVReader
         return datiComplessivi;
     }
 
-    public static int? calcolaMC(int giorniBonus, int componenti){
-        if(giorniBonus<= 0 || componenti <=0){
+    // Funzione che ricava gli metri cubi massimi bonus  
+    public static int? calcolaMC(int giorniBonus, int componenti)
+    {
+        if (giorniBonus <= 0 || componenti <= 0)
+        {
             return null;
         }
-        return (50*giorniBonus*componenti)/1000;
+        return (50 * giorniBonus * componenti) / 1000;
     }
 
 }
+
+// Vecchia Funzione che verifica solo i membri forniti dal INPS tramite i codici fiscali
+// if (codiciFiscaliFamigliari.Length > 0)
+// {
+//     foreach (var codFisc in codiciFiscaliFamigliari)
+//     {
+//         var dichiaranteFamigliare = dichiaranti.Where(s => s.CodiceFiscale == codFisc && s.IdEnte == selectedEnteId).ToList();
+//         DateTime dataNascita = dichiaranteFamigliare[0].DataNascita;
+//         if (dichiaranteFamigliare.Count == 1 && (FunzioniTrasversali.CalcolaEta(dataNascita) >= 18)) // Verifico che il membro della famiglia esista e abbia almeno 18 anni
+//         {
+//             // Verifico se il membro della famiglia ha una fornitura idrica diretta
+//             (string esitoFamigliare, int? idFornituraMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(codFisc, selectedEnteId, context, dichiaranteFamigliare[0].IndirizzoResidenza, dichiaranteFamigliare[0].NumeroCivico, dichiaranteFamigliare[0].Cognome, dichiaranteFamigliare[0].Nome, dichiaranteFamigliare[0].DataNascita);
+//             idFornituraIdrica = idFornituraMembro;
+//             if (esitoFamigliare == "01")
+//             {
+//                 esito = "01"; // Se uno dei membri della famiglia ha una fornitura diretta, l'esito è 01
+//                 break;
+//             }
+//             else if (esitoFamigliare == "03")
+//             {
+//                 esito = "03";
+//                 break;
+//             }
+//             else if (esitoFamigliare == "04")
+//             {
+//                 // 3.g) Verifico se Presenza_POD è SI
+//                 if (presenzaPod.Equals("Si", StringComparison.OrdinalIgnoreCase))
+//                 {
+//                     esito = "02"; // Se nessun membro della famiglia ha una fornitura diretta, ma Presenza_POD è SI, l'esito è 02
+//                 }
+//             }
+//         }
+//     }

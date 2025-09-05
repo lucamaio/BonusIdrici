@@ -39,7 +39,7 @@ public static class CsvGenerator
                 
                 riga.Append(EscapeCsvField(report.codiceBonus, Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esito, Delimitatore)).Append(Delimitatore);
-                //Console.WriteLine("Codice Bonus: " + report.codiceBonus + " Codice Fiscale: " + report.codiceFiscale + " Esito: " + report.esito);
+               
                 if (!string.IsNullOrEmpty(codiceFornitua) && report.esito == "01")
                 {
                     riga.Append(EscapeCsvField(codiceFornitua, Delimitatore)).Append(Delimitatore);
@@ -48,9 +48,9 @@ public static class CsvGenerator
                 {
                     riga.Append(EscapeCsvField("", Delimitatore)).Append(Delimitatore);
                 }
-                if (!string.IsNullOrEmpty(report.codiceFiscale) && (report.esito == "01" || report.esito == "02"))
+                if (!string.IsNullOrEmpty(report.codiceFiscaleRichiedente) && (report.esito == "01" || report.esito == "02"))
                 {
-                    riga.Append(EscapeCsvField(report.codiceFiscale.ToString(), Delimitatore)).Append(Delimitatore);
+                    riga.Append(EscapeCsvField(report.codiceFiscaleRichiedente.ToString(), Delimitatore)).Append(Delimitatore);
                 }else
                 {
                     riga.Append(EscapeCsvField("", Delimitatore)).Append(Delimitatore);
@@ -59,7 +59,6 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(report.numeroComponenti.ToString(), Delimitatore)).Append(Delimitatore);
                 
                 // Usa CultureInfo.InvariantCulture per formattare i decimali con il punto
-                // riga.Append(EscapeCsvField(report.codiceFiscale.ToString(CultureInfo.InvariantCulture), Delimitatore));
                 csvContent.AppendLine(riga.ToString());
             }
         }
@@ -68,7 +67,7 @@ public static class CsvGenerator
     }
 
    
-    public static byte[] GeneraCsvCompetenzaTerritoriale(List<Report> dati) // Nota: nome corretto "Territoriale"
+    public static byte[] GeneraCsvCompetenzaTerritoriale(List<Report> dati) 
     {
         StringBuilder csvContent = new StringBuilder();
         List<string> headers = new List<string> { "ID_RICHIESTA", "ESITO" };
@@ -90,10 +89,10 @@ public static class CsvGenerator
 
     // Funzione 3: consente di generare il file x Siscom
 
-    public static byte[] GeneraCsvSiscom(List<Report> dati) // Nota: nome corretto "Territoriale"
+    public static byte[] GeneraCsvSiscom(List<Report> dati)
     {
         StringBuilder csvContent = new StringBuilder();
-        List<string> headers = new List<string> { "ID_ACQUEDOTTO", "ANNO","SERIE","COMPONENTI","MC"};
+        List<string> headers = new List<string> { "ID_ACQUEDOTTO", "ANNO","SERIE","NUMERO_COMPONENTI","MC"};
         csvContent.AppendLine(string.Join(Delimitatore, headers));
 
         if (dati != null && dati.Any())
@@ -113,10 +112,10 @@ public static class CsvGenerator
         return Encoding.UTF8.GetBytes(csvContent.ToString());
     }
 
-     public static byte[] GeneraCsvDebug(List<Report> dati) // Nota: nome corretto "Territoriale"
+     public static byte[] GeneraCsvDebug(List<Report> dati)
     {
         StringBuilder csvContent = new StringBuilder();
-        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale", "Nome Dichiarante", "Cognome Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "SERIE","MC", "Incongruenze", "Note", "Numero Componenti", "Data Creazione", "Data Aggiornamento", "IdEnte", "IdUser" };
+        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale Richiedente", "Codice Fiscale x bonus", "Id utenza", "Nome Dichiarante", "Cognome Dichiarante","ID Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "PRESENZA POD", "SERIE","MC", "Incongruenze", "Note", "Numero Componenti", "Data Creazione", "Data Aggiornamento", "IdEnte", "IdUser" };
         csvContent.AppendLine(string.Join(Delimitatore, headers));
 
         if (dati != null && dati.Any())
@@ -130,9 +129,12 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(report.idFornitura.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esitoStr.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esito.ToString(), Delimitatore)).Append(Delimitatore);
-                riga.Append(EscapeCsvField(report.codiceFiscale.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.codiceFiscaleRichiedente.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.codiceFiscaleUtenzaTrovata?.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.idUtenza?.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.nomeDichiarante.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.cognomeDichiarante.ToString(), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.idDichiarante.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.annoValidita.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.indirizzoAbitazione.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.numeroCivico.ToString(), Delimitatore)).Append(Delimitatore);
@@ -141,6 +143,7 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(report.provinciaAbitazione.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.dataInizioValidita?.ToString("yyyy-MM-dd"), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.dataFineValidita?.ToString("yyyy-MM-dd") ?? "", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(report.presenzaPod?.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.serie.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.mc.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.incongruenze.ToString(), Delimitatore)).Append(Delimitatore);

@@ -105,7 +105,7 @@ namespace BonusIdrici2.Controllers
         // Funzione 1: consente di caricare il file fornito mensilmente dal INPS per generare i Report
 
         [HttpPost]
-        public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, int serie)
+        public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, int serie, bool confrontoCivico)
         {
             // Verifico se i dati non sono null
             if (string.IsNullOrEmpty(ruolo) || string.IsNullOrEmpty(username) || idUser == 0)
@@ -154,7 +154,7 @@ namespace BonusIdrici2.Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser, serie);
+                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser, serie, confrontoCivico);
                 AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");
                 using (var transaction = _context.Database.BeginTransaction())
                 {

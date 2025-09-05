@@ -1,6 +1,11 @@
 @{
     ViewData["Title"] = "Aggiungi una Persona";
     var sessi = new List<string> { "M", "F" };
+    var indirizzo = ViewBag.indirizzoResidenza != null ? ViewBag.indirizzoResidenza : "";
+    var civico = ViewBag.NumeroCivico !=null ? ViewBag.NumeroCivico : "";
+    var codiceFamiglia = ViewBag.codiceFamiglia;
+    var parentele = codiceFamiglia != null ? ViewBag.parentele : null;
+    var codiceIntestarioScheda = codiceFamiglia != null ? ViewBag.codiceIntestarioScheda : null;
 }
 
 <div class="report-page container my-5">
@@ -20,7 +25,8 @@
                 <div class="modern-card-body p-4 small">
                     <form asp-controller="Anagrafe" asp-action="Crea" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
-
+                        <input type="hidden" name="codiceFamiglia" value="@codiceFamiglia" />
+                        <input type="hidden" name="codiceFiscaleIntestatarioScheda" value="@codiceIntestarioScheda" />
 
                         <div class="accordion" id="accordionDichiarante">
 
@@ -88,12 +94,12 @@
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                              <div>
                                                 <label for="indirizzo_residenza" class="form-label">Indirizzo di residenza: *</label>
-                                                <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza" required>
+                                                <input type="text" class="form-control" id="indirizzo_residenza" name="indirizzo_residenza" value="@indirizzo" required>
                                             </div>
 
                                             <div>
                                                 <label for="numero_civico" class="form-label">Numero civico: *</label>
-                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" required>
+                                                <input type="text" class="form-control" id="numero_civico" name="numero_civico" value="@civico" required>
                                             </div>
 
                                         </div>
@@ -102,22 +108,33 @@
                             </div>
 
                         <!-- SEZIONE 3 -->
-                            <!-- <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading3">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
-                                             <i class="fa-solid fa-users"></i> Parenti
-                                    </button>
-                                </h2>
-                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
-                                     data-bs-parent="#accordionDichiarante">
-                                    <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-3 g-4">
-                                           @* // Da Implementare la posssibilita di andare ad inserire dei parenti alla scheda *@
+                            @if(parentele != null){
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading3">
+                                        <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                                <i class="fa-solid fa-users"></i> Parenti
+                                        </button>
+                                    </h2>
+                                    <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
+                                        data-bs-parent="#accordionDichiarante">
+                                        <div class="accordion-body">
+                                            <div class="row row-cols-1 row-cols-md-3 g-4">
+                                                <div class="col">
+                                                    <label for="parentela" class="form-label">Paretela: *</label>
+                                                    <select class="form-select" id="parentela" name="parentela" required>
+                                                        @foreach (var parentela in parentele)
+                                                        {
+                                                            <option value="@parentela">@parentela</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            
+                                            </div>
                                         </div>
-                                    </div>
+                                    </div>    
                                 </div>
-                            </div> -->
+                            }
                         
                         <!-- BOTTONI -->
                         <hr class="my-4" />

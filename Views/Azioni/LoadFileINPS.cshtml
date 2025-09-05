@@ -37,11 +37,20 @@
                       <div class="mb-3">
                         <label for="serie" class="form-label">Serie</label>
                         <input type="number" id="serie" name="serie" min="0" max="5" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="checkbox" id="confrontoCivico" name="confrontoCivico" class="form-check-input" value="true">
+                        <label for="confrontoCivico" class="form-check-label">Confronta numero civico</label>
+                    </div>
+
+                    <div class="mb-3">
                         <div class="info-text mt-2">
                             Indicare il numero di fatture annuali per ciascuna persona. <br><br>
                             • Se la fatturazione avviene una sola volta all’anno, impostare il valore su <strong>0</strong>. <br><br>
                             • Se il campo viene lasciato vuoto, il sistema utilizzerà automaticamente la serie di default associata alla scheda dell’ente. <br><br>
-                            • Qualora la serie di default non coincida con quella reale, è sempre possibile modificarla all’interno della pagina <em>Dettagli Report</em>.
+                            • Qualora la serie di default non coincida con quella reale, è sempre possibile modificarla all’interno della pagina <em>Dettagli Report</em>. <br><br>
+                            • Se si seleziona l’opzione <strong>Confronta numero civico</strong>, il sistema confronterà anche il numero civico durante la generazione dei risultati.
                         </div>
                     </div>
 

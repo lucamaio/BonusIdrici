@@ -147,7 +147,7 @@ namespace BonusIdrici2.Models
         
 
 
-        public static (string esito, int? idFornitura, string? messaggio) VerificaEsistenzaFornitura(string codiceFiscale, int selectedEnteId, ApplicationDbContext context, Dichiarante dichiarante, string indirizzoINPS, string numeroCivicoINPS)
+        public static (string esito, int? idFornitura, string? messaggio, int? idUtenza) VerificaEsistenzaFornitura(Dichiarante dichiarante, int selectedEnteId, ApplicationDbContext context, string indirizzoINPS, string numeroCivicoINPS, bool confrontoCivico)
         {
             // Recupera le forniture associate al codice fiscale e all'ente selezionato
             var forniture = context.UtenzeIdriche
@@ -157,10 +157,10 @@ namespace BonusIdrici2.Models
             if(forniture.Count == 0)
             {
                 // Nessuna fornitura trovata
-                return ("04", null, "Nessuna fornitura trovata per il dichiarante.");
+                return ("04", null, "Nessuna fornitura trovata per il dichiarante.",null);
             }else if(forniture.Count > 1){
                 // Più forniture trovate
-                return ("04", null, "Attenzione: piu' di una fornitura trovata per il dichiarante.");
+                return ("04", null, "Attenzione: piu' di una fornitura trovata per il dichiarante.", null);
 
             }
 
@@ -170,7 +170,7 @@ namespace BonusIdrici2.Models
             // Verifica il tipo di utenza
             if (!string.Equals(fornitura.tipoUtenza, "UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
             {
-                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.\n");
+                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.\n",fornitura.id);
             }
 
             // Recupera i dati dell'utenza
@@ -178,21 +178,34 @@ namespace BonusIdrici2.Models
             string? numeroCivicoUtenza = fornitura.numeroCivico;
             int? idToponimo = fornitura.idToponimo;
             string? message = null;
+            bool indirizzoCorrisponde = false;
 
-            bool indirizzoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
+
+            if (confrontoCivico)
+            {
+                indirizzoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) &&
                                         string.Equals(numeroCivicoUtenza, dichiarante.NumeroCivico, StringComparison.OrdinalIgnoreCase);
-
+            }
+            else
+            {
+                indirizzoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase);
+            }
+               
             // Se indirizzo e numero civico coincidono
             if (indirizzoCorrisponde)
             {
-                if(dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS){
+                if (dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS)
+                {
                     message = message + "Attenzione: L'indirizzo di ubicazione o il numero civico della fornitura corrisponde esattamente all'indirizzo di residenza del dichiarante, ma non corrisponde a quello fornito dal INPS. \n";
                 }
 
-                return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message);
-            }else{
-                if(dichiarante.IndirizzoResidenza == indirizzoUtenza && ( dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS)){
-                    message = message +"Attenzione: L'indirizzo di ubicazione o il numero civico non corrisponde esattamente all'indirizzo di residenza del dichiarante, fornito dal INPS.\n";
+                return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message, fornitura.id);
+            }
+            else
+            {
+                if (dichiarante.IndirizzoResidenza == indirizzoUtenza && (dichiarante.IndirizzoResidenza != indirizzoINPS || dichiarante.NumeroCivico != numeroCivicoINPS))
+                {
+                    message = message + "Attenzione: L'indirizzo di ubicazione o il numero civico non corrisponde esattamente all'indirizzo di residenza del dichiarante, fornito dal INPS.\n";
                 }
             }
 
@@ -204,33 +217,41 @@ namespace BonusIdrici2.Models
                 if (toponimo != null)
                 {
                     indirizzoUtenza = toponimo.normalizzazione;
+                    bool indirizzoToponimoCorrisponde = false;
 
-                    bool indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) && string.Equals(numeroCivicoUtenza, dichiarante.NumeroCivico, StringComparison.OrdinalIgnoreCase);
-
+                    if (confrontoCivico)
+                    {
+                        indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase) && string.Equals(numeroCivicoUtenza, dichiarante.NumeroCivico, StringComparison.OrdinalIgnoreCase);
+                    }
+                    else
+                    {
+                        indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase);
+                    }
+                    
                     if (indirizzoToponimoCorrisponde)
                     {
                         if(toponimo.normalizzazione != indirizzoINPS){
                             message = message + "Attenzione: L'indirizzo di ubicazione del toponimo non corrisponde a quello fornito dal INPS.\n";
                         }
-                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message);
+                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message,fornitura.id);
                     }
                 }
             }
 
             // L’indirizzo non corrisponde
-            return ("03", idFornituraTrovata, message);
+            return ("03", idFornituraTrovata, message, fornitura.id);
         }
 
         // Metodo ausiliario per verificare lo stato
-        private static (string esito, int? idFornitura, string? messaggio) VerificaStatoFornitura(int? stato, int? idFornitura, string? messaggio)
+        private static (string esito, int? idFornitura, string? messaggio, int? idUtenza) VerificaStatoFornitura(int? stato, int? idFornitura, string? messaggio, int? idUtenza)
         {
             if (stato >= 1 && stato <= 3)
             {
-                return ("01", idFornitura, messaggio);
+                return ("01", idFornitura, messaggio, idUtenza);
             }
             else
             {
-                return ("03", idFornitura, messaggio);
+                return ("03", idFornitura, messaggio,idUtenza);
             }
         }
 

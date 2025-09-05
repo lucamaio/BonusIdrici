@@ -136,9 +136,7 @@ namespace BonusIdrici2.Controllers
                 .OrderByDescending(x => x.DataCreazione)
                 .ToList();
             ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti
-                                            .FirstOrDefault(e => e.id == selectedEnteId)?.nome
-                                            ?? "Ente Sconosciuto";
+            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome?? "Ente Sconosciuto";
 
             return View();
         }
@@ -181,7 +179,7 @@ namespace BonusIdrici2.Controllers
                         esitoStr = g.esitoStr,
                         esito = g.esito,
                         idFornitura = g.idFornitura,
-                        codiceFiscale = g.codiceFiscale,
+                        codiceFiscale = g.codiceFiscaleRichiedente,
                         numeroComponenti = g.numeroComponenti,
                         serie = g.serie,
                         mc = g.mc,
@@ -215,7 +213,7 @@ namespace BonusIdrici2.Controllers
                         esitoStr = r.esitoStr,
                         esito = r.esito,
                         idFornitura = r.idFornitura,
-                        codiceFiscale = r.codiceFiscale,
+                        codiceFiscale = r.codiceFiscaleRichiedente,
                         numeroComponenti = r.numeroComponenti,
                         serie = r.serie,
                         mc = r.mc,
@@ -244,7 +242,7 @@ namespace BonusIdrici2.Controllers
                         esitoStr = r.esitoStr,
                         esito = r.esito,
                         idFornitura = r.idFornitura,
-                        codiceFiscale = r.codiceFiscale,
+                        codiceFiscale = r.codiceFiscaleRichiedente,
                         numeroComponenti = r.numeroComponenti,
                         serie = r.serie,
                         mc = r.mc,
@@ -325,6 +323,7 @@ namespace BonusIdrici2.Controllers
                 DataCreazione = report.DataCreazione,
                 serie = report.serie
             };
+            
             // 6) Apro la pagina
             return View(model);
         }
@@ -482,7 +481,8 @@ namespace BonusIdrici2.Controllers
 
             // 6) Salvo i cambiamenti
             _context.SaveChanges();
-            // 
+            AccountController.logFile.LogInfo($"L'utente {username} ha effetuato una variazione del numero di serie per l'elaborazione INPS con idAto: {idAto} per l'ente con id {idEnte}");
+            
             // 7) Torno alla pagina principale
             // return RedirectToAction("Dettails", "Report", new { selectedEnteId = idEnte, data = dataCreazione });
             return RedirectToAction("Show", "Report", new { selectedEnteId = idEnte });
@@ -490,7 +490,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 3: Consente l'aggiornamento dei dati di un report
         [HttpPost]
-        public IActionResult Update(int id, string codiceFiscale, string cognome, string nome, string esitoStr, string esito  )
+        public IActionResult Update(int id, string codiceFiscale, string cognome, string nome, string esitoStr, string esito )
         {
             // 1) Verifico se esiste una sessione attiva
             if (!VerificaSessione())
@@ -517,10 +517,12 @@ namespace BonusIdrici2.Controllers
                 return RedirectToAction("Index", "Report");
             }
 
+            AccountController.logFile.LogInfo($"L'utente {username} ha effetuato una variazione della domanda di bonus con id {report.id} è codice bonus {report.codiceBonus}");
+            AccountController.logFile.LogInfo($"Prima: {report.ToString()}");
             // 5) Aggiorno i vari campi
 
             // report.idFornitura = idFornitura;
-            report.codiceFiscale = codiceFiscale;
+            report.codiceFiscaleRichiedente = codiceFiscale;
             report.cognomeDichiarante = cognome;
             report.nomeDichiarante = nome;
             report.esitoStr = esitoStr;
@@ -529,6 +531,7 @@ namespace BonusIdrici2.Controllers
 
             // 6) Salvo le modifiche sul db
             _context.SaveChanges();
+            AccountController.logFile.LogInfo($"Dopo: {report.ToString()}");
 
             // 7) Ritorno alla pagina details
             return Dettails(id, report.DataCreazione);

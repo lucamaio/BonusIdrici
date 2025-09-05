@@ -113,10 +113,13 @@ namespace BonusIdrici2.Data
            entity.Property(f => f.esitoStr).HasColumnName("esito_str").IsRequired();
            entity.Property(f => f.esito).HasColumnName("esito").IsRequired();
            entity.Property(f => f.idFornitura).HasColumnName("idFornitura");
-           entity.Property(f => f.codiceFiscale).HasColumnName("codice_fiscale").IsRequired();
+           entity.Property(f => f.codiceFiscaleRichiedente).HasColumnName("codice_fiscale").IsRequired();
+           entity.Property(f => f.codiceFiscaleUtenzaTrovata).HasColumnName("codice_fiscale_trovato");
+           entity.Property(f => f.idUtenza).HasColumnName("id_utenza");
            entity.Property(f => f.numeroComponenti).HasColumnName("numero_componenti");
            entity.Property(f => f.nomeDichiarante).HasColumnName("nome_dichiarante");
            entity.Property(f => f.cognomeDichiarante).HasColumnName("cognome_dichiarante");
+           entity.Property(f => f.idDichiarante).HasColumnName("id_dichiarante");
            entity.Property(f => f.annoValidita).HasColumnName("anno_validita");
            entity.Property(f => f.indirizzoAbitazione).HasColumnName("indirizzo_abitazione");
            entity.Property(f => f.numeroCivico).HasColumnName("numero_civico");
