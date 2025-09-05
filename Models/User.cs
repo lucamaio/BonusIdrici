@@ -11,14 +11,16 @@ namespace BonusIdrici2.Models
         [Required]
 
         public required string Email { get; set; }
-
-        public string? Password { get; set; }
+        
+        [Required]
+        public required string Password { get; set; }
 
         public string? Cognome { get; set; }
 
         public string? Nome { get; set; }
         
-        public string? Username { get; set; }
+        [Required]
+        public required string Username { get; set; }
 
         [Required]
         public required int idRuolo { get; set; }
@@ -37,7 +39,7 @@ namespace BonusIdrici2.Models
             }
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return $"Username: {Username} | Cognome: {Cognome} | Nome: {Nome} | Email: {Email} Ruolo {getRuolo()}";
         }

@@ -68,7 +68,7 @@ namespace BonusIdrici2.Models
 
         public int? idToponimo { get; set; }
         
-       public string ToString()
+       public override string ToString()
         {
             return $"UtenzaIdrica: Acquedotto: {idAcquedotto}, Stato: {stato}, " +
                 $"Periodo Iniziale: {(periodoIniziale.HasValue ? periodoIniziale.Value.ToString("dd/MM/yyyy HH:mm:ss") : "")}, " +

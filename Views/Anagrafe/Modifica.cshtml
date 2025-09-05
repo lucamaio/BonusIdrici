@@ -5,8 +5,8 @@
     var sesso = dichiarante.Sesso;
     var sessi = new List<string> { "M", "F" };
     var parenti = ViewBag.Parenti;
-    @* var componenti= parenti.Count + 1; *@
-    var componenti = dichiarante.NumeroComponenti;
+    //var componentiNucleo = ViewBag.Componenti;
+    var componentiNucleo = dichiarante.NumeroComponenti;
 }
 
 <div class="report-page container my-5">
@@ -130,7 +130,7 @@
                                         <h6 class="fw-bold text-secondary mb-0">
                                             <i class="fa-solid fa-people-group me-2"></i> Elenco Parenti
                                         </h6>
-                                        <span>Componenti Nucleo: @componenti</span>
+                                        <span>Componenti Nucleo: @componentiNucleo</span>
                                         <a href="@Url.Action("Create", "Anagrafe", new { idEnte = dichiarante.IdEnte, codiceFamiglia = dichiarante.CodiceFamiglia, codiceIntestarioScheda = dichiarante.CodiceFiscaleIntestatarioScheda, indirizzoResidenza = dichiarante.IndirizzoResidenza, civico = dichiarante.NumeroCivico})"
                                         class="btn btn-sm btn-success rounded-3 shadow-sm">
                                             <i class="fa-solid fa-user-plus me-1"></i> Aggiungi Parente

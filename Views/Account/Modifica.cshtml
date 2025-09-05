@@ -61,9 +61,14 @@
                                                 <input type="email" class="form-control" id="email" name="email" value="@utente?.Email" required>
                                             </div>
 
-                                            <div class="col">
-                                                <label for="password" class="form-label">Password: *</label>
-                                                <input type="password" class="form-control" id="password" name="password" value="@utente?.Password" required>
+                                            <div class="col position-relative">
+                                                <label for="password" class="form-label fw-bold">Password: *</label>
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control form-control-lg rounded-3" id="password" name="password" value="@utente?.Password" required>
+                                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <div class="col">
@@ -147,11 +152,18 @@
 
                         <!-- BOTTONI -->
                         <hr class="my-4" />
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center">
                             <a href="@Url.Action("Show","Account")"
                                class="btn btn-outline-secondary btn-sm rounded-3">
                                 <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
                             </a>
+
+                            <!-- Pulsante centrale -->
+                            <a href="@Url.Action("ChangePasswordAdmin","Account", new { id = utente?.id })"
+                               class="btn btn-warning btn-sm rounded-3 mx-3">
+                                <i class="fa-solid fa-key"></i> Modifica Password
+                            </a>
+
                             <button type="submit" class="btn btn-primary btn-sm rounded-3">
                                 <i class="fa-solid fa-check"></i> Aggiorna Utente
                             </button>
@@ -163,3 +175,19 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("password");
+        const icon = this.querySelector("i");
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    });
+</script>

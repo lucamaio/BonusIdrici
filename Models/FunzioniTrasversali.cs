@@ -290,8 +290,12 @@ namespace BonusIdrici2.Models
             return indirizzoUbicazione;
         }
 
-        public static List<Ente> GetEnti(ApplicationDbContext _context, int id)
+        public static List<Ente> GetEnti(ApplicationDbContext _context, int? id)
         {
+            if (id == null)
+            {
+                return new List<Ente>();
+            }
             // Mi ricavo gli id degli enti che gestisce l'utente
             var idEnti = _context.UserEnti
                 .Where(s => s.idUser == id)

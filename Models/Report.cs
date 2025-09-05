@@ -10,57 +10,72 @@ namespace BonusIdrici2.Models
         [Key]
         public int id { get; set; }
 
-        public string? idAto { get; set; }
+        [Required]
+        public required string idAto { get; set; }
 
         [Required]
         public required string codiceBonus { get; set; }
 
+        [Required]
         public required string esitoStr { get; set; }  // esito "Si" o "No"
 
+        [Required]
         public required string esito { get; set; }  // (1<valore>5) 
 
         public int? idFornitura { get; set; }
 
-        public string? codiceFiscaleRichiedente { get; set; }
+        [Required]
+        public required string codiceFiscaleRichiedente { get; set; }
 
         public string? codiceFiscaleUtenzaTrovata { get; set; }
 
         public int? idUtenza { get; set; }
 
         public int? numeroComponenti { get; set; }
-        public string? nomeDichiarante { get; set; }
-        public string? cognomeDichiarante { get; set; }
+
+        [Required]
+        public required string nomeDichiarante { get; set; }
+
+        [Required]
+        public required string cognomeDichiarante { get; set; }
 
         public int? idDichiarante { get; set; }
+        
+        [Required]
+        public required string annoValidita { get; set; }
 
-        public string? annoValidita { get; set; }
-
-        public string? indirizzoAbitazione { get; set; }
+        [Required]
+        public required string indirizzoAbitazione { get; set; }
 
         public string? numeroCivico { get; set; }
 
-        public string? istat { get; set; }
+        [Required]
+        public required string istat { get; set; }
 
-        public string? capAbitazione { get; set; }
+        [Required]
+        public required string capAbitazione { get; set; }
 
         public string? provinciaAbitazione { get; set; }
 
-        public string? presenzaPod { get; set; }
+        [Required]
+        public required string presenzaPod { get; set; }
 
         public string? note { get; set; }
 
         public bool? incongruenze { get; set; }
 
-        public int serie { get; set; }
+        [Required]
+        public required int serie { get; set; }
 
         public int? mc { get; set; }
 
         [Required]
-        public required DateTime? dataInizioValidita { get; set; }
+        public required DateTime dataInizioValidita { get; set; }
 
         [Required]
-        public required DateTime? dataFineValidita { get; set; }
+        public required DateTime dataFineValidita { get; set; }
 
+        [Required]
         public required DateTime DataCreazione { get; set; }
 
         public DateTime? DataAggiornamento { get; set; }

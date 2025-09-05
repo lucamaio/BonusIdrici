@@ -125,17 +125,9 @@ namespace BonusIdrici2.Controllers
                 Cognome = x.Cognome,
                 Nome = x.Nome,
                 CodiceFiscale = x.CodiceFiscale,
-                Sesso = x.Sesso ?? string.Empty,
-                DataNascita = x.DataNascita,
-                ComuneNascita = x.ComuneNascita ?? string.Empty,
+                Sesso = x.Sesso,
                 IndirizzoResidenza = x.IndirizzoResidenza,
                 NumeroCivico = x.NumeroCivico,
-                CodiceFamiglia = x.CodiceFamiglia,
-                Parentela = x.Parentela,
-                CodiceFiscaleIntestatarioScheda = x.CodiceFiscaleIntestatarioScheda,
-                NumeroComponenti = x.NumeroComponenti,
-                data_creazione = x.data_creazione,
-                data_aggiornamento = x.data_aggiornamento,
                 IdEnte = x.IdEnte
             }).ToList();
 
@@ -179,9 +171,11 @@ namespace BonusIdrici2.Controllers
             
             ViewBag.id = id;
             var dichiarante = _context.Dichiaranti.FirstOrDefault(s => s.id == id);
-            var parenti = _context.Dichiaranti.Where(s => s.CodiceFamiglia == dichiarante.CodiceFamiglia && s.id != id);
+            var parenti = _context.Dichiaranti.Where(s => (s.CodiceFamiglia == dichiarante.CodiceFamiglia || s.CodiceFiscaleIntestatarioScheda == dichiarante.CodiceFiscaleIntestatarioScheda) && s.id != id).ToList();
+            //var componenti = _context.Dichiaranti.Where(s => s.CodiceFamiglia == dichiarante.CodiceFamiglia || s.CodiceFiscaleIntestatarioScheda == dichiarante.CodiceFiscaleIntestatarioScheda).Count();
             ViewBag.Dichiarante = dichiarante;
             ViewBag.Parenti = parenti;
+            //ViewBag.Componenti = componenti;
             return View();
         }
 
@@ -240,8 +234,8 @@ namespace BonusIdrici2.Controllers
             {
                 membro.NumeroComponenti = membro.NumeroComponenti + 1;
                 membro.data_aggiornamento = DateTime.Now;
+                _context.Dichiaranti.Update(membro);
             }
-            _context.Dichiaranti.Update(nuovaPersona);
             _context.SaveChanges();
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });

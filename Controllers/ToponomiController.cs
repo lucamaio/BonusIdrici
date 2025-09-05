@@ -16,7 +16,7 @@ namespace BonusIdrici2.Controllers
         private readonly ApplicationDbContext _context; // Inietta il DbContext
 
         private string? ruolo;
-        private int idUser;
+        private int? idUser;
         private string? username;
 
         public ToponomiController(ILogger<ToponomiController> logger, ApplicationDbContext context)
@@ -28,7 +28,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
-                idUser = (int)HttpContext.Session.GetInt32("idUser");
+                idUser = HttpContext.Session.GetInt32("idUser");
             }
         }
         // Funzione che inizializza le variabili con i dati della sessione
@@ -87,7 +87,7 @@ namespace BonusIdrici2.Controllers
 
             if (ruolo == "OPERATORE")
             {
-                enti = FunzioniTrasversali.GetEnti(_context, idUser);
+                enti = FunzioniTrasversali.GetEnti(_context, (int) idUser);
                 if (enti.Count == 1)
                 {
                     return Show(enti[0].id);

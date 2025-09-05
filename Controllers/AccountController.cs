@@ -15,7 +15,7 @@ namespace BonusIdrici2.Controllers
 
         // Variabili per la gestione dell'utente
         private string? ruolo;
-        private int idUser;
+        private int? idUser;
         private string? username;
 
         // File di Log accessi 
@@ -30,7 +30,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
-                idUser = (int)HttpContext.Session.GetInt32("idUser");
+                idUser = HttpContext.Session.GetInt32("idUser");
             }
         }
 
@@ -79,11 +79,13 @@ namespace BonusIdrici2.Controllers
         // Inizio - Pagine di navigazione
 
         // Pagina 1: Lista utenti 
-        public IActionResult Show(){
-             // a) Verifico se esiste una sessione
-            if(!VerificaSessione("ADMIN")){
+        public IActionResult Show()
+        {
+            // a) Verifico se esiste una sessione
+            if (!VerificaSessione("ADMIN"))
+            {
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
-               return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             // c) Mostro la pagina
@@ -94,16 +96,19 @@ namespace BonusIdrici2.Controllers
 
         // Pagina 2: Dettagli account
 
-        public IActionResult Dettagli(){
+        public IActionResult Dettagli()
+        {
             // a) Verifico se esiste una sessione
-            if(!VerificaSessione()){
-               return RedirectToAction("Index", "Login");
+            if (!VerificaSessione())
+            {
+                return RedirectToAction("Index", "Login");
             }
 
             // c) Cerco l'utente sul DB
-            var utente = _context.Users.Where(s=> s.id==idUser).ToList();
+            var utente = _context.Users.Where(s => s.id == idUser).ToList();
 
-            if(utente == null){
+            if (utente == null)
+            {
                 return RedirectToAction("Index", "Home");
             }
 
@@ -117,10 +122,12 @@ namespace BonusIdrici2.Controllers
 
         // Pagina 3: Pagina di sicurezza consente di cambiare password
 
-        public IActionResult Sicurezza(){
-             // a) Verifico se esiste una sessione
-            if(!VerificaSessione()){
-               return RedirectToAction("Index", "Login");
+        public IActionResult Sicurezza()
+        {
+            // a) Verifico se esiste una sessione
+            if (!VerificaSessione())
+            {
+                return RedirectToAction("Index", "Login");
             }
 
             return View();
@@ -128,10 +135,12 @@ namespace BonusIdrici2.Controllers
 
         // Pagina 4: Pagina di impostazioni consente di modificare le impostazioni dell'account
 
-        public IActionResult Impostazioni(){
-             // a) Verifico se esiste una sessione
-            if(!VerificaSessione()){
-               return RedirectToAction("Index", "Login");
+        public IActionResult Impostazioni()
+        {
+            // a) Verifico se esiste una sessione
+            if (!VerificaSessione())
+            {
+                return RedirectToAction("Index", "Login");
             }
 
             return View();
@@ -142,9 +151,10 @@ namespace BonusIdrici2.Controllers
         public IActionResult Create()
         {
             // a) Verifico se esiste una sessione
-            if(!VerificaSessione("ADMIN")){
+            if (!VerificaSessione("ADMIN"))
+            {
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
-               return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             // c) Mostro la pagina
@@ -160,19 +170,20 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Modifica(int id)
         {
-            if (!VerificaSessione()) 
+            if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
-            
+
             ViewBag.id = id;
             User? utente = _context.Users.FirstOrDefault(s => s.id == id);
-            if (utente == null) {
+            if (utente == null)
+            {
                 ViewBag.Message = "Utente non trovato!";
                 return Show();
             }
-            List<Ruolo> ruoli=  _context.Ruoli.ToList();
+            List<Ruolo> ruoli = _context.Ruoli.ToList();
             List<Ente> enti = _context.Enti.ToList();
 
             List<int> selectedEntiIds = new List<int>();
@@ -192,21 +203,36 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
+        // Pagina 7: Modifica la password da ADMIN ChangePassword
+
+        public IActionResult ChangePasswordAdmin(int id)
+        {
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+            ViewBag.id = id;
+            return View();
+        }
+
+
 
         // Fine - Pagine di navigazione
         // Inizio - Funzioni
 
         // Funzione 1: Crea nuovo utente
         [HttpPost]
-        public IActionResult Crea(string username, string email, string password, string? cognome, string? nome, int ruolo, List<int> enti){
-           
+        public IActionResult Crea(string username, string email, string password, string? cognome, string? nome, int ruolo, List<int> enti)
+        {
+
             // a) Verifico se esiste una sessione
             if (!VerificaSessione("ADMIN"))
             {
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Login"); // Ritorno alla pagina di login
             }
-            
+
             // c) Controllo che i dati siano stati inseriti correttamente
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(cognome) || string.IsNullOrEmpty(nome) || ruolo == 0 || enti.Count == 0)
             {
@@ -216,21 +242,24 @@ namespace BonusIdrici2.Controllers
 
             // d) Controllo che l'username non esista già
             var userExists = _context.Users.Any(u => u.Username == username);
-            if(userExists){
+            if (userExists)
+            {
                 ViewBag.Error = "L'username esiste già. Scegliere un altro username.";
                 return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
             // e) Controllo che l'email non esista già
             var emailExists = _context.Users.Any(u => u.Email == email);
-            if(emailExists){
+            if (emailExists)
+            {
                 ViewBag.Error = "L'email esiste già. Scegliere un'altra email.";
                 return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
-           
+
             // f) Creo l'utente
-            var newUser = new User{
+            var newUser = new User
+            {
                 Username = username,
                 Email = email,
                 Cognome = cognome,
@@ -239,7 +268,7 @@ namespace BonusIdrici2.Controllers
                 idRuolo = ruolo,
                 dataCreazione = DateTime.Now
             };
-            
+
 
             _context.Users.Add(newUser);
             _context.SaveChanges();
@@ -280,7 +309,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 3: Modifica dati utente
         [HttpPost]
-        public IActionResult Update(int id, string username, string cognome, string nome, string email, string password )
+        public IActionResult Update(int id, string username, string cognome, string nome, string email, string password)
         {
             var UtenteEsistente = _context.Users.FirstOrDefault(t => t.id == id);
 
@@ -313,6 +342,39 @@ namespace BonusIdrici2.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Show");
+        }
+
+        // Funzione 4: Funzione che reimposta la password da ADMIN
+
+        public IActionResult updatePassword(int id, string password)
+        {
+            if (!VerificaSessione("ADMIN"))
+            {
+                ViewBag.Message = "Utente non autorizzato ad effetuare questa operazione";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Mi ricavo l'utente dal suo id
+
+            var utente = _context.Users.FirstOrDefault(s => s.id == id);
+
+            if (utente == null)
+            {
+                ViewBag.Message = "Utente non trovato!";
+                return RedirectToAction("Show");
+            }
+
+            // Aggiorno la password e la data di aggiornamento
+
+            utente.Password = password;
+            utente.dataAggiornamento = DateTime.Now;
+
+            _context.Users.Update(utente);
+            _context.SaveChanges();
+
+            ViewBag.Message = "Password Cambiata con successo!";
+            return RedirectToAction("Modifica","Account", new{ id = id});
+
         }
 
 

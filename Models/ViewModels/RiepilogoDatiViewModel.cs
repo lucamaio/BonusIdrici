@@ -1,13 +1,18 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BonusIdrici2.Models.ViewModels
 {
     public class RiepilogoDatiViewModel
     {
+        [Key]
         public int? id { get; set; }
+
+        [Required]
         public required DateTime DataCreazione { get; set; }
 
-        public string idAto { get; set; }
+        [Required]
+        public required string idAto { get; set; }
 
         public string? codiceBonus { get; set; }
 

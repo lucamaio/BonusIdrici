@@ -51,7 +51,7 @@ namespace BonusIdrici2.Models
 
         public DateTime? data_cancellazione { get; set; }
 
-        public string? toString()
+        public override string ToString()
         {
             return $"Dichiarante: {Cognome}, {Nome}, Codice Fiscale: {CodiceFiscale}, " +
                    $"Sesso: {Sesso}, " +

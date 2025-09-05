@@ -550,7 +550,7 @@ public class CSVReader
                             normalizzazione = indirizzoRicavato // valorizzo subito se disponibile
                         };
 
-                        datiComplessivi.Toponimi.Add(nuovoToponimo);
+                        datiComplessivi.Toponimi?.Add(nuovoToponimo);
                     }
                 }
 
@@ -793,7 +793,7 @@ public class CSVReader
             }
 
             // c) Scrivo il numero di toponimi aggiunti nel DB se presenti
-            if (datiComplessivi.Toponimi.Count > 0)
+            if (datiComplessivi.Toponimi?.Count > 0)
             {
                 logFile.LogInfo($"Numero di Toponimi Aggiunti: {datiComplessivi.Toponimi.Count}");
             }
@@ -999,8 +999,8 @@ public class CSVReader
                 string[]? codiciFiscaliFamigliari = FunzioniTrasversali.splitCodiceFiscale(campi[5]);
 
                 string? annoValidita = FunzioniTrasversali.rimuoviVirgolette(campi[6]);
-                DateTime? dataInizioValidita = FunzioniTrasversali.ConvertiData(campi[7]);
-                DateTime? dataFineValidita = FunzioniTrasversali.ConvertiData(campi[8]);
+                DateTime dataInizioValidita = FunzioniTrasversali.ConvertiData(campi[7], DateTime.MinValue);
+                DateTime dataFineValidita = FunzioniTrasversali.ConvertiData(campi[8], DateTime.MinValue);
 
                 string? indirizzoAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[9]).ToUpper();
                 string? numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[10]).ToUpper();
@@ -1008,7 +1008,7 @@ public class CSVReader
                 string? capAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper();
                 string? provinciaAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[13]).ToUpper();
 
-                string? presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
+                string presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
                 string numeroComponenti_str = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
                 int numeroComponenti = int.Parse(numeroComponenti_str);
                 DateTime dataCreazione = DateTime.Now;
@@ -1188,20 +1188,14 @@ public class CSVReader
 
                 if (esito == "01" || esito == "02")
                 {
-                    if (dataInizioValidita.HasValue && dataFineValidita.HasValue)
-                    {
-                        // Calcolo differenza giorni (arrotondati all’intero)
-                        int giorni = (int)(dataFineValidita.Value.Date - dataInizioValidita.Value.Date).TotalDays;
+                   
+                    // Calcolo differenza giorni (arrotondati all’intero)
+                    int giorni = (int)(dataFineValidita.Date - dataInizioValidita.Date).TotalDays;
 
-                        // Evito valori negativi
-                        if (giorni < 0) giorni = 0;
+                    // Evito valori negativi
+                    if (giorni < 0) giorni = 0;
 
-                        mc = CSVReader.calcolaMC(giorni, numeroComponenti);
-                    }
-                    else
-                    {
-                        logFile.LogWarning($"Impossibile calcolare i giorni: date non valide. Riga {rigaCorrente}");
-                    }
+                    mc = CSVReader.calcolaMC(giorni, numeroComponenti);
                 }
 
                 // Se il check è attivo allore imposto come valore di serie quello di default della scheda ente
@@ -1318,7 +1312,7 @@ public class CSVReader
 
                     // Verifico campo per campo se ci sono differenze per il campo inizioValidita
 
-                    if (report.dataInizioValidita != null && reportEsistente.dataInizioValidita != null && reportEsistente.dataInizioValidita != report.dataInizioValidita)
+                    if (reportEsistente.dataInizioValidita != report.dataInizioValidita)
                     {
                         reportEsistente.dataInizioValidita = report.dataInizioValidita;
                         aggiornare = true;
@@ -1326,7 +1320,7 @@ public class CSVReader
 
                     // Verifico campo per campo se ci sono differenze per il campo fineValidita
 
-                    if (report.dataFineValidita != null && reportEsistente.dataFineValidita != null && reportEsistente.dataFineValidita != report.dataFineValidita)
+                    if (reportEsistente.dataFineValidita != report.dataFineValidita)
                     {
                         reportEsistente.dataFineValidita = report.dataFineValidita;
                         aggiornare = true;

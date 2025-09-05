@@ -14,7 +14,7 @@ namespace BonusIdrici2.Controllers
         private readonly ApplicationDbContext _context;
 
         private string? ruolo;
-        private int idUser;
+        private int? idUser;
         private string? username;
 
         // Costruttore
@@ -28,7 +28,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
-                idUser = (int)HttpContext.Session.GetInt32("idUser");
+                idUser = HttpContext.Session.GetInt32("idUser");
             }
         }
 

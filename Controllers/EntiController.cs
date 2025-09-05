@@ -18,7 +18,7 @@ namespace BonusIdrici2.Controllers
         private readonly ApplicationDbContext _context; // Inietta il DbContext
 
          private string? ruolo;
-        private int idUser;
+        private int? idUser;
         private string? username;
 
         public EntiController(ILogger<EntiController> logger, ApplicationDbContext context)
@@ -30,7 +30,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
-                idUser = (int) HttpContext.Session.GetInt32("idUser");
+                idUser = HttpContext.Session.GetInt32("idUser");
             }
         }
 
@@ -187,7 +187,7 @@ namespace BonusIdrici2.Controllers
                 Piranha = Piranha,
                 Selene = Selene,
                 DataCreazione = DateTime.Now,
-                IdUser = idUser,
+                IdUser = idUser ?? 0,
             };
             
             ViewBag.Message = "Ente creato con successo";

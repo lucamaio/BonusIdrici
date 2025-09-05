@@ -25,7 +25,7 @@ namespace BonusIdrici2.Models
         // public required int IdUser { get; set; }
         // Aggiungere identificativo all'utente che effetua la modifica
 
-        public string? ToString()
+        public override string ToString()
         {
             return $"Id: {id} Denominazione: {denominazione} Normalizzazione {normalizzazione} Data Creazione: {data_creazione} Data Aggiornamento {data_aggiornamento} Id Ente: {IdEnte}";
         }

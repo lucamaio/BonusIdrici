@@ -14,7 +14,7 @@ namespace BonusIdrici2.Controllers
         private readonly ApplicationDbContext _context;
 
         private string? ruolo;
-        private int idUser;
+        private int? idUser;
         private string? username;
 
         // Costruttore
@@ -28,7 +28,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
-                idUser = (int)HttpContext.Session.GetInt32("idUser");
+                idUser = HttpContext.Session.GetInt32("idUser");
             }
         }
 
@@ -47,7 +47,7 @@ namespace BonusIdrici2.Controllers
             {
                 username = null;
                 ruolo = null;
-                idUser = 0;
+                idUser = null;
             }
 
             // Così le variabili sono disponibili in tutte le viste
@@ -323,7 +323,7 @@ namespace BonusIdrici2.Controllers
 
 
                 // Lettura del file CSV
-                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche(filePath, selectedEnteId, _context, idUser);
+                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche(filePath, selectedEnteId, _context, idUser ?? 0);
 
                 if (datiComplessivi == null)
                 {

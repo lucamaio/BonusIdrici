@@ -15,8 +15,6 @@ namespace leggiCSV
         public List<UtenzaIdrica> UtenzeIdricheEsistente { get; set; }
 
         public int? countIndirizziMalFormati { get; set; }
-
-        public List<Atto.Atto> Atti { get; set; }
         
         public List<Report> reports { get; set; }
 
@@ -35,8 +33,6 @@ namespace leggiCSV
             UtenzeIdriche = new List<UtenzaIdrica>();
 
             UtenzeIdricheEsistente = new List<UtenzaIdrica>();
-
-            Atti = new List<Atto.Atto>();
 
             reports = new List<Report>();
 

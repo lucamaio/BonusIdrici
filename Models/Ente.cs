@@ -37,10 +37,15 @@ namespace BonusIdrici2.Models
 
         [Required]
         public required int IdUser { get; set; }
-        
+
         [Required]
         public required DateTime DataCreazione { get; set; }
-        
+
         public DateTime? DataAggiornamento { get; set; }
+
+        public override string ToString()
+        {
+            return $"id: {id} | nome: {nome} | istat: {istat} | cap: {Cap} | Codice Fiscale {CodiceFiscale} | Data Creazione: {DataCreazione.ToString("dd/MM/yyyy")} | Data Aggiornamento: {DataAggiornamento?.ToString("dd/MM/yyyy")}";
+        }
     }
 }
