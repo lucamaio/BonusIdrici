@@ -157,19 +157,23 @@ namespace BonusIdrici2.Controllers
 
         // Pagina 4: Consente la modifica dati di un toponimo
 
-        public IActionResult Modifica(int id, string denominazione, string? normalizzazione, DateTime data_creazione, int idEnte)
+        public IActionResult Modifica(int id)
         {
             if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
+            // 2. Mi ricavo il toponimo
 
-            ViewBag.id = id;
-            ViewBag.denominazione = denominazione;
-            ViewBag.normalizzazione = normalizzazione;
-            ViewBag.data_creazione = data_creazione;
-            ViewBag.IdEnte = idEnte;
+            var top = _context.Toponomi.FirstOrDefault(s => s.id == id);
+            if (top == null)
+            {
+                ViewBag.Message = "Toponimo non trovato!";
+                return RedirectToAction("Show");
+            }
+            
+            ViewBag.Toponimo = top;
             return View();
         }
 

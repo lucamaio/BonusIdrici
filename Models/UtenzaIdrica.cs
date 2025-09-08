@@ -67,7 +67,7 @@ namespace BonusIdrici2.Models
         public int IdUser { get; set; }
 
         public int? idToponimo { get; set; }
-        
+
        public override string ToString()
         {
             return $"UtenzaIdrica: Acquedotto: {idAcquedotto}, Stato: {stato}, " +

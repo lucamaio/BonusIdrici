@@ -1,34 +1,102 @@
 @{
     ViewData["Title"] = "Modifica Toponimo";
+    var toponimo = ViewBag.Toponimo;   
 }
 
-<div class="container my-5">
+<div class="report-page container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header header-classic text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Modifica Toponimo</h3>
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Modifica Toponimo</span>
+                    </h3>
                 </div>
-                <div class="card-body p-4">
-                    <form asp-controller="Enti" asp-action="Update" method="POST" enctype="multipart/form-data">
-                        @* Campo nascosto per salvare l'ID dell'ente *@
-                        <input type="hidden" name="id" value="@ViewBag.id" />
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
+                    <form asp-controller="Toponimi" asp-action="Update" method="POST" enctype="multipart/form-data">
                         
-                        <div class="mb-3">
-                            <label for="nome" class="form-label">Nome* </label>
-                            <input type="text" class="form-control" id="denominazione" name="denominazione" value="@ViewBag.denominazione"required>
+                        <div class="accordion" id="accordionToponimo">
+
+                            <!-- SEZIONE 1: Dati Identificativi -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionToponimo">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="id" class="form-label">ID</label>
+                                                <input type="text" class="form-control readonly-field" id="id" name="id" value="@toponimo.id" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="denominazione" class="form-label">Denominazione *</label>
+                                                <input type="text" class="form-control" id="denominazione" name="denominazione" value="@toponimo.denominazione" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="normalizzazione" class="form-label">Normalizzazione *</label>
+                                                <input type="text" class="form-control" id="normalizzazione" name="normalizzazione" value="@toponimo.normalizzazione" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 2: Metadati -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-calendar-days me-2"></i> Metadati
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionToponimo">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="dataCreazione" class="form-label">Data Creazione</label>
+                                                <input class="form-control readonly-field" type="date" id="dataCreazione" name="dataCreazione"
+                                                       value="@(toponimo.data_creazione?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="dataAggiornamento" class="form-label">Data Aggiornamento</label>
+                                                <input class="form-control readonly-field" type="date" id="dataAggiornamento" name="dataAggiornamento"
+                                                       value="@(toponimo.data_aggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
-                        <div class="mb-3">
-                            <label for="normalizzazione" class="form-label">Normalizzazione*</label>
-                            <input type="text" class="form-control" id="normalizzazione" name="normalizzazione" value="@ViewBag.normalizzazione" required>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-3">Modifica Toponimo</button>
+                        <!-- BOTTONI -->
+                        <hr class="my-4" />
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Show", "Toponomi")"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                <i class="fa-solid fa-check"></i> Aggiorna
+                            </button>
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

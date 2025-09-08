@@ -14,6 +14,8 @@
 
     var sesso = utenza.sesso;
     var sessoUtenza = new List<string> { "M", "F", "D" };
+    var nominativoDichiarante = ViewBag.nominativoDichiarante;
+    var denominazioneToponimo = ViewBag.denominazioneToponimo;
 }
 
 <div class="report-page container my-5">
@@ -101,6 +103,12 @@
                                                 <input type="text" class="form-control" id="nome" name="nome" value="@utenza.nome" required>
                                             </div>
 
+                                             <div>
+                                                <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
+                                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
+                                                       value="@utenza.codiceFiscale" required>
+                                            </div>
+
                                             <div>
                                                 <label for="sesso" class="form-label">Sesso *</label>
                                                 <select class="form-select" id="sesso" name="sesso" required>
@@ -115,12 +123,6 @@
                                                 <label for="data_nascita" class="form-label">Data di nascita *</label>
                                                 <input class="form-control" type="date" id="data_nascita" name="data_nascita"
                                                        value="@(utenza.DataNascita?.ToString("yyyy-MM-dd") ?? "")" required>
-                                            </div>
-
-                                            <div>
-                                                <label for="codice_fiscale" class="form-label">Codice Fiscale *</label>
-                                                <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale"
-                                                       value="@utenza.codiceFiscale" required>
                                             </div>
 
                                             <div>
@@ -143,7 +145,7 @@
                                 <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3"
                                      data-bs-parent="#accordionUtenza">
                                     <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div>
                                                 <label for="indirizzo_ubicazione" class="form-label">Indirizzo *</label>
                                                 <input type="text" class="form-control" id="indirizzo_ubicazione" name="indirizzo_ubicazione"
@@ -160,6 +162,12 @@
                                                 <label for="piano" class="form-label">Piano </label>
                                                 <input type="text" class="form-control" id="piano" name="piano" value="@utenza.piano" >
                                             </div>
+
+                                            @* <div>
+                                                <label for="idToponimo" class="form-label">Id Toponimo: </label>
+                                                <input type="text" class="form-control readonly-field" id="idToponimo" name="idToponimo" value="@utenza.idToponimo" readonly>
+                                            </div> *@
+
                                         </div>
                                     </div>
                                 </div>
@@ -192,6 +200,55 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Sezione 5: Metadati -->
+                            @if (utenza?.IdDichiarante != null || utenza?.idToponimo != null)
+                            {
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading6">
+                                        <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                                            <i class="fa-solid fa-database me-2"></i> Collegamenti
+                                        </button>
+                                    </h2>
+                                    <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="heading6"
+                                         data-bs-parent="#accordionUtenza">
+                                        <div class="accordion-body">
+                                            <div class="row row-cols-1 row-cols-md-2 g-4">
+
+                                                @* Visualizzazione dati toponimo con link *@
+                                                @if (utenza?.idToponimo != null)
+                                                {
+                                                    <div class="col">
+                                                        <label for="toponimo" class="form-label">Toponimo</label>
+                                                        <div>
+                                                            <a id="toponimo" href="@Url.Action("Modifica", "Toponomi", new { id = utenza.idToponimo })"
+                                                               class="form-control-plaintext text-decoration-none text-primary">
+                                                                @denominazioneToponimo
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                @* Visualizzazione dichiarante con link *@
+                                                @if (utenza?.IdDichiarante != null)
+                                                {
+                                                    <div class="col">
+                                                        <label for="dichiarante" class="form-label">Dichiarante</label>
+                                                        <div>
+                                                            <a id="dichiarante" href="@Url.Action("Modifica", "Anagrafe", new { id = utenza.IdDichiarante })"
+                                                               class="form-control-plaintext text-decoration-none text-primary">
+                                                                @nominativoDichiarante
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </div>
 
                         <!-- BOTTONI -->

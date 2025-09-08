@@ -177,10 +177,14 @@ namespace BonusIdrici2.Controllers
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
-
+           
             ViewBag.id = id;
-            List<UtenzaIdrica> utenza = _context.UtenzeIdriche.Where(s => s.id == id).ToList();
-            ViewBag.Utenza = utenza.First();
+            var utenza = _context.UtenzeIdriche.FirstOrDefault(s => s.id == id);
+            var getNominativoDichiarante = FunzioniTrasversali.getNominativoDichiarante(_context, utenza?.IdDichiarante);
+            var denominazioneToponimo = utenza?.idToponimo != null ? _context.Toponomi.FirstOrDefault(s => s.id == utenza.idToponimo) : null;
+            ViewBag.Utenza = utenza;
+            ViewBag.nominativoDichiarante = getNominativoDichiarante;
+            ViewBag.denominazioneToponimo = denominazioneToponimo != null ? denominazioneToponimo.denominazione : null;
             return View();
         }
 

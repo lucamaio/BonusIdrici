@@ -144,7 +144,7 @@ namespace BonusIdrici2.Models
         }
 
 
-        
+
 
 
         public static (string esito, int? idFornitura, string? messaggio, int? idUtenza) VerificaEsistenzaFornitura(Dichiarante dichiarante, int selectedEnteId, ApplicationDbContext context, string indirizzoINPS, string numeroCivicoINPS, bool confrontoCivico)
@@ -154,11 +154,13 @@ namespace BonusIdrici2.Models
                 .Where(s => ((s.codiceFiscale == dichiarante.CodiceFiscale || (s.cognome == dichiarante.Cognome && s.nome == dichiarante.Nome && s.DataNascita == dichiarante.DataNascita)) && (s.stato != 5 && s.stato != 4)) && s.IdEnte == selectedEnteId)
                 .ToList();
 
-            if(forniture.Count == 0)
+            if (forniture.Count == 0)
             {
                 // Nessuna fornitura trovata
-                return ("04", null, "Nessuna fornitura trovata per il dichiarante.",null);
-            }else if(forniture.Count > 1){
+                return ("04", null, "Nessuna fornitura trovata per il dichiarante.", null);
+            }
+            else if (forniture.Count > 1)
+            {
                 // Più forniture trovate
                 return ("04", null, "Attenzione: piu' di una fornitura trovata per il dichiarante.", null);
 
@@ -170,7 +172,7 @@ namespace BonusIdrici2.Models
             // Verifica il tipo di utenza
             if (!string.Equals(fornitura.tipoUtenza, "UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase))
             {
-                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.\n",fornitura.id);
+                return ("03", null, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'.\n", fornitura.id);
             }
 
             // Recupera i dati dell'utenza
@@ -190,7 +192,7 @@ namespace BonusIdrici2.Models
             {
                 indirizzoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase);
             }
-               
+
             // Se indirizzo e numero civico coincidono
             if (indirizzoCorrisponde)
             {
@@ -227,13 +229,14 @@ namespace BonusIdrici2.Models
                     {
                         indirizzoToponimoCorrisponde = string.Equals(indirizzoUtenza, dichiarante.IndirizzoResidenza, StringComparison.OrdinalIgnoreCase);
                     }
-                    
+
                     if (indirizzoToponimoCorrisponde)
                     {
-                        if(toponimo.normalizzazione != indirizzoINPS){
+                        if (toponimo.normalizzazione != indirizzoINPS)
+                        {
                             message = message + "Attenzione: L'indirizzo di ubicazione del toponimo non corrisponde a quello fornito dal INPS.\n";
                         }
-                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message,fornitura.id);
+                        return VerificaStatoFornitura(fornitura.stato, idFornituraTrovata, message, fornitura.id);
                     }
                 }
             }
@@ -251,7 +254,7 @@ namespace BonusIdrici2.Models
             }
             else
             {
-                return ("03", idFornitura, messaggio,idUtenza);
+                return ("03", idFornitura, messaggio, idUtenza);
             }
         }
 
@@ -322,12 +325,27 @@ namespace BonusIdrici2.Models
             int eta = oggi.Year - dataNascita.Year;
 
             // Se il compleanno non è ancora passato quest'anno, tolgo 1
-            if (dataNascita.Date > oggi.AddYears(-eta)) 
+            if (dataNascita.Date > oggi.AddYears(-eta))
             {
                 eta--;
             }
 
             return eta;
+        }
+
+        public static string? getNominativoDichiarante(ApplicationDbContext _context, int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return null;
+            }
+            // cerco il dichiarante
+            var dichiarante = _context.Dichiaranti.FirstOrDefault(s => s.id == id);
+            if (dichiarante == null)
+            {
+                return null;
+            }
+            return dichiarante.Cognome + " " + dichiarante.Nome;
         }
 
     }
