@@ -16,7 +16,7 @@
 <div class="container-xxl flex-grow-1 py-5">
     <div class="card shadow-sm border-0 rounded-4">
         <!-- Header -->
-        <div class="card-header header-report border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+        <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
             <h3 class="mb-1 fw-bold">
                 <i class="bi bi-building me-2"></i> Dattagli Report - 
                 <span class="fw-semibold">
@@ -28,6 +28,11 @@
                 </span>
             </h3>
             <small>Ente: @selectedEnteNome</small>
+        </div>
+
+        <!-- Barra di caricamento -->
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
         </div>
 
         <!-- Body -->
@@ -230,24 +235,22 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Mostra barra all'inizio
             $("#loadingBarContainer").show();
-            var progress = 0;
-            var interval = setInterval(function () {
-                if (progress < 90) {
-                    progress += 10;
-                    $("#loadingBar").css("width", progress + "%");
-                }
-            }, 300);
-            
-
-            var table = $('#dettagliReportTable').DataTable({
+                var progress = 0;
+                var interval = setInterval(function () {
+                    if (progress < 90) {
+                        progress += 10;
+                        $("#loadingBar").css("width", progress + "%");
+                    }
+                }, 300);
+                
+            var dettagliTable = $('#dettagliReportTable').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
                 responsive: true,
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end report"p>>',
                 buttons: [
                     {
                         text: '<i class="bi bi-plus-circle me-1"></i> Varia Serie',
@@ -257,18 +260,16 @@
                                 + '?idEnte=@idEnte&idAto=@idAto';
                         }
                     }
-                ]
-            });
-
-            // Quando la tabella è pronta → completa la barra e mostra tabella
-            table.on('init', function () {
+                ],
+            }); 
+            dettagliTable.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
                     $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); // 🔹 mostra la tabella solo adesso
+                    $("#tableWrapper").fadeIn(); 
                 }, 500);
             });
-        });
+        }); 
     </script>
 }

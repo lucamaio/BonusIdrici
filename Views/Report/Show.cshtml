@@ -10,13 +10,18 @@
 <div class="container-xxl flex-grow-1 py-5">
     <div class="card shadow-sm border-0 rounded-4">
         <!-- Header -->
-        <div class="card-header header-report border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+        <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
             <h3 class="mb-1 fw-bold">
                 <i class="bi bi-building me-2"></i> Report Disponibili - 
                 <span class="fw-semibold">@selectedEnteNome</span>
             </h3>
             <small>ID Ente: @selectedEnteId</small>
         </div>
+
+           <!-- Barra di caricamento -->
+            <div id="loadingBarContainer" style="display: none;">
+                <div id="loadingBar" role="progressbar"></div>
+            </div>
 
         <!-- Body -->
         <div class="card-body p-4">
@@ -25,7 +30,7 @@
                 <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i report correlati.</p>
 
                 <div class="table-responsive">
-                    <table id="riepilogoTableReport" class="table table-hover align-middle border-bottom">
+                    <table id="elencoReport" class="table table-hover align-middle border-bottom">
                         <thead>
                             <tr>
                                 <th class="text-center">ID ATO</th>
@@ -105,7 +110,7 @@
                 </div>
             }
 
-            @if(ruolo !="OPERATORE"){
+            @if(ruolo != "OPERATORE"){
                         <div class="d-grid mt-4">
                             <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary btn-lg shadow-sm">
                                 <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
@@ -121,16 +126,3 @@
         </div>
     </div>
 </div>
-<style>
-    html, body {
-        overflow-x: hidden !important; /* niente barra orizzontale */
-    }
-
-    dropdown-menu {
-        position: absolute !important;
-        inset: auto !important;
-        transform: none !important; /* annulla il translate3d */
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-</style>

@@ -1,46 +1,50 @@
-@* Views/Azioni/GeneraEsitoCompetenza.cshtml *@
 @{
-    ViewData["Title"] = "Anagrafe"; // Titolo più appropriato per la pagina iniziale
+    ViewData["Title"] = "Selezione Ente";
+    var enti = ViewBag.Enti;
 }
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header header-anagrafe text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Seleziona Ente per Visualizzare l'Anagrafe</h3>
-                </div>
-                <div class="card-body p-4">
-                    <form asp-controller="Anagrafe" asp-action="Show" method="post"> @* Azione POST modificata *@
-                        
-                        <div class="mb-3">
-                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente:</label>
-                            <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
-                                <option value="">-- Seleziona un Ente --</option>
-                                @if (ViewBag.Enti != null)
-                                {
-                                    foreach (var ente in ViewBag.Enti)
-                                    {
-                                        // Assicurati che "id" e "nome" siano le proprietà corrette del tuo oggetto ente
-                                        <option value="@ente.id">@ente.nome</option> 
-                                    }
-                                }
-                            </select>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-anagrafe">Visualizza Dati Ente</button> @* Testo del pulsante modificato *@
-                        </div>
-                    </form>
-
-                    @if (!string.IsNullOrEmpty(ViewBag.Message))
-                    {
-                        <div class="alert alert-info mt-3" role="alert">
-                            @ViewBag.Message
-                        </div>
-                    }
-                </div>
-            </div>
+<div class="container d-flex justify-content-center" style="margin-top: 80px;">
+    <div class="card shadow-lg rounded-4 p-5 w-100" style="max-width: 600px;">
+        <div class="text-center mb-4">
+            <i class="bi bi-building text-primary" style="font-size: 3rem;"></i>
+            <h2 class="fw-bold mt-2">Seleziona il tuo Ente</h2>
+            <p class="text-muted">Trova facilmente l'ente e visualizza i dati</p>
         </div>
+
+        <form asp-controller="Anagrafe" asp-action="Show" method="post">
+            <div class="mb-4 position-relative">
+                <input type="text" id="searchEnte" class="form-control shadow-sm rounded-pill ps-4 pe-5"
+                       placeholder="Cerca ente..." autocomplete="off">
+                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+
+                <select id="selectedEnteId" name="selectedEnteId" class="form-select d-none">
+                    <option value="">-- Seleziona un Ente --</option>
+                    @if (enti != null)
+                    {
+                        foreach (var ente in enti)
+                        {
+                            <option value="@ente.id">@ente.nome</option>
+                        }
+                    }
+                </select>
+
+                <ul id="filteredEnteList" class="list-group position-absolute w-100 shadow-sm mt-1 d-none rounded-3 overflow-auto"
+                    style="z-index: 1000; max-height: 200px; background: #fff;"></ul>
+            </div>
+
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                    <i class="bi bi-arrow-right-circle me-2"></i> Visualizza Anagrafe Ente
+                </button>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info mt-4 shadow-sm border-0 rounded-3">
+                <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
+            </div>
+        }
     </div>
 </div>
+

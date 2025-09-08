@@ -26,7 +26,7 @@ namespace BonusIdrici2.Controllers
             _logger = logger;
             _context = context;
 
-             if (VerificaSessione())
+            if (VerificaSessione())
             {
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
@@ -34,7 +34,7 @@ namespace BonusIdrici2.Controllers
             }
         }
 
-         // Funzione che inizializza le variabili con i dati della sessione
+        // Funzione che inizializza le variabili con i dati della sessione
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -119,7 +119,12 @@ namespace BonusIdrici2.Controllers
             return View("Error");
         }
 
-        // Aggiungere una pagina info
+        // Pagina 5: Pagina info
+
+        public IActionResult Info()
+        {
+            return View();
+        }
     }
     
 }

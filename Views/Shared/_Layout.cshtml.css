@@ -8,13 +8,13 @@ a.navbar-brand {
 }
 
 a {
-  color: #032f81;
+  color: #1E3A8A;
 }
 
 .btn-primary {
   color: #fff !important;
-  background-color: #032f81 !important;
-  border-color: #032668 !important;
+  background-color: #1E3A8A !important;
+  border-color: #1E3A8A !important;
 }
 
 .btn-back{
@@ -25,8 +25,8 @@ a {
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: #fff !important;
-  background-color: #032f81 !important;
-  border-color: #032668 !important;
+  background-color: #1E3A8A !important;
+  border-color: #153fb3 !important;
 }
 
 .border-top {
@@ -56,6 +56,14 @@ button.accept-policy {
 
 .table-primary{
   color: #fff;
-  background-color: #032f81;
-  border-color: #032668;
+  background-color: #1E3A8A !important;
+  border-color: #153fb3 !important;
+}
+
+
+@keyframes slideIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }

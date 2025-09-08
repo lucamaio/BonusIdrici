@@ -11,7 +11,7 @@
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
-                <div class="card-header header-anagrafe border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
                     <h3 class="mb-1 fw-bold">
                         <i class="bi bi-people-fill me-2"></i> Anagrafe -
                         <span class="fw-semibold">@selectedEnteNome</span>
@@ -20,9 +20,8 @@
                 </div>
 
                 <!-- Barra di caricamento -->
-                <div id="loadingBarContainer" class="progress rounded-0" style="height: 6px; display: none;">
-                    <div id="loadingBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
-                         role="progressbar" style="width: 0%"></div>
+                <div id="loadingBarContainer" style="display: none;">
+                    <div id="loadingBar" role="progressbar"></div>
                 </div>
 
                 <!-- Body -->
@@ -50,12 +49,12 @@
                                         <tr>
                                             <td><span class="fw-semibold">@item.Cognome</span></td>
                                             <td><span class="fw-semibold">@item.Nome</span></td>
-                                            <td>@item.CodiceFiscale</td>
-                                            <td>@item.Sesso</td>
+                                            <td><span class="text-center">@item.CodiceFiscale</span></td>
+                                            <td><span class="text-center">@item.Sesso</span></td>
                                             <td>@item.IndirizzoResidenza</td>
-                                            <td>@item.NumeroCivico</td>
+                                            <td><span class="text-center">@item.NumeroCivico</span></td>
                                             <td class="text-center">
-                                                <a class="btn btn-sm btn-light border me-1" style="fill: #198754 !important; color: #198754 !important" title="Modifica Persona"
+                                                <a class="btn btn-sm btn-light border me-1" title="Modifica Persona"
                                                    href="@Url.Action("Modifica", "Anagrafe", new { id = item.id })">
                                                     <i class="bi bi-pencil-square text-primary"></i>
                                                 </a>
@@ -101,7 +100,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Mostra barra all'inizio
             $("#loadingBarContainer").show();
             var progress = 0;
             var interval = setInterval(function () {
@@ -138,9 +136,8 @@
                         }
                     }
                 ]
-            });
+            }); 
 
-            // Quando la tabella è pronta → completa la barra e mostra tabella
             table.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");

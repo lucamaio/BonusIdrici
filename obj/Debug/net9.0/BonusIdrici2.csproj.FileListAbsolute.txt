@@ -710,7 +710,7 @@ C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdr.493C5E79.Up2Date
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\BonusIdrici2.genruntimeconfig.cache
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\ref\BonusIdrici2.dll
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-oe9nyxqr8c.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34j-3spz4fczx3.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-3spz4fczx3.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-5wc7wkwx91.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34j-znw9z57rqe.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-znw9z57rqe.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-u68q2kus0s.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-mfrhmq8i0i.gz

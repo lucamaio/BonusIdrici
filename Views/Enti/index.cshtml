@@ -8,16 +8,15 @@
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
-                <div class="card-header header-enti border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
                     <h3 class="mb-1 fw-bold">
                         <i class="bi bi-people-fill me-2"></i> Enti
                     </h3>
                 </div>
 
                 <!-- Barra di caricamento -->
-                <div id="loadingBarContainer" class="progress rounded-0" style="height: 6px; display: none;">
-                    <div id="loadingBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
-                         role="progressbar" style="width: 0%"></div>
+                <div id="loadingBarContainer" style="display: none;">
+                    <div id="loadingBar" role="progressbar"></div>
                 </div>
 
                 @if (!string.IsNullOrEmpty(ViewBag.Message))
@@ -96,7 +95,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Mostra barra all'inizio
             $("#loadingBarContainer").show();
             var progress = 0;
             var interval = setInterval(function () {
@@ -107,30 +105,27 @@
             }, 300);
 
             var entiTable = $('#entiTable').DataTable({
-                paging: false,
+                paging: true,
                 searching: true,
                 ordering: true,
                 responsive: true,
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
                 dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
-                buttons: [
-                    {
+                buttons: [ {
                         text: '<i class="bi bi-plus-circle me-1"></i> Aggiungi',
                         className: 'btn btn-sm btn-success',
                         action: function () {
                             window.location.href = '@Url.Action("Create", "Enti")';
                         }
-                    }
-                ]
+                    } ]
             });
 
-            // Quando la tabella è pronta → completa la barra e mostra tabella
             entiTable.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
                     $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn();
+                    $("#tableWrapper").fadeIn(); 
                 }, 500);
             });
         });

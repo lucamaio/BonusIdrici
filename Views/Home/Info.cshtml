@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = "Bonus Sociale Idrico";
+}
+
+<div class="container-xxl flex-grow-1 py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+
+            <!-- Header -->
+            <div class="mb-4 text-center">
+                <h1 class="fw-bold mb-2">Bonus Sociale Idrico</h1>
+                <p class="text-muted fs-6">Tutte le informazioni sul sostegno economico per il servizio idrico.</p>
+            </div>
+
+            <!-- Che cos'è il Bonus -->
+            <div class="card shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h3 class="fw-semibold mb-3"><i class="bi bi-info-circle me-2"></i>Che cos'è il Bonus Sociale Idrico?</h3>
+                    <p>
+                        Il <strong>Bonus Sociale Idrico</strong>, spesso chiamato "Bonus Acqua", è una misura di sostegno economico pensata per ridurre la spesa per il servizio di acquedotto dei nuclei familiari che si trovano in condizioni di disagio economico o sociale.  
+                        L'agevolazione garantisce la fornitura gratuita di un quantitativo minimo di acqua necessario per i bisogni essenziali di ogni persona.
+                    </p>
+                </div>
+            </div>
+
+            <!-- A chi spetta -->
+            <div class="card shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h3 class="fw-semibold mb-3"><i class="bi bi-people-fill me-2"></i>A chi spetta il Bonus?</h3>
+                    <p>Il bonus è destinato a tutti i nuclei familiari che rientrano in una delle seguenti categorie:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Nuclei familiari con un indicatore ISEE non superiore a <strong>€ 9.530</strong>.</li>
+                        <li class="list-group-item">Nuclei familiari con almeno 4 figli a carico e un ISEE non superiore a <strong>€ 20.000</strong>.</li>
+                        <li class="list-group-item">Nuclei familiari titolari di <strong>Reddito di Cittadinanza</strong> o <strong>Pensione di Cittadinanza</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Come si calcola -->
+            <div class="card shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h3 class="fw-semibold mb-3"><i class="bi bi-calculator me-2"></i>Come si calcola l'importo?</h3>
+                    <p>L'importo del bonus non è fisso e copre il costo del "quantitativo minimo vitale" di acqua: 50 litri per abitante al giorno, pari a <strong>18,25 mc annui</strong> per ogni componente del nucleo familiare.</p>
+
+                    <div class="table-responsive mt-3">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Composizione Nucleo Familiare</th>
+                                    <th>Valore Annuale del Bonus (indicativo)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1-2 componenti</td>
+                                    <td>€ 167,90</td>
+                                </tr>
+                                <tr>
+                                    <td>3-4 componenti</td>
+                                    <td>€ 219,00</td>
+                                </tr>
+                                <tr>
+                                    <td>Oltre 4 componenti</td>
+                                    <td>€ 240,90</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <small class="text-muted">*I valori possono variare annualmente in base alle tariffe.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modalità di erogazione -->
+            <div class="card shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h3 class="fw-semibold mb-3"><i class="bi bi-credit-card-2-front me-2"></i>Modalità di Erogazione</h3>
+                    <p>
+                        Il Bonus Idrico viene riconosciuto automaticamente ai soggetti aventi diritto.  
+                        L'erogazione avviene tramite:
+                    </p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Bonus Diretto:</strong> per contratti individuali, lo sconto viene applicato direttamente in bolletta.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Bonus Indiretto:</strong> per forniture centralizzate, l'agevolazione viene erogata tramite bonifico o accredito.
+                        </li>
+                    </ul>
+                    <p class="mt-2 text-muted">
+                        In caso di morosità, l'importo del bonus non ancora erogato può essere trattenuto dal gestore per compensare l'insoluto.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Assistenza -->
+            <div class="card shadow-sm rounded-4 mb-4">
+                <div class="card-body text-center">
+                    <h3 class="fw-semibold mb-3"><i class="bi bi-headset me-2"></i>Hai bisogno di assistenza?</h3>
+                    <p>Per chiarimenti o informazioni specifiche, consulta la nostra sezione FAQ o contatta il nostro servizio clienti.</p>
+                    <a href="@Url.Action("FAQ", "Home")" class="btn btn-primary btn-sm me-2"><i class="bi bi-question-circle me-1"></i> FAQ</a>
+                    <a href="@Url.Action("Contatti", "Home")" class="btn btn-outline-primary btn-sm"><i class="bi bi-envelope me-1"></i> Contatta il servizio clienti</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using BonusIdrici2.Models.ViewModels;
-using BonusIdrici2.Models; 
+using BonusIdrici2.Models;
 using BonusIdrici2.Data;
+using System.Globalization;
+using System.Collections.Generic; 
 using System.IO;
 
 namespace BonusIdrici2.Controllers
@@ -105,31 +107,26 @@ namespace BonusIdrici2.Controllers
             }
 
             // c) Cerco l'utente sul DB
-            var utente = _context.Users.Where(s => s.id == idUser).ToList();
+            var utente = _context.Users.FirstOrDefault(s => s.id == idUser);
 
             if (utente == null)
             {
                 return RedirectToAction("Index", "Home");
             }
-
-            ViewBag.Username = utente[0].Username;
-            ViewBag.Email = utente[0].Email;
-            ViewBag.Cognome = utente[0].Cognome;
-            ViewBag.Nome = utente[0].Nome;
-            ViewBag.Role = utente[0].getRuolo();
+            ViewBag.Utente = utente;
             return View();
         }
 
         // Pagina 3: Pagina di sicurezza consente di cambiare password
 
-        public IActionResult Sicurezza()
+        public IActionResult Sicurezza(int id)
         {
             // a) Verifico se esiste una sessione
             if (!VerificaSessione())
             {
                 return RedirectToAction("Index", "Login");
             }
-
+            ViewBag.id = id;
             return View();
         }
 
@@ -194,7 +191,7 @@ namespace BonusIdrici2.Controllers
                                         .Select(s => s.idEnte)
                                         .ToList();
             }
-
+        
             ViewBag.SelectedEntiIds = selectedEntiIds; // usato dalla vista per il ListBox
             ViewBag.idRuolo = utente.idRuolo;
             ViewBag.Enti = enti;
@@ -216,7 +213,7 @@ namespace BonusIdrici2.Controllers
             return View();
         }
 
-
+    
 
         // Fine - Pagine di navigazione
         // Inizio - Funzioni
@@ -373,10 +370,51 @@ namespace BonusIdrici2.Controllers
             _context.SaveChanges();
 
             ViewBag.Message = "Password Cambiata con successo!";
-            return RedirectToAction("Modifica","Account", new{ id = id});
+            return RedirectToAction("Modifica", "Account", new { id = id });
 
         }
 
+        // Funzione 5: Funzione che reimposta la password di un user
+
+        public IActionResult ChangePassword(int id, string password, string newPassword, string confirmPassword)
+        {
+            // 1. Ricavo l'utente a partire dal id
+            var utente = _context.Users.FirstOrDefault(s => s.id == id);
+
+            if (utente == null)
+            {
+                ViewBag.Message = "Utente non trovato!";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Verifico se la password attuale è corretta
+
+            if (utente.Password != password)
+            {
+                ViewBag.Message = "La password attuale non è corretta";
+                return RedirectToAction("Dettagli", "Account", new { id = id });
+            }
+
+
+            // 3. Verifico che le password non sono diverse
+
+            if (newPassword != confirmPassword)
+            {
+                ViewBag.Message = "Le password non coincidono!";
+                return RedirectToAction("Dettagli", "Account", new { id = id });
+            }
+
+            // 4. Aggiorno la password
+
+            utente.Password = newPassword;
+            utente.dataAggiornamento = DateTime.Now;
+
+            _context.Users.Update(utente);
+            _context.SaveChanges();
+
+            ViewBag.Message = "Password Cambiata con successo!";
+            return RedirectToAction("Dettagli", "Account", new { id = id });
+        }
 
     }
 }
