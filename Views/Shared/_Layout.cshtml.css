@@ -46,13 +46,19 @@ button.accept-policy {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-  background-color: transparent;
+    margin-top: 20px;
+    margin-bottom: 0px;
+    width: 100%;
+    line-height: 50px;
+    background-color: #F2F3F4;
+    color: #000;
+    position: static; /* importante rimuovere absolute */
 }
+
+main {
+    padding-bottom: 50px;
+}
+
 
 .table-primary{
   color: #fff;

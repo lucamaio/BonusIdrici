@@ -8,6 +8,12 @@ public static class CsvGenerator
 {
     private const string Delimitatore = ";";
 
+    /*
+        Questa classe contiene tre funzioni statiche per generare file CSV da liste di oggetti Report.
+        Ogni funzione crea un CSV con intestazioni e campi specifici, gestendo l'escape dei campi che contengono caratteri speciali.
+        Le funzioni restituiscono il contenuto del CSV come array di byte codificato in UTF-8.
+    */
+
     // Funzione helper per l'escape dei campi CSV (mantienila invariata)
     private static string EscapeCsvField(string field, string delimiter)
     {
@@ -23,11 +29,13 @@ public static class CsvGenerator
         }
         return field;
     }
+    
+    // Funzione 1: consente di generare il file x Bonus Idrico
 
     public static byte[] GeneraCsvBonusIdrico(List<Report> dati)
     {
         StringBuilder csvContent = new StringBuilder();
-        List<string> headers = new List<string> { "COD_BONUS_IDRICO", "ESITO", "COD_FORNITURA", "CF","N_NUCLEO" };
+        List<string> headers = new List<string> { "COD_BONUS_IDRICO", "ESITO", "COD_FORNITURA", "CF", "N_NUCLEO" };
         csvContent.AppendLine(string.Join(Delimitatore, headers));
 
         if (dati != null && dati.Any()) // Usa .Any() per controllare se la lista contiene elementi
@@ -36,10 +44,10 @@ public static class CsvGenerator
             {
                 StringBuilder riga = new StringBuilder();
                 var codiceFornitua = report.idFornitura.ToString();
-                
+
                 riga.Append(EscapeCsvField(report.codiceBonus, Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.esito, Delimitatore)).Append(Delimitatore);
-               
+
                 if (!string.IsNullOrEmpty(codiceFornitua) && report.esito == "01")
                 {
                     riga.Append(EscapeCsvField(codiceFornitua, Delimitatore)).Append(Delimitatore);
@@ -51,23 +59,24 @@ public static class CsvGenerator
                 if (!string.IsNullOrEmpty(report.codiceFiscaleRichiedente) && (report.esito == "01" || report.esito == "02"))
                 {
                     riga.Append(EscapeCsvField(report.codiceFiscaleRichiedente.ToString(), Delimitatore)).Append(Delimitatore);
-                }else
+                }
+                else
                 {
                     riga.Append(EscapeCsvField("", Delimitatore)).Append(Delimitatore);
                 }
-                                
+
                 riga.Append(EscapeCsvField(report.numeroComponenti.ToString() ?? "N/D", Delimitatore)).Append(Delimitatore);
-                
+
                 // Usa CultureInfo.InvariantCulture per formattare i decimali con il punto
                 csvContent.AppendLine(riga.ToString());
             }
         }
-       
+
         return Encoding.UTF8.GetBytes(csvContent.ToString());
     }
 
-   
-    public static byte[] GeneraCsvCompetenzaTerritoriale(List<Report> dati) 
+    // Funzione 2: consente di generare il file x Competenza Territoriale
+    public static byte[] GeneraCsvCompetenzaTerritoriale(List<Report> dati)
     {
         StringBuilder csvContent = new StringBuilder();
         List<string> headers = new List<string> { "ID_RICHIESTA", "ESITO" };
@@ -112,10 +121,14 @@ public static class CsvGenerator
         return Encoding.UTF8.GetBytes(csvContent.ToString());
     }
 
+    // Funzione 4: consente di generare il file di Debug 
+    // Contiene tutti i campi del report
+    // Utile per analisi e debug
+
      public static byte[] GeneraCsvDebug(List<Report> dati)
     {
         StringBuilder csvContent = new StringBuilder();
-        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale Richiedente", "Codice Fiscale x bonus", "Id utenza", "Nome Dichiarante", "Cognome Dichiarante","ID Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "PRESENZA POD", "SERIE","MC", "Incongruenze", "Note", "Numero Componenti", "Data Creazione", "Data Aggiornamento", "IdEnte", "IdUser" };
+        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale Richiedente", "Codice Fiscale x bonus", "Id utenza", "Nome Dichiarante", "Cognome Dichiarante", "ID Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "PRESENZA POD", "SERIE", "MC", "Incongruenze", "Note", "Numero Componenti", "Data Creazione", "Data Aggiornamento", "IdEnte", "IdUser" };
         csvContent.AppendLine(string.Join(Delimitatore, headers));
 
         if (dati != null && dati.Any())
@@ -152,7 +165,7 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(report.DataCreazione.ToString("yyyy-MM-dd HH:mm:ss"), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.DataAggiornamento?.ToString("yyyy-MM-dd HH:mm:ss") ?? "", Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(report.IdEnte.ToString(), Delimitatore)).Append(Delimitatore);
-                riga.Append(EscapeCsvField(report.IdUser.ToString(), Delimitatore)).Append(Delimitatore);                
+                riga.Append(EscapeCsvField(report.IdUser.ToString(), Delimitatore)).Append(Delimitatore);
                 csvContent.AppendLine(riga.ToString());
             }
         }

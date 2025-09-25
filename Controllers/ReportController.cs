@@ -13,7 +13,7 @@ namespace BonusIdrici2.Controllers
     {
         private readonly ILogger<ReportController> _logger;
         private readonly ApplicationDbContext _context;
-        // private FileLog logFile = new FileLog($"wwwroot/log/Report.log");
+        private FileLog logFile = new FileLog($"wwwroot/log/Report.log");
         private string? ruolo;
         private int idUser;
         private string? username;
@@ -145,8 +145,7 @@ namespace BonusIdrici2.Controllers
 
         public IActionResult Dettails(int selectedEnteId, DateTime? data, string? idAto = null)
         {
-            //logFile.LogInfo($"Sono dentro la pagina Dettails. IdEnte: {selectedEnteId} | Data: {data} | idAto: {idAto}");
-
+           // logFile.LogInfo($"Sono dentro la pagina Dettails. IdEnte: {selectedEnteId} | Data: {data} | idAto: {idAto}");
             // ✅ Verifica sessione
             if (!VerificaSessione())
             {
@@ -378,9 +377,9 @@ namespace BonusIdrici2.Controllers
             }
 
             DateTime dataCreazioneParsed;
-            if (!DateTime.TryParseExact(DataCreazione, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataCreazioneParsed))
+            if (!DateTime.TryParseExact(DataCreazione, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataCreazioneParsed))
             {
-                return BadRequest("Formato data non valido. Usare il formato AAAA-MM-GG.");
+                return BadRequest("Formato data non valido. Usare il formato AAAA-MM-GG HH:mm:ss.");
             }
 
             var ente = _context.Enti.Where(r => r.id == enteId).ToList();
@@ -490,7 +489,7 @@ namespace BonusIdrici2.Controllers
 
         // Funzione 3: Consente l'aggiornamento dei dati di un report
         [HttpPost]
-        public IActionResult Update(int id, string codiceFiscale, string cognome, string nome, string esitoStr, string esito )
+        public IActionResult Update(int id, string codiceFiscaleRichiedente, string cognome, string nome, string esitoStr, string esito)
         {
             // 1) Verifico se esiste una sessione attiva
             if (!VerificaSessione())
@@ -522,7 +521,10 @@ namespace BonusIdrici2.Controllers
             // 5) Aggiorno i vari campi
 
             // report.idFornitura = idFornitura;
-            report.codiceFiscaleRichiedente = codiceFiscale;
+            if (codiceFiscaleRichiedente != report.codiceFiscaleRichiedente)
+            {
+                report.codiceFiscaleRichiedente = codiceFiscaleRichiedente;
+            }
             report.cognomeDichiarante = cognome;
             report.nomeDichiarante = nome;
             report.esitoStr = esitoStr;
@@ -534,7 +536,8 @@ namespace BonusIdrici2.Controllers
             AccountController.logFile.LogInfo($"Dopo: {report.ToString()}");
 
             // 7) Ritorno alla pagina details
-            return Dettails(id, report.DataCreazione);
+            return Dettails(report.IdEnte, report.DataCreazione);
+            //return RedirectToAction("Details", "Report", new {selectedEnteId = report.id, data = report.DataCreazione});
         }
 
         // Fine - Funzioni

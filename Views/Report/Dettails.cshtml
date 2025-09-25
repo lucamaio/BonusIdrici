@@ -6,7 +6,7 @@
     var selectedEnteNome = ViewBag.SelectedEnteNome;
 
     DateTime? data1 =ViewBag.Data != null ? ViewBag.Data : Model != null && Model.Any() ?  Model.First().DataCreazione : null;
-    string? data =  ViewBag.Data != null ? ViewBag.Data.ToString("dd/MM/yyyy") : null;
+    string? data =  ViewBag.Data != null ? ViewBag.Data.ToString("dd/MM/yyyy HH:mm:ss") : null;
 
     var ruolo = ViewBag.Ruolo;
     string? idAto = ViewBag.idAto != null ? ViewBag.idAto : Model != null && Model.Any() ? Model.First().idAto : (string?) null;

@@ -18,8 +18,25 @@ using System.Linq.Expressions;
 
 public class CSVReader
 {
-    private const char CsvDelimiter = ';';
+    private const char CsvDelimiter = ';';  // Delimitatore standard per i file CSV
 
+    /*
+        Questa classe contiene le funzioni per la lettura dei file CSV
+        - LoadAnagrafe: legge il file CSV dell'anagrafe e restituisce una lista di dichiaranti da aggiungere o aggiornare
+        - LeggiFileUtenzeIdriche: legge il file CSV delle utenze idriche e restituisce una lista di utenze da aggiungere o aggiornare
+        - LeggiFileBonusIdrico: legge il file CSV dei bonus idrici e restituisce una lista di bonus da aggiungere o aggiornare
+
+        Ogni funzione effettua le seguenti operazioni:
+        1. Apre il file CSV e legge le righe
+        2. Per ogni riga, effettua delle verifiche preliminari sui campi
+        3. Se i campi sono validi, crea un'istanza dell'oggetto corrispondente (Dichiarante, UtenzaIdrica, BonusIdrico)
+        4. Aggiunge l'istanza alla lista dei dati da aggiungere o aggiornare
+        5. Restituisce la lista dei dati da aggiungere o aggiornare
+
+        Ogni funzione utilizza un file di log per registrare le operazioni effettuate e gli eventuali errori riscontrati
+    */
+
+    // Funzione 1: Carica il file CSV dell'anagrafe e restituisce una lista di dichiaranti da aggiungere o aggiornare
     public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
     {
         // Parte 1: Creazione della variabile da restituire e apertura file di log
@@ -308,6 +325,7 @@ public class CSVReader
         return datiComplessivi;
     }
 
+    // Funzione 2: Carica il file CSV delle utenze idriche e restituisce una lista di utenze da aggiungere o aggiornare
     public static DatiCsvCompilati LeggiFileUtenzeIdriche(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
     {
         // Parte 1: Creazione della variabile da restituire e apertura file di log
@@ -838,14 +856,14 @@ public class CSVReader
         return datiComplessivi;
     }
 
-
-    // Funzione che genera i report finali a partire dal file csv INPS
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int? serie, bool confrontoCivico)
+    // Funzione 3: Legge il file CSV proveniente da INPS per generare i report delle persone con bonus idrico
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int? serie, bool confrontoCivico, bool escludiComponenti)
     {
         // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_INPS.log");
         List<string> errori = new List<string>();
+        DateTime dataElaborazione = DateTime.Now; // Neccessaria per impostarla nei report ed evitare divisioni
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
@@ -858,6 +876,7 @@ public class CSVReader
             // Parte 2: Lettura delle varie righe
             foreach (var riga in righe)
             {
+                //logFile.LogInfo($"Sto elaborando la riga {rigaCorrente}");
                 var error = false;
                 rigaCorrente++;
                 // Parte 3: Verifiche Preliminari sui campi
@@ -986,10 +1005,12 @@ public class CSVReader
                     continue; // Salta la riga se ci sono errori
                 }
 
+                //logFile.LogError($"Riga {rigaCorrente} Error: {error}");
+
                 // Parte 5: Elaborazione della riga
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
-
+                // logFile.LogInfo($"Sto Inizializzando le variabili con i dati del File CSV!");
                 string? idAto = FunzioniTrasversali.rimuoviVirgolette(campi[0]);
                 string? codiceBonus = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper();
                 string? codiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper();
@@ -1011,7 +1032,10 @@ public class CSVReader
                 string presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
                 string numeroComponenti_str = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
                 int numeroComponenti = int.Parse(numeroComponenti_str);
-                DateTime dataCreazione = DateTime.Now;
+                // logFile.LogInfo("Ho istanziato tutti i campi con i dati del CSV");
+
+                //DateTime dataCreazione = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 0); // Escludo i secondi della data attuale per evitare problemi successivi
+                // logFile.LogInfo($"Ho inizializatto la data di creazione: {dataCreazione}");
 
                 // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
                 string esitoStr = "No";
@@ -1042,20 +1066,23 @@ public class CSVReader
                 string? codiceFiscaleDichiarateTrovato = null;
                 int? idUtenza = null;
                 // 2.b) Verifico se i campi ISTAT, CAP e provincia corrispondono a l'ente selezionato il quale gestisce le utenze idriche
-
+                // logFile.LogInfo($"Riga: {rigaCorrente} sto verificando l'indirizzo!");
                 if (!(istatEnte != istatAbitazione || capEnte != capAbitazione || provinciaAbitazione != ente.Provincia))
                 {
                     // 2.c) se i campi corispondono verifico se il richiedente è residente nel comune selezionato
                     var dichiaranteTrovato = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId);
                     if (dichiaranteTrovato != null)
                     {
+                        // logFile.LogInfo($"Ho trovato un dichiarante: {dichiaranteTrovato.ToString()}");
                         // 2.c.1) se è residente nel comune selzionato allora esito è uguale a Si
                         esitoStr = "Si";
                         idDichiarante = dichiaranteTrovato.id;
                         //3.a) verifica se il richiedente ha una fornitura idrica diretta 
 
+                        // logFile.LogInfo("Pre verifica esistenza fornitura");
                         (string esitoRestituito, int? idFornituraTrovato, string? messagge, int? idUtenzaDichiarante) = FunzioniTrasversali.VerificaEsistenzaFornitura(dichiaranteTrovato, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
                         idFornituraIdrica = idFornituraTrovato;
+                        // logFile.LogInfo($"Post pre verifica fornitura. Dati restituiti. Esito: {esitoRestituito} | id Fornitura: {idFornituraTrovato} | id Utenza {idUtenza} | Messaggio:\n {messagge}");
 
                         // Resetto il messaggio
 
@@ -1081,6 +1108,7 @@ public class CSVReader
                         {
                             if (dichiaranteTrovato.NumeroComponenti > 1)
                             {
+                                // logFile.LogInfo("Cerco i Famigliari!");
                                 // Cerco tra i famigliari
                                 var today = DateTime.Today;
                                 var cutoff = today.AddYears(-18);
@@ -1099,9 +1127,11 @@ public class CSVReader
                                 {
                                     foreach (var membro in famigliari)
                                     {
+                                        // logFile.LogInfo($"Verifica 2 Esistenza Fornitura. Membro: {membro.ToString()}");
 
                                         (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare, int? idUtenzaMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
                                         idFornituraIdrica = idFornituraMembro;
+                                        // logFile.LogInfo($"Post pre verifica fornitura 2. Dati restituiti. Esito: {esitoRestituito} | id Fornitura: {idFornituraTrovato} | id Utenza {idUtenza} | Messaggio:\n {messagge}");
 
                                         if (messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
                                         {
@@ -1155,9 +1185,9 @@ public class CSVReader
                         }
 
                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
-                        if (dichiaranteTrovato.NumeroComponenti != numeroComponenti)
+                        if (dichiaranteTrovato.NumeroComponenti != numeroComponenti && !escludiComponenti)
                         {
-                            if (ente.Piranha == true)
+                            if (ente.Selene == true)
                             {
                                 note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). é stato impostato come valore quello ricavato dal anagrafe.";
                                 numeroComponenti = dichiaranteTrovato.NumeroComponenti;
@@ -1188,7 +1218,7 @@ public class CSVReader
 
                 if (esito == "01" || esito == "02")
                 {
-                   
+
                     // Calcolo differenza giorni (arrotondati all’intero)
                     int giorni = (int)(dataFineValidita.Date - dataInizioValidita.Date).TotalDays;
 
@@ -1208,6 +1238,8 @@ public class CSVReader
                 {
                     valueSerie = (int)serie;
                 }
+
+                // logFile.LogInfo("Sto creando il report");
 
                 // 4) Creo un nuovo report con i dati raccolti
                 var report = new Report
@@ -1236,11 +1268,13 @@ public class CSVReader
                     serie = valueSerie,
                     mc = mc,
                     incongruenze = verificare,
-                    note = note,
+                    note = note != null ? note.Trim() : null,
                     IdEnte = selectedEnteId,
                     IdUser = idUser,
-                    DataCreazione = dataCreazione
+                    DataCreazione = dataElaborazione
                 };
+
+                // logFile.LogInfo($"Report Creato riga: {rigaCorrente}: {report.ToString()}");
 
                 // Parte 6: Verifico se il report è gia presente
 
@@ -1248,10 +1282,12 @@ public class CSVReader
 
                 if (reportEsistente == null)
                 {
+                    // logFile.LogInfo("Il report non esiste");
                     datiComplessivi.reports.Add(report);
                 }
                 else
                 {
+                    // logFile.LogInfo("Sto Verificando se devo aggiornare i dati");
                     // Report esistente, verifico se ci sono campi da aggiornare
                     bool aggiornare = false;
 
@@ -1270,6 +1306,14 @@ public class CSVReader
                         reportEsistente.codiceFiscaleRichiedente = report.codiceFiscaleRichiedente;
                         aggiornare = true;
                     }
+
+                    // Verifico il campo numeroComponenti
+                    if (reportEsistente.numeroComponenti != report.numeroComponenti)
+                    {
+                        reportEsistente.numeroComponenti = report.numeroComponenti;
+                        aggiornare = true;
+                    }
+                    
 
                     // Verifico il campo codiceFiscaleUtenzaTrovata
                     if (reportEsistente.codiceFiscaleUtenzaTrovata != report.codiceFiscaleUtenzaTrovata)
@@ -1369,6 +1413,7 @@ public class CSVReader
 
                     if (aggiornare)
                     {
+                        // logFile.LogInfo("Aggiorno i dati e imposto la data d'aggiornamento");
                         reportEsistente.DataAggiornamento = DateTime.Now;
                         datiComplessivi.reportsDaAggiornare.Add(reportEsistente);
                     }
@@ -1403,7 +1448,7 @@ public class CSVReader
         return datiComplessivi;
     }
 
-    // Funzione che ricava gli metri cubi massimi bonus  
+    // Funzione 4: Calcolo dei metri cubi da assegnare in base ai giorni di validità e numero di componenti
     public static int? calcolaMC(int giorniBonus, int componenti)
     {
         if (giorniBonus <= 0 || componenti <= 0)

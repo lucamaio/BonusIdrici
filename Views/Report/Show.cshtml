@@ -44,11 +44,11 @@
                         <tbody>
                             @foreach (var report in reports)
                             {
-                                var dataUrl = report.DataCreazione.ToString("yyyy-MM-dd");
+                                var dataUrl = report.DataCreazione.ToString("yyyy-MM-dd HH:mm:ss");
 
                                   <tr>
                                     <td class="text-center"><span>@report.idAto</span></td>
-                                    <td class="text-center"><span>@report.DataCreazione.ToString("dd/MM/yyyy")</span></td>
+                                    <td class="text-center"><span>@dataUrl</span></td>
                                     <td class="text-center"><span>@report.Username</span></td>
                                     <td class="text-center"><span>@report.annoValidita</span></td>
                                     <td class="text-center"><span>@report.count</span></td>

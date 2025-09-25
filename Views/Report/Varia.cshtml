@@ -25,6 +25,11 @@
                 <div class="modern-card-body p-4 small">
                     <form asp-controller="Report" asp-action="Update" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="idEnte" value="@report.IdEnte" />
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" id="toggleAll" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-angles-down"></i> Espandi tutte
+                            </button>
+                        </div>
 
                         <div class="accordion" id="accordionReport">
 
@@ -41,17 +46,41 @@
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div class="col">
-                                                <label for="id" class="form-label">Id</label>
+                                                <label for="id" class="form-label">Id:</label>
                                                 <input type="text" class="form-control form-control-sm readonly-field" id="id" name="id" value="@report.id" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="idFornitura" class="form-label">ID Fornitura</label>
-                                                <input type="text" class="form-control form-control-sm readonly-field" id="idFornitura" name="idFornitura" value="@report.idFornitura" readonly>
+                                                <label for="idAto" class="form-label">Id Ato:</label>
+                                                <input type="text" class="form-control form-control-sm readonly-field" id="idAto" name="idAto" value="@report.idAto" readonly>
                                             </div>
+
                                             <div class="col">
-                                                <label for="codiceBonus" class="form-label">Codice Bonus</label>
+                                                <label for="codiceBonus" class="form-label">Codice Bonus:</label>
                                                 <input type="text" class="form-control form-control-sm readonly-field" id="CodiceBonus" name="CodiceBonus" value="@report.codiceBonus" readonly>
                                             </div>
+
+                                             <div class="col">
+                                                <label for="presenzaPod" class="form-label">Presenza POD:</label>
+                                                <input type="text" class="form-control readonly-field" id="presenzaPod" name="presenzaPod" value="@report.presenzaPod" readonly>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="idFornitura" class="form-label">ID Fornitura:</label>
+                                                <input type="text" class="form-control form-control-sm readonly-field" id="idFornitura" name="idFornitura" value="@report.idFornitura" readonly>
+                                            </div>
+                                            
+                                            <div class="col">
+                                                <label for="codiceFiscaleForintura" class="form-label">Codice Fiscale Fornitura:</label>
+                                                <input type="text" class="form-control form-control-sm readonly-field" id="codiceFiscaleForintura" name="codiceFiscaleForintura" value="@report.codiceFiscaleUtenzaTrovata" readonly>
+                                            </div>
+
+                                            @if(report.idFornitura != null){
+                                                <div class="col">
+                                                    <a href="@Url.Action("Modifica", "Utenze", new { id = report.idFornitura })" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fa-solid fa-arrow-down"></i> Vai ai Dati Idrici
+                                                    </a>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -60,37 +89,44 @@
                             <!-- SEZIONE 2 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading2">
-                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                        <i class="fa-solid fa-user me-2"></i> Dati Dichiarante
+                                        <i class="fa-solid fa-user me-2"></i> Dati Richiedente
                                     </button>
                                 </h2>
-                                <div id="collapse2" class="accordion-collapse collapse fs-6" aria-labelledby="heading2"
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
                                      data-bs-parent="#accordionReport">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div class="col">
-                                                <label for="cognome" class="form-label">Cognome *</label>
+                                                <label for="cognome" class="form-label">Cognome:*</label>
                                                 <input type="text" class="form-control form-control-sm" id="cognome" name="cognome" value="@report.cognomeDichiarante" required>
                                             </div>
                                             <div class="col">
-                                                <label for="nome" class="form-label">Nome *</label>
+                                                <label for="nome" class="form-label">Nome:*</label>
                                                 <input type="text" class="form-control form-control-sm" id="nome" name="nome" value="@report.nomeDichiarante" required>
                                             </div>
                                             <div class="col">
-                                                <label for="codiceFiscaleRichiedente" class="form-label">Codice Fiscale *</label>
+                                                <label for="codiceFiscaleRichiedente" class="form-label">Codice Fiscale Richiedente:*</label>
                                                 <input type="text" class="form-control form-control-sm" id="codiceFiscaleRichiedente" name="codiceFiscaleRichiedente"
                                                        value="@report.codiceFiscaleRichiedente" minlength="16" maxlength="16" required>
                                             </div>
+                                            @if(report.idUtenza != null){
+                                                <div class="col">
+                                                    <a href="@Url.Action("Modifica", "Anagrafe", new { id = report.idUtenza })" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fa-solid fa-arrow-down"></i> Vai ai Dati Anagrafici
+                                                    </a>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                        <!-- SEZIONE 3 -->
+                         <!-- SEZIONE 3 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading3">
-                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
                                             <i class="fa-solid fa-home me-2"></i>  Indirizzo Abitazione (INPS)
                                     </button>
@@ -100,27 +136,27 @@
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div class="col">
-                                                <label for="indirizzo" class="form-label">Indirizzo <span class="note">(INPS)</span></label>
+                                                <label for="indirizzo" class="form-label">Indirizzo:</label>
                                                 <input type="text" class="form-control readonly-field" id="indirizzo" name="indirizzo" value="@report.indirizzoAbitazione" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="civico" class="form-label">Civico</label>
+                                                <label for="civico" class="form-label">Numero Civico:</label>
                                                 <input type="text" class="form-control readonly-field" id="civico" name="civico" value="@report.numeroCivico" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="cap" class="form-label">CAP</label>
+                                                <label for="cap" class="form-label">CAP:</label>
                                                 <input type="text" class="form-control readonly-field" id="cap" name="cap" value="@report.capAbitazione" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="istat" class="form-label">ISTAT</label>
+                                                <label for="istat" class="form-label">ISTAT:</label>
                                                 <input type="text" class="form-control readonly-field" id="istat" name="istat" value="@report.istat" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="provincia" class="form-label">Provincia</label>
+                                                <label for="provincia" class="form-label">Provincia:</label>
                                                 <input type="text" class="form-control readonly-field" id="provincia" name="provincia" value="@report.provinciaAbitazione" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="componenti" class="form-label">Componenti</label>
+                                                <label for="componenti" class="form-label">Componenti Nucleo:</label>
                                                 <input class="form-control readonly-field" type="number" id="componenti" name="componenti" min="1" value="@report.numeroComponenti" readonly>
                                             </div>
                                         </div>
@@ -131,21 +167,17 @@
                         <!-- SEZIONE 4 -->
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading4">
-                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
                                             <i class="fa-regular fa-thumbs-up me-2"></i> Esiti
                                     </button>
                                 </h2>
-                                <div id="collapse4" class="accordion-collapse collapse fs-6" aria-labelledby="heading4"
+                                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4"
                                      data-bs-parent="#accordionReport">
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
-                                           <div class="col">
-                                                <label for="presenzaPod" class="form-label">Presenza POD</label>
-                                                <input type="text" class="form-control readonly-field" id="presenzaPod" name="presenzaPod" value="@report.presenzaPod" readonly>
-                                            </div>
                                             <div class="col">
-                                                <label for="esitoStr" class="form-label">Esito STR</label>
+                                                <label for="esitoStr" class="form-label">Esito STR:</label>
                                                 <select class="form-select" id="esitoStr" name="esitoStr" required>
                                                     @foreach (var esito1 in esiti)
                                                     {
@@ -154,39 +186,46 @@
                                                 </select>
                                             </div>
                                             <div class="col">
-                                                <label for="esito" class="form-label">Esito *</label>
+                                                <label for="esito" class="form-label">Esito:</label>
                                                 <input class="form-control" type="number" id="esito" name="esito" min="1" max="4" value="@report.esito" required>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading5">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">
-                                            <i class="fa-regular fa-calendar-days me-2"></i>   Validità
-                                    </button>
-                                </h2>
-                                <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5"
-                                     data-bs-parent="#accordionReport">
-                                    <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div class="col">
-                                                <label for="anno" class="form-label">Anno Validità</label>
+                                                <label for="anno" class="form-label">Anno Validità:</label>
                                                 <input class="form-control readonly-field" type="text" id="anno" name="anno" value="@report.annoValidita" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="inizioValidita" class="form-label">Data Inizio</label>
+                                                <label for="inizioValidita" class="form-label">Data Inizio:</label>
                                                 <input class="form-control readonly-field" type="date" id="inizioValidita" name="inizioValidita"
                                                     value="@(report.dataInizioValidita?.ToString("yyyy-MM-dd") ?? "")" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="fineValidita" class="form-label">Data Fine</label>
+                                                <label for="fineValidita" class="form-label">Data Fine:</label>
                                                 <input class="form-control readonly-field" type="date" id="fineValidita" name="fineValidita"
                                                     value="@(report.dataFineValidita?.ToString("yyyy-MM-dd") ?? "")" readonly>
                                             </div>
+
+                                            <div class="col">
+                                                <label for="incongruente" class="form-label">Incongruente:</label>
+                                                @* <input class="form-control readonly-field" type="text" id="incongruente" name="incongruente"
+                                                    value="@(report.incongruenze)" readonly> *@
+                                                <select class="form-select" id="incongruenze" name="incongruenze" required>
+                                                    @foreach (var valore in datiBool)
+                                                    {
+                                                        <option value="@valore" selected="@(valore == incongruenza ? "selected" : null)">@valore</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                             <div class="w-100">
+                                                <label for="note" class="form-label">Note:</label>
+                                                <textarea class="form-control readonly-field w-100"
+                                                        id="note"
+                                                        name="note"
+                                                        rows="3"
+                                                        readonly>@report.note</textarea>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -205,59 +244,27 @@
                                     <div class="accordion-body">
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                             <div class="col">
-                                                <label for="serie" class="form-label">Serie</label>
+                                                <label for="serie" class="form-label">Serie:</label>
                                                 <input type="text" class="form-control readonly-field" id="serie" name="serie" value="@report.serie" readonly>
                                             </div>
                                             <div class="col">
-                                                <label for="mc" class="form-label">MC</label>
+                                                <label for="mc" class="form-label">MC:</label>
                                                 <input type="text" class="form-control readonly-field" id="mc" name="mc" value="@report.mc" readonly>
                                             </div>
                                             <div class="col">
                                                 <label for="dataCreazione" class="form-label">Data Creazione</label>
-                                                <input class="form-control readonly-field" type="date" id="dataCreazione" name="dataCreazione"
-                                                    value="@(report.DataCreazione?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                                <input class="form-control readonly-field" type="dateTime" id="dataCreazione" name="dataCreazione"
+                                                    value="@(report.DataCreazione?.ToString("dd/MM/yyyy HH:mm:ss") ?? "")" readonly>
                                             </div>
                                             <div class="col">
                                                 <label for="dataAggiornamento" class="form-label">Data Aggiornamento</label>
-                                                <input class="form-control readonly-field" type="date" id="dataAggiornamento" name="dataAggiornamento"
-                                                    value="@(report.DataAggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                                <input class="form-control readonly-field" type="dateTime" id="dataAggiornamento" name="dataAggiornamento"
+                                                    value="@(report.DataAggiornamento?.ToString("dd/MM/yyyy HH:mm:ss") ?? "")" readonly>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                        <!-- SEZIONE 7 -->
-                         <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading7">
-                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
-                                            <i class="fa-solid fa-triangle-exclamation me-2"></i> Incongruenze
-                                    </button>
-                                </h2>
-                                <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7"
-                                     data-bs-parent="#accordionReport">
-                                    <div class="accordion-body">
-                                        <div class="row row-cols-1 row-cols-md-3 g-4">
-                                             <div class="col">
-                                                <label for="incongruenze" class="form-label">Incongruenze</label>
-                                                <select class="form-select" id="incongruenze" name="incongruenze" required>
-                                                    @foreach (var valore in datiBool)
-                                                    {
-                                                        <option value="@valore" selected="@(valore == incongruenza ? "selected" : null)">@valore</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div class="col">
-                                                <label for="note" class="form-label">Note</label>
-                                                <textarea class="form-control readonly-field" id="note" name="note" rows="3" readonly>@report.note</textarea>
-                                            </div>
-                                            
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                           
 
                         <!-- BOTTONI -->
                         <hr class="my-4" />
@@ -277,3 +284,29 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("toggleAll");
+        const accordions = document.querySelectorAll("#accordionReport .accordion-collapse");
+        let expanded = false;
+
+        toggleBtn.addEventListener("click", function () {
+            expanded = !expanded;
+
+            accordions.forEach(acc => {
+                if (expanded) {
+                    new bootstrap.Collapse(acc, { show: true });
+                } else {
+                    new bootstrap.Collapse(acc, { hide: true });
+                }
+            });
+
+            // Cambia testo e icona dinamicamente
+            if (expanded) {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-angles-up"></i> Chiudi tutte';
+            } else {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-angles-down"></i> Espandi tutte';
+            }
+        });
+    });
+</script>

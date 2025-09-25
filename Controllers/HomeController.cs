@@ -101,10 +101,10 @@ namespace BonusIdrici2.Controllers
         }
 
         // Pagina 3: Privacy Policy
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        // public IActionResult Privacy()
+        // {
+        //     return View();
+        // }
 
         // Pagina 4: Error 403 e error 404
 

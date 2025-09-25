@@ -638,10 +638,8 @@ C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\scopedcss\bundle\BonusIdrici2.styles.css
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\scopedcss\projectbundle\BonusIdrici2.bundle.scp.css
-C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\vh59zl9ipq-s4t9wyss1k.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\2eh2bpy5t6-61n19gt1b8.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\kuhye7d3fm-z9maivmcma.gz
-C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\5do40fxjmg-pz7zkoqfdi.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\1m9b6tb3xa-t1cqhe9u97.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\mzhverrf52-c2jlpeoesf.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\m0atteg26z-sejl45xvog.gz
@@ -701,8 +699,6 @@ C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\fw7j6kdczd-9vr69e8ynj.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\4kr8r9rnay-87fc7y1x7t.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\d7bn7f0j62-mlv21k5csn.gz
-C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\iac6pyj34j-s1xgkyej85.gz
-C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\22ivjwqf8i-s1xgkyej85.gz
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\staticwebassets.development.json
@@ -714,3 +710,7 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\iac6pyj34
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\22ivjwqf8i-znw9z57rqe.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-u68q2kus0s.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-mfrhmq8i0i.gz
+C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\vh59zl9ipq-mfrhmq8i0i.gz
+C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\5do40fxjmg-u68q2kus0s.gz
+C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\iac6pyj34j-r1ly4aj14r.gz
+C:\Users\Antonella\OneDrive - unime.it\Desktop\BonusIdrici\BonusIdrici\obj\Debug\net9.0\compressed\22ivjwqf8i-r1ly4aj14r.gz

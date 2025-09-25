@@ -2,141 +2,179 @@
     ViewData["Title"] = "Statistiche";
 }
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 bg-dark text-light min-vh-100">
     <!-- HEADER -->
-    <div class="text-center mb-5">
-        <h2 class="fw-bold">
-            <i class="fa-solid fa-chart-line me-2 text-primary"></i> Statistiche Generali
-        </h2>
-        <p class="text-muted">
-            Panoramica in tempo reale sugli enti, utenze idriche e toponimi.
-        </p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-0 text-white">Dashboard Statistiche</h1>
+            <small class="text-secondary">Panoramica aggiornata dei dati gestionali</small>
+        </div>
+        <button id="refreshButton" class="btn btn-outline-light">
+            <i class="bi bi-arrow-clockwise"></i> Aggiorna
+        </button>
     </div>
 
-    <!-- CARDS STATISTICHE PRINCIPALI -->
+    <!-- KPI CARDS -->
     <div class="row g-4 mb-5">
         <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 h-100">
-                <i class="fa-solid fa-city fa-2x text-primary mb-2"></i>
-                <h6 class="fw-bold">Totale Enti</h6>
-                <h3 class="fw-bolder">@ViewBag.TotaleEnti</h3>
-                <div class="progress mt-2" style="height:6px;">
-                    <div class="progress-bar bg-primary" role="progressbar" data-progress="80"></div>
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+                <div class="mb-2 text-primary"><i class="bi bi-building fs-1"></i></div>
+                <h2 class="fw-bold text-white">@ViewBag.TotaleEnti</h2>
+                <p class="text-secondary mb-0">Totale Enti</p>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+                <div class="mb-2 text-info"><i class="bi bi-droplet fs-1"></i></div>
+                <h2 class="fw-bold text-white">@ViewBag.TotaleUtenze</h2>
+                <p class="text-secondary mb-0">Utenze Idriche</p>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+                <div class="mb-2 text-success"><i class="bi bi-geo-alt fs-1"></i></div>
+                <h2 class="fw-bold text-white">@ViewBag.TotaleToponomi</h2>
+                <p class="text-secondary mb-0">Totale Toponimi</p>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+                <div class="mb-2 text-danger"><i class="bi bi-exclamation-triangle fs-1"></i></div>
+                <h2 class="fw-bold text-white">@ViewBag.TotaleToponomiDaSistemare</h2>
+                <p class="text-secondary mb-0">Toponimi da Sistemare</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRAFICI -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 stat-card-dark h-100">
+                <div class="card-header bg-transparent text-white fw-bold">Report per Ente</div>
+                <div class="card-body">
+                    <canvas id="reportEnteChart" height="120"></canvas>
                 </div>
             </div>
         </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 h-100">
-                <i class="fa-solid fa-droplet fa-2x text-info mb-2"></i>
-                <h6 class="fw-bold">Utenze Idriche</h6>
-                <h3 class="fw-bolder">@ViewBag.TotaleUtenze</h3>
-                <div class="progress mt-2" style="height:6px;">
-                    <div class="progress-bar bg-info" role="progressbar" data-progress="65"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 h-100">
-                <i class="fa-solid fa-map-location-dot fa-2x text-success mb-2"></i>
-                <h6 class="fw-bold">Totale Toponimi</h6>
-                <h3 class="fw-bolder">@ViewBag.TotaleToponomi</h3>
-                <div class="progress mt-2" style="height:6px;">
-                    <div class="progress-bar bg-success" role="progressbar" data-progress="70"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 h-100">
-                <i class="fa-solid fa-map-pin fa-2x text-danger mb-2"></i>
-                <h6 class="fw-bold">Toponimi da Sistemare</h6>
-                <h3 class="fw-bolder">@ViewBag.TotaleToponomiDaSistemare</h3>
-                <div class="progress mt-2" style="height:6px;">
-                    <div class="progress-bar bg-danger" role="progressbar" data-progress="40"></div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 stat-card-dark h-100">
+                <div class="card-header bg-transparent text-white fw-bold">Esito Domande</div>
+                <div class="card-body">
+                    <canvas id="domandeEsitoChart" height="250"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SEZIONE GRAFICI -->
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 p-3 h-100">
-                <h6 class="fw-bold text-center mb-3">
-                    <i class="fa-solid fa-file-circle-check text-primary me-2"></i> Report per Ente
-                </h6>
-                <canvas id="reportEnteChart"></canvas>
+    <div class="row g-4 mt-1">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 stat-card-dark h-100">
+                <div class="card-header bg-transparent text-white fw-bold">Utenze Idriche per Ente</div>
+                <div class="card-body">
+                    <canvas id="utenzeEnteChart" height="200"></canvas>
+                </div>
             </div>
         </div>
-
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 p-3 h-100">
-                <h6 class="fw-bold text-center mb-3">
-                    <i class="fa-solid fa-droplet text-info me-2"></i> Utenze per Ente
-                </h6>
-                <canvas id="utenzeEnteChart"></canvas>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 stat-card-dark h-100">
+                <div class="card-header bg-transparent text-white fw-bold">Anagrafe per Ente</div>
+                <div class="card-body">
+                    <canvas id="anagrafeChart" height="200"></canvas>
+                </div>
             </div>
         </div>
-
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 p-3 h-100">
-                <h6 class="fw-bold text-center mb-3">
-                    <i class="fa-solid fa-users text-success me-2"></i> Anagrafe per Ente
-                </h6>
-                <canvas id="anagrafeChart"></canvas>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 stat-card-dark h-100">
+                <div class="card-header bg-transparent text-white fw-bold">Toponimi per Ente</div>
+                <div class="card-body">
+                    <canvas id="toponimiChart" height="200"></canvas>
+                </div>
             </div>
         </div>
-
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 p-3 h-100">
-                <h6 class="fw-bold text-center mb-3">
-                    <i class="fa-solid fa-map-location-dot text-warning me-2"></i> Toponimi per Ente
-                </h6>
-                <canvas id="toponomiChart"></canvas>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mx-auto">
-            <div class="card shadow-sm border-0 p-3 h-100">
-                <h6 class="fw-bold text-center mb-3">
-                    <i class="fa-solid fa-chart-pie text-danger me-2"></i> Domande per Esito
-                </h6>
-                <canvas id="domandeEsitoChart" style="max-height:350px;"></canvas>
-            </div>
-        </div>  
     </div>
 </div>
+
+<!-- STILE CUSTOM -->
+<style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    .stat-card-dark {
+        background: #1e1e1e;
+        border-radius: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card-dark:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.75rem 1.25rem rgba(0,0,0,0.4);
+    }
+    .stat-card-dark h2 {
+        font-size: 2.2rem;
+    }
+    .card-header {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer {
+        color: #fff8f8 !important;
+        fill: #fff8f8 !important;
+    }
+</style>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // ANIMAZIONE PROGRESS BAR
-        document.querySelectorAll('.progress-bar').forEach(bar => {
-            let value = bar.getAttribute('data-progress');
-            bar.style.width = '0%';
-            setTimeout(() => {
-                bar.style.transition = 'width 1.5s ease-in-out';
-                bar.style.width = value + '%';
-            }, 200);
+        // Funzione per gestire il pulsante di aggiornamento
+        document.getElementById('refreshButton').addEventListener('click', function() {
+            location.reload();
         });
 
-        // Grafico a barre: Report per ente
+        // Imposta colori scuri per i grafici
+        Chart.defaults.color = "#e0e0e0";
+        Chart.defaults.borderColor = "rgba(255,255,255,0.1)";
+
+        // Dati da ViewBag per i grafici
+        const reportLabels = @Html.Raw(Json.Serialize(ViewBag.ReportLabels));
+        const reportValues = @Html.Raw(Json.Serialize(ViewBag.ReportValues));
+        
+        // Report per ente (Line)
         new Chart(document.getElementById('reportEnteChart'), {
-            type: 'bar',
+            type: 'line', // Tipo di grafico cambiato in 'line'
             data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.ReportLabels)),
+                labels: reportLabels,
                 datasets: [{
                     label: 'Report effettuati',
-                    data: @Html.Raw(Json.Serialize(ViewBag.ReportValues)),
-                    backgroundColor: 'rgb(212, 8, 32)'
+                    data: reportValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    tension: 0.3, // Rende la linea curva
+                    fill: false // Non riempire l'area sotto la linea
                 }]
             },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            options: { 
+                responsive: true, 
+                scales: { 
+                    y: { 
+                        beginAtZero: true 
+                    } 
+                } 
+            }
         });
 
-        // Grafico a barre: Utenze per ente
+        // Esito domande
+        new Chart(document.getElementById('domandeEsitoChart'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.DomandeLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(ViewBag.DomandeValues)),
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Utenze idriche per ente
         new Chart(document.getElementById('utenzeEnteChart'), {
             type: 'bar',
             data: {
@@ -144,13 +182,16 @@
                 datasets: [{
                     label: 'Utenze Idriche',
                     data: @Html.Raw(Json.Serialize(ViewBag.UtenzeIdricheValues)),
-                    backgroundColor: '#0d6efd'
+                    //borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    //tension: 0.3,
+                    //fill: true
                 }]
             },
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
-        // Grafico a barre: Anagrafe per ente
+        // Anagrafe per ente
         new Chart(document.getElementById('anagrafeChart'), {
             type: 'bar',
             data: {
@@ -158,37 +199,24 @@
                 datasets: [{
                     label: 'Anagrafe',
                     data: @Html.Raw(Json.Serialize(ViewBag.AnagrafeValues)),
-                    backgroundColor: '#198754'
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)'
                 }]
             },
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
-        // Grafico a barre: Toponimi per ente
-        new Chart(document.getElementById('toponomiChart'), {
+        // Toponimi per ente
+        new Chart(document.getElementById('toponimiChart'), {
             type: 'bar',
             data: {
                 labels: @Html.Raw(Json.Serialize(ViewBag.ToponimiLabels)),
                 datasets: [{
                     label: 'Toponimi',
                     data: @Html.Raw(Json.Serialize(ViewBag.ToponimiValues)),
-                    backgroundColor: '#ffc107'
+                    backgroundColor: 'rgba(255, 193, 7, 0.7)'
                 }]
             },
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
-
-        // Grafico a torta: Domande per esito
-        new Chart(document.getElementById('domandeEsitoChart'), {
-            type: 'pie',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.DomandeLabels)),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(ViewBag.DomandeValues)),
-                    backgroundColor: ['#28a745', '#FFD700', '#B20000', "#000000"]
-                }]
-            },
-            options: { responsive: true }
         });
     </script>
 }

@@ -5439,19 +5439,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\User000015\\.nuget\\packages\\": {}
+    "C:\\Users\\Antonella\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User000015\\Documents\\BonusIdrici2\\BonusIdrici2.csproj",
+      "projectUniqueName": "C:\\Users\\Antonella\\OneDrive - unime.it\\Desktop\\BonusIdrici\\BonusIdrici\\BonusIdrici2.csproj",
       "projectName": "BonusIdrici2",
-      "projectPath": "C:\\Users\\User000015\\Documents\\BonusIdrici2\\BonusIdrici2.csproj",
-      "packagesPath": "C:\\Users\\User000015\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User000015\\Documents\\BonusIdrici2\\obj\\",
+      "projectPath": "C:\\Users\\Antonella\\OneDrive - unime.it\\Desktop\\BonusIdrici\\BonusIdrici\\BonusIdrici2.csproj",
+      "packagesPath": "C:\\Users\\Antonella\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Antonella\\OneDrive - unime.it\\Desktop\\BonusIdrici\\BonusIdrici\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\User000015\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Antonella\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -5529,7 +5529,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
