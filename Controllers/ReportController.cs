@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using BonusIdrici2.Models;
-using BonusIdrici2.Data;
+using Models;
+using Data;
 using System.Globalization;
-using BonusIdrici2.Models.ViewModels; // Aggiungi questo using
+using Models.ViewModels; // Aggiungi questo using
 using System.IO;
 using System.Collections.Generic; 
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class ReportController : Controller
     {

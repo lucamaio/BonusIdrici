@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BonusIdrici2.Models.ViewModels
+namespace Models.ViewModels
 {
     public class RiepilogoDatiViewModel
     {

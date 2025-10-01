@@ -5,14 +5,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BonusIdrici2.Data;
-using BonusIdrici2.Controllers;
+using Data;
+using Controllers;
 
 using leggiCSV;
 using Org.BouncyCastle.Crypto.Digests;
 using ZstdSharp.Unsafe;
 using Org.BouncyCastle.Bcpg;
-using BonusIdrici2.Models;
+using Models;
 using Mysqlx.Notice;
 using System.Linq.Expressions;
 

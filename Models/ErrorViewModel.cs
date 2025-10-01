@@ -1,4 +1,4 @@
-namespace BonusIdrici2.Models;
+namespace Models;
 
 public class ErrorViewModel
 {

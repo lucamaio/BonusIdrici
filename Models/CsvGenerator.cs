@@ -2,7 +2,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System;
-using BonusIdrici2.Models;
+using Models;
 using System.Globalization; 
 public static class CsvGenerator
 {

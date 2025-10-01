@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Diagnostics;
-using BonusIdrici2.Models; 
-using BonusIdrici2.Data;
+using Models; 
+using Data;
 using System.IO;
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using BonusIdrici2.Models.ViewModels; 
+using Models.ViewModels; 
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class EntiController : Controller
     {

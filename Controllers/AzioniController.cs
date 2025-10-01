@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using BonusIdrici2.Models;
-using BonusIdrici2.Data;
-using BonusIdrici2.Models.ViewModels; // Aggiungi questo using
+using Models;
+using Data;
+using Models.ViewModels; // Aggiungi questo using
 using System.IO;
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class AzioniController : Controller
     {

@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Selezione Log";
+    List<string> tipologieLog = ViewBag.TipologieLog;
+}
+
+<div class="container d-flex justify-content-center" style="margin-top: 80px;">
+    <div class="card shadow-lg rounded-4 p-5 w-100" style="max-width: 600px;">
+        <div class="text-center mb-4">
+            <i class="bi bi-building text-primary" style="font-size: 3rem;"></i>
+            <h2 class="fw-bold mt-2">Seleziona il Tipo di Log</h2>
+            <p class="text-muted">Trova facilmente il log e visualizza i dati</p>
+        </div>
+
+
+        <form asp-controller="Log" asp-action="Show" method="POST">
+            <div class="mb-4 position-relative">
+                <!-- Campo testo visibile -->
+                <input type="text" id="tipoLog" name="tipoLog" class="form-control shadow-sm rounded-pill ps-4 pe-5"
+                    placeholder="Seleziona il tipo di log da visualizzare" autocomplete="off">
+
+                <!-- Lista suggerimenti -->
+                <ul id="suggestions"
+                    class="list-group position-absolute w-100 shadow-sm mt-1 d-none rounded-3 overflow-auto"
+                    style="z-index: 1000; max-height: 200px; background: #fff;">
+                </ul>
+            </div>
+
+            <!-- Pulsante submit -->
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                    <i class="bi bi-arrow-right-circle me-2"></i> Visualizza Log
+                </button>
+            </div>
+        </form>
+
+        <script>
+            // Lista tipologie provenienti dal backend
+            const tipiLog = [
+        @foreach (var tipologia in tipologieLog)
+                {
+                    @: "@tipologia",
+                }
+    ];
+
+            const input = document.getElementById("tipoLog");
+            const suggestions = document.getElementById("suggestions");
+
+            input.addEventListener("input", function () {
+                const value = this.value.toLowerCase();
+                suggestions.innerHTML = "";
+
+                if (value) {
+                    const filtrati = tipiLog.filter(t => t.toLowerCase().includes(value));
+                    filtrati.forEach(t => {
+                        const li = document.createElement("li");
+                        li.textContent = t;
+                        li.classList.add("list-group-item");
+                        li.onclick = () => {
+                            input.value = t;
+                            suggestions.classList.add("d-none");
+                        };
+                        suggestions.appendChild(li);
+                    });
+                    if (filtrati.length > 0) {
+                        suggestions.classList.remove("d-none");
+                    } else {
+                        suggestions.classList.add("d-none");
+                    }
+                } else {
+                    suggestions.classList.add("d-none");
+                }
+            });
+        </script>
+
+
+
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info mt-4 shadow-sm border-0 rounded-3">
+                <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
+            </div>
+        }
+    </div>
+</div>

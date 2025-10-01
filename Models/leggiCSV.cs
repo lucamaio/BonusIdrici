@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BonusIdrici2.Models;
+using Models;
 
 namespace leggiCSV
 {

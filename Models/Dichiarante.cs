@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BonusIdrici2.Models
+namespace Models
 {
     /*
         Questa classe rappresenta l'anagrafe di un persona che fa parte di un ente.

@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "Dettagli Log";
+    List<Log> rows = ViewBag.Logs;
+    var LogViewModel = new Models.ViewModels.LogViewModel();
+}
+
+<div class="container-xxl flex-grow-1 py-5">
+    <div class="card shadow-sm border-0 rounded-4">
+        <!-- Header -->
+        <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+            <h3 class="mb-1 fw-bold">
+                <i class="bi bi-building me-2"></i> Dettagli Log - <span class="fw-semibold">@ViewBag.TipoLog</span>
+            </h3>
+        </div>
+
+        <!-- Barra di caricamento -->
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body p-4">
+            @if (rows != null && rows.Count > 0){
+                <p class="lead mb-4 text-muted">Consulta tutti i log presenti</p>
+                <br>
+
+                <div class="table-responsive">
+                    <table id="logsTable" class="table table-hover align-middle border-bottom">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Timestamp</th>
+                                <th class="text-center">Tipo Log</th>
+                                <th class="text-center">Messaggio</th>
+                                <th class="text-center">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in rows)
+                            {
+                                <tr>
+                                    <td class="text-center"><span>@row.Timestamp</span></td>
+                                    <td class="fw-semibold text-center"><span>@row.TipoLog</span></td>
+                                    <td class="text-center"><span>@row.GetShortMessage()</span></td>
+                                   
+                                  
+                                    <td class="text-center">
+                                        <form asp-action="Dettails" method="post">
+                                            <input type="hidden" name="Timestamp" value="@row.Timestamp" />
+                                            <input type="hidden" name="TipoLog" value="@row.TipoLog" />
+                                            <input type="hidden" name="Messaggio" value="@row.Messaggio" />
+                                            <button type="submit" class="btn btn-sm btn-light border me-1" title="Dettagli">
+                                                <i class="bi bi-pencil-square text-primary"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center shadow-sm rounded-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun report disponibile per il tipo di log selezionato.
+                </div>
+            }
+            <hr class="my-4" />
+
+            <div class="d-grid mt-4">
+                <a href="@Url.Action("Index", "Log")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                    <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione
+                </a>
+            </div>
+                   
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#loadingBarContainer").show();
+                var progress = 0;
+                var interval = setInterval(function () {
+                    if (progress < 90) {
+                        progress += 10;
+                        $("#loadingBar").css("width", progress + "%");
+                    }
+                }, 300);
+                
+            var logsTable = $('#logsTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end report"p>>',
+                buttons: [
+                    {
+                        @* text: '<i class="bi bi-plus-circle me-1"></i> Varia Serie',
+                        className: 'btn btn-sm btn-success',
+                        action: function () {
+                            window.location.href = '@Url.Action("VariaSerie", "Report")'
+                                + '?idEnte=@idEnte&idAto=@idAto';
+                        } *@
+                    }
+                ],
+            }); 
+            logsTable.on('init', function () {
+                clearInterval(interval);
+                $("#loadingBar").css("width", "100%");
+                setTimeout(function () {
+                    $("#loadingBarContainer").fadeOut();
+                    $("#tableWrapper").fadeIn(); 
+                }, 500);
+            });
+        }); 
+    </script>
+}

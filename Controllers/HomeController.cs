@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Diagnostics;
-using BonusIdrici2.Models; 
-using BonusIdrici2.Data;
+using Models; 
+using Data;
 using System.IO;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class HomeController : Controller
     {

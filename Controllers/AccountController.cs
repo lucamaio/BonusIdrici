@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using BonusIdrici2.Models.ViewModels;
-using BonusIdrici2.Models;
-using BonusIdrici2.Data;
+using Models.ViewModels;
+using Models;
+using Data;
 using System.Globalization;
 using System.Collections.Generic; 
 using System.IO;
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class AccountController : Controller
     {

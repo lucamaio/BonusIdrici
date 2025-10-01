@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using BonusIdrici2.Models;
+using Models;
 using System.Linq;
 using System;
 
-namespace BonusIdrici2.Data
+namespace Data
 {
     public class ApplicationDbContext : DbContext
     {

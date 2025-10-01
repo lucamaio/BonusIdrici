@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace BonusIdrici2.Models{
+namespace Models{
     
     /*
         Questa classe gestisce il logging delle operazioni in un file di log.

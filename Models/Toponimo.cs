@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace BonusIdrici2.Models
+namespace Models
 {
     /*
         Questa classe rappresenta un toponimo associato a un ente.

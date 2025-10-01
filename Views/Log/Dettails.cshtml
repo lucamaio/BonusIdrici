@@ -1,0 +1,75 @@
+@model Models.ViewModels.LogViewModel
+@{
+    ViewData["Title"] = "Dettagli Log";
+}
+<div class="report-page container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Dettagli Log</span>
+                    </h3>
+                </div>
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
+                    <div class="accordion" id="accordionLog">
+                        <!-- Sezione 1 -->
+                           <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                            <i class="fa-regular fa-thumbs-up me-2"></i> Informazioni Generali
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionLog">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div class="col">
+                                                <label for="timeStamp" class="form-label">TimeStamp:</label>
+                                                <input class="form-control readonly-field" type="text" id="timeStamp" name="timeStamp" value="@Model.Timestamp" readonly>
+                                            </div>
+                                            <div class="col">
+                                                <label for="tipoLog" class="form-label">Tipo Log:</label>
+                                                <input class="form-control readonly-field" type="text" id="tipoLog" name="tipoLog"
+                                                    value="@Model.TipoLog" readonly>
+                                            </div>
+                                            <div class="col">
+                                                @* <label for="fineValidita" class="form-label">Data Fine:</label>
+                                                <input class="form-control readonly-field" type="date" id="fineValidita" name="fineValidita"
+                                                    value="@(report.dataFineValidita?.ToString("yyyy-MM-dd") ?? "")" readonly> *@
+                                            </div>
+
+                                             <div class="w-100">
+                                                <label for="messaggio" class="form-label">Messaggio:</label>
+                                                <textarea class="form-control readonly-field w-100"
+                                                        id="messaggio"
+                                                        name="messaggio"
+                                                        rows="3"
+                                                        readonly>@Model.Messaggio</textarea>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <!-- BOTTONI -->
+                        <hr class="my-4" />
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Index","Log")"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla selezione
+                            </a>
+                        </div> 
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

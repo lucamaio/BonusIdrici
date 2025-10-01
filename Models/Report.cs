@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BonusIdrici2.Models
+namespace Models
 {
     /*
         Questa classe rappresenta un report generato durante l'elaborazione dei bonus idrici.

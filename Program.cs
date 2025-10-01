@@ -1,18 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using BonusIdrici2.Data;
+using Data;
 using MySql.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Configurazione Sessione
+builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromMinutes(20); // Timeout di 20 minuti
+    options.Cookie.HttpOnly = true;                // Non accessibile da JS
+    options.Cookie.IsEssential = true;             // Necessario per GDPR
+    options.Cookie.Name = ".BonusIdrici.Session";  // Nome personalizzato cookie
 });
 
+// ✅ Abilita accesso al contesto HTTP
 builder.Services.AddHttpContextAccessor();
+
+// ✅ MVC
 builder.Services.AddControllersWithViews();
 
 // ✅ Connessione DB
@@ -31,21 +37,18 @@ var app = builder.Build();
 // 🔹 Middleware
 if (!app.Environment.IsDevelopment())
 {
-    // Gestione eccezioni globali
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-// HTTPS + file statici
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// Sessione PRIMA del routing
-app.UseSession();
-
 app.UseRouting();
 
-// Autenticazione e autorizzazione
+// 🔹 Sessione PRIMA di Authentication/Authorization
+app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

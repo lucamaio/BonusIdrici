@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BonusIdrici2.Models
+namespace Models
 {
     /*
         Questa classe rappresenta un ente che gestisce i bonus idrici.

@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using BonusIdrici2.Data;
+using Data;
 
-namespace BonusIdrici2.Models
+namespace Models
 {
     public class Ruolo
     {

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using BonusIdrici2.Models; 
-using BonusIdrici2.Data;
+using Models; 
+using Data;
 using System.IO;
-using BonusIdrici2.Models.ViewModels;
+using Models.ViewModels;
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class AnagrafeController : Controller
     {
@@ -25,8 +25,8 @@ namespace BonusIdrici2.Controllers
             
             if (VerificaSessione())
             {
-                username = HttpContext.Session.GetString("Username");
-                ruolo = HttpContext.Session.GetString("Role");
+                username =  (string?) HttpContext.Session.GetString("Username");
+                ruolo = (string?) HttpContext.Session.GetString("Role");
                 idUser = (int) HttpContext.Session.GetInt32("idUser");
             }
         }

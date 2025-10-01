@@ -1,6 +1,6 @@
 using System;
 
-namespace BonusIdrici2.Models.ViewModels
+namespace Models.ViewModels
 {
     public class ToponomiViewModel
     {

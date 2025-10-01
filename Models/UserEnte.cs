@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BonusIdrici2.Models
+namespace Models
 {
    public class UserEnte
     {

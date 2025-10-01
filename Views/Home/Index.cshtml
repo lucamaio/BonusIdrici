@@ -1,11 +1,21 @@
-﻿@{
+﻿@using System.Net
+@{
     ViewData["Title"] = "Pannello di Controllo";
+    /* 
+        Restituisco gli indirizzi IP del server
+        IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+        IPAddress[] addr = ipEntry.AddressList;
+
+        for (int i = 0; i < addr.Length; i++) {
+            Console.WriteLine("IP Address {0}: {1} ", i, addr[i].ToString());
+        } */
+
+    // Prova invio email
+    @* var email = new Models.Email("maiolucaangelo00@gmail.com","Test Email","Questa è una email di prova inviata dal sistema Bonus Idrici.");
+    Console.WriteLine("Invio email di prova:");
+    Console.WriteLine(email.ToString());
+    email.Invia(); *@
 }
-
-<style>
-   
-
-</style>
 
 <!-- HEADER -->
 <div class="text-center py-5 mb-4 page-header">
@@ -206,8 +216,28 @@
                     </div>
                 </div>
             </a>
-        </div>     
+        </div>
+
+        <!-- Log -->
+        <div class="col-md-6 col-lg-4">
+            <a asp-controller="Log" asp-action="Index" class="text-decoration-none text-reset">
+                <div class="card card-home h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-circle bg-primary text-white me-3">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h5 class="card-title mb-0">Log</h5>
+                        </div>
+                        <p class="card-text text-muted mt-auto">
+                            Visualizza i log delle operazioni.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>   
     }
+    
 
     <!-- Messaggio -->
     @if (!string.IsNullOrEmpty(ViewBag.Message))

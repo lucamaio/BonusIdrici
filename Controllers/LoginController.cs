@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using BonusIdrici2.Models; 
-using BonusIdrici2.Data;
+using Models; 
+using Data;
 
-namespace BonusIdrici2.Controllers
+namespace Controllers
 {
     public class LoginController : Controller
     {
@@ -83,6 +83,11 @@ namespace BonusIdrici2.Controllers
         [HttpPost]
         public IActionResult Accedi(string email, string password)
         {
+            // Ottieni l'indirizzo IP dell'utente (Da sistemare in futuro)
+            // var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            // Console.WriteLine("IP utente: " + ipAddress);
+            // logFile.LogInfo($"Tentativo di accesso da IP: {ipAddress} ");
+
             // Controllo credenziali vuote
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
