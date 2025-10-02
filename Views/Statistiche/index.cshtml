@@ -2,14 +2,14 @@
     ViewData["Title"] = "Statistiche";
 }
 
-<div class="container-fluid py-4 bg-dark text-light min-vh-100">
+<div class="container-fluid py-4 bg-light text-dark min-vh-100">
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="fw-bold mb-0 text-white">Dashboard Statistiche</h1>
-            <small class="text-secondary">Panoramica aggiornata dei dati gestionali</small>
+            <h1 class="fw-bold mb-0 text-dark">Dashboard Statistiche</h1>
+            <small class="text-muted">Panoramica aggiornata dei dati gestionali</small>
         </div>
-        <button id="refreshButton" class="btn btn-outline-light">
+        <button id="refreshButton" class="btn btn-outline-primary">
             <i class="bi bi-arrow-clockwise"></i> Aggiorna
         </button>
     </div>
@@ -17,31 +17,31 @@
     <!-- KPI CARDS -->
     <div class="row g-4 mb-5">
         <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
                 <div class="mb-2 text-primary"><i class="bi bi-building fs-1"></i></div>
-                <h2 class="fw-bold text-white">@ViewBag.TotaleEnti</h2>
-                <p class="text-secondary mb-0">Totale Enti</p>
+                <h2 class="fw-bold text-dark">@ViewBag.TotaleEnti</h2>
+                <p class="text-muted mb-0">Totale Enti</p>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
                 <div class="mb-2 text-info"><i class="bi bi-droplet fs-1"></i></div>
-                <h2 class="fw-bold text-white">@ViewBag.TotaleUtenze</h2>
-                <p class="text-secondary mb-0">Utenze Idriche</p>
+                <h2 class="fw-bold text-dark">@ViewBag.TotaleUtenze</h2>
+                <p class="text-muted mb-0">Utenze Idriche</p>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
                 <div class="mb-2 text-success"><i class="bi bi-geo-alt fs-1"></i></div>
-                <h2 class="fw-bold text-white">@ViewBag.TotaleToponomi</h2>
-                <p class="text-secondary mb-0">Totale Toponimi</p>
+                <h2 class="fw-bold text-dark">@ViewBag.TotaleToponomi</h2>
+                <p class="text-muted mb-0">Totale Toponimi</p>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-dark">
+            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
                 <div class="mb-2 text-danger"><i class="bi bi-exclamation-triangle fs-1"></i></div>
-                <h2 class="fw-bold text-white">@ViewBag.TotaleToponomiDaSistemare</h2>
-                <p class="text-secondary mb-0">Toponimi da Sistemare</p>
+                <h2 class="fw-bold text-dark">@ViewBag.TotaleToponomiDaSistemare</h2>
+                <p class="text-muted mb-0">Toponimi da Sistemare</p>
             </div>
         </div>
     </div>
@@ -49,16 +49,16 @@
     <!-- GRAFICI -->
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0 stat-card-dark h-100">
-                <div class="card-header bg-transparent text-white fw-bold">Report per Ente</div>
+            <div class="card shadow-sm border-0 stat-card-light h-100">
+                <div class="card-header bg-transparent text-dark fw-bold">Report per Ente</div>
                 <div class="card-body">
                     <canvas id="reportEnteChart" height="120"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 stat-card-dark h-100">
-                <div class="card-header bg-transparent text-white fw-bold">Esito Domande</div>
+            <div class="card shadow-sm border-0 stat-card-light h-100">
+                <div class="card-header bg-transparent text-dark fw-bold">Esito Domande</div>
                 <div class="card-body">
                     <canvas id="domandeEsitoChart" height="250"></canvas>
                 </div>
@@ -68,24 +68,24 @@
 
     <div class="row g-4 mt-1">
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 stat-card-dark h-100">
-                <div class="card-header bg-transparent text-white fw-bold">Utenze Idriche per Ente</div>
+            <div class="card shadow-sm border-0 stat-card-light h-100">
+                <div class="card-header bg-transparent text-dark fw-bold">Utenze Idriche per Ente</div>
                 <div class="card-body">
                     <canvas id="utenzeEnteChart" height="200"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 stat-card-dark h-100">
-                <div class="card-header bg-transparent text-white fw-bold">Anagrafe per Ente</div>
+            <div class="card shadow-sm border-0 stat-card-light h-100">
+                <div class="card-header bg-transparent text-dark fw-bold">Anagrafe per Ente</div>
                 <div class="card-body">
                     <canvas id="anagrafeChart" height="200"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 stat-card-dark h-100">
-                <div class="card-header bg-transparent text-white fw-bold">Toponimi per Ente</div>
+            <div class="card shadow-sm border-0 stat-card-light h-100">
+                <div class="card-header bg-transparent text-dark fw-bold">Toponimi per Ente</div>
                 <div class="card-body">
                     <canvas id="toponimiChart" height="200"></canvas>
                 </div>
@@ -97,68 +97,59 @@
 <!-- STILE CUSTOM -->
 <style>
     body {
-        background-color: #121212;
-        color: #e0e0e0;
+        background-color: #f8f9fa; /* Sfondo chiaro */
+        color: #212529; /* Testo scuro */
     }
-    .stat-card-dark {
-        background: #1e1e1e;
+    .stat-card-light {
+        background: #ffffff;
         border-radius: 1rem;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .stat-card-dark:hover {
+    .stat-card-light:hover {
         transform: translateY(-5px);
-        box-shadow: 0 0.75rem 1.25rem rgba(0,0,0,0.4);
+        box-shadow: 0 0.75rem 1.25rem rgba(0,0,0,0.1);
     }
-    .stat-card-dark h2 {
+    .stat-card-light h2 {
         font-size: 2.2rem;
     }
     .card-header {
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(0,0,0,0.1);
     }
     .footer {
-        color: #fff8f8 !important;
-        fill: #fff8f8 !important;
+        color: #212529 !important;
+        fill: #212529 !important;
     }
 </style>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Funzione per gestire il pulsante di aggiornamento
         document.getElementById('refreshButton').addEventListener('click', function() {
             location.reload();
         });
 
-        // Imposta colori scuri per i grafici
-        Chart.defaults.color = "#e0e0e0";
-        Chart.defaults.borderColor = "rgba(255,255,255,0.1)";
+        // Colori chiari per i grafici
+        Chart.defaults.color = "#212529";
+        Chart.defaults.borderColor = "rgba(0,0,0,0.1)";
 
-        // Dati da ViewBag per i grafici
+        // Report per ente
         const reportLabels = @Html.Raw(Json.Serialize(ViewBag.ReportLabels));
         const reportValues = @Html.Raw(Json.Serialize(ViewBag.ReportValues));
         
-        // Report per ente (Line)
         new Chart(document.getElementById('reportEnteChart'), {
-            type: 'line', // Tipo di grafico cambiato in 'line'
+            type: 'line',
             data: {
                 labels: reportLabels,
                 datasets: [{
                     label: 'Report effettuati',
                     data: reportValues,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.4)',
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    tension: 0.3, // Rende la linea curva
-                    fill: false // Non riempire l'area sotto la linea
+                    tension: 0.3,
+                    fill: false
                 }]
             },
-            options: { 
-                responsive: true, 
-                scales: { 
-                    y: { 
-                        beginAtZero: true 
-                    } 
-                } 
-            }
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
         // Esito domande
@@ -174,7 +165,7 @@
             options: { responsive: true }
         });
 
-        // Utenze idriche per ente
+        // Utenze idriche
         new Chart(document.getElementById('utenzeEnteChart'), {
             type: 'bar',
             data: {
@@ -182,16 +173,14 @@
                 datasets: [{
                     label: 'Utenze Idriche',
                     data: @Html.Raw(Json.Serialize(ViewBag.UtenzeIdricheValues)),
-                    //borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                    //tension: 0.3,
-                    //fill: true
+                    backgroundColor: 'rgba(13, 110, 253, 0.4)',
+                    borderColor: '#0d6efd'
                 }]
             },
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
-        // Anagrafe per ente
+        // Anagrafe
         new Chart(document.getElementById('anagrafeChart'), {
             type: 'bar',
             data: {
@@ -199,13 +188,13 @@
                 datasets: [{
                     label: 'Anagrafe',
                     data: @Html.Raw(Json.Serialize(ViewBag.AnagrafeValues)),
-                    backgroundColor: 'rgba(25, 135, 84, 0.7)'
+                    backgroundColor: 'rgba(25, 135, 84, 0.6)'
                 }]
             },
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
-        // Toponimi per ente
+        // Toponimi
         new Chart(document.getElementById('toponimiChart'), {
             type: 'bar',
             data: {
@@ -213,7 +202,7 @@
                 datasets: [{
                     label: 'Toponimi',
                     data: @Html.Raw(Json.Serialize(ViewBag.ToponimiValues)),
-                    backgroundColor: 'rgba(255, 193, 7, 0.7)'
+                    backgroundColor: 'rgba(255, 193, 7, 0.6)'
                 }]
             },
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
