@@ -122,27 +122,27 @@ namespace Controllers
             if (string.IsNullOrEmpty(mese) || string.IsNullOrEmpty(anno))
             {
                 ViewBag.Message = "Dati mese e anno mancanti!";
-                return LoadFileINPS();
+                 return RedirectToAction("LoadFileINPS");
             }
 
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
                 ViewBag.Enti = _context.Enti.ToList();
-                return LoadFileINPS();
+                return RedirectToAction("LoadFileINPS");
             }
 
             if (csv_file == null || csv_file.Length == 0)
             {
                 ViewBag.Message = "Seleziona un file CSV da caricare.";
-                return LoadFileINPS(); // Torna alla pagina di upload con un messaggio
+                return RedirectToAction("LoadFileINPS");
             }
 
             // Validazione del tipo di file (opzionale ma consigliata)
             if (Path.GetExtension(csv_file.FileName).ToLowerInvariant() != ".csv")
             {
                 ViewBag.Message = "Il file selezionato non è un CSV valido.";
-                return LoadFileINPS();
+                return RedirectToAction("LoadFileINPS");
             }
 
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
@@ -150,7 +150,7 @@ namespace Controllers
             {
                 ViewBag.Message = "Ente selezionato non valido.";
                 ViewBag.Enti = _context.Enti.ToList();
-                return LoadFileINPS();
+                return RedirectToAction("LoadFileINPS");
             }
             
 
@@ -219,7 +219,7 @@ namespace Controllers
                         if (!datiSalvati)
                         {
                             ViewBag.Message = "Nessun dato da salvare.";
-                            return LoadFileINPS();
+                            return RedirectToAction("LoadFileINPS");
                         }
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
@@ -247,7 +247,7 @@ namespace Controllers
                 }
             }
 
-            return LoadFileINPS(); // Torna alla pagina di upload con il messaggio di stato
+             return RedirectToAction("LoadFileINPS"); 
         }
         // Fine - Funzioni
     }

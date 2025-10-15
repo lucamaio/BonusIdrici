@@ -175,6 +175,8 @@ namespace Controllers
                 ViewBag.Message = "ID report non trovato! Riprova";
                 return RedirectToAction("Index", "Home");
             }
+            ViewBag.idReport = idReport;
+            ViewBag.idEnte = reportEsistente.idEnte;
 
             // 4. Mi ricavo tutte le domande associate al report
 

@@ -27,6 +27,11 @@
                         <input type="hidden" name="idEnte" value="@ViewBag.IdEnte" />
                         <input type="hidden" name="codiceFamiglia" value="@codiceFamiglia" />
                         <input type="hidden" name="codiceFiscaleIntestatarioScheda" value="@codiceIntestarioScheda" />
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" id="toggleAll" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-angles-down"></i> Espandi tutte
+                            </button>
+                        </div>
 
                         <div class="accordion" id="accordionDichiarante">
 
@@ -154,3 +159,29 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("toggleAll");
+        const accordions = document.querySelectorAll("#accordionDichiarante .accordion-collapse");
+        let expanded = false;
+
+        toggleBtn.addEventListener("click", function () {
+            expanded = !expanded;
+
+            accordions.forEach(acc => {
+                if (expanded) {
+                    new bootstrap.Collapse(acc, { show: true });
+                } else {
+                    new bootstrap.Collapse(acc, { hide: true });
+                }
+            });
+
+            // Cambia testo e icona dinamicamente
+            if (expanded) {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-angles-up"></i> Chiudi tutte';
+            } else {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-angles-down"></i> Espandi tutte';
+            }
+        });
+    });
+</script>

@@ -1,11 +1,13 @@
+@using System.Globalization
 @{
     ViewData["Title"] = "Riepilogo Domande";
-    var idEnte = ViewBag.SelectedEnteId ?? "ND";
-    var nomeEnte = ViewBag.nomeEnte ?? "ND";
+    var idEnte = ViewBag.idEnte ?? "ND";
+    var idReport = ViewBag.idReport; 
+    var nomeEnte = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.nomeEnte.ToLower()) ?? "ND";
     var ruolo = ViewBag.Ruolo;
 
     var domande = ViewBag.Domande;
-    var elaborazione = ViewBag.ElaborazioneDel;
+    var elaborazione = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.ElaborazioneDel.ToLower()) ?? "ND";
 }
 
 <div class="container-xxl flex-grow-1 py-5">
@@ -13,7 +15,7 @@
         <!-- Header -->
         <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
             <h3 class="mb-1 fw-bold">
-                <i class="bi bi-building me-2"></i> Dattagli Domande Elaborazione -
+                <i class="bi bi-building me-2"></i> Domande Elaborazione
                 <span class="fw-semibold">
                    @elaborazione
                 </span>
@@ -30,81 +32,122 @@
         <div class="card-body p-4">
             @if (domande != null && domande.Count > 0)
             {
-                <div style="background-color: #f8f9fa; border-radius: 12px;">
-                        <div class="row g-3">
-                            <!-- Stat Box 1 -->
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm text-center">
-                                    <div class="card-body">
-                                        <i class="fa-solid fa-file fa-2x text-primary mb-2"></i>
-                                        @* <i class="fa-solid fa-city fa-2x "></i> *@
-                                        <h6>Totale Domande</h6>
-                                        <h4>@ViewBag.TotaleDomande</h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stat Box 2 -->
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm text-center">
-                                    <div class="card-body">
-                                        <i class="fa-solid fa-xmark fa-2x text-danger mb-2"></i>
-                                        <h6>Incongruenze Trovate</h6>
-                                        <h4>@ViewBag.incongruenze</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Stat Box 3 -->
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm text-center">
-                                    <div class="card-body">
-                                        <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
-                                        <h6>Domande Esito 1</h6>
-                                        <h4>@ViewBag.DomandeValide</h4>
-                                    </div>
+                <div style="background-color: #f8f9fa; border-radius: 12px; padding: 10px;">
+                    <div class="row g-2 mb-2">
+                        <!-- Stat Box 1 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm text-center mb-2">
+                                <div class="card-body py-3">
+                                    <i class="fa-solid fa-file fa-2x text-primary mb-1"></i>
+                                    <h6>Totale Domande</h6>
+                                    <h4>@ViewBag.TotaleDomande</h4>
                                 </div>
                             </div>
                         </div>
-                        <br>
-                        <div class="row g-3">
-                            <!-- Esito 2 -->
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm text-center">
-                                    <div class="card-body">
-                                        <i class="fa-solid fa-lightbulb fa-2x text-primary mb-2"></i>
-                                        <h6>Esito 2</h6>
-                                        <h4>@ViewBag.DomandeEsito2</h4>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Esito 3 -->
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm text-center">
-                                    <div class="card-body">
-                                        <i class="fa-solid fa-exclamation-triangle fa-2x text-warning mb-2"></i>
-                                        <h6>Esito 3</h6>
-                                        <h4>@ViewBag.DomandeEsito3</h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Esito 4 -->
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm text-center">
-                                    <div class="card-body">
-                                        <i class="fa-solid fa-times-circle fa-2x text-danger mb-2"></i>
-                                        <h6>Esito 4</h6>
-                                        <h4>@ViewBag.DomandeEsito4</h4>
-                                    </div>
+                        <!-- Stat Box 2 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm text-center mb-2">
+                                <div class="card-body py-3">
+                                    <i class="fa-solid fa-xmark fa-2x text-danger mb-1"></i>
+                                    <h6>Incongruenze Trovate</h6>
+                                    <h4>@ViewBag.incongruenze</h4>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Stat Box 3 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm text-center mb-2">
+                                <div class="card-body py-3">
+                                    <i class="fa-solid fa-circle-check fa-2x text-success mb-1"></i>
+                                    <h6>Domande Esito 1</h6>
+                                    <h4>@ViewBag.DomandeValide</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <!-- Esito 2 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm text-center mb-2">
+                                <div class="card-body py-3">
+                                    <i class="fa-solid fa-lightbulb fa-2x text-primary mb-1"></i>
+                                    <h6>Esito 2</h6>
+                                    <h4>@ViewBag.DomandeEsito2</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Esito 3 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm text-center mb-2">
+                                <div class="card-body py-3">
+                                    <i class="fa-solid fa-exclamation-triangle fa-2x text-warning mb-1"></i>
+                                    <h6>Esito 3</h6>
+                                    <h4>@ViewBag.DomandeEsito3</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Esito 4 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm text-center mb-2">
+                                <div class="card-body py-3">
+                                    <i class="fa-solid fa-times-circle fa-2x text-danger mb-1"></i>
+                                    <h6>Esito 4</h6>
+                                    <h4>@ViewBag.DomandeEsito4</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                 
+
                 <hr class="my-4" />
-                 <p class="lead mb-4 text-muted">Consulta tutte le domande relative al Domande selezionato</p>
-                 <br>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="lead mb-0 text-muted">
+                        Consulta tutte le domande relative all'elaborazione selezionata
+                    </p>
+
+                    <div class="btn-group">
+                        <button id="myDropdownToggle" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear-fill me-1"></i> Azioni
+                        </button>
+                        <ul class="dropdown-menu shadow-sm">
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Bonus Idrico" })">
+                                    <i class="bi bi-download me-2 text-anagrafe"></i> Esito Bonus Idrico
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Competenza Territoriale" })">
+                                    <i class="bi bi-download me-2 text-domande"></i> Competenza Territoriale
+                                </a>
+                            </li>
+                             @if( ruolo == "ADMIN"){
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Siscom" })">
+                                            <i class="bi bi-download me-2 text-utenza"></i> File Siscom
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Debug" })">
+                                            <i class="bi bi-download me-2 text-info"></i> Debug
+                                        </a>
+                                    </li>
+                                }
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-warning" href="@Url.Action("VariaSerie", "Report", new { idReport = idReport })">
+                                    <i class="bi bi-pencil-square me-2"></i> Varia Serie
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
                 <div class="table-responsive">
                     <table id="dettagliDomandeTable" class="table table-hover align-middle border-bottom">
@@ -201,20 +244,14 @@
                 </div>
             }
             <hr class="my-4" />
-
-            @if(ruolo !="OPERATORE"){
-                        <div class="d-grid mt-4">
-                            <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
-                            </a>
-                        </div>
-                    }else{
-                        <div class="d-grid mt-4">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
-                        </a>
-                    </div>
-                    }      
+            @* Pulsante per tornare alla pagina precedente *@
+            <div class="d-grid mt-4">
+                <a href="@Url.Action("Show", "Report", new {selectedEnteId = idEnte})" class="btn btn-outline-secondary btn-lg shadow-sm">
+                    <i class="bi bi-arrow-left-circle me-2"></i> Torna alla pagina Elaborazioni Ente
+                </a>
+            </div>
+                   
+                  
         </div>
     </div>
 </div>
@@ -247,5 +284,18 @@
                 }, 500);
             });
         }); 
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var btn = document.getElementById('myDropdownToggle');
+            if (btn) {
+                new bootstrap.Dropdown(btn, {
+                popperConfig: {
+                    modifiers: [
+                    { name: 'preventOverflow', options: { boundary: document.body } }
+                    ]
+                }
+                });
+            }
+            });
     </script>
 }

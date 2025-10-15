@@ -1,0 +1,206 @@
+@{
+    ViewData["Title"] = "Genera Risultati";
+    var mesi = ViewBag.Mesi;
+}
+
+<div class="domande-page container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <!-- HEADER -->
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-gears me-2"></i>
+                        <span class="fw-semibold">Nuova Elaborazione</span>
+                    </h3>
+                </div>
+
+                <!-- FORM -->
+                <div class="modern-card-body p-4 small">
+                    <form asp-controller="Elaborazione" asp-action="Processing" method="POST" enctype="multipart/form-data">
+                        <div class="accordion" id="accordionDichiarante">
+
+                            <!-- Pulsante Espandi/Chiudi -->
+                            <div class="d-flex justify-content-end mb-3">
+                                <button type="button" id="toggleAll" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-folder-open me-1"></i> Espandi/Chiudi tutte
+                                </button>
+                            </div>
+
+                            <!-- SEZIONE 1 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-database me-2"></i> Dati Generazione
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div class="col">
+                                                <label for="selectedEnteId" class="form-label">Ente: *</label>
+                                                <select class="form-select" id="selectedEnteId" name="selectedEnteId" required>
+                                                    <option value="">-- Seleziona un Ente --</option>
+                                                    <hr />
+                                                    @if (ViewBag.Enti != null)
+                                                    {
+                                                        foreach (var ente in ViewBag.Enti)
+                                                        {
+                                                            <option value="@ente.id">@ente.nome</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="mese" class="form-label">Mese: *</label>
+                                                <select class="form-select" id="mese" name="mese" required>
+                                                    <option value="">-- Seleziona un mese --</option>
+                                                    <hr />
+                                                    @if(mesi != null){
+                                                        foreach (var month in mesi)
+                                                        {
+                                                            <option value="@month">@month</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="anno" class="form-label">Anno: *</label>
+                                                <input type="text" class="form-control" id="anno" name="anno" minlength="4" maxlength="4"
+                                                    value="@DateTime.Now.Year" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 2 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
+                                        <i class="fa-solid fa-file-upload me-2"></i> Caricamento File
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse show" aria-labelledby="heading2">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div class="mb-4">
+                                                <label for="csv_file" class="form-label fw-semibold">File CSV INPS</label>
+                                                <input type="file" id="csv_file" name="csv_file" class="form-control form-control-lg" required accept=".csv" />
+                                            </div>
+
+                                            <div>
+                                                <label for="serie" class="form-label">Serie: *</label>
+                                                <input type="text" class="form-control" id="serie" name="serie" min="0" max="5">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 3 -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading3">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
+                                        <i class="fa-solid fa-sliders me-2"></i> Opzioni Aggiuntive
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse show" aria-labelledby="heading3">
+                                    <div class="accordion-body">
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" id="confrontoCivico" name="confrontoCivico" class="form-check-input" value="true" />
+                                            <label for="confrontoCivico" class="form-check-label">Confronta numero civico</label>
+                                        </div>
+
+                                        <div class="form-check mb-4">
+                                            <input type="checkbox" id="escludiComponenti" name="escludiComponenti" class="form-check-input" value="true" />
+                                            <label for="escludiComponenti" class="form-check-label">
+                                                Escludi incongruenze relative al numero dei componenti del nucleo familiare
+                                            </label>
+                                        </div>
+
+                                        <!-- NOTE -->
+                                        <div class="alert alert-secondary mt-4 border-start border-4 border-primary">
+                                            <h6 class="fw-bold"><i class="fa-solid fa-circle-info me-2"></i>Indicazioni Utili</h6>
+                                            <ul class="mb-0 small">
+                                                <li>Se la fatturazione è annuale, impostare il valore su <strong>0</strong>.</li>
+                                                <li>Se il campo “Serie” è vuoto, verrà usata la serie predefinita dell’ente.</li>
+                                                <li>Le modifiche possono essere effettuate nella sezione <em>Dettagli Domande</em>.</li>
+                                                <li>Le opzioni sopra influenzano i controlli sui dati anagrafici e composizione familiare.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BOTTONI -->
+                            <hr class="my-4" />
+                            <div class="d-flex justify-content-between">
+                                <a href="@Url.Action("Index","Home")" class="btn btn-outline-secondary btn-sm rounded-3">
+                                    <i class="fa-solid fa-arrow-left"></i> Torna alla Home
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3" onclick="return validateForm()">
+                                    <i class="fa-solid fa-check"></i> Elabora
+                                </button>
+                            </div>
+
+                            <!-- LOADER -->
+                            <div id="loader" class="text-center mt-4" style="display:none;">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-3 text-muted">Elaborazione in corso, attendere...</p>
+                            </div>
+
+                            <!-- MESSAGGIO -->
+                            @if (!string.IsNullOrEmpty(ViewBag.Message))
+                            {
+                                <div class="alert alert-info mt-4 text-center" role="alert">
+                                    @ViewBag.Message
+                                </div>
+                            }
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Mostra il loader durante l'elaborazione
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+
+        // Espandi/chiudi tutte le sezioni
+        document.getElementById("toggleAll").addEventListener("click", function () {
+            const all = document.querySelectorAll(".accordion-collapse");
+            const someClosed = Array.from(all).some(el => !el.classList.contains("show"));
+            all.forEach(el => {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(el);
+                someClosed ? bsCollapse.show() : bsCollapse.hide();
+            });
+        });
+
+        function validateForm() {
+        const form = document.querySelector("form");
+        
+        // Verifica se tutti i campi richiesti sono validi
+        if (!form.checkValidity()) {
+            form.reportValidity(); // mostra i messaggi standard del browser
+            return false; // blocca l'invio
+        }
+
+        // Se è tutto valido, mostra il loader e consente l'invio
+        document.getElementById("loader").style.display = "block";
+        return true;
+    }
+    </script>
+}
