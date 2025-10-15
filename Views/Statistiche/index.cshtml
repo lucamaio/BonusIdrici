@@ -1,4 +1,4 @@
-@{
+@* @{
     ViewData["Title"] = "Statistiche";
 }
 
@@ -50,9 +50,9 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card shadow-sm border-0 stat-card-light h-100">
-                <div class="card-header bg-transparent text-dark fw-bold">Report per Ente</div>
+                <div class="card-header bg-transparent text-dark fw-bold">Domande per Ente</div>
                 <div class="card-body">
-                    <canvas id="reportEnteChart" height="120"></canvas>
+                    <canvas id="domandeEnteChart" height="120"></canvas>
                 </div>
             </div>
         </div>
@@ -132,17 +132,17 @@
         Chart.defaults.color = "#212529";
         Chart.defaults.borderColor = "rgba(0,0,0,0.1)";
 
-        // Report per ente
-        const reportLabels = @Html.Raw(Json.Serialize(ViewBag.ReportLabels));
-        const reportValues = @Html.Raw(Json.Serialize(ViewBag.ReportValues));
+        // Domande per ente
+        const domandeLabels = @Html.Raw(Json.Serialize(ViewBag.DomandeLabels));
+        const domandeValues = @Html.Raw(Json.Serialize(ViewBag.DomandeValues));
         
-        new Chart(document.getElementById('reportEnteChart'), {
+        new Chart(document.getElementById('domandeEnteChart'), {
             type: 'line',
             data: {
-                labels: reportLabels,
+                labels: domandeLabels,
                 datasets: [{
-                    label: 'Report effettuati',
-                    data: reportValues,
+                    label: 'Domande effettuati',
+                    data: domandeValues,
                     backgroundColor: 'rgba(54, 162, 235, 0.4)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     tension: 0.3,
@@ -208,4 +208,4 @@
             options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
     </script>
-}
+} *@

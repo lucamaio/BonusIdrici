@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+ using System.Globalization;
 using Models;
 using Data;
 using Models.ViewModels; // Aggiungi questo using
@@ -62,7 +63,7 @@ namespace Controllers
 
         // Inizio - Pagine di Navigazione
 
-        // Pagina 1: Consente di andare a caricare i dati di un ente di cui si vogliono generare i vari report
+        // Pagina 1: Consente di andare a caricare i dati di un ente di cui si vogliono generare i vari domande
         public IActionResult LoadFileINPS()
         {
             // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
@@ -71,7 +72,10 @@ namespace Controllers
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
+            // Mi ricavo i mesi
 
+            var mesi = DateTimeFormatInfo.CurrentInfo.MonthNames.Where(m => !string.IsNullOrEmpty(m)).ToList();
+            ViewBag.Mesi = mesi;
              // 2) Mi ricavo gli enti
             List<Ente> enti = new List<Ente>();
 
@@ -102,16 +106,23 @@ namespace Controllers
 
         // Inizio - Funzioni
         
-        // Funzione 1: consente di caricare il file fornito mensilmente dal INPS per generare i Report
+        // Funzione 1: consente di caricare il file fornito mensilmente dal INPS per generare i Domande
 
         [HttpPost]
-        public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, int serie, bool confrontoCivico, bool escludiComponenti)
+        public async Task<IActionResult> LoadFileINPS(IFormFile csv_file, int selectedEnteId, string mese, string anno, int serie, bool confrontoCivico, bool escludiComponenti)
         {
             // Verifico se i dati non sono null
             if (string.IsNullOrEmpty(ruolo) || string.IsNullOrEmpty(username) || idUser == 0)
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
+            }
+
+
+            if (string.IsNullOrEmpty(mese) || string.IsNullOrEmpty(anno))
+            {
+                ViewBag.Message = "Dati mese e anno mancanti!";
+                return LoadFileINPS();
             }
 
             if (csv_file == null || csv_file.Length == 0)
@@ -153,8 +164,31 @@ namespace Controllers
                     await csv_file.CopyToAsync(stream);
                 }
 
-                // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idUser, serie, confrontoCivico, escludiComponenti);
+                // Verifico se non esiste alcun report con i dati passati
+                var reportEsistente = _context.Reports.FirstOrDefault(f=> f.mese == mese && f.anno == anno && f.idEnte==selectedEnteId);
+                int idReport;
+                if(reportEsistente != null){
+                    // Aggiungi parte aggiornamento report
+                    idReport = reportEsistente.id;
+
+                }else{
+                    var report = new Report(){
+                        mese = mese,
+                        anno = anno,
+                        stato ="Da verificare",
+                        serie = serie,
+                        idUser = idUser,
+                        idEnte = selectedEnteId,
+                        DataCreazione = DateTime.Now
+                    };
+
+                    _context.Reports.Add(report);
+                    await _context.SaveChangesAsync();
+                    
+                    idReport = report.id;
+                }            
+                // Leggi il file CSV con la tua classe CSVReaders
+                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idReport, confrontoCivico, escludiComponenti);
                 AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -162,22 +196,22 @@ namespace Controllers
                     {
                         bool datiSalvati = false;
 
-                        if (datiComplessivi.reports.Count > 0)
+                        if (datiComplessivi.domande.Count > 0)
                         {
                             datiSalvati = true;
-                            foreach (var report in datiComplessivi.reports)
+                            foreach (var domande in datiComplessivi.domande)
                             {
-                                _context.Reports.Add(report);
+                                _context.Domande.Add(domande);
                             }
                             await _context.SaveChangesAsync();
                         }
 
-                        if (datiComplessivi.reportsDaAggiornare.Count > 0)
+                        if (datiComplessivi.domandeDaAggiornare.Count > 0)
                         {
                             datiSalvati = true;
-                            foreach (var report in datiComplessivi.reportsDaAggiornare)
+                            foreach (var domande in datiComplessivi.domandeDaAggiornare)
                             {
-                                _context.Reports.Update(report);
+                                _context.Domande.Update(domande);
                             }
                             await _context.SaveChangesAsync();
                         }
@@ -189,7 +223,7 @@ namespace Controllers
                         }
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
-                        ViewBag.Message = $"Dati caricati e salvati con successo!\n Aggiunti: {datiComplessivi.reports.Count}, Aggiornati: {datiComplessivi.reportsDaAggiornare.Count}";
+                        ViewBag.Message = $"Dati caricati e salvati con successo!\n Aggiunti: {datiComplessivi.domande.Count}, Aggiornati: {datiComplessivi.domandeDaAggiornare.Count}";
                     }
                     catch (Exception dbEx)
                     {

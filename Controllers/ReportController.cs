@@ -13,7 +13,7 @@ namespace Controllers
     {
         private readonly ILogger<ReportController> _logger;
         private readonly ApplicationDbContext _context;
-        private FileLog logFile = new FileLog($"wwwroot/log/Report.log");
+        private FileLog logFile = new FileLog($"wwwroot/log/Domande.log");
         private string? ruolo;
         private int idUser;
         private string? username;
@@ -98,9 +98,10 @@ namespace Controllers
             return View();
         }
 
-        // Pagina 2: Consente la visualizzazione di tutti i report effetuati 
 
-        [HttpPost]
+        // Pagina 2: Consente la visualizzazione di tutti i domande effetuati 
+
+        [HttpGet, HttpPost]
         public IActionResult Show(int selectedEnteId)
         {
             // Verifica la sessione
@@ -114,177 +115,43 @@ namespace Controllers
             {
                 ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("Index", "Report");
+                return View("Index", "Domande");
             }
 
-           // ✅ Raggruppa per utente + data di creazione e ordina in senso inverso
+            // Mi recupuero tutti i report relativi all'ente
 
-            ViewBag.Report = _context.Reports
-                .Where(r => r.IdEnte == selectedEnteId)
-                .GroupBy(r => r.DataCreazione)
-                .Select(g => new RiepilogoDatiViewModel
+            var reportEffettuati = _context.Reports
+                .Where(r => r.idEnte == selectedEnteId)
+                .GroupBy(r => new { r.id, r.idEnte, r.idUser, r.serie, r.DataCreazione, r.stato, r.mese, r.anno })
+                .Select(g => new Models.ViewModels.ReportViewModel
                 {
-                    DataCreazione = g.Key,
-                    idAto = g.FirstOrDefault().idAto,
-                    count = g.Count(),
-                    annoValidita = g.FirstOrDefault().annoValidita,
+                    id = g.Key.id,
+                    idEnte = g.Key.idEnte,
+                    DataCreazione = g.Key.DataCreazione,
+                    mese = g.Key.mese,
+                    anno = g.Key.anno,
+                    stato = g.Key.stato,
+                    serie = g.Key.serie,
+                    count = _context.Domande.Where(d => d.idReport == g.Key.id).Count(),
                     Username = _context.Users
-                                .Where(u => u.id == g.FirstOrDefault().IdUser)
-                                .Select(u => u.Username)
-                                .FirstOrDefault()
+                        .Where(u => u.id == g.Key.idUser)
+                        .Select(u => u.Username)
+                        .FirstOrDefault()
                 })
-                .OrderByDescending(x => x.DataCreazione)
+                .OrderByDescending(r => r.DataCreazione)
                 .ToList();
-            ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome?? "Ente Sconosciuto";
 
+            ViewBag.Reports = reportEffettuati ?? null;
+            ViewBag.idEnte = selectedEnteId;
+            ViewBag.SelectedEnteNome = _context.Enti.Where(e => e.id == selectedEnteId).Select(e => e.nome).FirstOrDefault();
             return View();
         }
 
-        // Pagina 3: Consente la visualizzazione dei dati associati a un Report
-
-        public IActionResult Dettails(int selectedEnteId, DateTime? data, string? idAto = null)
+        // Pagina 3: Consente la visualizzazione dei dati associati a un Domande
+        [HttpGet, HttpPost]
+        public IActionResult Dettails(int idReport)
         {
-           // logFile.LogInfo($"Sono dentro la pagina Dettails. IdEnte: {selectedEnteId} | Data: {data} | idAto: {idAto}");
-            // ✅ Verifica sessione
-            if (!VerificaSessione())
-            {
-                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
-                return RedirectToAction("Index", "Home");
-            }
-
-            // ✅ Validazione ente
-            if (selectedEnteId == 0)
-            {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
-                ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return RedirectToAction("Index", "Report");
-            }
-
-            // Lista per i dati di output
-            List<RiepilogoDatiViewModel> riepilogoDati = new List<RiepilogoDatiViewModel>();
-
-            // ✅ Caso: né data né idAto specificati
-            if (data == null && idAto == null)
-            {
-                ViewBag.Report = _context.Reports
-                    .OrderByDescending(g => g.idFornitura)
-                    .ThenBy(g => g.id)
-                    .Select(g => new RiepilogoDatiViewModel
-                    {
-                        id = g.id,
-                        idAto = g.idAto,
-                        codiceBonus = g.codiceBonus,
-                        esitoStr = g.esitoStr,
-                        esito = g.esito,
-                        idFornitura = g.idFornitura,
-                        codiceFiscale = g.codiceFiscaleRichiedente,
-                        numeroComponenti = g.numeroComponenti,
-                        serie = g.serie,
-                        mc = g.mc,
-                        incongruenze = g.incongruenze,
-                        DataCreazione = g.DataCreazione,
-                        Iduser = g.IdUser,
-                        Username = _context.Users
-                            .Where(u => u.id == g.IdUser)
-                            .Select(u => u.Username)
-                            .FirstOrDefault(),
-                        NumeroDatiInseriti = 1
-                    })
-                    .ToList();
-                
-                ViewBag.Message = "Data e idAto mancanti o non validi";
-                return RedirectToAction("Index", "Report");
-            }
-
-            // ✅ Caso: ricerca per data
-            if (data != null)
-            {
-                riepilogoDati = _context.Reports
-                    .Where(r => r.IdEnte == selectedEnteId && r.DataCreazione == data)
-                    .OrderByDescending(r => r.idFornitura)
-                    .ThenBy(r => r.id)
-                    .Select(r => new RiepilogoDatiViewModel
-                    {
-                        id = r.id,
-                        idAto = r.idAto,
-                        codiceBonus = r.codiceBonus,
-                        esitoStr = r.esitoStr,
-                        esito = r.esito,
-                        idFornitura = r.idFornitura,
-                        codiceFiscale = r.codiceFiscaleRichiedente,
-                        numeroComponenti = r.numeroComponenti,
-                        serie = r.serie,
-                        mc = r.mc,
-                        incongruenze = r.incongruenze,
-                        DataCreazione = r.DataCreazione,
-                        Iduser = r.IdUser,
-                        Username = _context.Users
-                            .Where(u => u.id == r.IdUser)
-                            .Select(u => u.Username)
-                            .FirstOrDefault(),
-                    })
-                    .ToList();
-            }
-            // ✅ Caso: ricerca per idAto
-            else if (!string.IsNullOrEmpty(idAto))
-            {
-                riepilogoDati = _context.Reports
-                    .Where(r => r.IdEnte == selectedEnteId && r.idAto == idAto)
-                    .OrderByDescending(r => r.idFornitura)
-                    .ThenBy(r => r.id)
-                    .Select(r => new RiepilogoDatiViewModel
-                    {
-                        id = r.id,
-                        idAto = r.idAto,
-                        codiceBonus = r.codiceBonus,
-                        esitoStr = r.esitoStr,
-                        esito = r.esito,
-                        idFornitura = r.idFornitura,
-                        codiceFiscale = r.codiceFiscaleRichiedente,
-                        numeroComponenti = r.numeroComponenti,
-                        serie = r.serie,
-                        mc = r.mc,
-                        incongruenze = r.incongruenze,
-                        DataCreazione = r.DataCreazione,
-                        Iduser = r.IdUser,
-                        Username = _context.Users
-                            .Where(u => u.id == r.IdUser)
-                            .Select(u => u.Username)
-                            .FirstOrDefault(),
-                    })
-                    .ToList();
-            }
-            else
-            {
-                return RedirectToAction("Show", "Report", new { id = selectedEnteId });
-            }
-
-            ViewBag.TotaleDomande = riepilogoDati.Count;
-            ViewBag.TotaleAccettate = riepilogoDati.Count(r => r.esito == "01" && r.esitoStr == "Si");
-            ViewBag.TotaleRifiutate = riepilogoDati.Count(r => r.esitoStr == "No");
-            ViewBag.TotaleEsito2 = riepilogoDati.Count(r => r.esito == "02" && r.esitoStr == "Si");
-            ViewBag.TotaleEsito3 = riepilogoDati.Count(r => r.esito == "03" && r.esitoStr == "Si");
-            ViewBag.TotaleEsito4 = riepilogoDati.Count(r => r.esito == "04");
-            ViewBag.IncongruenzeTrovate = _context.Reports.Count(r => r.IdEnte == selectedEnteId && r.DataCreazione == data && r.incongruenze == true);
-
-            // ✅ ViewBag info
-            ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.Data = data;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
-
-            //logFile.LogInfo($"Dati recuperati: EnteId={ViewBag.SelectedEnteId}, Data={ViewBag.Data}, EnteNome={ViewBag.SelectedEnteNome}");
-
-            return View("Dettails", riepilogoDati);
-        }
-
-
-        // Pagina 4: Consente di variare la serie per un insieme di Report
-
-        public IActionResult VariaSerie(int? idEnte, string idAto)
-        {
-            //logFile.LogInfo($"Sono dentro la pagina VariaSerie.");
-            // 1) Verifico la sessione
+            // 1. Verifico se esiste una sessione attiva
 
             if (!VerificaSessione())
             {
@@ -292,44 +159,87 @@ namespace Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            //logFile.LogInfo($"IdEnte: {idEnte}, IdAto: {idAto}");
+            // 2. Verifico che l'id del report non è 0
 
-            // 2) Verifico se i dati passati sono null
-
-            if (idEnte == null || idAto == null)
+            if (idReport == 0)
             {
-                // logFile.LogError("Dati mancanti!");
-                ViewBag.Message = "Dati Mancanti!";
-                return RedirectToAction("Show", "Report");
+                ViewBag.Message = "Id Report non valido, riporova";
+                return RedirectToAction("Index", "Home");
             }
 
-            // 3) Cerco il valore del campo serie sul DB
+            // 3. Verifico che l'id esiste nel db
 
-            var report = _context.Reports.FirstOrDefault(s => s.IdEnte == idEnte && s.idAto == idAto);
-
-            // 4) Verifico se trovo un occorenza nel DB
-            if (report == null)
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (reportEsistente == null)
             {
-                return RedirectToAction("Show", "Report");
+                ViewBag.Message = "ID report non trovato! Riprova";
+                return RedirectToAction("Index", "Home");
             }
 
-            // 5) Creo il modello 
+            // 4. Mi ricavo tutte le domande associate al report
 
-            var model = new RiepilogoDatiViewModel
-            {
-                IdEnte = idEnte,
-                idAto = idAto,
-                DataCreazione = report.DataCreazione,
-                serie = report.serie
-            };
+            var domandeReport = _context.Domande.Where(d => d.idReport == idReport).ToList();
+            ViewBag.Domande = domandeReport;
+
+            // 5. Salvo la data di elaborazione e il nome dal ente in modo da poterli visualizzare
+            var elaborazione = reportEsistente.mese + " " + reportEsistente.anno;
+            ViewBag.ElaborazioneDel = elaborazione;
+            ViewBag.nomeEnte = _context.Enti.Where(e => e.id == reportEsistente.idEnte).Select(e => e.nome).FirstOrDefault();
+
+            // 6. Mi ricavo le informazioni aggiuntive per la parte relativa alle statistiche
+
+            ViewBag.TotaleDomande = domandeReport.Count();
+            ViewBag.DomandeValide = domandeReport.Count(d => d.esito == "01" && d.esitoStr == "Si");
+            ViewBag.TotaleRifiutate = domandeReport.Count(d => d.esitoStr == "No");
+
+            ViewBag.DomandeEsito1 = domandeReport.Count(d => d.esito == "01");
+            ViewBag.DomandeEsito2 = domandeReport.Count(d => d.esito == "02");
+            ViewBag.DomandeEsito3 = domandeReport.Count(d => d.esito == "03");
+            ViewBag.DomandeEsito4 = domandeReport.Count(d => d.esito == "04");
+
+            ViewBag.incongruenze = domandeReport.Count(d => d.incongruenze == true);
             
-            // 6) Apro la pagina
-            return View(model);
+            return View();
         }
 
-        // Pagina 5: Consente di Variare i dati di un Report
+        // Pagina 4: Consente di variare la serie per un insieme di Domande
 
-        public IActionResult Varia(int? id)
+        public IActionResult VariaSerie(int idReport)
+        {
+            // 1. Verifico se esiste una sessione attiva
+            if (!VerificaSessione())
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Verifico che l'id del report non è 0
+
+            if (idReport == 0)
+            {
+                ViewBag.Message = "Id Report non valido, riporova";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 3. Verifico che l'id esiste nel db
+
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (reportEsistente == null)
+            {
+                ViewBag.Message = "ID report non trovato! Riprova";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 4. Salvo il valore della serie e mostro la pagina
+            ViewBag.idReport = idReport;
+            ViewBag.idEnte = reportEsistente.idEnte; // Invio l'id del ente in modo di poter ritorare alla pagina precedente
+            ViewBag.Serie = reportEsistente.serie;
+            return View();
+        }
+
+        // Pagina 5: Consente di Variare i dati di un Domande
+        [HttpGet, HttpPost]
+        public IActionResult Varia(int id)
         {
             // 1) Verifico se esiste una sessione
             if (!VerificaSessione())
@@ -338,29 +248,27 @@ namespace Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // 2) Verifico se l'id == null
+            // 2) Verifico se l'id e maggiore di zero
 
-            if (id == null || id == 0)
-            {
-                ViewBag.Message = "Id Mancante, per effetuare la variazione";
-                return RedirectToAction("Show", "Report");
+            if (id <= 0) {
+                ViewBag.Message = "ID non valido! Riprova";
+                return RedirectToAction("Index", "Home");
             }
 
-            // 3) Mi ricavo il report dal id
+            // 3) Verifico che la domanda esista
 
-            var report = _context.Reports.FirstOrDefault(s => s.id == id);
-
-            // 4) Verifico che report non sia null
-            if (report == null)
+            var domandaEsistente = _context.Domande.FirstOrDefault(d => d.id == id);
+            if (domandaEsistente == null)
             {
-                return RedirectToAction("Show", "Report");
+                ViewBag.Message = "Domanda non trovata riprova";
+                return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Report = report;
+            // 4) Invio i dati e visualizzo la pagina
+            ViewBag.Domanda = domandaEsistente;
+            ViewBag.Serie = _context.Reports.Where(r => r.id == domandaEsistente.idReport).Select(r => r.serie).FirstOrDefault();
             return View();
         }
-
-
 
         // Fine - Pagine di Navigazione
 
@@ -368,70 +276,81 @@ namespace Controllers
 
         // Funzione 1: Consente il download dei file di esportazione
 
-        public async Task<IActionResult> ScaricaCsv(int enteId, string DataCreazione, string tipoReport)
+        public async Task<IActionResult> ScaricaCsv(int idReport, string tipoEsportazione)
         {
-            // 1. Validazione input
-            if (string.IsNullOrEmpty(DataCreazione) || string.IsNullOrEmpty(tipoReport))
+            // 1) Validazione input
+            if (idReport <= 0 || string.IsNullOrEmpty(tipoEsportazione))
             {
-                return BadRequest("Parametri mancanti per il download del report.");
+                return BadRequest("Parametri mancanti per il download del domande.");
+            }
+            // 2) Verifico che esista il report
+
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (reportEsistente == null)
+            {
+                return BadRequest("Report non trovato!");
             }
 
-            DateTime dataCreazioneParsed;
-            if (!DateTime.TryParseExact(DataCreazione, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataCreazioneParsed))
+            var serie = reportEsistente.serie; // Variabile neccessaria solo nel caso in cui il tipo di esportazione è siscom o Debug
+
+            // 3) Mi ricavo i dati relativi all'ente
+
+            var ente = _context.Enti.FirstOrDefault(e => e.id == reportEsistente.idEnte);
+            if (ente == null)
             {
-                return BadRequest("Formato data non valido. Usare il formato AAAA-MM-GG HH:mm:ss.");
+                return BadRequest("Ente non trovato!");
             }
 
-            var ente = _context.Enti.Where(r => r.id == enteId).ToList();
-            var p_iva = ente[0].partitaIva;
-            var nomeEnte = ente[0].nome;
-            List<Report> datiDelReport = new List<Report>();
+            var p_iva = ente.partitaIva;
+            var nomeEnte = ente.nome;
 
-            // 2. Recupero dei dati dal database (una sola query per entrambi i tipi di report)
-            if (tipoReport != "Siscom")
+            // 4) Addesso recupero i dati dal DB
+            List<Domanda> domande = new List<Domanda>();
+
+            if (tipoEsportazione != "Siscom")
             {
-                datiDelReport = _context.Reports.Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed).ToList();
+                domande = _context.Domande.Where(r => r.idReport == idReport).ToList();
             }
             else
             {
-                // datiDelReport = _context.Reports.Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed && (r.esito =="01" || r.esito =="02") && r.esitoStr=="Si").ToList();
-                datiDelReport = _context.Reports.Where(r => r.IdEnte == enteId && r.DataCreazione == dataCreazioneParsed && r.esito == "01" && r.esitoStr == "Si").ToList();
+                domande = _context.Domande.Where(r => r.idReport == idReport && r.esito == "01" && r.esitoStr == "Si").ToList();
             }
 
+            // 5) Definizione delle variabili neccessarie a generare il file
             byte[]? fileBytes;
             string fileName = "";
             string contentType = "text/csv";
             DateTime timeStamp = DateTime.Now;
             var pogressivo = "1";
 
-            // 3. Chiama la funzione di generazione CSV appropriata in base al tipo di report
-            if (tipoReport == "Esito Bonus Idrico")
+            // 6) Chiama la funzione di generazione CSV appropriata in base al tipo di domande
+            if (tipoEsportazione == "Esito Bonus Idrico")
             {
                 // <PIVA_Utente>_BID_<AAAAMM>_EBI_<timestamp>_<progressivo>.csv
-                fileName = $"{p_iva}_BID_{dataCreazioneParsed:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
-                fileBytes = CsvGenerator.GeneraCsvBonusIdrico(datiDelReport); // Chiamata alla funzione specifica
+                fileName = $"{p_iva}_BID_{reportEsistente.DataCreazione:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
+                fileBytes = CsvGenerator.GeneraCsvBonusIdrico(domande); // Chiamata alla funzione specifica
             }
-            else if (tipoReport == "Esito Competenza Territoriale")
+            else if (tipoEsportazione == "Esito Competenza Territoriale")
             {
-                fileName = $"{p_iva}_BID_{dataCreazioneParsed:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
-                fileBytes = CsvGenerator.GeneraCsvCompetenzaTerritoriale(datiDelReport); // Chiamata alla funzione specifica
+                fileName = $"{p_iva}_BID_{reportEsistente.DataCreazione:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
+                fileBytes = CsvGenerator.GeneraCsvCompetenzaTerritoriale(domande); // Chiamata alla funzione specifica
             }
-            else if (tipoReport == "Siscom")
+            else if (tipoEsportazione == "Siscom")
             {
                 fileName = $"Esportazione Bonus Idrici {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
-                fileBytes = CsvGenerator.GeneraCsvSiscom(datiDelReport);
+                fileBytes = CsvGenerator.GeneraCsvSiscom(domande,serie);
             }
-            else if (tipoReport == "Debug")
+            else if (tipoEsportazione == "Debug")
             {
-                fileName = $"Debug Report {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
-                fileBytes = CsvGenerator.GeneraCsvDebug(datiDelReport);
+                fileName = $"Debug Domande {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
+                fileBytes = CsvGenerator.GeneraCsvDebug(domande,serie);
             }
             else
             {
-                return NotFound("Tipo di report non riconosciuto o non supportato per la generazione CSV.");
+                return NotFound("Tipo di domande non riconosciuto o non supportato per la generazione CSV.");
             }
 
-            // 4. Imposta l'header Content-Disposition
+            // 7) Imposta l'header Content-Disposition
             var contentDisposition = new System.Net.Mime.ContentDisposition
             {
                 FileName = fileName,
@@ -439,16 +358,15 @@ namespace Controllers
             };
             Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
 
-            // 5. Restituisci i byte come file
+            // 8) Restituisci i byte come file
             return File(fileBytes, contentType, fileName);
         }
 
-        // Funzione 2: Consente l'aggiornamento del valore di serie dei report
+        // Funzione 2: Consente l'aggiornamento del valore di serie dei domande
 
         [HttpPost]
-        public IActionResult UpdateSerie(int idEnte, string idAto, int serie)
+        public IActionResult UpdateSerie(int idReport, int serie)
         {
-            // logFile.LogInfo($"Sono dentro la funzione UpdateSerie.");
 
             // 1. Verfica la sessione
             if (!VerificaSessione())
@@ -457,37 +375,36 @@ namespace Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // logFile.LogInfo($"Dati ricevuti: Id Ente: {idEnte} | idAto {idAto} | Serie {serie}");
+            // 2. Verifico se idReport è 0 e se serie e valido
 
-            // 2. Mi ricavo i report presenti nel DB
-            var ReportTrovati = _context.Reports.Where(s => s.IdEnte == idEnte && s.idAto == idAto);
-
-            // 3. Verifico se non sono stati trovati dati nel DB
-
-            if (ReportTrovati == null)
+            if (idReport == 0 || serie < 0)
             {
-                return RedirectToAction("Index", "Home");
+                ViewBag.Message = "Id report o serie non è valido! Riprova";
+                return RedirectToAction("Index", "Report");
             }
 
-            // 4. Leggo tutti i report da Aggiornare
+            // 3. Verifico l'esistenza del report
 
-            foreach (var report in ReportTrovati)
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (reportEsistente == null)
             {
-                //  5) Aggiorno le proprietà
-                report.serie = serie;
-                report.DataAggiornamento = DateTime.Now;
+                ViewBag.Message = "Report non trovato! Riprova";
+                return RedirectToAction("Index", "Report");
             }
 
-            // 6) Salvo i cambiamenti
+            // 4. Aggiorno il report
+
+            reportEsistente.serie = serie;
+            reportEsistente.DataAggiornamento = DateTime.Now;
+
+            // 5) Salvo i cambiamenti
             _context.SaveChanges();
-            AccountController.logFile.LogInfo($"L'utente {username} ha effetuato una variazione del numero di serie per l'elaborazione INPS con idAto: {idAto} per l'ente con id {idEnte}");
-            
-            // 7) Torno alla pagina principale
-            // return RedirectToAction("Dettails", "Report", new { selectedEnteId = idEnte, data = dataCreazione });
-            return RedirectToAction("Show", "Report", new { selectedEnteId = idEnte });
+
+            // 6) Torno alla pagina principale
+            return RedirectToAction("Show", "Report", new { selectedEnteId = reportEsistente.idEnte });
         }
 
-        // Funzione 3: Consente l'aggiornamento dei dati di un report
+        // Funzione 3: Consente l'aggiornamento dati relativi ad una domanda
         [HttpPost]
         public IActionResult Update(int id, string codiceFiscaleRichiedente, string cognome, string nome, string esitoStr, string esito)
         {
@@ -501,43 +418,42 @@ namespace Controllers
             // 2) Verifico che id non sia <= 0
             if (id <= 0)
             {
-                ViewBag.Message = "Id non valido";
+                ViewBag.Message = "Id non valido!";
                 return RedirectToAction("Index", "Report");
             }
 
-            // 3) Mi ricavo il report da aggiornare
+            // 3) Mi ricavo il domande da aggiornare
 
-            var report = _context.Reports.FirstOrDefault(s => s.id == id);
+            var domandaEsistente = _context.Domande.FirstOrDefault(s => s.id == id);
 
-            // 4) verifico che il report non è presente nel db
-            if (report == null)
+            // 4) verifico che il domande non è presente nel db
+            if (domandaEsistente == null)
             {
-                ViewBag.Message = "Report non trovato nel db";
+                ViewBag.Message = "Domande non trovato nel db";
                 return RedirectToAction("Index", "Report");
             }
 
-            AccountController.logFile.LogInfo($"L'utente {username} ha effetuato una variazione della domanda di bonus con id {report.id} è codice bonus {report.codiceBonus}");
-            AccountController.logFile.LogInfo($"Prima: {report.ToString()}");
+            //AccountController.logFile.LogInfo($"L'utente {username} ha effetuato una variazione della domanda di bonus con id {domande.id} è codice bonus {domande.codiceBonus}");
+            //AccountController.logFile.LogInfo($"Prima: {domande.ToString()}");
             // 5) Aggiorno i vari campi
 
-            // report.idFornitura = idFornitura;
-            if (codiceFiscaleRichiedente != report.codiceFiscaleRichiedente)
+            if (codiceFiscaleRichiedente != domandaEsistente.codiceFiscaleRichiedente)
             {
-                report.codiceFiscaleRichiedente = codiceFiscaleRichiedente;
+                domandaEsistente.codiceFiscaleRichiedente = codiceFiscaleRichiedente;
             }
-            report.cognomeDichiarante = cognome;
-            report.nomeDichiarante = nome;
-            report.esitoStr = esitoStr;
-            report.esito = esito;
-            report.DataAggiornamento = DateTime.Now;
+            domandaEsistente.cognomeDichiarante = cognome;
+            domandaEsistente.nomeDichiarante = nome;
+            domandaEsistente.esitoStr = esitoStr;
+            domandaEsistente.esito = esito;
+            domandaEsistente.DataAggiornamento = DateTime.Now;
 
             // 6) Salvo le modifiche sul db
             _context.SaveChanges();
-            AccountController.logFile.LogInfo($"Dopo: {report.ToString()}");
+            //AccountController.logFile.LogInfo($"Dopo: {domandeEsistente.ToString()}");
 
             // 7) Ritorno alla pagina details
-            return Dettails(report.IdEnte, report.DataCreazione);
-            //return RedirectToAction("Details", "Report", new {selectedEnteId = report.id, data = report.DataCreazione});
+            // return Dettails(domandeEsistente.idReport);
+            return RedirectToAction("Dettails", "Report", new { idReport = domandaEsistente.idReport });
         }
 
         // Fine - Funzioni

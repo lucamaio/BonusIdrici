@@ -4497,7 +4497,7 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 		// Halve the iteration target value to prevent interference from CSS upper bounds (gh-2144)
 		initial = initial / 2;
 
-		// Trust units reported by jQuery.css
+		// Trust units domandeed by jQuery.css
 		unit = unit || initialInUnit[ 3 ];
 
 		// Iteratively approximate from a nonzero starting point
@@ -6304,7 +6304,7 @@ var rboxStyle = new RegExp( cssExpand.join( "|" ), "i" );
 		pixelBoxStylesVal = roundPixelMeasures( divStyle.right ) === 36;
 
 		// Support: IE 9 - 11 only
-		// Detect misreporting of content dimensions for box-sizing:border-box elements
+		// Detect misdomandeing of content dimensions for box-sizing:border-box elements
 		boxSizingReliableVal = roundPixelMeasures( divStyle.width ) === 36;
 
 		// Support: IE 9 only
@@ -6364,8 +6364,8 @@ var rboxStyle = new RegExp( cssExpand.join( "|" ), "i" );
 		},
 
 		// Support: IE 9 - 11+, Edge 15 - 18+
-		// IE/Edge misreport `getComputedStyle` of table rows with width/height
-		// set in CSS while `offset*` properties report correct values.
+		// IE/Edge misdomande `getComputedStyle` of table rows with width/height
+		// set in CSS while `offset*` properties domande correct values.
 		// Behavior in IE 9 is more subtle than in newer versions & it passes
 		// some versions of this test; make sure not to make it pass there!
 		//
@@ -6678,8 +6678,8 @@ function getWidthOrHeight( elem, dimension, extra ) {
 	if ( ( !support.boxSizingReliable() && isBorderBox ||
 
 		// Support: IE 10 - 11+, Edge 15 - 18+
-		// IE/Edge misreport `getComputedStyle` of table rows with width/height
-		// set in CSS while `offset*` properties report correct values.
+		// IE/Edge misdomande `getComputedStyle` of table rows with width/height
+		// set in CSS while `offset*` properties domande correct values.
 		// Interestingly, in some cases IE 9 doesn't suffer from this issue.
 		!support.reliableTrDimensions() && nodeName( elem, "tr" ) ||
 
@@ -6688,7 +6688,7 @@ function getWidthOrHeight( elem, dimension, extra ) {
 		val === "auto" ||
 
 		// Support: Android <=4.1 - 4.3 only
-		// Also use offsetWidth/offsetHeight for misreported inline dimensions (gh-3602)
+		// Also use offsetWidth/offsetHeight for misdomandeed inline dimensions (gh-3602)
 		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) &&
 
 		// Make sure the element is visible & connected
@@ -7459,7 +7459,7 @@ function Animation( elem, properties, options ) {
 				deferred.notifyWith( elem, [ animation, 1, 0 ] );
 			}
 
-			// Resolve the animation and report its conclusion
+			// Resolve the animation and domande its conclusion
 			deferred.resolveWith( elem, [ animation ] );
 			return false;
 		},

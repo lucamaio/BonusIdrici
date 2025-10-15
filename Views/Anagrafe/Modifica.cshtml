@@ -9,7 +9,7 @@
     var componentiNucleo = dichiarante.NumeroComponenti;
 }
 
-<div class="report-page container my-5">
+<div class="domande-page container my-5">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-11">
             <div class="modern-card shadow rounded-4 border-0">
@@ -219,7 +219,7 @@
                                         <div class="row row-cols-1 row-cols-md-3 g-4">
                                            <div class="col">
                                                 <label for="presenzaPod" class="form-label">Presenza POD</label>
-                                                <input type="text" class="form-control readonly-field" id="presenzaPod" name="presenzaPod" value="@report.presenzaPod" readonly>
+                                                <input type="text" class="form-control readonly-field" id="presenzaPod" name="presenzaPod" value="@domande.presenzaPod" readonly>
                                             </div>
                                             <div class="col">
                                                 <label for="esitoStr" class="form-label">Esito STR</label>
@@ -232,7 +232,7 @@
                                             </div>
                                             <div class="col">
                                                 <label for="esito" class="form-label">Esito *</label>
-                                                <input class="form-control" type="number" id="esito" name="esito" min="1" max="4" value="@report.esito" required>
+                                                <input class="form-control" type="number" id="esito" name="esito" min="1" max="4" value="@domande.esito" required>
                                             </div>
                                         </div>
                                     </div>

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BonusIdrici2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250723144153_FixReportNumeroComponentiType")]
-    partial class FixReportNumeroComponentiType
+    [Migration("20250723144153_FixDomandeNumeroComponentiType")]
+    partial class FixDomandeNumeroComponentiType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,7 +72,7 @@ namespace BonusIdrici2.Migrations
                     b.ToTable("enti", (string)null);
                 });
 
-            modelBuilder.Entity("Models.Report", b =>
+            modelBuilder.Entity("Models.Domande", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -165,7 +165,7 @@ namespace BonusIdrici2.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("reports", (string)null);
+                    b.ToTable("domande", (string)null);
                 });
 
             modelBuilder.Entity("Models.UtenzaIdrica", b =>

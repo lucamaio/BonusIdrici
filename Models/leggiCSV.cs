@@ -16,13 +16,15 @@ namespace leggiCSV
 
         public int? countIndirizziMalFormati { get; set; }
         
-        public List<Report> reports { get; set; }
+        public List<Domanda> domande { get; set; }
 
-        public List<Report> reportsDaAggiornare { get; set; }
+        public List<Domanda> domandeDaAggiornare { get; set; }
 
         public List<Toponimo> Toponimi { get; set; }
 
         public List<Toponimo> ToponimiDaAggiornare { get; set; }
+
+        public List<Report> Reports {get;set;}
 
         public DatiCsvCompilati() // Costruttore per inizializzare le liste
         {
@@ -34,13 +36,15 @@ namespace leggiCSV
 
             UtenzeIdricheEsistente = new List<UtenzaIdrica>();
 
-            reports = new List<Report>();
+            domande = new List<Domanda>();
 
-            reportsDaAggiornare = new List<Report>();
+            domandeDaAggiornare = new List<Domanda>();
 
             Toponimi = new List<Toponimo>();
 
             ToponimiDaAggiornare = new List<Toponimo>();
+
+            Reports = new List<Report>();
 
             countIndirizziMalFormati = null;
         }

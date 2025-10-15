@@ -37,8 +37,8 @@ body.dark-mode a {
   color: #032f81 !important;
 }
 
-/* === SOLO PER VARIA REPORT === */
-.report-page .modern-card {
+/* === SOLO PER VARIA DOMANDE === */
+.domande-page .modern-card {
   background: #fff;
   border-radius: 1rem;
   overflow: hidden;
@@ -46,10 +46,10 @@ body.dark-mode a {
   transition: transform 0.2s ease;
 }
 
-/* .report-page .modern-card:hover {
+/* .domande-page .modern-card:hover {
   transform: translateY(-3px);
 } */
-.report-page .modern-card-header {
+.domande-page .modern-card-header {
   background: linear-gradient(135deg, #032f81, #113f94);
   color: white;
   padding: 1.2rem;
@@ -58,25 +58,25 @@ body.dark-mode a {
   font-size: 1.25rem;
 }
 
-.report-page .modern-card-body {
+.domande-page .modern-card-body {
   padding: 2rem;
 }
 
 /* Campi input */
-.report-page .form-control {
+.domande-page .form-control {
   border-radius: 0.6rem;
   border: 1px solid #dee2e6;
   padding: 0.65rem 0.75rem;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.report-page .form-control:focus {
+.domande-page .form-control:focus {
   border-color: #032f81;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
 }
 
 /* Readonly evidenziati */
-.report-page .readonly-field {
+.domande-page .readonly-field {
   background: #f8f9fa;
   border: 1px dashed #ced4da;
   color: #6c757d;
@@ -84,33 +84,33 @@ body.dark-mode a {
 }
 
 /* Label e note */
-.report-page .form-label {
+.domande-page .form-label {
   font-weight: 500;
   margin-bottom: 0.4rem;
 }
 
-.report-page .note {
+.domande-page .note {
   font-size: 0.8rem;
   color: #6c757d;
   font-weight: 400;
 }
 
 /* Pulsanti */
-.report-page .btn {
+.domande-page .btn {
   padding: 0.65rem 1.2rem;
   font-weight: 500;
 }
 
-.report-page .btn-primary {
+.domande-page .btn-primary {
   background: linear-gradient(135deg, #032f81, #113f94) !important;
   border: none !important;
 }
 
-.report-page .btn-outline-secondary {
+.domande-page .btn-outline-secondary {
   border: 1px solid #ced4da;
 }
 
-.report-page .btn-outline-secondary:hover {
+.domande-page .btn-outline-secondary:hover {
   background: #f1f1f1;
 }
 
@@ -257,7 +257,7 @@ S .page-header {
   fill: #fff;
 }
 
-.header-report {
+.header-domande {
   background: linear-gradient(90deg, rgb(212, 8, 32), rgb(161, 11, 19));
   color: #fff;
   fill: #fff;
@@ -333,7 +333,7 @@ S .page-header {
   fill: #113f94 !important;
 }
 
-.text-report {
+.text-domande {
   color: rgb(212, 8, 32);
   fill: rgb(212, 8, 32);
 }
@@ -349,7 +349,7 @@ S .page-header {
   border-color: #146c43 !important;
 } */
 
-.btn-report {
+.btn-domande {
   background-color: rgb(212, 8, 32);
   color: #fff;
 }
@@ -739,3 +739,14 @@ S .page-header {
 #suggestions li:hover {
   background: #f0f0f0;
 }
+ /* Altezza e larghezza uniformi per tutti gli input/select della sezione */
+        .uniform-input {
+            height: 3.2rem !important;
+            font-size: 1rem;
+        }
+
+        /* Stesso comportamento su focus per coerenza visiva */
+        .uniform-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }

@@ -440,7 +440,7 @@ namespace Controllers
                 }
                 else
                 {
-                    ViewBag.Message = ViewBag.Message + $"Sono stati trovati {datiComplessivi.countIndirizziMalFormati} indirizzi malformati si consiglia di andare ad aggiornare i toponimi in modo tale da prevenire eventuali incongruenze durante la generazione dei report";
+                    ViewBag.Message = ViewBag.Message + $"Sono stati trovati {datiComplessivi.countIndirizziMalFormati} indirizzi malformati si consiglia di andare ad aggiornare i toponimi in modo tale da prevenire eventuali incongruenze durante la generazione dei domande";
                 }
             }
             catch (Exception ex)

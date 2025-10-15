@@ -151,7 +151,7 @@ namespace BonusIdrici2.Migrations
                     b.ToTable("enti", (string)null);
                 });
 
-            modelBuilder.Entity("Models.Report", b =>
+            modelBuilder.Entity("Models.Domande", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -244,7 +244,7 @@ namespace BonusIdrici2.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("reports", (string)null);
+                    b.ToTable("domande", (string)null);
                 });
 
             modelBuilder.Entity("Models.UtenzaIdrica", b =>

@@ -6,22 +6,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BonusIdrici2.Migrations
 {
     /// <inheritdoc />
-    public partial class FixReportNumeroComponentiType : Migration
+    public partial class FixDomandeNumeroComponentiType : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
                 name: "data_fine",
-                table: "reports");
+                table: "domande");
 
             migrationBuilder.DropColumn(
                 name: "data_inzio",
-                table: "reports");
+                table: "domande");
 
             migrationBuilder.AlterColumn<int>(
                 name: "numero_componenti",
-                table: "reports",
+                table: "domande",
                 type: "int",
                 nullable: true,
                 oldClrType: typeof(string),
@@ -29,7 +29,7 @@ namespace BonusIdrici2.Migrations
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "data_creazione",
-                table: "reports",
+                table: "domande",
                 type: "datetime(6)",
                 nullable: true);
 
@@ -45,7 +45,7 @@ namespace BonusIdrici2.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "data_creazione",
-                table: "reports");
+                table: "domande");
 
             migrationBuilder.DropColumn(
                 name: "patitaIVA",
@@ -53,7 +53,7 @@ namespace BonusIdrici2.Migrations
 
             migrationBuilder.AlterColumn<string>(
                 name: "numero_componenti",
-                table: "reports",
+                table: "domande",
                 type: "longtext",
                 nullable: false,
                 defaultValue: "",
@@ -63,13 +63,13 @@ namespace BonusIdrici2.Migrations
 
             migrationBuilder.AddColumn<string>(
                 name: "data_fine",
-                table: "reports",
+                table: "domande",
                 type: "longtext",
                 nullable: false);
 
             migrationBuilder.AddColumn<string>(
                 name: "data_inzio",
-                table: "reports",
+                table: "domande",
                 type: "longtext",
                 nullable: false);
         }

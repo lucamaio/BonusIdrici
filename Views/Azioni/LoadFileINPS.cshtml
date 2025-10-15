@@ -1,92 +1,158 @@
-@* Consolidato i due blocchi ViewData["Title"] in uno solo per chiarezza *@
 @{
     ViewData["Title"] = "Genera Risultati";
+    var mesi = ViewBag.Mesi;
 }
 
-<div class="container my-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow rounded-4 border-0">
-                <div class="card-header header-classic text-white text-center rounded-top-4">
-                    <h3 class="mb-0">Carica il file INPS</h3>
+        <div class="col-xl-10 col-lg-11">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                <!-- HEADER -->
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-upload me-2"></i>Carica il File INPS
+                    </h3>
                 </div>
-                <div class="card-body p-4">
-                    <form asp-controller="Azioni" asp-action="LoadFileINPS" method="post" enctype="multipart/form-data" onsubmit="showLoader()">
-                        
-                        @* --- INIZIO AGGIUNTA SELECT ENTE QUI --- *@
-                        <div class="mb-3">
-                            <label for="selectedEnteId" class="form-label">Seleziona l'Ente</label>
-                            <select id="selectedEnteId" name="selectedEnteId" class="form-select" required>
-                                <option value="">-- Seleziona un Ente --</option>
-                                @if (ViewBag.Enti != null)
-                                {
-                                    foreach (var ente in ViewBag.Enti)
+
+                <!-- BODY -->
+                <div class="card-body bg-light p-5">
+                    <form asp-controller="Azioni"
+                          asp-action="LoadFileINPS"
+                          method="post"
+                          enctype="multipart/form-data"
+                          onsubmit="showLoader()">
+
+                        <!-- DATI PRINCIPALI -->
+                        <h5 class="mb-3 text-secondary fw-semibold">
+                            <i class="bi bi-building me-2"></i>Dati di Generazione
+                        </h5>
+
+                        <div class="row g-4 align-items-end">
+                            <!-- ENTE -->
+                            <div class="col-md-4">
+                                <label for="selectedEnteId" class="form-label fw-semibold">Ente</label>
+                                <select id="selectedEnteId" name="selectedEnteId" class="form-select form-select-lg uniform-input" required>
+                                    <option value="">-- Seleziona un Ente --</option>
+                                    @if (ViewBag.Enti != null)
                                     {
-                                        <option value="@ente.id">@ente.nome</option>
+                                        foreach (var ente in ViewBag.Enti)
+                                        {
+                                            <option value="@ente.id">@ente.nome</option>
+                                        }
                                     }
-                                }
-                            </select>
+                                </select>
+                            </div>
+
+                            <!-- MESE -->
+                            <div class="col-md-4">
+                                <label for="mese" class="form-label fw-semibold">Mese</label>
+                                <select id="mese" name="mese" class="form-select form-select-lg uniform-input" required>
+                                    <option value="">-- Mese --</option>
+                                    @if (mesi != null)
+                                    {
+                                        foreach (var mese in mesi)
+                                        {
+                                            <option value="@mese">@mese</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- ANNO -->
+                            <div class="col-md-4">
+                                <label for="anno" class="form-label fw-semibold">Anno</label>
+                                <input type="text"
+                                       id="anno"
+                                       name="anno"
+                                       class="form-control form-control-lg text-center uniform-input"
+                                       minlength="4"
+                                       maxlength="4"
+                                       value="@DateTime.Now.Year"
+                                       required />
+                            </div>
                         </div>
-                        @* --- FINE AGGIUNTA SELECT ENTE QUI --- *@
 
-                        <div class="mb-3">
-                            <label for="csv_file" class="form-label">Seleziona file INPS</label>
-                            <input type="file" name="csv_file" class="form-control" required accept=".csv">
+                        <hr class="my-5">
+
+                        <!-- FILE UPLOAD -->
+                        <h5 class="mb-3 text-secondary fw-semibold">
+                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Caricamento File
+                        </h5>
+
+                        <div class="mb-4">
+                            <label for="csv_file" class="form-label fw-semibold">File CSV INPS</label>
+                            <input type="file"
+                                   id="csv_file"
+                                   name="csv_file"
+                                   class="form-control form-control-lg"
+                                   required
+                                   accept=".csv" />
                         </div>
 
-                      <div class="mb-3">
-                        <label for="serie" class="form-label">Serie</label>
-                        <input type="number" id="serie" name="serie" min="0" max="5" class="form-control">
-                    </div>
-
-                    <div class="mb-3">
-                        <input type="checkbox" id="confrontoCivico" name="confrontoCivico" class="form-check-input" value="true">
-                        <label for="confrontoCivico" class="form-check-label">Confronta numero civico</label>
-                    </div>
-
-                    <div class="mb-3">
-                        <input type="checkbox" id="escludiComponenti" name="escludiComponenti" class="form-check-input" value="true">
-                        <label for="escludiComponenti" class="form-check-label">
-                            Escludi eventuali incongruenze relative al numero dei componenti del nucleo familiare
-                        </label>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="info-text mt-2">
-                            Indicare il numero di fatture annuali per ciascuna persona. <br><br>
-                            • Se la fatturazione avviene una sola volta all’anno, impostare il valore su <strong>0</strong>. <br><br>
-                            • Se il campo viene lasciato vuoto, il sistema utilizzerà automaticamente la serie di default associata alla scheda dell’ente. <br><br>
-                            • Qualora la serie di default non coincida con quella reale, è sempre possibile modificarla all’interno della pagina <em>Dettagli Report</em>. <br><br>
-                            • Se si seleziona l’opzione <strong>Confronta numero civico</strong>, il sistema confronterà anche il numero civico durante la generazione dei risultati.<br><br>
-                            • Selezionando l’opzione <strong>Escludi incongruenze componenti</strong>, il sistema ignorerà eventuali discrepanze relative al numero dei componenti del nucleo.Eventuali divergenza non saranno segnalate nel report.<br><br>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <label for="serie" class="form-label fw-semibold">Serie</label>
+                                <input type="number" id="serie" name="serie" min="0" max="5" class="form-control form-control-lg" />
+                            </div>
                         </div>
-                    </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-classic">Carica File</button>
+                        <hr class="my-5">
+
+                        <!-- OPZIONI -->
+                        <h5 class="mb-3 text-secondary fw-semibold">
+                            <i class="bi bi-sliders me-2"></i>Opzioni Aggiuntive
+                        </h5>
+
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="confrontoCivico" name="confrontoCivico" class="form-check-input" value="true" />
+                            <label for="confrontoCivico" class="form-check-label">Confronta numero civico</label>
                         </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" id="escludiComponenti" name="escludiComponenti" class="form-check-input" value="true" />
+                            <label for="escludiComponenti" class="form-check-label">
+                                Escludi incongruenze relative al numero dei componenti del nucleo familiare
+                            </label>
+                        </div>
+
+                        <!-- NOTE -->
+                        <div class="alert alert-secondary mt-4 border-start border-4 border-primary">
+                            <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Indicazioni Utili</h6>
+                            <ul class="mb-0 small">
+                                <li>Se la fatturazione è annuale, impostare il valore su <strong>0</strong>.</li>
+                                <li>Se il campo “Serie” è vuoto, verrà usata la serie predefinita dell’ente.</li>
+                                <li>Le modifiche possono essere effettuate nella sezione <em>Dettagli Domande</em>.</li>
+                                <li>Le opzioni sopra influenzano i controlli sui dati anagrafici e composizione familiare.</li>
+                            </ul>
+                        </div>
+
+                        <!-- SUBMIT -->
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="bi bi-cloud-upload me-2"></i>Carica e Genera
+                            </button>
+                        </div>
+
+                        <!-- LOADER -->
+                        <div id="loader" class="text-center mt-4" style="display:none;">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-3 text-muted">Elaborazione in corso, attendere...</p>
+                        </div>
+
+                        <!-- MESSAGGIO -->
+                        @if (!string.IsNullOrEmpty(ViewBag.Message))
+                        {
+                            <div class="alert alert-info mt-4 text-center" role="alert">
+                                @ViewBag.Message
+                            </div>
+                        }
                     </form>
-
-                    <div id="loader" class="text-center mt-3" style="display:none;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Caricamento...</span>
-                        </div>
-                        <p class="mt-2">Elaborazione in corso, attendere...</p>
-                    </div>
-
-
-                    @if (!string.IsNullOrEmpty(ViewBag.Message))
-                    {
-                        <div class="alert alert-info mt-3" role="alert">
-                            @ViewBag.Message
-                        </div>
-                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @section Scripts {
     <script>
         function showLoader() {

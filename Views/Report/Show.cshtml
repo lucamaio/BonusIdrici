@@ -1,10 +1,10 @@
-@model IEnumerable<Models.ViewModels.RiepilogoDatiViewModel>
+@model IEnumerable<Models.ViewModels.ReportViewModel>
 @{
     ViewData["Title"] = "Riepilogo Dati Ente";
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
     var ruolo = ViewBag.Ruolo;
-    var reports = ViewBag.Report;
+    var Reports = ViewBag.Reports;
 }
 
 <div class="container-xxl flex-grow-1 py-5">
@@ -12,7 +12,7 @@
         <!-- Header -->
         <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
             <h3 class="mb-1 fw-bold">
-                <i class="bi bi-building me-2"></i> Report Disponibili - 
+                <i class="bi bi-building me-2"></i> Domande Disponibili - 
                 <span class="fw-semibold">@selectedEnteNome</span>
             </h3>
             <small>ID Ente: @selectedEnteId</small>
@@ -25,43 +25,41 @@
 
         <!-- Body -->
         <div class="card-body p-4">
-            @if (reports != null)
+            @if (Reports != null)
             {
-                <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i report correlati.</p>
+                <p class="lead mb-4 text-muted">Seleziona una data di inserimento per scaricare i domande correlati.</p>
 
                 <div class="table-responsive">
-                    <table id="elencoReport" class="table table-hover align-middle border-bottom">
+                    <table id="elencoDomande" class="table table-hover align-middle border-bottom">
                         <thead>
                             <tr>
-                                <th class="text-center">ID ATO</th>
+                                <th class="text-center">Elaborazione</th>
                                 <th class="text-center">Data Elaborazione</th>
-                                <th class="text-center">Elabotato da</th>
-                                <th class="text-center">Anno Validità</th>
+                                <th class="text-center">Stato</th>
+                                <th class="text-center">Serie</th>
                                 <th class="text-center">Numero Record</th>
+                                <th class="text-center">Elabotato da</th>
                                 <th class="text-center">Azioni</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var report in reports)
+                            @foreach (var report in Reports)
                             {
                                 var dataUrl = report.DataCreazione.ToString("yyyy-MM-dd HH:mm:ss");
-
+                                var esportatoda = report.mese + " " + report.anno;
                                   <tr>
-                                    <td class="text-center"><span>@report.idAto</span></td>
+                                    <td class="text-center"><span>@esportatoda</span></td>
                                     <td class="text-center"><span>@dataUrl</span></td>
-                                    <td class="text-center"><span>@report.Username</span></td>
-                                    <td class="text-center"><span>@report.annoValidita</span></td>
+                                    <td class="text-center"><span>@report.stato</span></td>
+                                    <td class="text-center"><span>@report.serie</span></td>
                                     <td class="text-center"><span>@report.count</span></td>
-                                    @* <td>
-                                        <span class="badge bg-label-primary rounded-pill px-3 py-2" style="color: #000">
-                                            @report.Count
-                                        </span>
-                                    </td> *@
+                                    <td class="text-center"><span>@report.Username</span></td>
+                                    
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center gap-2">
                                             <!-- Pulsante Dettaglio -->
                                             <a class="btn btn-sm btn-light border" 
-                                            href="@Url.Action("Dettails", new { selectedEnteId = selectedEnteId, data = dataUrl })"
+                                            href="@Url.Action("Dettails", new { idReport = report.id })"
                                             title="Visualizza dettaglio report">
                                                 <i class="bi bi-eye text-primary"></i>
                                             </a>
@@ -72,29 +70,34 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li>
-                                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv",  new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Bonus Idrico" })">
+                                                        <a class="dropdown-item" href="@Url.Action("VariaSerie", "Report",  new {idReport = report.id})">
+                                                            Varia Serie
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv",  new { idReport = report.id, tipoEsportazione = "Esito Bonus Idrico" })">
                                                             <i class="bi bi-download me-2 text-anagrafe"></i> Esito Bonus Idrico
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Esito Competenza Territoriale" })">
-                                                            <i class="bi bi-download me-2 text-report"></i> Competenza Territoriale
+                                                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = report.id, tipoEsportazione = "Esito Competenza Territoriale" })">
+                                                            <i class="bi bi-download me-2 text-domande"></i> Competenza Territoriale
                                                         </a>
                                                     </li>
                                                     @if( ruolo == "ADMIN"){
                                                         <li>
-                                                            <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Siscom" })">
+                                                            <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = report.id, tipoEsportazione = "Siscom" })">
                                                                 <i class="bi bi-download me-2 text-utenza"></i> File Siscom
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { enteId = selectedEnteId, DataCreazione = dataUrl, tipoReport = "Debug" })">
+                                                            <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = report.id, tipoEsportazione = "Debug" })">
                                                                 <i class="bi bi-download me-2 text-info"></i> Debug
                                                             </a>
                                                         </li>
                                                     }
                                                 </ul>
-                                            </div>
+                                            </div> 
                                         </div>
                                     </td>
                                 </tr>

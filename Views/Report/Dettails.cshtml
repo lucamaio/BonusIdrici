@@ -1,16 +1,11 @@
-@model IEnumerable<Models.ViewModels.RiepilogoDatiViewModel>
-
 @{
-    ViewData["Title"] = "Riepilogo Report";
-    var idEnte = ViewBag.SelectedEnteId;
-    var selectedEnteNome = ViewBag.SelectedEnteNome;
-
-    DateTime? data1 =ViewBag.Data != null ? ViewBag.Data : Model != null && Model.Any() ?  Model.First().DataCreazione : null;
-    string? data =  ViewBag.Data != null ? ViewBag.Data.ToString("dd/MM/yyyy HH:mm:ss") : null;
-
+    ViewData["Title"] = "Riepilogo Domande";
+    var idEnte = ViewBag.SelectedEnteId ?? "ND";
+    var nomeEnte = ViewBag.nomeEnte ?? "ND";
     var ruolo = ViewBag.Ruolo;
-    string? idAto = ViewBag.idAto != null ? ViewBag.idAto : Model != null && Model.Any() ? Model.First().idAto : (string?) null;
-    
+
+    var domande = ViewBag.Domande;
+    var elaborazione = ViewBag.ElaborazioneDel;
 }
 
 <div class="container-xxl flex-grow-1 py-5">
@@ -18,16 +13,12 @@
         <!-- Header -->
         <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
             <h3 class="mb-1 fw-bold">
-                <i class="bi bi-building me-2"></i> Dattagli Report - 
+                <i class="bi bi-building me-2"></i> Dattagli Domande Elaborazione -
                 <span class="fw-semibold">
-                    @if(data != null){
-                        @data;
-                    }else{
-                       @idAto;
-                    }
+                   @elaborazione
                 </span>
             </h3>
-            <small>Ente: @selectedEnteNome</small>
+            <small>Ente: @nomeEnte</small> 
         </div>
 
         <!-- Barra di caricamento -->
@@ -37,7 +28,7 @@
 
         <!-- Body -->
         <div class="card-body p-4">
-            @if (Model != null && Model.Any())
+            @if (domande != null && domande.Count > 0)
             {
                 <div style="background-color: #f8f9fa; border-radius: 12px;">
                         <div class="row g-3">
@@ -58,9 +49,8 @@
                                 <div class="card border-0 shadow-sm text-center">
                                     <div class="card-body">
                                         <i class="fa-solid fa-xmark fa-2x text-danger mb-2"></i>
-                                        @* <i class="fa-solid fa-check-to-slot fa-2x text-success mb-2"></i> *@
                                         <h6>Incongruenze Trovate</h6>
-                                        <h4>@ViewBag.IncongruenzeTrovate</h4>
+                                        <h4>@ViewBag.incongruenze</h4>
                                     </div>
                                 </div>
                             </div>
@@ -70,7 +60,7 @@
                                     <div class="card-body">
                                         <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
                                         <h6>Domande Esito 1</h6>
-                                        <h4>@ViewBag.TotaleAccettate</h4>
+                                        <h4>@ViewBag.DomandeValide</h4>
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +73,7 @@
                                     <div class="card-body">
                                         <i class="fa-solid fa-lightbulb fa-2x text-primary mb-2"></i>
                                         <h6>Esito 2</h6>
-                                        <h4>@ViewBag.TotaleEsito2</h4>
+                                        <h4>@ViewBag.DomandeEsito2</h4>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +84,7 @@
                                     <div class="card-body">
                                         <i class="fa-solid fa-exclamation-triangle fa-2x text-warning mb-2"></i>
                                         <h6>Esito 3</h6>
-                                        <h4>@ViewBag.TotaleEsito3</h4>
+                                        <h4>@ViewBag.DomandeEsito3</h4>
                                     </div>
                                 </div>
                             </div>
@@ -105,7 +95,7 @@
                                     <div class="card-body">
                                         <i class="fa-solid fa-times-circle fa-2x text-danger mb-2"></i>
                                         <h6>Esito 4</h6>
-                                        <h4>@ViewBag.TotaleEsito4</h4>
+                                        <h4>@ViewBag.DomandeEsito4</h4>
                                     </div>
                                 </div>
                             </div>
@@ -113,11 +103,11 @@
                 </div>
                  
                 <hr class="my-4" />
-                 <p class="lead mb-4 text-muted">Consulta tutte le domande relative al Report selezionato</p>
+                 <p class="lead mb-4 text-muted">Consulta tutte le domande relative al Domande selezionato</p>
                  <br>
 
                 <div class="table-responsive">
-                    <table id="dettagliReportTable" class="table table-hover align-middle border-bottom">
+                    <table id="dettagliDomandeTable" class="table table-hover align-middle border-bottom">
                         <thead>
                             <tr>
                                  <th class="text-center">idAto</th>
@@ -128,40 +118,38 @@
                                 <th class="text-center">Esito str</th>
                                 <th class="text-center">Esito</th>
                                 <th class="text-center">Incongruente</th>
-                                @* <th class="text-center">Serie</th>
-                                <th class="text-center">MC</th> *@
                                 <th class="text-center">Azioni</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model)
+                            @foreach (var domanda in domande)
                             {
                                 <tr>
-                                    <td class="text-center"><span>@item.idAto</span></td>
-                                     <td class="fw-semibold text-center"><span >@item.codiceBonus</span></td>
-                                    <td class="fw-semibold text-center"><span>@item.codiceFiscale</span></td>
-                                    <td class="text-center"><span>@item.idFornitura</span></td>
-                                    <td class="text-center"><span>@item.numeroComponenti</span></td>
+                                    <td class="text-center"><span>@domanda.idAto</span></td>
+                                     <td class="fw-semibold text-center"><span >@domanda.codiceBonus</span></td>
+                                    <td class="fw-semibold text-center"><span>@domanda.codiceFiscaleRichiedente</span></td>
+                                    <td class="text-center"><span>@domanda.idFornitura</span></td>
+                                    <td class="text-center"><span>@domanda.numeroComponenti</span></td>
                                     <td class="text-center">
-                                            @if (string.IsNullOrEmpty(item.esitoStr))
+                                            @if (string.IsNullOrEmpty(domanda.esitoStr))
                                             {
                                                 <span class="badge bg-secondary">N/A</span>
                                             }
-                                            else if (item.esitoStr.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                                            else if (domanda.esitoStr.Equals("Si", StringComparison.OrdinalIgnoreCase))
                                             {
                                                 <span class="badge bg-success">Si</span>
                                             }
-                                            else if (item.esitoStr.Equals("No", StringComparison.OrdinalIgnoreCase))
+                                            else if (domanda.esitoStr.Equals("No", StringComparison.OrdinalIgnoreCase))
                                             {
                                                 <span class="badge bg-danger">No</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-warning text-dark">@item.esitoStr</span>
+                                                <span class="badge bg-warning text-dark">@domanda.esitoStr</span>
                                             }
                                     </td>
                                     <td class="text-center">
-                                        @switch (item.esito)
+                                        @switch (domanda.esito)
                                         {
                                             case "01":
                                                 <span class="badge bg-success">1</span>
@@ -181,11 +169,11 @@
                                         }
                                     </td>
                                     <td class="text-center">
-                                         @if (item.incongruenze == false)
+                                         @if (domanda.incongruenze == false)
                                             {
                                                 <span class="badge bg-danger">Falso</span>
                                             }
-                                            else if (item.incongruenze == true)
+                                            else if (domanda.incongruenze == true)
                                             {
                                                 <span class="badge bg-success">Vero</span>
                                             }
@@ -194,11 +182,9 @@
                                                 <span class="badge bg-secondary">N/A</span>
                                             }
                                     </td>
-                                    @* <td class="text-center"><span>@item.serie</span></td>
-                                    <td class="text-center"><span>@item.mc</span></td> *@
                                     <td class="text-center">
                                         <a class="btn btn-sm btn-light border me-1" title="Varia"
-                                            href="@Url.Action("Varia", "Report", new { id = item.id })">
+                                            href="@Url.Action("Varia", "Report", new { id = domanda.id })">
                                             <i class="bi bi-pencil-square text-primary"></i>
                                         </a>
                                     </td>
@@ -244,23 +230,13 @@
                     }
                 }, 300);
                 
-            var dettagliTable = $('#dettagliReportTable').DataTable({
+            var dettagliTable = $('#dettagliDomandeTable').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
                 responsive: true,
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end report"p>>',
-                buttons: [
-                    {
-                        text: '<i class="bi bi-plus-circle me-1"></i> Varia Serie',
-                        className: 'btn btn-sm btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("VariaSerie", "Report")'
-                                + '?idEnte=@idEnte&idAto=@idAto';
-                        }
-                    }
-                ],
+                //dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
             }); 
             dettagliTable.on('init', function () {
                 clearInterval(interval);

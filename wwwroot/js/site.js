@@ -32,19 +32,19 @@
         }
     }, 300);
 
-    // Tabella Report
+    // Tabella Domande
 
-    var reportTable = $('#elencoReport').DataTable({
+    var domandeTable = $('#elencoDomande').DataTable({
         paging: true,
         searching: true,
         ordering: true,
         responsive: true,
         language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-        dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end report"p>>',
+        dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
         buttons: [ ],
     }); 
 
-    reportTable.on('init', function () {
+    domandeTable.on('init', function () {
         clearInterval(interval);
         $("#loadingBar").css("width", "100%");
         setTimeout(function () {

@@ -16,8 +16,9 @@ namespace Data
         public DbSet<Ente> Enti { get; set; }
 
         public DbSet<UtenzaIdrica> UtenzeIdriche { get; set; }        
-        public DbSet<Report> Reports { get; set; }
+        public DbSet<Domanda> Domande { get; set; }
         public DbSet<Toponimo> Toponomi { get; set; }
+        public DbSet<Report> Reports {get; set;}
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserEnte> UserEnti { get; set; }
@@ -102,9 +103,9 @@ namespace Data
             entity.Property(f => f.idToponimo).HasColumnName("id_toponimo");
         });
 
-            modelBuilder.Entity<Report>(entity =>
+        modelBuilder.Entity<Domanda>(entity =>
        {
-           entity.ToTable("reports"); // Mappa la classe Report alla tabella 'reports' nel DB
+           entity.ToTable("domande"); // Mappa la classe Domande alla tabella 'domande' nel DB
 
            // Mappatura esplicita delle proprietà alle colonne del DB (snake_case)
            entity.HasKey(f => f.id);
@@ -129,16 +130,24 @@ namespace Data
            entity.Property(f => f.presenzaPod).HasColumnName("presenza_pod");
            entity.Property(f => f.note).HasColumnName("note");
            entity.Property(f => f.incongruenze).HasColumnName("incongruenze");
-           entity.Property(f => f.serie).HasColumnName("serie").IsRequired();
            entity.Property(f => f.mc).HasColumnName("mc");
            entity.Property(f => f.dataInizioValidita).HasColumnName("data_inizio_validita").IsRequired();
            entity.Property(f => f.dataFineValidita).HasColumnName("data_fine_validita").IsRequired();
+           entity.Property(f => f.idReport).HasColumnName("id_report").IsRequired();
            entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
-           entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
-           entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
-           entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
        });
-
+         modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("reports");
+                entity.HasKey(f=> f.id);
+                entity.Property(f=>f.mese).HasColumnName("mese").IsRequired();
+                entity.Property(f=>f.anno).HasColumnName("anno").IsRequired();
+                entity.Property(f=>f.stato).HasColumnName("stato").IsRequired();
+                entity.Property(f=>f.DataCreazione).HasColumnName("data_creazione").IsRequired();
+                entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f=>f.idEnte).HasColumnName("id_ente").IsRequired();
+                entity.Property(f=>f.idUser).HasColumnName("id_user").IsRequired();
+            });
             // Configurazione per la classe Ente
             modelBuilder.Entity<Toponimo>(entity =>
             {

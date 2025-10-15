@@ -127,7 +127,7 @@ namespace BonusIdrici2.Migrations
                 oldType: "longtext");
 
             migrationBuilder.CreateTable(
-                name: "reports",
+                name: "domande",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -156,7 +156,7 @@ namespace BonusIdrici2.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_reports", x => x.id);
+                    table.PrimaryKey("PK_domande", x => x.id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
         }
@@ -165,7 +165,7 @@ namespace BonusIdrici2.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "reports");
+                name: "domande");
 
             migrationBuilder.RenameColumn(
                 name: "regione",

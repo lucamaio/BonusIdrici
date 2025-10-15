@@ -62,7 +62,7 @@
             else
             {
                 <div class="alert alert-warning text-center shadow-sm rounded-3">
-                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun report disponibile per il tipo di log selezionato.
+                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun domande disponibile per il tipo di log selezionato.
                 </div>
             }
             <hr class="my-4" />
@@ -94,13 +94,13 @@
                 ordering: true,
                 responsive: true,
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end report"p>>',
+                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
                 buttons: [
                     {
                         @* text: '<i class="bi bi-plus-circle me-1"></i> Varia Serie',
                         className: 'btn btn-sm btn-success',
                         action: function () {
-                            window.location.href = '@Url.Action("VariaSerie", "Report")'
+                            window.location.href = '@Url.Action("VariaSerie", "Domande")'
                                 + '?idEnte=@idEnte&idAto=@idAto';
                         } *@
                     }

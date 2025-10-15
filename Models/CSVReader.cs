@@ -856,14 +856,14 @@ public class CSVReader
         return datiComplessivi;
     }
 
-    // Funzione 3: Legge il file CSV proveniente da INPS per generare i report delle persone con bonus idrico
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idUser, int? serie, bool confrontoCivico, bool escludiComponenti)
+    // Funzione 3: Legge il file CSV proveniente da INPS per generare i domande delle persone con bonus idrico
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idReport, bool confrontoCivico, bool escludiComponenti)
     {
         // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
         FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_INPS.log");
         List<string> errori = new List<string>();
-        DateTime dataElaborazione = DateTime.Now; // Neccessaria per impostarla nei report ed evitare divisioni
+        DateTime dataElaborazione = DateTime.Now; // Neccessaria per impostarla nei domande ed evitare divisioni
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
@@ -1037,7 +1037,7 @@ public class CSVReader
                 //DateTime dataCreazione = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 0); // Escludo i secondi della data attuale per evitare problemi successivi
                 // logFile.LogInfo($"Ho inizializatto la data di creazione: {dataCreazione}");
 
-                // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del report
+                // 1.c) Aggiungo dei campi aggiuntivi neccessari per la creazione del domande
                 string esitoStr = "No";
                 string esito = "04"; // 01 = fornitura diretta, 02 = fornitura indiretta, 03 = fornitura diretta non rispetta requisiti, 04 =  fornitura indiretta non rispetta requisiti 
                 int? idFornituraIdrica = null;
@@ -1045,16 +1045,14 @@ public class CSVReader
 
                 // 2.a) mi salvo i campi relativi all'ente in modo da poter effetuare le operazioni successive
 
-                var enti = context.Enti.Where(d => d.id == selectedEnteId).ToList();
+                var ente = context.Enti.FirstOrDefault(d => d.id == selectedEnteId);
 
-                if (enti.Count == 0)
+                if (ente == null)
                 {
                     errori.Add($"Attenzione: Nessun ente trovato con l'ID selezionato {selectedEnteId}. Riga {rigaCorrente}");
                     continue; // Salta la riga se non c'è l'ente
                 }
 
-                var ente = enti.First();
-                // var nomeEnte = ente.nome;
                 var codiceFiscaleEnte = ente.CodiceFiscale;
                 var istatEnte = ente.istat;
                 var capEnte = ente.Cap;
@@ -1229,20 +1227,20 @@ public class CSVReader
                 }
 
                 // Se il check è attivo allore imposto come valore di serie quello di default della scheda ente
-                int valueSerie;
-                if (serie == null)
-                {
-                    valueSerie = context.Enti.Where(s => s.id == selectedEnteId).Select(s => s.Serie).FirstOrDefault();
-                }
-                else
-                {
-                    valueSerie = (int)serie;
-                }
+                // int valueSerie;
+                // if (serie == null)
+                // {
+                //     valueSerie = context.Enti.Where(s => s.id == selectedEnteId).Select(s => s.Serie).FirstOrDefault();
+                // }
+                // else
+                // {
+                //     valueSerie = (int)serie;
+                // }
 
-                // logFile.LogInfo("Sto creando il report");
+                // logFile.LogInfo("Sto creando il domande");
 
-                // 4) Creo un nuovo report con i dati raccolti
-                var report = new Report
+                // 4) Creo un nuovo domande con i dati raccolti
+                var domanda = new Domanda
                 {
                     idAto = idAto,
                     codiceBonus = codiceBonus,
@@ -1265,146 +1263,137 @@ public class CSVReader
                     numeroComponenti = numeroComponenti,
                     esitoStr = esitoStr,
                     esito = esito,
-                    serie = valueSerie,
+                    idReport = idReport,
+                    //serie = valueSerie,
                     mc = mc,
                     incongruenze = verificare,
                     note = note != null ? note.Trim() : null,
-                    IdEnte = selectedEnteId,
-                    IdUser = idUser,
-                    DataCreazione = dataElaborazione
                 };
 
-                // logFile.LogInfo($"Report Creato riga: {rigaCorrente}: {report.ToString()}");
+                // logFile.LogInfo($"Domande Creato riga: {rigaCorrente}: {domanda.ToString()}");
 
-                // Parte 6: Verifico se il report è gia presente
+                // Parte 6: Verifico se il domande è gia presente
 
-                var reportEsistente = context.Reports.FirstOrDefault(r => r.codiceBonus == report.codiceBonus && r.IdEnte == selectedEnteId);
+                 var domandaEsistente = context.Domande.FirstOrDefault(r => r.codiceBonus == domanda.codiceBonus && r.idReport == idReport);
 
-                if (reportEsistente == null)
+                if (domandaEsistente == null)
                 {
-                    // logFile.LogInfo("Il report non esiste");
-                    datiComplessivi.reports.Add(report);
+                    // logFile.LogInfo("Il domande non esiste");
+                    datiComplessivi.domande.Add(domanda);
                 }
                 else
                 {
                     // logFile.LogInfo("Sto Verificando se devo aggiornare i dati");
-                    // Report esistente, verifico se ci sono campi da aggiornare
+                    // Domande esistente, verifico se ci sono campi da aggiornare
                     bool aggiornare = false;
 
                     // Inzio - Confronto tra i dati del db e quelli del csv
                     // Verifico campo per campo se ci sono differenze per il campo idAto
-                    if (report.idAto != null && reportEsistente.idAto != null && reportEsistente.idAto != report.idAto)
+                    if (domanda.idAto != null && domandaEsistente.idAto != null && domandaEsistente.idAto != domanda.idAto)
                     {
-                        reportEsistente.idAto = report.idAto;
+                        domandaEsistente.idAto = domanda.idAto;
                         aggiornare = true;
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo codiceFiscaleRichiedente
 
-                    if (report.codiceFiscaleRichiedente != null && reportEsistente.codiceFiscaleRichiedente != null && reportEsistente.codiceFiscaleRichiedente != report.codiceFiscaleRichiedente)
+                    if (domanda.codiceFiscaleRichiedente != null && domandaEsistente.codiceFiscaleRichiedente != null && domandaEsistente.codiceFiscaleRichiedente != domanda.codiceFiscaleRichiedente)
                     {
-                        reportEsistente.codiceFiscaleRichiedente = report.codiceFiscaleRichiedente;
+                        domandaEsistente.codiceFiscaleRichiedente = domanda.codiceFiscaleRichiedente;
                         aggiornare = true;
                     }
 
                     // Verifico il campo numeroComponenti
-                    if (reportEsistente.numeroComponenti != report.numeroComponenti)
+                    if (domandaEsistente.numeroComponenti != domanda.numeroComponenti)
                     {
-                        reportEsistente.numeroComponenti = report.numeroComponenti;
+                        domandaEsistente.numeroComponenti = domanda.numeroComponenti;
                         aggiornare = true;
                     }
                     
 
                     // Verifico il campo codiceFiscaleUtenzaTrovata
-                    if (reportEsistente.codiceFiscaleUtenzaTrovata != report.codiceFiscaleUtenzaTrovata)
+                    if (domandaEsistente.codiceFiscaleUtenzaTrovata != domanda.codiceFiscaleUtenzaTrovata)
                     {
-                        reportEsistente.codiceFiscaleUtenzaTrovata = report.codiceFiscaleUtenzaTrovata;
+                        domandaEsistente.codiceFiscaleUtenzaTrovata = domanda.codiceFiscaleUtenzaTrovata;
                         aggiornare = true;
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo esito
 
-                    if (report.esito != null && reportEsistente.esito != null && reportEsistente.esito != report.esito)
+                    if (domanda.esito != null && domandaEsistente.esito != null && domandaEsistente.esito != domanda.esito)
                     {
-                        reportEsistente.esito = report.esito;
+                        domandaEsistente.esito = domanda.esito;
                         aggiornare = true;
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo esitoStr
 
-                    if (report.esitoStr != null && reportEsistente.esitoStr != null && reportEsistente.esitoStr != report.esitoStr)
+                    if (domanda.esitoStr != null && domandaEsistente.esitoStr != null && domandaEsistente.esitoStr != domanda.esitoStr)
                     {
-                        reportEsistente.esitoStr = report.esitoStr;
+                        domandaEsistente.esitoStr = domanda.esitoStr;
                         aggiornare = true;
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo idFornitura
 
-                    if (report.idFornitura != null && reportEsistente.idFornitura != null && reportEsistente.idFornitura != report.idFornitura)
+                    if (domanda.idFornitura != null && domandaEsistente.idFornitura != null && domandaEsistente.idFornitura != domanda.idFornitura)
                     {
-                        reportEsistente.idFornitura = report.idFornitura;
+                        domandaEsistente.idFornitura = domanda.idFornitura;
                         aggiornare = true;
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo mc
 
-                    if (reportEsistente.mc != report.mc)
+                    if (domandaEsistente.mc != domanda.mc)
                     {
-                        reportEsistente.mc = report.mc;
+                        domandaEsistente.mc = domanda.mc;
                         aggiornare = true;
                     }
 
                     // Verifico campo per campo se ci sono differenze per il campo inizioValidita
 
-                    if (reportEsistente.dataInizioValidita != report.dataInizioValidita)
-                    {
-                        reportEsistente.dataInizioValidita = report.dataInizioValidita;
-                        aggiornare = true;
-                    }
+                    // if (domandaEsistente.dataInizioValidita != domanda.dataInizioValidita)
+                    // {
+                    //     domandaEsistente.dataInizioValidita = domanda.dataInizioValidita;
+                    //     aggiornare = true;
+                    // }
 
                     // Verifico campo per campo se ci sono differenze per il campo fineValidita
 
-                    if (reportEsistente.dataFineValidita != report.dataFineValidita)
-                    {
-                        reportEsistente.dataFineValidita = report.dataFineValidita;
-                        aggiornare = true;
-                    }
+                    // if (domandaEsistente.dataFineValidita != domanda.dataFineValidita)
+                    // {
+                    //     domandaEsistente.dataFineValidita = domanda.dataFineValidita;
+                    //     aggiornare = true;
+                    // }
 
-                    // Verifico se il campo serie e diverso 
-
-                    if (report.serie != reportEsistente.serie)
-                    {
-                        reportEsistente.serie = report.serie;
-                        aggiornare = true;
-                    }
 
                     // Verifico se il campo incongruenze è diverso
-                    if (report.incongruenze != reportEsistente.incongruenze)
+                    if (domanda.incongruenze != domandaEsistente.incongruenze)
                     {
-                        reportEsistente.incongruenze = report.incongruenze;
+                        domandaEsistente.incongruenze = domanda.incongruenze;
                         aggiornare = true;
                     }
 
                     // Verifico se il campo note è diverso
-                    if (reportEsistente.note != report.note)
+                    if (domandaEsistente.note != domanda.note)
                     {
-                        reportEsistente.note = report.note;
+                        domandaEsistente.note = domanda.note;
                         aggiornare = true;
                     }
 
                     // Verifico il campo idDichiarante
 
-                    if (report.idDichiarante != reportEsistente.idDichiarante)
+                    if (domanda.idDichiarante != domandaEsistente.idDichiarante)
                     {
-                        reportEsistente.idDichiarante = report.idDichiarante;
+                        domandaEsistente.idDichiarante = domanda.idDichiarante;
                         aggiornare = true;
                     }
 
                     // Verifico il campo idUtenza
 
-                    if (report.idUtenza != reportEsistente.idUtenza)
+                    if (domanda.idUtenza != domandaEsistente.idUtenza)
                     {
-                        reportEsistente.idUtenza = report.idUtenza;
+                        domandaEsistente.idUtenza = domanda.idUtenza;
                         aggiornare = true;
                     }
 
@@ -1414,8 +1403,8 @@ public class CSVReader
                     if (aggiornare)
                     {
                         // logFile.LogInfo("Aggiorno i dati e imposto la data d'aggiornamento");
-                        reportEsistente.DataAggiornamento = DateTime.Now;
-                        datiComplessivi.reportsDaAggiornare.Add(reportEsistente);
+                        // domandaEsistente.DataAggiornamento = DateTime.Now;
+                        datiComplessivi.domandeDaAggiornare.Add(domandaEsistente);
                     }
 
                 }
