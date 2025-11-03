@@ -344,6 +344,32 @@ namespace Models
             return indirizzoUbicazione;
         }
 
+        // Funzione che analizza un indirizzo per ricavare il suo tipo_toponimo e l'intestazione
+
+        public static (string? tipoToponimo, string? intestazione) AnalizzaIndirizzoPerToponimo(string indirizzo)
+        {
+            if (string.IsNullOrWhiteSpace(indirizzo))
+            {
+                return (null, null);
+            }
+
+            var partiIndirizzo = indirizzo.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            if (partiIndirizzo.Length < 2)
+            {
+                return (null, null);
+            }
+
+            var possibileTipo = partiIndirizzo[0];
+            var intestazione = partiIndirizzo[1];
+
+            if (!Toponimo.IsTipoToponimoValido(possibileTipo))
+            {
+                return (null, null);
+            }
+
+            return (possibileTipo, intestazione);
+        }
+
         public static List<Ente> GetEnti(ApplicationDbContext _context, int? id)
         {
             if (id == null)

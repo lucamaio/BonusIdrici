@@ -103,11 +103,14 @@ namespace Controllers
 
         public IActionResult Show(int selectedEnteId)
         {
+            // Verifico l'autorizzazione e la sessione dell'utente
             if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
+
+            // Verifico che l'ente selezionato sia valido
 
             if (selectedEnteId == 0)
             {
@@ -115,31 +118,20 @@ namespace Controllers
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
                 return View("Index", "Toponomi");
             }
+            // Mi ricavo i toponimi relativi all'ente selezionato
+            var toponimi = _context.Toponomi.Where(r => r.IdEnte == selectedEnteId).OrderByDescending(x => x.denominazione).ToList();
 
-            var dati = _context.Toponomi
-                        .Where(r => r.IdEnte == selectedEnteId)
-                        .OrderByDescending(x => x.denominazione)
-                        .ToList();
+            // Statistiche
+            ViewBag.TotaleToponomi = toponimi.Count;
+            ViewBag.ToponomiNoNormalizzazione = toponimi.Count(r => r.normalizzazione == null);
+            ViewBag.ToponomiNormalizzati = toponimi.Count(r => r.normalizzazione != null);
 
-            var viewModelList = dati.Select(x => new ToponomiViewModel
-            {
-                id = x.id,
-                denominazione = x.denominazione,
-                normalizzazione = x.normalizzazione,
-                data_creazione = x.data_creazione,
-                data_aggiornamento = x.data_aggiornamento,
-                IdEnte = x.IdEnte
-            }).ToList();
-
-            ViewBag.TotaleToponomi = viewModelList.Count;
-            ViewBag.ToponomiNoNormalizzazione = viewModelList.Count(r => r.normalizzazione == null);
-            ViewBag.ToponomiNormalizzati = viewModelList.Count(r => r.normalizzazione != null);
-
-
+            // Passo i dati alla view
+            ViewBag.Toponimi = toponimi;
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
 
-            return View("Show", viewModelList);
+            return View("Show");
         }
 
         // Pagina 3: Consente la creazione di un nuovo Toponimo
@@ -170,7 +162,7 @@ namespace Controllers
             if (top == null)
             {
                 ViewBag.Message = "Toponimo non trovato!";
-                return RedirectToAction("Show");
+                return RedirectToAction("Show", "Toponomi");
             }
             
             ViewBag.Toponimo = top;
@@ -191,8 +183,8 @@ namespace Controllers
                 denominazione = denominazione.Trim().ToUpper(),
                 normalizzazione = normalizzazione.Trim().ToUpper(),
                 IdEnte = idEnte,
-                data_creazione = DateTime.Now,
-                data_aggiornamento = null
+                dataCreazione = DateTime.Now,
+                dataAggiornamento = null
             };
 
             _context.Toponomi.Add(nuovoToponimo);
@@ -216,7 +208,7 @@ namespace Controllers
             // Aggiorna le proprietà
             toponimoEsistente.denominazione = denominazione.Trim().ToUpper();
             toponimoEsistente.normalizzazione = normalizzazione.Trim().ToUpper();
-            toponimoEsistente.data_aggiornamento = DateTime.Now;
+            toponimoEsistente.dataAggiornamento = DateTime.Now;
             // data_creazione non viene modificata
             toponimoEsistente.IdEnte = idEnte;
 

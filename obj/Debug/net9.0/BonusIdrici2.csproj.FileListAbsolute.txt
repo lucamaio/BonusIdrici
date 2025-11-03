@@ -475,4 +475,4 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\refint\BonusIdrici2.
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.pdb
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.genruntimeconfig.cache
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\ref\BonusIdrici2.dll
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-zgt58toqb0.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-noamkoff74.gz

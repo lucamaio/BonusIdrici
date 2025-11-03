@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "Modifica Toponimo";
-    var toponimo = ViewBag.Toponimo;   
+    var toponimo = ViewBag.Toponimo;
+    var tipiToponimiValidi = Models.Toponimo.GetTipiToponimiValidi();   
 }
 
 <div class="domande-page container my-5">
@@ -19,6 +20,12 @@
                 <!-- FORM -->
                 <div class="modern-card-body p-4 small">
                     <form asp-controller="Toponimi" asp-action="Update" method="POST" enctype="multipart/form-data">
+                        <!-- Pulsante che apre/chiude l'accordion -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" id="toggleAll" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-angles-down"></i> Espandi tutte
+                            </button>
+                        </div>
                         
                         <div class="accordion" id="accordionToponimo">
 
@@ -48,6 +55,27 @@
                                                 <label for="normalizzazione" class="form-label">Normalizzazione *</label>
                                                 <input type="text" class="form-control" id="normalizzazione" name="normalizzazione" value="@toponimo.normalizzazione" required>
                                             </div>
+                                        
+                                            <div>
+                                                <label for="tipoToponimo" class="form-label">Tipo Toponimo: *</label>
+                                                <select class="form-select" id="tipoToponimo" name="tipoToponimo" required>
+                                                    @foreach (var tipo in tipiToponimiValidi)
+                                                    {
+                                                        <option value="@tipo" selected="@(tipo == toponimo.tipoToponimo ? "selected" : null)">@tipo</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for="intestazione" class="form-label">Intestazione:</label>
+                                                <input type="text" class="form-control" id="intestazione" name="intestazione" value="@toponimo.intestazione">
+                                            </div>
+
+                                            <div>
+                                                <label for="intestazioneNormalizzata" class="form-label">Intestazione Normalizzata:</label>
+                                                <input type="text" class="form-control" id="intestazioneNormalizzata" name="intestazioneNormalizzata" value="@toponimo.intestazioneNormalizzata">
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -68,13 +96,19 @@
                                             <div>
                                                 <label for="dataCreazione" class="form-label">Data Creazione</label>
                                                 <input class="form-control readonly-field" type="date" id="dataCreazione" name="dataCreazione"
-                                                       value="@(toponimo.data_creazione?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                                       value="@(toponimo.dataCreazione?.ToString("yyyy-MM-dd") ?? "")" readonly>
                                             </div>
 
                                             <div>
                                                 <label for="dataAggiornamento" class="form-label">Data Aggiornamento</label>
                                                 <input class="form-control readonly-field" type="date" id="dataAggiornamento" name="dataAggiornamento"
-                                                       value="@(toponimo.data_aggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                                       value="@(toponimo.dataAggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="idEnte" class="form-label">Id Ente</label>
+                                                <input class="form-control readonly-field" type="number" id="idEnte" name="idEnte"
+                                                       value="@(toponimo.IdEnte)" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -86,7 +120,7 @@
                         <!-- BOTTONI -->
                         <hr class="my-4" />
                         <div class="d-flex justify-content-between">
-                            <a href="@Url.Action("Show", "Toponomi")"
+                            <a href="@Url.Action("Show", "Toponomi", new {selectedEnteId = toponimo.IdEnte})"
                                class="btn btn-outline-secondary btn-sm rounded-3">
                                 <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
                             </a>
@@ -101,3 +135,30 @@
         </div>
     </div>
 </div>
+<script>
+// Codice per il pulsante di espandi/chiudi tutte le sezioni dell'accordion
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("toggleAll");
+        const accordions = document.querySelectorAll("#accordionToponimo .accordion-collapse");
+        let expanded = false;
+
+        toggleBtn.addEventListener("click", function () {
+            expanded = !expanded;
+
+            accordions.forEach(acc => {
+                if (expanded) {
+                    new bootstrap.Collapse(acc, { show: true });
+                } else {
+                    new bootstrap.Collapse(acc, { hide: true });
+                }
+            });
+
+            // Cambia testo e icona dinamicamente
+            if (expanded) {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-angles-up"></i> Chiudi tutte';
+            } else {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-angles-down"></i> Espandi tutte';
+            }
+        });
+    });
+</script>

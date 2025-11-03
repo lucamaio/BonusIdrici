@@ -155,8 +155,11 @@ namespace Data
                 entity.HasKey(f => f.id); // La chiave primaria è 'id'
                 entity.Property(f => f.denominazione).HasColumnName("denominazione").IsRequired().HasMaxLength(255);
                 entity.Property(f => f.normalizzazione).HasColumnName("normalizzazione").HasMaxLength(255);
-                entity.Property(f => f.data_creazione).HasColumnName("data_creazione");
-                entity.Property(f => f.data_aggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.tipoToponimo).HasColumnName("tipo_toponimo");
+                entity.Property(f => f.intestazione).HasColumnName("intestazione").HasMaxLength(255);
+                entity.Property(f => f.intestazioneNormalizzata).HasColumnName("intestazione_normalizzata").HasMaxLength(255);
+                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
             });
 

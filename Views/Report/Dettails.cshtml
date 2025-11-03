@@ -255,6 +255,7 @@
         </div>
     </div>
 </div>
+@* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> *@
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -285,17 +286,17 @@
             });
         }); 
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var btn = document.getElementById('myDropdownToggle');
-            if (btn) {
-                new bootstrap.Dropdown(btn, {
+       document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('myDropdownToggle');
+        if (btn) {
+            new bootstrap.Dropdown(btn, {
                 popperConfig: {
                     modifiers: [
-                    { name: 'preventOverflow', options: { boundary: document.body } }
+                        { name: 'preventOverflow', options: { boundary: document.body } }
                     ]
                 }
-                });
-            }
             });
+        }
+    });
     </script>
 }

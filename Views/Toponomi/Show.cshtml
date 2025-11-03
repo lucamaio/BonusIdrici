@@ -1,9 +1,9 @@
-@model IEnumerable<Models.ViewModels.ToponomiViewModel>
-
 @{
     ViewData["Title"] = "Riepilogo Dati Ente";
+    List<Toponimo>? toponimi = ViewBag.Toponimi;
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
+    var tipoToponimo = "";
 }
 
 <div class="container-xxl flex-grow-1 py-5">
@@ -27,8 +27,9 @@
 
                 <!-- Body -->
                 <div class="card-body p-4 position-relative">
-                    @if (Model != null && Model.Any())
+                    @if (toponimi != null && toponimi.Count > 0)
                     {
+                        
                         <div style="background-color: #f8f9fa; border-radius: 12px;"></div>
                             <div class="row g-3">
                                 <!-- Stat Box 1 -->
@@ -74,23 +75,24 @@
                                         <th class="text-center">Id</th>
                                         <th class="text-center">Denominazione</th>
                                         <th class="text-center">Normalizzazione</th>
+                                        <th class="text-center">Tipo</th>
                                         <th class="text-center">Data Creazione</th>
-                                        @* <th class="text-center">Data Aggiornamento</th> *@
                                         <th class="text-center">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model)
+                                    @foreach (var toponimo in toponimi)
                                     {
+                                         tipoToponimo = toponimo.tipoToponimo ?? "N/D";
                                         <tr>
-                                            <td class="text-center"><span>@item.id</span></td>
-                                            <td><span>@item.denominazione</span></td>
-                                            <td><span>@item.normalizzazione</span></td>
-                                            <td class="text-center"><span>@item.data_creazione?.ToString("dd/MM/yyyy")</span></td>
-                                            @* <td class="text-center"><span>@item.data_aggiornamento?.ToString("dd/MM/yyyy")</span></td> *@
+                                            <td class="text-center"><span>@toponimo.id</span></td>
+                                            <td><span>@toponimo.denominazione</span></td>
+                                            <td><span>@toponimo.normalizzazione</span></td>
+                                            <td><span class="text-center">@tipoToponimo</span></td>
+                                            <td><span class="text-center">@toponimo.dataCreazione?.ToString("dd/MM/yyyy")</span></td>
                                             <td class="text-center">
                                                 <a class="btn btn-sm btn-light border me-1" title="Modifica Toponimo"
-                                                   href="@Url.Action("Modifica", "Toponomi", new { id = item.id, denominazione = item.denominazione, normalizzazione = item.normalizzazione, data_creazione = item.data_creazione, IdEnte = item.IdEnte })">
+                                                   href="@Url.Action("Modifica", "Toponomi", new { id = toponimo.id})">
                                                     <i class="bi bi-pencil-square text-primary"></i>
                                                 </a>
                                             </td>

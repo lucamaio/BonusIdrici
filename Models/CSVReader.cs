@@ -524,25 +524,46 @@ public class CSVReader
                 var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[36]).ToUpper();
                 var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
                 var indirizzoFormattato = FunzioniTrasversali.FormattaIndirizzo(_context, indirizzoUbicazione, cod_fisc, selectedEnteId);
+                
                 string? indirizzoRicavato = indirizzoFormattato != null ? indirizzoFormattato.ToUpper() : null;
+
+                // Mi ricavo il tipo di toponimo e l'intestazione base
+
+                (string? tipoToponimo, string? intestazione) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(indirizzoUbicazione);
+
+                //logFile.LogDebug($"Riga {rigaCorrente} | Indirizzo Ubicazione: {indirizzoUbicazione} | Indirizzo Ubicazione: {indirizzoUbicazione} | Tipo Toponimo: {tipoToponimo} | Intestazione: {intestazione}");
 
                 int? idToponimo = null;
 
                 // b) Controllo nel DB se esiste già il toponimo
-                var toponimoTrova = _context.Toponomi
-                    .FirstOrDefault(s => s.denominazione == indirizzoUbicazione && s.IdEnte == selectedEnteId);
+                Toponimo? toponimoTrova = _context.Toponomi.FirstOrDefault(s => s.denominazione == indirizzoUbicazione && s.IdEnte == selectedEnteId);
 
                 if (toponimoTrova != null)
                 {
                     idToponimo = toponimoTrova.id;
+                    //logFile.LogDebug($"Riga {rigaCorrente} | Trovato toponimo ID: {idToponimo} per indirizzo: {indirizzoUbicazione}");
 
                     // c) Aggiorno solo se non è già normalizzato e se ho un indirizzo ricavato valido
                     if (toponimoTrova.normalizzazione == null && indirizzoRicavato != null)
                     {
                         toponimoTrova.normalizzazione = indirizzoRicavato;
-                        toponimoTrova.data_aggiornamento = DateTime.Now;
+
+                        // mi ricavo il tipo di toponimo e l'intestazione in forma normale
+
+                        (string? tipoToponimoNormale, string? intestazioneNormale) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(toponimoTrova.normalizzazione ?? "");
+                        toponimoTrova.intestazioneNormalizzata = intestazioneNormale;
+                        toponimoTrova.dataAggiornamento = DateTime.Now;
                         datiComplessivi.ToponimiDaAggiornare.Add(toponimoTrova);
                     }
+
+                    // d) Verifico se il tipo di toponimo è cambiato e lo aggiorno
+                    if (tipoToponimo != null && toponimoTrova.tipoToponimo != tipoToponimo)
+                    {
+                        toponimoTrova.tipoToponimo = tipoToponimo;
+                        toponimoTrova.dataAggiornamento = DateTime.Now;
+                        datiComplessivi.ToponimiDaAggiornare.Add(toponimoTrova);
+                    }
+
                 }
                 else
                 {
@@ -554,8 +575,18 @@ public class CSVReader
                         if (toponimoLista.normalizzazione == null && indirizzoRicavato != null)
                         {
                             toponimoLista.normalizzazione = indirizzoRicavato;
-                            toponimoLista.data_aggiornamento = DateTime.Now;
+                            // mi ricavo il tipo di toponimo e l'intestazione in forma normale
+                            (string? tipoToponimoNormale, string? intestazioneNormale) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(toponimoTrova.normalizzazione ?? "");
+                            toponimoLista.intestazioneNormalizzata = intestazioneNormale;
+                            toponimoLista.dataAggiornamento = DateTime.Now;
                         }
+
+                        if (tipoToponimo != null && toponimoLista.tipoToponimo != tipoToponimo)
+                        {
+                            toponimoLista.tipoToponimo = tipoToponimo;
+                            toponimoLista.dataAggiornamento = DateTime.Now;
+                        }
+
                     }
                     else
                     {
@@ -563,8 +594,10 @@ public class CSVReader
                         var nuovoToponimo = new Toponimo
                         {
                             denominazione = indirizzoUbicazione,
+                            tipoToponimo = tipoToponimo,
+                            intestazione = intestazione,
                             IdEnte = selectedEnteId,
-                            data_creazione = DateTime.Now,
+                            dataCreazione = DateTime.Now,
                             normalizzazione = indirizzoRicavato // valorizzo subito se disponibile
                         };
 

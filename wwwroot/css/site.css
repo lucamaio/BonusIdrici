@@ -673,6 +673,7 @@ S .page-header {
 .dropdown-menu {
   border-radius: 0.75rem;
   overflow: hidden;
+  z-index: 2000 !important;
 }
 
 .dropdown-item:hover {

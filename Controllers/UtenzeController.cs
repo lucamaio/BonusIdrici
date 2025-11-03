@@ -358,7 +358,7 @@ namespace Controllers
                             datiPresenti = true;
                             foreach (var top in datiComplessivi.ToponimiDaAggiornare)
                             {
-                                top.data_aggiornamento = DateTime.Now;
+                                top.dataAggiornamento = DateTime.Now;
                                 _context.Toponomi.Update(top);
                             }
                         }
