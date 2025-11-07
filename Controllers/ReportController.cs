@@ -77,20 +77,23 @@ namespace Controllers
 
             // 2) Mi ricavo gli enti
             List<Ente> enti = new List<Ente>();
+            Console.WriteLine("Ruolo utente " + username + ": " + ruolo);
 
             if (ruolo == "OPERATORE")
             {
                 // 2.a) Verifico se gestisce un solo ente
                 enti = FunzioniTrasversali.GetEnti(_context, idUser);
+                Console.WriteLine("Numero enti trovati per l'operatore " + username + ": " + enti.Count);
                 if (enti.Count == 1)
                 {
-                    return Show(enti[0].id);
+                    return RedirectToAction("Show", new { selectedEnteId = enti[0].id });
+                }else if(enti.Count > 1)
+                {
+                    // 2.b)  Altrimenti mostro so gli enti su cui l'utente opera
+                    ViewBag.Enti = enti;
+                    return View();
                 }
-
-                // 2.b)  Altrimenti mostro so gli enti su cui l'utente opera
-
-                ViewBag.Enti = enti;
-                return View();
+                
             }
             // 2.c) Se sono amministratore me li mostri tutti
             enti = _context.Enti.OrderBy(e => e.nome).ToList();
@@ -128,6 +131,7 @@ namespace Controllers
                     id = g.Key.id,
                     idEnte = g.Key.idEnte,
                     DataCreazione = g.Key.DataCreazione,
+                    DataAggiornamento = g.Max(r => r.DataAggiornamento),
                     mese = g.Key.mese,
                     anno = g.Key.anno,
                     stato = g.Key.stato,
@@ -200,6 +204,7 @@ namespace Controllers
             ViewBag.DomandeEsito4 = domandeReport.Count(d => d.esito == "04");
 
             ViewBag.incongruenze = domandeReport.Count(d => d.incongruenze == true);
+            ViewBag.StatoReport = reportEsistente.stato ?? "ND";
             
             return View();
         }
@@ -269,6 +274,7 @@ namespace Controllers
             // 4) Invio i dati e visualizzo la pagina
             ViewBag.Domanda = domandaEsistente;
             ViewBag.Serie = _context.Reports.Where(r => r.id == domandaEsistente.idReport).Select(r => r.serie).FirstOrDefault();
+            ViewBag.Stato = _context.Reports.Where(r => r.id == domandaEsistente.idReport).Select(r => r.stato).FirstOrDefault();
             return View();
         }
 
@@ -340,17 +346,20 @@ namespace Controllers
             else if (tipoEsportazione == "Siscom")
             {
                 fileName = $"Esportazione Bonus Idrici {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
-                fileBytes = CsvGenerator.GeneraCsvSiscom(domande,serie);
+                fileBytes = CsvGenerator.GeneraCsvSiscom(domande, serie);
             }
             else if (tipoEsportazione == "Debug")
             {
                 fileName = $"Debug Domande {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
-                fileBytes = CsvGenerator.GeneraCsvDebug(domande,serie);
+                fileBytes = CsvGenerator.GeneraCsvDebug(domande, serie);
             }
             else
             {
+                AccountController.logFile.LogWarning("L'Utente " + username + " ha tentato di scaricare un tipo di domande non riconosciuto: " + tipoEsportazione);
                 return NotFound("Tipo di domande non riconosciuto o non supportato per la generazione CSV.");
             }
+            
+            AccountController.logFile.LogInfo("L'Utente " + username + " ha scaricato il file " + fileName + " relativo al report ID " + idReport);
 
             // 7) Imposta l'header Content-Disposition
             var contentDisposition = new System.Net.Mime.ContentDisposition
@@ -370,14 +379,14 @@ namespace Controllers
         public IActionResult UpdateSerie(int idReport, int serie)
         {
 
-            // 1. Verfica la sessione
+            // 1) Verfica la sessione
             if (!VerificaSessione())
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
 
-            // 2. Verifico se idReport è 0 e se serie e valido
+            // 2) Verifico se idReport è 0 e se serie e valido
 
             if (idReport == 0 || serie < 0)
             {
@@ -385,7 +394,7 @@ namespace Controllers
                 return RedirectToAction("Index", "Report");
             }
 
-            // 3. Verifico l'esistenza del report
+            // 3) Verifico l'esistenza del report
 
             var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
             if (reportEsistente == null)
@@ -394,15 +403,30 @@ namespace Controllers
                 return RedirectToAction("Index", "Report");
             }
 
-            // 4. Aggiorno il report
+            //4) Verifico lo stato del report
+
+            if (reportEsistente.stato != "Da verificare")
+            {
+                AccountController.logFile.LogWarning("L'Utente " + username + " ha tentato di alterare la serie del report ID " + reportEsistente.id);
+                ViewBag.Message = "Impossibile variare la serie di un report emesso o annullato!";
+                return Forbid();
+            }
+
+            // 5) Verifico che la serie sia diversa
+            if (reportEsistente.serie == serie)
+            {
+                // Nessuna modifica necessaria
+                return RedirectToAction("Show", "Report", new { selectedEnteId = reportEsistente.idEnte });
+            }
 
             reportEsistente.serie = serie;
             reportEsistente.DataAggiornamento = DateTime.Now;
 
-            // 5) Salvo i cambiamenti
+            // 6) Salvo i cambiamenti
             _context.SaveChanges();
+            AccountController.logFile.LogInfo("L'Utente " + username + " ha modificato la serie del report ID " + reportEsistente.id + " in " + serie);
 
-            // 6) Torno alla pagina principale
+            // 7) Torno alla pagina principale
             return RedirectToAction("Show", "Report", new { selectedEnteId = reportEsistente.idEnte });
         }
 
@@ -435,27 +459,118 @@ namespace Controllers
                 return RedirectToAction("Index", "Report");
             }
 
-            //AccountController.logFile.LogInfo($"L'utente {username} ha effetuato una variazione della domanda di bonus con id {domande.id} è codice bonus {domande.codiceBonus}");
-            //AccountController.logFile.LogInfo($"Prima: {domande.ToString()}");
-            // 5) Aggiorno i vari campi
+            // 5) Mi recupero il report 
+
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == domandaEsistente.idReport);
+            if (reportEsistente == null)
+            {
+                ViewBag.Message = "Report associato non trovato nel db";
+                return RedirectToAction("Index", "Report");
+            }
+
+            // 6) Adesso verifico se lo stato del report consente la variazione
+
+            if (reportEsistente.stato != "Da verificare")
+            {
+                AccountController.logFile.LogWarning("L'Utente " + username + " ha tentato di alterare la domanda ID " + domandaEsistente.id);
+                ViewBag.Message = "Impossibile variare i dati di una domanda associata ad un report emesso o annullato!";
+                return Forbid();
+            }
+
+            // 8) Nuova versione - Aggiorno direttamente la domanda solo quando i valori sono diversi
+
+            bool datiModificati = false;
 
             if (codiceFiscaleRichiedente != domandaEsistente.codiceFiscaleRichiedente)
             {
                 domandaEsistente.codiceFiscaleRichiedente = codiceFiscaleRichiedente;
+                datiModificati = true;
             }
-            domandaEsistente.cognomeDichiarante = cognome;
-            domandaEsistente.nomeDichiarante = nome;
-            domandaEsistente.esitoStr = esitoStr;
-            domandaEsistente.esito = esito;
-            domandaEsistente.DataAggiornamento = DateTime.Now;
+            if (cognome != domandaEsistente.cognomeDichiarante)
+            {
+                domandaEsistente.cognomeDichiarante = cognome;
+                datiModificati = true;
+            }
+            if (nome != domandaEsistente.nomeDichiarante)
+            {
+                domandaEsistente.nomeDichiarante = nome;
+                datiModificati = true;
+            }
+            if (esitoStr != domandaEsistente.esitoStr)
+            {
+                domandaEsistente.esitoStr = esitoStr;
+                datiModificati = true;
+            }
+            if (esito != domandaEsistente.esito)
+            {
+                domandaEsistente.esito = esito;
+                datiModificati = true;
+            }
+            if (datiModificati)
+            {
+                AccountController.logFile.LogInfo("L'Utente " + username + " ha modificato la domanda ID " + domandaEsistente.id);
+                domandaEsistente.DataAggiornamento = DateTime.Now;
+                _context.SaveChanges();
+            }
 
-            // 6) Salvo le modifiche sul db
-            _context.SaveChanges();
-            //AccountController.logFile.LogInfo($"Dopo: {domandeEsistente.ToString()}");
-
-            // 7) Ritorno alla pagina details
-            // return Dettails(domandeEsistente.idReport);
+            // 9) Ritorno alla pagina details
             return RedirectToAction("Dettails", "Report", new { idReport = domandaEsistente.idReport });
+        }
+
+        // Funzione 4: Consente di impostare lo stato di un report
+
+        [HttpGet]
+        public IActionResult AggiornaStatoReport(int idReport, string nuovoStato)
+        {
+            // 1. Verifica la sessione
+            if (!VerificaSessione())
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Verifico che l'id del report non è 0
+
+            if (idReport == 0)
+            {
+                ViewBag.Message = "Id Report non valido, riporova";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 3. Verifico che l'id esiste nel db
+
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (reportEsistente == null)
+            {
+                ViewBag.Message = "ID report non trovato! Riprova";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 4. Verifico che lo stato sia valido
+
+            if (!reportEsistente.isStatoValido(nuovoStato))
+            {
+                AccountController.logFile.LogWarning("L'Utente " + username + " ha tentato di impostare uno stato non valido al report ID " + reportEsistente.id+": " + nuovoStato);
+                ViewBag.Message = "Stato non valido! Riprova";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 5. Aggiorno lo stato
+            if (reportEsistente.stato == nuovoStato)
+            {
+                // Nessuna modifica necessaria
+                return RedirectToAction("Dettails", "Report", new { idReport = idReport });
+            }
+            
+            reportEsistente.stato = nuovoStato;
+            reportEsistente.DataAggiornamento = DateTime.Now;
+            AccountController.logFile.LogInfo("L'Utente " + username + " ha modificato lo stato del report ID " + reportEsistente.id + " in " + nuovoStato);
+
+            // 6) Salvo i cambiamenti
+            _context.SaveChanges();
+
+            // 7) Torno alla pagina principale
+            return RedirectToAction("Dettails", "Report", new { idReport = idReport});
         }
 
         // Fine - Funzioni

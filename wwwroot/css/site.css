@@ -787,3 +787,145 @@ S .page-header {
     opacity: 0.5;
     cursor: default;
 }
+
+/* pagina primo accesso */
+/* ==========================
+   FIRST LOGIN PAGE STYLES
+   File: first-login.css
+   ========================== */
+
+.fl-main {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); */
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    max-height: 100vh;
+}
+
+.fl-container {
+    display: flex;
+    flex-direction: row;
+    width: 900px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.fl-left-panel {
+    background: linear-gradient(180deg, #007bff, #0069d9);
+    color: #fff;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.fl-title {
+    font-size: 2.2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.fl-description {
+    font-size: 1em;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.fl-right-panel {
+    flex: 1;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.fl-form-title {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.fl-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.fl-label {
+    font-size: 0.95em;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.fl-input {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
+
+.fl-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.fl-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.fl-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.03);
+}
+
+/* Responsività */
+@media (max-width: 768px) {
+    .fl-container {
+        flex-direction: column;
+        width: 90%;
+        height: auto;
+    }
+
+    .fl-left-panel {
+        padding: 30px;
+    }
+
+    .fl-right-panel {
+        padding: 30px;
+    }
+}
+.fl-login-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.fl-login-icon {
+    font-size: 3rem;
+    color: #0056b3;
+    background-color: #f0f0f0; /* sfondo grigio chiaro */
+    border-radius: 50%;       /* arrotondamento */
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+

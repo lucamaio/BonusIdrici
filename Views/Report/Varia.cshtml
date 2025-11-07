@@ -7,6 +7,7 @@
     var esiti = new List<string> { "Si", "No" };
     var incongruenza = domanda.incongruenze.ToString();
     var datiBool = new List<string> {"True","False"};
+    var statoReport = ViewBag.Stato;
 }   
 
 <div class="domande-page container my-5">
@@ -272,9 +273,11 @@
                                class="btn btn-outline-secondary btn-sm rounded-3">
                                 <i class="fa-solid fa-arrow-left"></i> Torna indietro
                             </a>
-                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
-                                <i class="fa-solid fa-check"></i> Aggiorna
-                            </button>
+                            @if(statoReport == "Da verificare") {
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                    <i class="fa-solid fa-check"></i> Aggiorna
+                                </button>
+                            }
                         </div>
                     </form>
                 </div>

@@ -176,6 +176,7 @@ namespace Data
                 entity.Property(f => f.Username).HasColumnName("username").HasMaxLength(255);
                 entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
                 entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.DataAggiornamentoPassword).HasColumnName("data_aggiornamento_password");
                 entity.Property(f => f.idRuolo).HasColumnName("id_ruolo").IsRequired();
             });
 

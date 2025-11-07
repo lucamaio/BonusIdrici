@@ -35,18 +35,17 @@ namespace Models
         [Required]
         public required int serie {get; set;}
 
-        // Costruttori
-
-        // public Report(){
-
-        // }
-
-        // Funzione che mi restituisce l'elenco degli stati validi
+        // Stati validi per il report
+        private static List<string> statiValidi = new List<string> { "Da verificare", "Approvato", "Emesso", "Annullato" };
 
         public List<string> getStatiValidi()
         {
-            List<string> stati = ["Da Verificare", "Approvato", "Emesso"];
-            return stati;
+            return statiValidi;
+        }
+
+        public bool isStatoValido(string statoDaVerificare)
+        {
+            return statiValidi.Contains(statoDaVerificare);
         }
 
         // Metodo ToString()

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Identity;  // Neccessario per la gestione delle identità
 using Models; 
 using Data;
 
@@ -69,51 +70,77 @@ namespace Controllers
             return true;
         }
 
+        // Inizio Sezione - Pagine di Navigazione
 
-        // Pagina di login
+        // Pagina 1: Consente di effetuare il login al sistema
         public IActionResult Index()
         {
-            if(VerificaSessione()){
+            // 1) Verifico se l'utente è già loggato
+            if (VerificaSessione())
+            {
                 return RedirectToAction("Index", "Home");
+            }
+            // 2) Verifico se ci sono utenti nel sistema
+            var utenti = _context.Users.ToList();
+            if (utenti.Count == 0)
+            {
+                TempData["Message"] = "Nessun utente trovato nel sistema. Crea un utente ADMIN per accedere.";
+                return RedirectToAction("FirstRegister", "Account");
             }
 
             return View();
         }
 
+        // Fine Sezione - Pagine di Navigazione
+
+        // Inizio Sezione - Azioni
+        // Azione 1: Consente di effetuare il login al sistema
         [HttpPost]
-        public IActionResult Accedi(string email, string password)
+        public IActionResult Accedi(string username, string password)
         {
             // Ottieni l'indirizzo IP dell'utente (Da sistemare in futuro)
             // var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             // Console.WriteLine("IP utente: " + ipAddress);
             // logFile.LogInfo($"Tentativo di accesso da IP: {ipAddress} ");
 
-            // Controllo credenziali vuote
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            // 1) Controllo se le credenziali sono vuote
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 TempData["Message"] = "Inserisci username e password.";
                 return RedirectToAction("Index");
             }
 
-            // Cerca l'utente nel database
-            var utente = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
+            // 2) Verifico le credenziali dell'utente fornite
 
+            var utente = _context.Users.FirstOrDefault(u => u.Email == username || u.Username == username);
             if (utente == null)
             {
                 TempData["Message"] = "Username o password errati.";
                 return RedirectToAction("Index");
             }
-            // Salvo il messagio di un nuovo accesso
-            AccountController.logFile.LogInfo($"Utente logato: {utente.Username} ");
 
-            // Salva i dati dell'utente in sessione
-            HttpContext.Session.SetInt32("idUser", utente.id);
-            HttpContext.Session.SetString("Username", utente.Username);
-            HttpContext.Session.SetString("Role", utente.getRuolo());
+            // 3) Verifico la password
+            var hasher = new PasswordHasher<User>();
+            var result = hasher.VerifyHashedPassword(utente, utente.Password, password);
+           
+            if (result == PasswordVerificationResult.Success)
+            {
+                // Password corretta, procedo con il login
 
-            return RedirectToAction("Index", "Home");
+                // 4) Salva i dati dell'utente in sessione
+                HttpContext.Session.SetInt32("idUser", utente.id);
+                HttpContext.Session.SetString("Username", utente.Username);
+                HttpContext.Session.SetString("Role", utente.getRuolo());
+
+                // 5) Salvo un messaggio di log per l'accesso effettuato
+                AccountController.logFile.LogInfo($"Utente logato: {utente.Username} ");
+                return RedirectToAction("Index", "Home");
+            }
+           
+            TempData["Message"] = "Username o password errati.";
+            return RedirectToAction("Index");
         }
-    
+        // Azione 2: Consente di effetuare il logout dal sistema
         public IActionResult Logout()
         {
             AccountController.logFile.LogInfo($"Utente disconesso: {username} ");
@@ -121,5 +148,6 @@ namespace Controllers
             TempData["Message"] = "Logout effettuato con successo!";
             return RedirectToAction("Index");
         }
+        // Fine Sezione - Azioni
     }
 }

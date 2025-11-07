@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Identity;  // Neccessario per la gestione delle identità
 using Models.ViewModels;
 using Models;
 using Data;
@@ -79,6 +80,28 @@ namespace Controllers
 
 
         // Inizio - Pagine di navigazione
+
+        // Pagina 0 : Consente di effetuare la prima registrazione di un utente ADMIN se non esistono utenti nel sistema
+
+        public IActionResult FirstRegister()
+        {
+            // 1) Verifico se l'utente è già loggato
+            if (VerificaSessione())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2) Verifico se esistono utenti nel sistema
+            var utenti = _context.Users.ToList();
+            if (utenti.Count > 0)
+            {
+                TempData["Message"] = "Esistono già utenti nel sistema. Effettua il login.";
+                return RedirectToAction("Index", "Login");
+            }
+            // 3) Reindirizzo alla pagina di registrazione
+            return View();
+        }
+
 
         // Pagina 1: Lista utenti 
         public IActionResult Show()
@@ -213,76 +236,114 @@ namespace Controllers
             return View();
         }
 
-    
+
 
         // Fine - Pagine di navigazione
         // Inizio - Funzioni
+
+        // Funzione 0: Crea il primo utente ADMIN se non esistono utenti nel sistema
+        [HttpPost]
+        public IActionResult CreateFristUser(string email, string password, string cognome, string nome)
+        {
+            // 1) Verifico se esistono utenti nel sistema
+            var utenti = _context.Users.ToList();
+            if (utenti.Count > 0)
+            {
+                TempData["Message"] = "Esistono già utenti nel sistema. Effettua il login.";
+                return RedirectToAction("Index", "Login");
+            }
+
+            // 2) Creo il primo utente ADMIN
+            var hasher = new PasswordHasher<User>();
+
+            var newUser = new User
+            {
+                Username = "Admin",
+                Email = email,
+                Cognome = cognome,
+                Password = "", // Verrà sostituita dopo l'hashing"
+                Nome = nome,
+                idRuolo = 1, // Ruolo ADMIN
+                dataCreazione = DateTime.Now
+            };
+
+            string hashedPassword = hasher.HashPassword(newUser, password);
+            newUser.Password = hashedPassword;
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            logFile.LogInfo($"Primo utente ADMIN creato: {username}");
+
+            TempData["Message"] = "Utente ADMIN creato con successo. Effettua il login.";
+            return RedirectToAction("Index", "Login");
+        }
 
         // Funzione 1: Crea nuovo utente
         [HttpPost]
         public IActionResult Crea(string username, string email, string password, string? cognome, string? nome, int ruolo, List<int> enti)
         {
 
-            // a) Verifico se esiste una sessione
+            // 1) Verifico se esiste una sessione ed il ruolo è ADMIN
             if (!VerificaSessione("ADMIN"))
             {
+                logFile.LogWarning($"Tentativo di accesso non autorizzato alla creazione di un utente da parte di {username}");
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Login"); // Ritorno alla pagina di login
             }
 
-            // c) Controllo che i dati siano stati inseriti correttamente
+            // 2) Verifico che ho i dati necessari per creare l'utente
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(cognome) || string.IsNullOrEmpty(nome) || ruolo == 0 || enti.Count == 0)
             {
                 ViewBag.Error = "Tutti i campi contrassegnati con * sono obbligatori";
                 return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
-            // d) Controllo che l'username non esista già
-            var userExists = _context.Users.Any(u => u.Username == username);
+            // 3) Controllo che l'utente non esista già con lo stesso username o email
+
+            var userExists = _context.Users.Any(u => u.Username == username || u.Email == email);
             if (userExists)
             {
-                ViewBag.Error = "L'username esiste già. Scegliere un altro username.";
+                ViewBag.Error = "L'utente esiste già. Scegliere un altro username.";
                 return RedirectToAction("Create"); // Ritorno alla pagina di creazione
             }
 
-            // e) Controllo che l'email non esista già
-            var emailExists = _context.Users.Any(u => u.Email == email);
-            if (emailExists)
-            {
-                ViewBag.Error = "L'email esiste già. Scegliere un'altra email.";
-                return RedirectToAction("Create"); // Ritorno alla pagina di creazione
-            }
+            // 4) Protezzione password se rispetta i criteri minimi (di lunghezza minima 8 caratteri, almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale)
+            // if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit) || !password.Any(ch => !char.IsLetterOrDigit(ch)))
+            // {
+            //     ViewBag.Error = "La password non soddisfa i criteri di sicurezza. Deve contenere almeno 8 caratteri, una lettera maiuscola, una minuscola, un numero e un carattere speciale.";
+            //     return RedirectToAction("Create"); // Ritorno alla pagina di creazione
+            // }
+           
+            // 5) Crittografo la password con PasswordHasher e creo l'utente
 
+            var hasher = new PasswordHasher<User>();
 
-            // f) Creo l'utente
             var newUser = new User
             {
                 Username = username,
                 Email = email,
                 Cognome = cognome,
-                Password = password,
+                Password = "", // Verrà sostituita dopo l'hashing"
                 Nome = nome,
                 idRuolo = ruolo,
                 dataCreazione = DateTime.Now
             };
 
+           string hashedPassword = hasher.HashPassword(newUser, password);
+           newUser.Password = hashedPassword;
 
             _context.Users.Add(newUser);
             _context.SaveChanges();
-            //Console.WriteLine("Utente creato!");
 
-            // g) Associo l'utente agli enti selezionati
-            //Console.WriteLine($"Username : {username} | Password: {password} | email: {email} | Cognome: {cognome} | Nome: {nome} | ruolo {ruolo}");
+            // 6) Se il ruolo è OPERATORE collego l'utente agli enti selezionati
             if (ruolo == 2)
             {
                 foreach (var enteId in enti)
                 {
                     var ente = _context.Enti.Find(enteId);
-                    //Console.WriteLine(ente.ToString());
                     if (ente != null)
                     {
-                        // Qui puoi implementare la logica per associare l'utente all'ente
-                        // Ad esempio, se hai una tabella di associazione UserEnte, puoi aggiungere una nuova voce lì
                         var userEnte = new UserEnte
                         {
                             idUser = newUser.id,
@@ -291,22 +352,18 @@ namespace Controllers
                         _context.UserEnti.Add(userEnte);
                     }
                     _context.SaveChanges();
-                    //Console.WriteLine("Enti Collegati!");
                 }
             }
-
+            
+            // 7) Registro l'evento e ritorno alla lista utenti
+            logFile.LogInfo($"Nuovo utente creato: {username} con ruolo {ruolo} da parte di {HttpContext.Session.GetString("Username")}");
             ViewBag.Message = "Utente creato con successo";
             return RedirectToAction("Show");
         }
 
-
-        // Funzione 2: Reset/Modifica password
-
-        // ....
-
-        // Funzione 3: Modifica dati utente
+        // Funzione 2: Modifica dati utente
         [HttpPost]
-        public IActionResult Update(int id, string username, string cognome, string nome, string email, string password)
+        public IActionResult Update(int id, string username, string cognome, string nome, string email)
         {
             var UtenteEsistente = _context.Users.FirstOrDefault(t => t.id == id);
 
@@ -314,29 +371,42 @@ namespace Controllers
             {
                 return RedirectToAction("Index", "Home"); // oppure restituisci una view con errore
             }
+            bool datiModificati = false;
 
-            // Aggiorna le proprietà
-            UtenteEsistente.Cognome = FunzioniTrasversali.rimuoviVirgolette(cognome);
-            UtenteEsistente.Nome = FunzioniTrasversali.rimuoviVirgolette(nome);
+            // Aggiorna le proprietà se sono diverse
 
-            if (UtenteEsistente.Username != username)
+            if (UtenteEsistente.Cognome != FunzioniTrasversali.rimuoviVirgolette(cognome))
+            {
+                UtenteEsistente.Cognome = FunzioniTrasversali.rimuoviVirgolette(cognome);
+                datiModificati = true;
+            }
+
+            if (UtenteEsistente.Nome != FunzioniTrasversali.rimuoviVirgolette(nome))
+            {
+                datiModificati = true;
+            }
+
+            if (UtenteEsistente.Username != FunzioniTrasversali.rimuoviVirgolette(username))
             {
                 UtenteEsistente.Username = FunzioniTrasversali.rimuoviVirgolette(username);
+                datiModificati = true;
             }
 
-            if (UtenteEsistente.Email != email)
+            if (UtenteEsistente.Email != FunzioniTrasversali.rimuoviVirgolette(email))
             {
                 UtenteEsistente.Email = FunzioniTrasversali.rimuoviVirgolette(email);
+                datiModificati = true;
             }
-
-            if (UtenteEsistente.Password != password)
+            if (datiModificati)
             {
-                UtenteEsistente.Password = FunzioniTrasversali.rimuoviVirgolette(password);
+                UtenteEsistente.dataAggiornamento = DateTime.Now;
+                ViewBag.Message = "Dati utente aggiornati con successo.";
+                _context.SaveChanges();
             }
-
-            UtenteEsistente.dataAggiornamento = DateTime.Now;
-
-            _context.SaveChanges();
+            else
+            {
+                ViewBag.Message = "Nessuna modifica rilevata nei dati dell'utente.";
+            }    
 
             return RedirectToAction("Show");
         }
@@ -345,29 +415,50 @@ namespace Controllers
 
         public IActionResult updatePassword(int id, string password)
         {
+            // 1) Verifico se esiste una sessione ed il ruolo è ADMIN
             if (!VerificaSessione("ADMIN"))
             {
+                logFile.LogWarning($"Tentativo di accesso non autorizzato alla reimpostazione della password da parte di {username}");
                 ViewBag.Message = "Utente non autorizzato ad effetuare questa operazione";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Mi ricavo l'utente dal suo id
+            // 2) Verifico che la password non sia vuota
+            if (string.IsNullOrEmpty(password))
+            {
+                ViewBag.Message = "La password non può essere vuota!";
+                return RedirectToAction("Modifica", "Account", new { id = id });
+            }
+
+            // 3) Verifico l'esistenza dell'utente
 
             var utente = _context.Users.FirstOrDefault(s => s.id == id);
-
             if (utente == null)
             {
                 ViewBag.Message = "Utente non trovato!";
                 return RedirectToAction("Show");
             }
 
-            // Aggiorno la password e la data di aggiornamento
+            // 4) Verifico che la password rispetti i criteri minimi (di lunghezza minima 8 caratteri, almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale)
+            // if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit) || !password.Any(ch => !char.IsLetterOrDigit(ch)))
+            // {
+            //     ViewBag.Message = "La password non soddisfa i criteri di sicurezza. Deve contenere almeno 8 caratteri, una lettera maiuscola, una minuscola, un numero e un carattere speciale.";
+            //     return RedirectToAction("Modifica", "Account", new { id = id });
+            // }
 
-            utente.Password = password;
-            utente.dataAggiornamento = DateTime.Now;
+            // 5) Crittografo la password con PasswordHasher
+            var hasher = new PasswordHasher<User>();
+            string hashedPassword = hasher.HashPassword(utente, password);
+            string newPassword = hashedPassword;
+
+            // 6) Salvo le modifiche
+            utente.Password = newPassword;
+            // utente.dataAggiornamento = DateTime.Now;
+            utente.DataAggiornamentoPassword = DateTime.Now;
 
             _context.Users.Update(utente);
             _context.SaveChanges();
+            logFile.LogInfo($"Password reimpostata per l'utente {utente.Username} da parte di {HttpContext.Session.GetString("Username")}");
 
             ViewBag.Message = "Password Cambiata con successo!";
             return RedirectToAction("Modifica", "Account", new { id = id });
@@ -395,7 +486,6 @@ namespace Controllers
                 return RedirectToAction("Dettagli", "Account", new { id = id });
             }
 
-
             // 3. Verifico che le password non sono diverse
 
             if (newPassword != confirmPassword)
@@ -404,17 +494,26 @@ namespace Controllers
                 return RedirectToAction("Dettagli", "Account", new { id = id });
             }
 
-            // 4. Aggiorno la password
+            // 4. Crittografo la nuova password con PasswordHasher
+            var hasher = new PasswordHasher<User>();
+            string hashedPassword = hasher.HashPassword(utente, newPassword);
+        
+            // 5. Aggiorno la password
 
-            utente.Password = newPassword;
-            utente.dataAggiornamento = DateTime.Now;
+            utente.Password = hashedPassword;
+            // utente.dataAggiornamento = DateTime.Now;
+            utente.DataAggiornamentoPassword = DateTime.Now;
 
             _context.Users.Update(utente);
             _context.SaveChanges();
+
+            // 6. Registro l'evento
+            logFile.LogInfo($"Password cambiata per l'utente {utente.Username} ");
 
             ViewBag.Message = "Password Cambiata con successo!";
             return RedirectToAction("Dettagli", "Account", new { id = id });
         }
 
+        // Fine - Funzioni
     }
 }

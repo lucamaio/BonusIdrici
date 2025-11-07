@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Configurazione Primo Accesso";
+}
+
+<main class="fl-main">
+<div class="fl-container">
+    <div class="fl-left-panel">
+        <h1 class="fl-title">Benvenuto</h1>
+        <p class="fl-description">Configura il tuo account amministratore per il sistema di gestione Bonus Idrici.</p>
+    </div>
+
+    <div class="fl-right-panel">
+        <h2 class="fl-form-title">Crea il tuo account</h2>
+        <form asp-controller="Account" asp-action="CreateFristUser" method="POST" class="fl-form">
+            <label for="nome" class="fl-label fw-bold">Nome</label>
+            <input type="text" id="nome" name="nome" class="fl-input" required>
+
+            <label for="cognome" class="fl-label fw-bold">Cognome</label>
+            <input type="text" id="cognome" name="cognome" class="fl-input" required>
+
+            <label for="email" class="fl-label fw-bold">Email</label>
+            <input type="email" id="email" name="email" class="fl-input" required>
+
+            <label for="password" class="fl-label fw-bold">Password</label>
+            <input type="password" id="password" name="password" class="fl-input" required>
+
+            <button type="submit" class="fl-button">Crea account</button>
+        </form>
+    </div>
+</div>
+</main>

@@ -36,6 +36,9 @@
                             <tr>
                                 <th class="text-center">Elaborazione</th>
                                 <th class="text-center">Data Elaborazione</th>
+                                @if(ruolo == "ADMIN"){
+                                    <th class="text-center">Data Aggiornamento</th>
+                                }
                                 <th class="text-center">Stato</th>
                                 <th class="text-center">Serie</th>
                                 <th class="text-center">Numero Record</th>
@@ -48,11 +51,16 @@
                             {
                                 @* var dataUrl = report.DataCreazione.ToString("yyyy-MM-dd HH:mm:ss"); *@
                                 var dataUrl = report.DataCreazione.ToString("dd/MM/yyyy HH:mm:ss");
+                                var dataAggiornamento = report.DataAggiornamento?.ToString("dd/MM/yyyy HH:mm:ss") ?? "ND";
+                                 @* Formattazione mese e anno *@
                                 var esportatoda = report.mese + " " + report.anno;
                                 esportatoda = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(esportatoda.ToLower());
                                   <tr>
                                     <td class="text-center"><span>@esportatoda</span></td>
                                     <td class="text-center"><span>@dataUrl</span></td>
+                                    @if(ruolo == "ADMIN"){
+                                        <td class="text-center"><span>@dataAggiornamento</span></td>
+                                    }
                                     <td class="text-center"><span>@report.stato</span></td>
                                     <td class="text-center"><span>@report.serie</span></td>
                                     <td class="text-center"><span>@report.count</span></td>

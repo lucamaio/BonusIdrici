@@ -54,6 +54,8 @@ namespace Models
 
         public DateTime? dataAggiornamento { get; set; }
 
+        public DateTime? DataAggiornamentoPassword { get; set; }
+
         // Metodo per ottenere la descrizione del ruolo in base all'idRuolo
         public string? getRuolo()
         {
