@@ -403,7 +403,6 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\scopedcss\bundle\Bon
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\scopedcss\projectbundle\BonusIdrici2.bundle.scp.css
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\2eh2bpy5t6-61n19gt1b8.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\kuhye7d3fm-peyzcavbpg.gz
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-pefnsyf0mm.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\1m9b6tb3xa-bqjiyaj88i.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\mzhverrf52-c2jlpeoesf.gz
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\m0atteg26z-erw9l3u2r3.gz
@@ -475,4 +474,5 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\refint\BonusIdrici2.
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.pdb
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\BonusIdrici2.genruntimeconfig.cache
 C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\ref\BonusIdrici2.dll
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-6vkzp2xk1s.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-rakgok2gxf.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-eqqrnbnk09.gz

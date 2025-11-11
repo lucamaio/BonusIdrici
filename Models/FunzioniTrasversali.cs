@@ -425,5 +425,34 @@ namespace Models
             return dichiarante.Cognome + " " + dichiarante.Nome;
         }
 
+        // Funzione che restituisce lo stato dell'utenza idrica come stringa
+        public static string getStatoStringUtenza(int? stato)
+        {
+            //Valori campo stato (1=Iscrivendo;2=Iscritto;3=Iscrivendo/Cancellando;4=Cancellando;5=Cancellato)
+            return stato switch
+            {
+                1 => "Iscrivendo",
+                2 => "Iscritto",
+                3 => "Iscrivendo/Cancellando",
+                4 => "Cancellando",
+                5 => "Cancellato",
+                _ => "Sconosciuto",
+            };
+        }
+
+        public static string MaiuscoleIniziali(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            var parole = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < parole.Length; i++)
+            {
+                parole[i] = char.ToUpper(parole[i][0]) + parole[i].Substring(1).ToLower();
+            }
+
+            return string.Join(" ", parole);
+        }
+
     }
 }

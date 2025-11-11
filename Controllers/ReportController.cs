@@ -159,6 +159,7 @@ namespace Controllers
 
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di visualizzazione domande. Ha tentato di visualizzare il report ID " + idReport);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -216,6 +217,7 @@ namespace Controllers
             // 1. Verifico se esiste una sessione attiva
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di variazione serie domande. Ha tentato di variare la serie del report ID " + idReport);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -286,6 +288,13 @@ namespace Controllers
 
         public async Task<IActionResult> ScaricaCsv(int idReport, string tipoEsportazione)
         {
+            if (!VerificaSessione())
+            {
+                AccountController.logFile.LogWarning($"Utente non autorizzato ad accedere alla pagina di download domande. Ha tentato di scaricare un file CSV di tipo {tipoEsportazione}, idReport {idReport}.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             // 1) Validazione input
             if (idReport <= 0 || string.IsNullOrEmpty(tipoEsportazione))
             {
@@ -382,6 +391,7 @@ namespace Controllers
             // 1) Verfica la sessione
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di variazione serie domande. Ha tentato di variare la serie del report ID " + idReport);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -419,6 +429,8 @@ namespace Controllers
                 return RedirectToAction("Show", "Report", new { selectedEnteId = reportEsistente.idEnte });
             }
 
+            AccountController.logFile.LogInfo("L'Utente " + username + " sta modificando la serie del report ID " + reportEsistente.id + " da " + reportEsistente.serie + " a " + serie);
+
             reportEsistente.serie = serie;
             reportEsistente.DataAggiornamento = DateTime.Now;
 
@@ -437,6 +449,7 @@ namespace Controllers
             // 1) Verifico se esiste una sessione attiva
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di variazione dati domande. Ha tentato di variare la domanda ID " + id);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -525,6 +538,7 @@ namespace Controllers
             // 1. Verifica la sessione
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di variazione stato report. Ha tentato di modificare lo stato del report ID " + idReport);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }

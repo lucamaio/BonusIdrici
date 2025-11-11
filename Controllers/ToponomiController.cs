@@ -79,6 +79,7 @@ namespace Controllers
         {
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la pagina di selezione ente per la gestione toponimi.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -106,6 +107,7 @@ namespace Controllers
             // Verifico l'autorizzazione e la sessione dell'utente
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la pagina di visualizzazione toponimi per l'ente ID " + selectedEnteId);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -140,6 +142,7 @@ namespace Controllers
         {
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la pagina di creazione nuovo toponimo per l'ente ID " + idEnte);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -153,6 +156,7 @@ namespace Controllers
         {
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la pagina di modifica toponimo ID " + id);
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -178,6 +182,13 @@ namespace Controllers
         [HttpPost]
         public IActionResult crea(string denominazione, string normalizzazione, int idEnte)
         {
+            if (!VerificaSessione())
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la funzione crea per aggiungere un toponimo.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+            
             var nuovoToponimo = new Toponimo
             {
                 denominazione = denominazione.Trim().ToUpper(),
@@ -198,6 +209,12 @@ namespace Controllers
         [HttpPost]
         public IActionResult Update(int id, string denominazione, string normalizzazione, DateTime data_creazione, int idEnte)
         {
+            if(!VerificaSessione())
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la funzione Update per modificare il toponimo ID " + id);
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
             var toponimoEsistente = _context.Toponomi.FirstOrDefault(t => t.id == id);
 
             if (toponimoEsistente == null)

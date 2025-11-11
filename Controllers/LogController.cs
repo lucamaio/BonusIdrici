@@ -86,6 +86,8 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di visualizzazione log.");
+                ViewBag.Messaggio = "Accesso non autorizzato.";
                 return RedirectToAction("Index", "Home");
             }
             ViewBag.TipologieLog = tipologieLog;
@@ -98,6 +100,7 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di visualizzazione log.");
                 ViewBag.Messaggio = "Accesso non autorizzato.";
                 return RedirectToAction("Index", "Home");
             }
@@ -166,6 +169,7 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di visualizzazione dettaglio log.");
                 ViewBag.Messaggio = "Accesso non autorizzato.";
                 return RedirectToAction("Index", "Home");
             }

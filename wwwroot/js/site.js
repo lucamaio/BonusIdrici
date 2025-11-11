@@ -20,6 +20,45 @@
 //         }
 //     });
 
+// Dark mode automatico in base al tema salvato in sessione
+
+ // wwwroot/js/funzioni-trasversali.js
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const body = document.body;
+//     const icon = document.getElementById('darkIcon');
+//     const toggleButton = document.getElementById('toggleDarkMode');
+
+//     // Valore fornito dal server (se presente)
+//     const serverTheme = body.getAttribute('data-theme');
+
+//     // Recupero preferenza locale o valore server
+//     const savedTheme = localStorage.getItem('theme') || serverTheme || 'light';
+
+//     // Applica il tema iniziale
+//     if (savedTheme === 'dark') {
+//         body.classList.add('dark-mode');
+//         icon?.classList.replace('bi-moon-stars', 'bi-sun');
+//     } else {
+//         body.classList.remove('dark-mode');
+//         icon?.classList.replace('bi-sun', 'bi-moon-stars');
+//     }
+
+//     // Gestione cambio tema
+//     toggleButton?.addEventListener('click', () => {
+//         body.classList.toggle('dark-mode');
+//         const isDark = body.classList.contains('dark-mode');
+
+//         if (isDark) {
+//             localStorage.setItem('theme', 'dark');
+//             icon?.classList.replace('bi-moon-stars', 'bi-sun');
+//         } else {
+//             localStorage.setItem('theme', 'light');
+//             icon?.classList.replace('bi-sun', 'bi-moon-stars');
+//         }
+//     });
+// });
+
 // Load-Bar
 
  $(document).ready(function () {
@@ -39,9 +78,22 @@
         searching: true,
         ordering: true,
         responsive: true,
+        pageLength: 25,
+        lengthMenu: [10, 25, 50, 100],
         language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-        dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
-        buttons: [ ],
+        dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+        buttons: [],
+        drawCallback: function (settings) {
+            var api = this.api();
+            var pages = api.page.info().pages;
+            if (pages <= 1) {
+                $(api.table().container()).find('.dataTables_paginate').hide();
+                $(api.table().container()).find('.dataTables_length').hide();
+            } else {
+                $(api.table().container()).find('.dataTables_paginate').show();
+                $(api.table().container()).find('.dataTables_length').show();
+            }
+        }
     }); 
 
     domandeTable.on('init', function () {

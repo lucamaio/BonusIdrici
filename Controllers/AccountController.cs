@@ -20,6 +20,7 @@ namespace Controllers
         private string? ruolo;
         private int? idUser;
         private string? username;
+        private string tema;
 
         // File di Log accessi 
         public static FileLog logFile = new FileLog($"wwwroot/log/utenti.log");
@@ -34,6 +35,7 @@ namespace Controllers
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
                 idUser = HttpContext.Session.GetInt32("idUser");
+                tema = HttpContext.Session.GetString("Tema") ?? "Default";
             }
         }
 
@@ -47,18 +49,21 @@ namespace Controllers
             username = HttpContext.Session.GetString("Username");
             ruolo = HttpContext.Session.GetString("Role");
             idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+            tema = HttpContext.Session.GetString("Tema") ?? "Default";
 
             if (!VerificaSessione())
             {
                 username = null;
                 ruolo = null;
                 idUser = 0;
+                tema = "Default";
             }
 
             // Così le variabili sono disponibili in tutte le viste
             ViewBag.idUser = idUser;
             ViewBag.Username = username;
             ViewBag.Ruolo = ruolo;
+            ViewBag.Tema = tema;
         }
 
         // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
@@ -88,6 +93,8 @@ namespace Controllers
             // 1) Verifico se l'utente è già loggato
             if (VerificaSessione())
             {
+                logFile.LogWarning($"Utente {username} ha tentato di accedere alla pagina di FirstRegister pur essendo già loggato.");
+                ViewBag.Message = "Sei già loggato nel sistema.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -95,6 +102,7 @@ namespace Controllers
             var utenti = _context.Users.ToList();
             if (utenti.Count > 0)
             {
+                logFile.LogWarning("Tentativo di accesso alla pagina di FirstRegister nonostante esistano già utenti nel sistema.");
                 TempData["Message"] = "Esistono già utenti nel sistema. Effettua il login.";
                 return RedirectToAction("Index", "Login");
             }
@@ -109,6 +117,7 @@ namespace Controllers
             // a) Verifico se esiste una sessione
             if (!VerificaSessione("ADMIN"))
             {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di visualizzazione utenti.");
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Login");
             }
@@ -126,6 +135,8 @@ namespace Controllers
             // a) Verifico se esiste una sessione
             if (!VerificaSessione())
             {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di dettagli account.");
+                ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Login");
             }
 
@@ -147,6 +158,7 @@ namespace Controllers
             // a) Verifico se esiste una sessione
             if (!VerificaSessione())
             {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di sicurezza account.");
                 return RedirectToAction("Index", "Login");
             }
             ViewBag.id = id;
@@ -160,6 +172,7 @@ namespace Controllers
             // a) Verifico se esiste una sessione
             if (!VerificaSessione())
             {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di impostazioni account.");
                 return RedirectToAction("Index", "Login");
             }
 
@@ -173,6 +186,7 @@ namespace Controllers
             // a) Verifico se esiste una sessione
             if (!VerificaSessione("ADMIN"))
             {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di creazione nuovo utente.");
                 ViewBag.Message = "Non sei Autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Login");
             }
@@ -192,6 +206,7 @@ namespace Controllers
         {
             if (!VerificaSessione())
             {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di modifica utente.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -245,6 +260,13 @@ namespace Controllers
         [HttpPost]
         public IActionResult CreateFristUser(string email, string password, string cognome, string nome)
         {
+            if (VerificaSessione())
+            {
+                logFile.LogWarning($"Utente {username} ha tentato di accedere alla funzione CreateFirstUser pur essendo già loggato.");
+                ViewBag.Message = "Sei già loggato nel sistema.";
+                return RedirectToAction("Index", "Home");
+            }
+            
             // 1) Verifico se esistono utenti nel sistema
             var utenti = _context.Users.ToList();
             if (utenti.Count > 0)
@@ -469,6 +491,13 @@ namespace Controllers
 
         public IActionResult ChangePassword(int id, string password, string newPassword, string confirmPassword)
         {
+            if (!VerificaSessione())
+            {
+                logFile.LogWarning("Utente non autorizzato ad accedere alla funzione di cambio password.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+            
             // 1. Ricavo l'utente a partire dal id
             var utente = _context.Users.FirstOrDefault(s => s.id == id);
 

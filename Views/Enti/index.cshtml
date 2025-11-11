@@ -4,14 +4,15 @@
 }
 
 <div class="container-xxl flex-grow-1 py-5">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
-                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <h3 class="mb-1 fw-bold">
-                        <i class="bi bi-people-fill me-2"></i> Enti
-                    </h3>
+               <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <div class="d-flex fw-bold justify-content-center align-items-center">
+                        <i class="fa-solid fa-building me-2"></i>
+                        <h3 class="fw-bold mb-0">Enti</h3>
+                    </div>
                 </div>
 
                 <!-- Barra di caricamento -->
@@ -30,9 +31,18 @@
                 <div class="card-body p-4 position-relative">
                     @if (Model != null && Model.Any())
                     {
-                        <p class="lead mb-4 text-muted">Di seguito trovi l'anagrafe del ente selezionato.</p>
+                       <div class="info-text mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span>Di seguito sono elencate tutte gli enti registrati nel sistema.</span>
+                        </div>
 
-                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> <!-- 🔹 nascosta finché carica -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="@Url.Action("Create", "Enti")" class="btn btn-modern-add shadow-sm">
+                                <i class="bi bi-plus-circle me-2"></i> Aggiungi un Ente
+                            </a>
+                        </div>
+
+                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> 
                             <table id="entiTable" class="table table-hover align-middle border-bottom w-100">
                                 <thead>
                                     <tr>
@@ -49,14 +59,14 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td><span class="fw-semibold">@item.id</span></td>
-                                            <td><span class="fw-semibold">@item.nome</span></td>
-                                            <td>@item.istat</td>    
-                                            <td>@item.CodiceFiscale</td>
-                                            <td>@item.partitaIva</td>
-                                            <td>@item.Cap</td>
+                                            <td><span class="text-center fw-semibold">@item.id</span></td>
+                                            <td><span class="text-center fw-semibold">@item.nome</span></td>
+                                            <td><span class="text-center">@item.istat</span></td>    
+                                            <td><span class="text-center">@item.CodiceFiscale</span></td>
+                                            <td><span class="text-center">@item.partitaIva</span></td>
+                                            <td><span class="text-center">@item.Cap</span></td>
                                             <td class="text-center">
-                                                <a class="btn btn-sm btn-light border me-1" title="Modifica Ente"
+                                                <a class="btn btn-modern-edit btn-sm" title="Modifica Dati Ente"
                                                    href="@Url.Action("Modifica", "Enti", new { id = item.id})">
                                                     <i class="bi bi-pencil-square text-primary"></i>
                                                 </a>
@@ -109,15 +119,22 @@
                 searching: true,
                 ordering: true,
                 responsive: true,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
-                buttons: [ {
-                        text: '<i class="bi bi-plus-circle me-1"></i> Aggiungi',
-                        className: 'btn btn-sm btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("Create", "Enti")';
-                        }
-                    } ]
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                buttons: [],
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var pages = api.page.info().pages;
+                    if (pages <= 1) {
+                        $(api.table().container()).find('.dataTables_paginate').hide();
+                        $(api.table().container()).find('.dataTables_length').hide();
+                    } else {
+                        $(api.table().container()).find('.dataTables_paginate').show();
+                        $(api.table().container()).find('.dataTables_length').show();
+                    }
+                }
             });
 
             entiTable.on('init', function () {

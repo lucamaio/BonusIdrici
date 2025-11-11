@@ -21,6 +21,8 @@ namespace Controllers
         private int? idUser;
         private string? username;
 
+        private string tema;
+
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
@@ -31,6 +33,7 @@ namespace Controllers
                 username = HttpContext.Session.GetString("Username");
                 ruolo = HttpContext.Session.GetString("Role");
                 idUser = HttpContext.Session.GetInt32("idUser");
+                tema = HttpContext.Session.GetString("Tema") ?? "Default";
             }
         }
 
@@ -44,18 +47,21 @@ namespace Controllers
             username = HttpContext.Session.GetString("Username");
             ruolo = HttpContext.Session.GetString("Role");
             idUser = HttpContext.Session.GetInt32("idUser") ?? 0;
+            tema = HttpContext.Session.GetString("Tema") ?? "Default";
 
             if (!VerificaSessione())
             {
                 username = null;
                 ruolo = null;
                 idUser = 0;
+                tema = "Default";
             }
 
             // Così le variabili sono disponibili in tutte le viste
             ViewBag.idUser = idUser;
             ViewBag.Username = username;
             ViewBag.Ruolo = ruolo;
+            ViewBag.Tema = tema;
         }
 
         // Funzione che verifica se esiste una funzione ed il ruolo e quello richiesto per accedere alla pagina
@@ -90,6 +96,7 @@ namespace Controllers
             ViewBag.IdUtente = idUser;
             ViewBag.Username = username;
             ViewBag.Ruolo = ruolo;
+            ViewBag.Tema = tema;
 
             return View();
         }

@@ -7,16 +7,16 @@
 }
 
 <div class="container-xxl flex-grow-1 py-5">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
                 <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <h3 class="mb-1 fw-bold">
-                        <i class="bi bi-geo-alt-fill me-2"></i> Toponomi -
-                        <span class="fw-semibold">@selectedEnteNome</span>
-                    </h3>
-                    <small>ID Ente: @selectedEnteId</small>
+                    <div class="d-flex fw-bold justify-content-center align-items-center">
+                        <i class="bi bi-geo-alt-fill me-2"></i>
+                        <h3 class="fw-bold mb-0">Toponomi - <span class="fw-semibold">@selectedEnteNome</span></h3>
+                    </div>
+                    <p class="mb-0 small opacity-75">ID Ente: <span class="fw-semibold">@selectedEnteId</span></p>
                 </div>
 
                 <!-- Barra di caricamento -->
@@ -29,47 +29,54 @@
                 <div class="card-body p-4 position-relative">
                     @if (toponimi != null && toponimi.Count > 0)
                     {
-                        
-                        <div style="background-color: #f8f9fa; border-radius: 12px;"></div>
-                            <div class="row g-3">
-                                <!-- Stat Box 1 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-road fa-2x text-primary mb-2"></i>
-                                            <h6>Totale Toponomi</h6>
-                                            <h4>@ViewBag.TotaleToponomi</h4>
+                        <div class="row g-4 mb-4">
+                            <div class="col-6 col-md-4 col-lg-4">
+                                <div class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow">
+                                    <div class="card-body py-4">
+                                        <div class="icon-circle mx-auto mb-3 bg-light shadow-sm">
+                                            <i class="fa-solid fa-road text-primary fs-4"></i>
                                         </div>
+                                        <h6 class="fw-semibold mb-1">Totale Toponomi</h6>
+                                        <h4 class="fw-bold text-dark mb-0">@ViewBag.TotaleToponomi</h4>
                                     </div>
                                 </div>
-
-                                <!-- Stat Box 2 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-xmark fa-2x text-danger mb-2"></i>
-                                            @* <i class="fa-solid fa-check-to-slot fa-2x text-success mb-2"></i> *@
-                                            <h6>Toponomi senza normalizzazione</h6>
-                                            <h4>@ViewBag.ToponomiNoNormalizzazione</h4>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-4">
+                                <div class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow">
+                                    <div class="card-body py-4">
+                                        <div class="icon-circle mx-auto mb-3 bg-light shadow-sm">
+                                            <i class="fa-solid fa-xmark text-danger fs-4"></i>
                                         </div>
+                                        <h6 class="fw-semibold mb-1">Toponomi senza normalizzazione</h6>
+                                        <h4 class="fw-bold text-dark mb-0">@ViewBag.ToponomiNoNormalizzazione</h4>
                                     </div>
                                 </div>
-                                <!-- Stat Box 3 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
-                                            <h6>Toponomi Normalizzati</h6>
-                                            <h4>@ViewBag.ToponomiNormalizzati</h4>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-4">
+                                <div class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow">
+                                    <div class="card-body py-4">
+                                        <div class="icon-circle mx-auto mb-3 bg-light shadow-sm">
+                                            <i class="fa-solid fa-circle-check text-success fs-4"></i>
                                         </div>
+                                        <h6 class="fw-semibold mb-1">Toponomi Normalizzati</h6>
+                                        <h4 class="fw-bold text-dark mb-0">@ViewBag.ToponomiNormalizzati</h4>
                                     </div>
                                 </div>
+                            </div>
                         </div>
+
                         <hr class="my-4" />
                         <p class="lead mb-4 text-muted">Di seguito sono elencati i toponimi associati all’ente selezionato.</p>
 
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="@Url.Action("Create", "Toponomi", new { idEnte = selectedEnteId })"
+                               class="btn btn-modern-add shadow-sm">
+                                <i class="bi bi-plus-circle me-2"></i> Aggiungi Toponimo
+                            </a>
+                        </div>
+
                         <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
-                            <table id="toponomiTable" class="table table-hover align-middle border-bottom w-100">
+                            <table id="toponomiTable" class="table table-hover align-middle border-bottom w-100 rounded-3 shadow-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-center">Id</th>
@@ -83,17 +90,17 @@
                                 <tbody>
                                     @foreach (var toponimo in toponimi)
                                     {
-                                         tipoToponimo = toponimo.tipoToponimo ?? "N/D";
+                                        tipoToponimo = toponimo.tipoToponimo ?? "N/D";
                                         <tr>
-                                            <td class="text-center"><span>@toponimo.id</span></td>
-                                            <td><span>@toponimo.denominazione</span></td>
-                                            <td><span>@toponimo.normalizzazione</span></td>
-                                            <td><span class="text-center">@tipoToponimo</span></td>
-                                            <td><span class="text-center">@toponimo.dataCreazione?.ToString("dd/MM/yyyy")</span></td>
+                                            <td class="text-center">@toponimo.id</td>
+                                            <td>@toponimo.denominazione</td>
+                                            <td>@toponimo.normalizzazione</td>
+                                            <td class="text-center">@tipoToponimo</td>
+                                            <td class="text-center">@toponimo.dataCreazione?.ToString("dd/MM/yyyy")</td>
                                             <td class="text-center">
-                                                <a class="btn btn-sm btn-light border me-1" title="Modifica Toponimo"
+                                                <a class="btn btn-modern-edit btn-sm" title="Modifica Toponimo"
                                                    href="@Url.Action("Modifica", "Toponomi", new { id = toponimo.id})">
-                                                    <i class="bi bi-pencil-square text-primary"></i>
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -109,7 +116,7 @@
                         </div>
                     }
 
-                     @if(ViewBag.Ruolo != "OPERATORE"){
+                    @if(ViewBag.Ruolo != "OPERATORE"){
                         <div class="d-grid mt-4">
                             <a href="@Url.Action("Index", "Toponomi")" class="btn btn-outline-secondary btn-lg shadow-sm">
                                 <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
@@ -117,11 +124,11 @@
                         </div>
                     }else{
                         <div class="d-grid mt-4">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
-                        </a>
-                    </div>
-                    }       
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
+                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
+                            </a>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -130,41 +137,46 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $("#loadingBarContainer").show();
-                var progress = 0;
-                var interval = setInterval(function () {
-                    if (progress < 90) {
-                        progress += 10;
-                        $("#loadingBar").css("width", progress + "%");
-                    }
-                }, 300);
-                
-            var toponomiTable = $('#toponomiTable').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                responsive: true,
-                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
-                buttons: [
-                    {
-                       text: '<i class="bi bi-plus-circle me-1"></i> Aggiungi',
-                        className: 'btn btn-sm btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("Create", "Toponomi", new { idEnte = selectedEnteId })';
-                        }
-                    }
-                ],
-            }); 
-            toponomiTable.on('init', function () {
-                clearInterval(interval);
-                $("#loadingBar").css("width", "100%");
-                setTimeout(function () {
-                    $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); 
-                }, 500);
-            });
-        }); 
+    $(document).ready(function () {
+        $("#loadingBarContainer").show();
+        var progress = 0;
+        var interval = setInterval(function () {
+            if (progress < 90) {
+                progress += 10;
+                $("#loadingBar").css("width", progress + "%");
+            }
+        }, 300);
+
+        var toponomiTable = $('#toponomiTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            responsive: true,
+            pageLength: 25,
+            lengthMenu: [10, 25, 50, 100],
+            language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+            dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+            drawCallback: function (settings) {
+                var api = this.api();
+                var pages = api.page.info().pages;
+                if (pages <= 1) {
+                    $(api.table().container()).find('.dataTables_paginate').hide();
+                    $(api.table().container()).find('.dataTables_length').hide();
+                } else {
+                    $(api.table().container()).find('.dataTables_paginate').show();
+                    $(api.table().container()).find('.dataTables_length').show();
+                }
+            }
+        });
+
+        toponomiTable.on('init', function () {
+            clearInterval(interval);
+            $("#loadingBar").css("width", "100%");
+            setTimeout(function () {
+                $("#loadingBarContainer").fadeOut();
+                $("#tableWrapper").fadeIn();
+            }, 500);
+        });
+    });
     </script>
 }

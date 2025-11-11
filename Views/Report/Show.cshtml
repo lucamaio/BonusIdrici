@@ -30,6 +30,11 @@
             {
                 <p class="lead mb-4 text-muted">Seleziona un'elaborazione per visualizzare le domande corrispondenti.</p>
                 
+                <div class="btn-group">
+                    <a href="@Url.Action("NewProcessing", "Elaborazione")" class="btn btn-outline-primary">
+                        <i class="bi bi-gear-fill me-1"></i>Nuova Elaborazione
+                    </a>
+                </div>
                 <div class="table-responsive">
                     <table id="elencoDomande" class="table table-hover align-middle border-bottom">
                         <thead>

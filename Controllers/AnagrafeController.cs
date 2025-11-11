@@ -119,18 +119,24 @@ namespace Controllers
 
             var dati = _context.Dichiaranti.Where(r => r.IdEnte == selectedEnteId).ToList();
 
-            var viewModelList = dati.Select(x => new AnagrafeViewModel
-            {
-                id = x.id,
-                Cognome = x.Cognome,
-                Nome = x.Nome,
-                CodiceFiscale = x.CodiceFiscale,
-                Sesso = x.Sesso,
-                IndirizzoResidenza = x.IndirizzoResidenza,
-                NumeroCivico = x.NumeroCivico,
-                IdEnte = x.IdEnte
-            }).ToList();
-
+           var viewModelList = _context.Dichiaranti
+                .Where(r => r.IdEnte == selectedEnteId)
+                .OrderBy(x => x.Cognome)
+                .ThenBy(x => x.Nome)
+                .ThenBy(x => x.DataNascita)
+                .Select(x => new AnagrafeViewModel
+                {
+                    id = x.id,
+                    Cognome = x.Cognome,
+                    Nome = x.Nome,
+                    CodiceFiscale = x.CodiceFiscale,
+                    Sesso = x.Sesso,
+                    DataNascita = x.DataNascita,
+                    IndirizzoResidenza = x.IndirizzoResidenza,
+                    NumeroCivico = x.NumeroCivico,
+                    IdEnte = x.IdEnte
+                })
+                .ToList();
 
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
@@ -185,6 +191,7 @@ namespace Controllers
             // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
             if (!VerificaSessione("ADMIN"))
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di caricamento anagrafe.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -277,6 +284,7 @@ namespace Controllers
             // Controllo se l'utente può accedere alla pagina desideratà
             if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di caricamento anagrafe. Ha invocato la funzione Upload.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }

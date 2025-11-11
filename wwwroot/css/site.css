@@ -20,12 +20,12 @@ body {
 
 /* Dark Mode */
 body.dark-mode {
-  background-color: #121212 !important;
+  background-color: #343333 !important;
   color: #f8f9fa !important;
 }
 
 body.dark-mode .navbar {
-  background-color: #1f1f1f !important;
+  background-color: #071c92 !important;
 }
 
 body.dark-mode .card {
@@ -162,6 +162,14 @@ body.dark-mode a {
 .card-action:hover .card-title {
   color: #032f81;
   /* Colore link Bootstrap al passaggio del mouse */
+}
+
+.card-action .card-title .dark-mode {
+  color: #ffffff;
+}
+
+.card-action:hover .card-title .dark-mode {
+  color: #cccccc;
 }
 
 .icon-circle {
@@ -788,6 +796,149 @@ S .page-header {
     cursor: default;
 }
 
+/* Contenitore del select e della barra di ricerca */
+.dataTables_length label {
+    font-weight: 500;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Selettore "Mostra" */
+.dataTables_length select {
+    border-radius: 8px;
+    border: 1px solid #d0d7de;
+    padding: 6px 10px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+}
+
+.dataTables_length select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Barra di ricerca */
+.dataTables_filter {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dataTables_filter label {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dataTables_filter input {
+    width: 480px !important; /* ✅ Ancora più grande */
+    max-width: 100%;
+    border-radius: 50px;
+    border: 1px solid #d0d7de;
+    background-color: #f8f9fa;
+    padding: 10px 16px 10px 40px;
+    font-size: 1rem;
+    transition: all 0.25s ease-in-out;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/622/622669.png'); /* 🔍 Icona lente */
+    background-size: 18px;
+    background-repeat: no-repeat;
+    background-position: 14px center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.dataTables_filter input:focus {
+    outline: none;
+    background-color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+    transform: scale(1.01);
+}
+
+/* Spaziatura coerente */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length {
+    margin-bottom: 0 !important;
+}
+
+/* Pulsante aggiungi moderno */
+
+.btn-modern-add {
+    background: linear-gradient(90deg, #1E3A8A, #0f47e0);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 12px 24px;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+}
+
+.btn-modern-add:hover {
+    background: linear-gradient(90deg, #2446a2, #2356e4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 123, 255, 0.35);
+    color: #fff;
+}
+
+.btn-modern-add:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.25);
+}
+
+
+/* Stile per il pulsante azione
+/* --- Pulsante Azione "Modifica" --- */
+.btn-modern-edit {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border: 1px solid #dee2e6;
+    color: #0d6efd;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-modern-edit i {
+    transition: transform 0.25s ease-in-out, color 0.25s ease-in-out;
+}
+
+.btn-modern-edit:hover {
+    background: linear-gradient(135deg, #e9f2ff, #ffffff);
+    border-color: #0d6efd;
+    color: #0d6efd;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-modern-edit:hover i {
+    transform: rotate(8deg) scale(1.1);
+    color: #0a58ca;
+}
+
+/* --- Hover sui div statici (card statistiche) --- */
+.stat-card {
+    transition: all 0.3s ease-in-out;
+    background-color: #fff;
+}
+
+.stat-card:hover {
+    background-color: #f8f9fa; /* grigio chiaro */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+/* Effetto più morbido sulle icone dentro le stat-card */
+.stat-card:hover .icon-circle {
+    background-color: #e9ecef;
+    transition: background-color 0.3s ease;
+}
+
+
 /* pagina primo accesso */
 /* ==========================
    FIRST LOGIN PAGE STYLES
@@ -927,5 +1078,104 @@ S .page-header {
     justify-content: center;
     align-items: center;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================
+   MODALITÀ SCURA (Dark Mode)
+========================== */
+
+body.dark-mode {
+  background-color: #1c1c1e !important;
+  color: #e4e4e7 !important;
+}
+
+/* HEADER */
+body.dark-mode .page-header {
+  background: linear-gradient(135deg, #0a0f3c, #071c92) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .page-header h1 {
+  color: #fff !important;
+}
+body.dark-mode .page-header p {
+  color: #d0d3ff !important;
+}
+
+/* CARD */
+body.dark-mode .card-home {
+  background-color: #2a2a2d !important;
+  color: #f1f1f1 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+body.dark-mode .card-home .card-title {
+  color: #b7c5ff !important;
+}
+body.dark-mode .card-home .card-text {
+  color: #adb5bd !important;
+}
+
+/* ICONCINE */
+body.dark-mode .icon-circle {
+  background-color: #3a3a3f !important;
+  color: #e0e0e0 !important;
+}
+
+/* BOTTONI */
+body.dark-mode .btn-darkmode {
+  background: #2a2a2d !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+body.dark-mode .btn-darkmode:hover {
+  background: #ffffff !important;
+  color: #0d6efd !important;
+}
+
+/* ALERT */
+body.dark-mode .alert {
+  background-color: #2f2f36 !important;
+  color: #d9d9d9 !important;
+  border: 1px solid #444 !important;
+}
+
+/* LINKS E TESTI */
+body.dark-mode a.text-reset,
+body.dark-mode .text-muted {
+  color: #d4d4d4 !important;
+}
+
+/* TABELLE */
+body.dark-mode table,
+body.dark-mode th,
+body.dark-mode td {
+  background-color: #2a2a2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+/* SCROLLBAR */
+body.dark-mode::-webkit-scrollbar {
+  width: 10px;
+}
+body.dark-mode::-webkit-scrollbar-track {
+  background: #1a1a1c;
+}
+body.dark-mode::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 10px;
+}
+
+/* TRANSIZIONI */
+body.dark-mode *,
+body.dark-mode .card-home,
+body.dark-mode .page-header {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.form-control .dark-mode {
+  background-color: #3a3a3f !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #555 !important;
 }
 

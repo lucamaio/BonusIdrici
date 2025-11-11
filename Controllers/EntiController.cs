@@ -82,6 +82,7 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di gestione enti.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -116,7 +117,8 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
-                 ViewBag.Message = "Utente non autorizzato ad creare un nuovo ente";
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di creazione nuovo ente.");
+                ViewBag.Message = "Utente non autorizzato ad creare un nuovo ente";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -133,7 +135,8 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
-                 ViewBag.Message = "Utente non autorizzato alla modifica dei dati del ente";
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di modifica dati ente.");
+                ViewBag.Message = "Utente non autorizzato alla modifica dei dati del ente";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -166,7 +169,8 @@ namespace Controllers
         {
             if (!VerificaSessione("ADMIN"))
             {
-                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la funzione Crea.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -200,6 +204,13 @@ namespace Controllers
         [HttpPost]
         public IActionResult Update(int id, string nome, string istat, string partitaIva, string cap, string? CodiceFiscale, string? provincia, string? regione, int serie, bool? Piranha, bool? Selene)
         {
+            if (!VerificaSessione("ADMIN"))
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere a questa pagina. Ha invocato la funzione Update.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
             var enteEsistente = _context.Enti.FirstOrDefault(s => s.id == id);
 
             if (enteEsistente == null)
@@ -230,7 +241,6 @@ namespace Controllers
             return Index();
         }
 
-        
         // Fine - Funzioni da eseguire a seconda della operazione
 
     }

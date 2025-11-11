@@ -1,6 +1,8 @@
 ﻿@using System.Net
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @{
     ViewData["Title"] = "Pannello di Controllo";
+    var tema = ViewBag.Tema;
     /* 
         Restituisco gli indirizzi IP del server
         IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
@@ -16,11 +18,93 @@
     Console.WriteLine(email.ToString());
     email.Invia(); *@
 }
+@* <style>
+    .btn-darkmode {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        border-radius: 50%;
+        padding: 0.6rem 0.8rem;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-darkmode:hover {
+        background-color: #0d6efd;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    .page-header {
+        position: relative;
+    }
+
+    .page-header h1 {
+        font-size: 2.4rem;
+        letter-spacing: 0.5px;
+        color: #1c1c1c;
+    }
+
+    .page-header::after {
+        content: "";
+        display: block;
+        width: 60px;
+        height: 4px;
+        background-color: #0d6efd;
+        margin: 1rem auto 0;
+        border-radius: 2px;
+    }
+
+    .card-home {
+        border: none;
+        border-radius: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-home:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Tema scuro */
+    body.dark-mode {
+        background-color: #1a1a1a;
+        color: #e9ecef;
+    }
+
+    body.dark-mode .card-home {
+        background-color: #2b2b2b;
+        color: #e9ecef;
+    }
+
+    body.dark-mode .page-header h1,
+    body.dark-mode .card-title {
+        color: #f8f9fa;
+    }
+
+    body.dark-mode .card-text {
+        color: #adb5bd;
+    }
+</style> *@
+@* <button id="toggleDarkMode" class="btn btn-outline-secondary btn-darkmode" title="Cambia tema">
+    <i class="bi bi-moon-stars" id="darkIcon"></i>
+</button> *@
+
 
 <!-- HEADER -->
 <div class="text-center py-5 mb-4 page-header">
     <h1 class="display-5 fw-bold">Benvenuto nel Pannello di Controllo</h1>
     <p class="lead mb-0">Scegli una delle funzionalità per iniziare a lavorare.</p>
+    <span>@tema</span>
 </div>
 
 <!-- FUNZIONALITÀ -->
@@ -37,7 +121,7 @@
                         <h5 class="card-title mb-0">Anagrafe</h5>
                     </div>
                     <p class="card-text text-muted mt-auto">
-                        Vedi Anagrafe enti.
+                        Gestisci e consulta i dati anagrafici relativi al ente selezionati o di appartenenza.
                     </p>
                 </div>
             </div>
@@ -56,7 +140,7 @@
                         <h5 class="card-title mb-0">Toponomi</h5>
                     </div>
                     <p class="card-text text-muted mt-auto">
-                        Visualizza tutti i Toponomi di un Ente.
+                        Visualizza e amministri l’elenco completo dei toponimi associati ad un ente.
                     </p>
                 </div>
             </div>
@@ -75,7 +159,7 @@
                         <h5 class="card-title mb-0">Utenze Idriche</h5>
                     </div>
                     <p class="card-text text-muted mt-auto">
-                        Vedi Utenze Idriche.
+                        Consulta le utenze idriche registrate.
                     </p>
                 </div>
             </div>
@@ -94,7 +178,7 @@
                         <h5 class="card-title mb-0">Nuova Elaborazione</h5>
                     </div>
                     <p class="card-text text-muted mt-auto">
-                        Procedi con l'upload dei file relativi ai dati INPS.
+                        Avvia una nuova elaborazione dei dati importando i file INPS.
                     </p>
                 </div>
             </div>
@@ -113,7 +197,7 @@
                         <h5 class="card-title mb-0">Elaborazioni</h5>
                     </div>
                     <p class="card-text text-muted mt-auto">
-                        Elecno delle elaborazioni
+                        Esamina l’elenco delle elaborazioni effettuate e consulta le domande associate ad esse.
                     </p>
                 </div>
             </div>
@@ -135,7 +219,7 @@
                             <h5 class="card-title mb-0">Gestione Enti</h5>
                         </div>
                         <p class="card-text text-muted mt-auto">
-                            Aggiungi o modifica le informazioni sugli enti.
+                            Accedi alla gestione degli enti, modificando o aggiornando le informazioni degli enti.
                         </p>
                     </div>
                 </div>
@@ -154,7 +238,7 @@
                             <h5 class="card-title mb-0">Carica Anagrafica</h5>
                         </div>
                         <p class="card-text text-muted mt-auto">
-                            Carica o aggiorna l'anagrafica utenti.
+                            Importa o aggiorna i dati anagrafici relativi ai soggetti registrati nel sistema.
                         </p>
                     </div>
                 </div>
@@ -173,7 +257,7 @@
                             <h5 class="card-title mb-0">Carica Utenze Idriche</h5>
                         </div>
                         <p class="card-text text-muted mt-auto">
-                            Carica o aggiorna le utenze idriche.
+                           Carica o aggiorna i dati delle utenze idriche per gli enti di competenza.
                         </p>
                     </div>
                 </div>
@@ -192,7 +276,7 @@
                             <h5 class="card-title mb-0">Gestione Utenti</h5>
                         </div>
                         <p class="card-text text-muted mt-auto">
-                            Aggiungi, modifica o rimuovi utenti del sistema.
+                            Crea o modifica gli utenti del sistema.
                         </p>
                     </div>
                 </div>
@@ -211,7 +295,7 @@
                             <h5 class="card-title mb-0">Statistiche</h5>
                         </div>
                         <p class="card-text text-muted mt-auto">
-                            Visualizza le statistiche di utilizzo del sistema.
+                            Visualizza le statistiche realtive all'utilizzo del sistema.
                         </p>
                     </div>
                 </div>
@@ -230,7 +314,7 @@
                             <h5 class="card-title mb-0">Log</h5>
                         </div>
                         <p class="card-text text-muted mt-auto">
-                            Visualizza i log delle operazioni.
+                            Accedi al registro delle operazioni per monitorare le attività svolte nel sistema.
                         </p>
                     </div>
                 </div>

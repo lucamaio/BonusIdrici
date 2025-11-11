@@ -4,10 +4,11 @@
     ViewData["Title"] = "Anagrafe Ente";
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
+    string nominativo= "", residenza ="";
 }
 
 <div class="container-xxl flex-grow-1 py-5">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
@@ -28,35 +29,43 @@
                 <div class="card-body p-4 position-relative">
                     @if (Model != null && Model.Any())
                     {
-                        <p class="lead mb-4 text-muted">Di seguito trovi l'anagrafe del ente selezionato.</p>
+                        <div class="info-text mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span>Di seguito è elencata l'anagrafe per l'ente selezionato.</span>
+                        </div>
 
-                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> <!-- 🔹 nascosta finché carica -->
+                        <div class="d-flex justify-content-end mb-3">
+                        <a href="@Url.Action("Create", "Anagrafe")" class="btn btn-modern-add shadow-sm">
+                            <i class="bi bi-plus-circle me-2"></i> Aggiungi Persona
+                        </a>
+                    </div>
+
+                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
                             <table id="anagrafeTable" class="table table-hover align-middle border-bottom w-100">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">Cognome</th>
-                                        <th class="text-center">Nome</th>
+                                        <th class="text-center">Nominativo</th>
                                         <th class="text-center">Codice Fiscale</th>
-                                        <th class="text-center">Sesso</th>
-                                        <th class="text-center">Indirizzo Residenza</th>
-                                        <th class="text-center">Numero Civico</th>
+                                        <th class="text-center">Data Nascita</th>
+                                        <th class="text-center">Residente</th>
                                         <th class="text-center">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
+                                        nominativo= item.Cognome + " " + item.Nome;
+                                        nominativo = FunzioniTrasversali.MaiuscoleIniziali(nominativo);
+                                        residenza = FunzioniTrasversali.MaiuscoleIniziali(item.IndirizzoResidenza)+ ", " + item.NumeroCivico;
                                         <tr>
-                                            <td><span class="fw-semibold">@item.Cognome</span></td>
-                                            <td><span class="fw-semibold">@item.Nome</span></td>
+                                            <td><span class="text-center">@nominativo</span></td>
                                             <td><span class="text-center">@item.CodiceFiscale</span></td>
-                                            <td><span class="text-center">@item.Sesso</span></td>
-                                            <td>@item.IndirizzoResidenza</td>
-                                            <td><span class="text-center">@item.NumeroCivico</span></td>
+                                            <td><span class="text-center">@item.DataNascita?.ToString("dd/MM/yyyy")</span></td>
+                                            <td><span class="text-center">@residenza</span></td>
                                             <td class="text-center">
-                                                <a class="btn btn-sm btn-light border me-1" title="Modifica Persona"
+                                                <a class="btn btn-modern-edit btn-sm" title="Modifica Persona"
                                                    href="@Url.Action("Modifica", "Anagrafe", new { id = item.id })">
-                                                    <i class="bi bi-pencil-square text-primary"></i>
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -114,28 +123,22 @@
                 searching: true,
                 ordering: true,
                 responsive: true,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end anagrafe"p>>',
-                buttons: [
-                    {
-                        extend: 'collection',
-                        className: 'btn btn-sm btn-primary dropdown-toggle me-2',
-                        text: '<i class="bi bi-download me-1"></i> Export',
-                        buttons: [
-                            { extend: 'copy', text: 'Copia' },
-                            { extend: 'excel', text: 'Excel' },
-                            { extend: 'pdf', text: 'PDF' },
-                            { extend: 'print', text: 'Stampa' }
-                        ]
-                    },
-                    {
-                        text: '<i class="bi bi-plus-circle me-1"></i> Aggiungi',
-                        className: 'btn btn-sm btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("Create", "Anagrafe", new { idEnte = selectedEnteId })';
-                        }
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                buttons: [],
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var pages = api.page.info().pages;
+                    if (pages <= 1) {
+                        $(api.table().container()).find('.dataTables_paginate').hide();
+                        $(api.table().container()).find('.dataTables_length').hide();
+                    } else {
+                        $(api.table().container()).find('.dataTables_paginate').show();
+                        $(api.table().container()).find('.dataTables_length').show();
                     }
-                ]
+                }
             }); 
 
             table.on('init', function () {

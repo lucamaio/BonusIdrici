@@ -7,16 +7,16 @@
 }
 
 <div class="container-xxl flex-grow-1 py-5">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-4 w-100">
                 <!-- Header -->
-                <div class="card-header header-utenze border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <h3 class="mb-1 fw-bold">
-                        <i class="bi bi-droplet-fill me-2"></i> Utenze -
-                        <span class="fw-semibold">@selectedEnteNome</span>
-                    </h3>
-                    <small>ID Ente: @selectedEnteId</small>
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <div class="d-flex fw-bold justify-content-center align-items-center">
+                        <i class="bi bi-droplet-fill me-2"></i>
+                        <h3 class="fw-bold mb-0">Utenze - <span class="fw-semibold">@selectedEnteNome</span></h3>
+                    </div>
+                    <p class="mb-0 small opacity-75">ID Ente: <span class="fw-semibold">@selectedEnteId</span></p>
                 </div>
 
                 <!-- Barra di caricamento -->
@@ -29,92 +29,54 @@
                 <div class="card-body p-4 position-relative">
                     @if (Model != null && Model.Any())
                     {
-                        <div style="background-color: #f8f9fa; border-radius: 12px;">
-                            <div class="row g-3">
-                                <!-- Stat Box 1 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-droplet fa-2x text-primary mb-2"></i>
-                                            <h6>Totale Utenze</h6>
-                                            <h4>@ViewBag.TotaleUtenze</h4>
+                         <div class="row g-4 mb-4">
+                            @{
+                                var stats = new[]
+                                {
+                                    new { Icon="fa-droplet text-primary", Label="Totale Utenze", Value=ViewBag.TotaleUtenze },
+                                    new { Icon="fa-user-plus text-success", Label="Utenze Iscrivendo/Iscritti", Value=ViewBag.UtenzeIscrivendo },
+                                    new { Icon="fa-user-minus text-danger", Label="Utenze Cancellando/Cancellato", Value=ViewBag.UtenzeCancellate },
+                                    new { Icon="fa-arrows-rotate text-warning", Label="Iscrivendo/Cancellando", Value=ViewBag.UtenzeIscrivendoCancellando },
+                                    new { Icon="fa-house text-primary", Label="Utenze Domestiche", Value=ViewBag.UtenzeDomestiche },
+                                    new { Icon="fa-building text-secondary", Label="Utenze Non Domestiche", Value=ViewBag.UtenzeNonDomestiche }
+                                };
+                            }
+                            @foreach (var s in stats)
+                            {
+                                <div class="col-6 col-md-4 col-lg-4">
+                                    <div class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow">
+                                        <div class="card-body py-4">
+                                            <div class="icon-circle mx-auto mb-3 bg-light shadow-sm">
+                                                <i class="fa-solid @s.Icon fs-4"></i>
+                                            </div>
+                                            <h6 class="fw-semibold mb-1">@s.Label</h6>
+                                            <h4 class="fw-bold text-dark mb-0">@s.Value</h4>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Stat Box 2 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-user-plus fa-2x text-success mb-2"></i>
-                                            <h6>Utenze Iscrivendo/Iscritti</h6>
-                                            <h4>@ViewBag.UtenzeIscrivendo</h4>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Stat Box 3 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-user-minus fa-2x text-danger mb-2"></i>
-                                            <h6>Utenze Cancellando e Cancellato</h6>
-                                            <h4>@ViewBag.UtenzeCancellate</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row g-3">
-                                <!-- Stat Box 4 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-arrows-rotate fa-2x text-warning mb-2"></i>
-                                            <h6>Utenze Iscrivendo/Cancellando</h6>
-                                            <h4>@ViewBag.UtenzeIscrivendoCancellando</h4>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Stat Box 5 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-house fa-2x text-primary mb-2"></i>
-                                            <h6>Utenze Domestiche</h6>
-                                            <h4>@ViewBag.UtenzeDomestiche</h4>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Stat Box 6 -->
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm text-center">
-                                        <div class="card-body">
-                                            <i class="fa-solid fa-building fa-2x text-secondary mb-2"></i>
-                                            <h6>Utenze non Domestiche</h6>
-                                            <h4>@ViewBag.UtenzeNonDomestiche</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            }
+                        </div>
+                        
+                       <div class="info-text mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span>Di seguito sono elencate tutte le utenze idriche registrate per l'ente selezionato.</span>
                         </div>
 
-                        <hr class="my-4" />
-                        <p class="lead mb-4 text-muted">Di seguito trovi le utenze idriche registrate per l'ente selezionato</p>
+                        <div class="d-flex justify-content-end mb-3">
+                        <a href="@Url.Action("Create", "Utenze")" class="btn btn-modern-add shadow-sm">
+                            <i class="bi bi-plus-circle me-2"></i> Aggiungi Utenza
+                        </a>
+                    </div>
 
                         <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> <!-- nascosta finché carica -->
-                            <table id="utenzeTable" class="table table-hover align-middle border-bottom w-100">
+                            <table id="utenzeTable" class="table table-hover align-middle border-bottom w-100 rounded-3 shadow-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-center">Id Acquedotto</th>
                                         <th class="text-center">Matricola</th>
-                                        <th class="text-center">Cognome</th>
-                                        <th class="text-center">Nome</th>
-                                        <th class="text-center">Sesso</th>
-                                        <th class="text-center">Ubicazione</th>
-                                        <th class="text-center">Civico</th>
+                                        <th class="text-center">Detentore</th>
+                                        <th class="text-center">Situato</th>
+                                        <th class="text-center">Tipo</th>
                                         <th class="text-center">Stato</th>
                                         <th class="text-center">Azioni</th>
                                     </tr>
@@ -122,19 +84,52 @@
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
+                                        string detentore = item.cognome + " " + item.nome;
+                                        string sito = item.indirizzoUbicazione + ", " + item.numeroCivico;
+                                        string statoUtenza = FunzioniTrasversali.getStatoStringUtenza(item.stato);
+                                       
+                                        detentore = FunzioniTrasversali.MaiuscoleIniziali(detentore);
+                                        sito = FunzioniTrasversali.MaiuscoleIniziali(sito);
                                         <tr>
                                             <td class="text-center">@item.idAcquedotto</td>
                                             <td class="text-center">@item.matricolaContatore</td>
-                                            <td><span class="fw-semibold">@item.cognome</span></td>
-                                            <td><span class="fw-semibold">@item.nome</span></td>
-                                            <td><span class="text-center">@item.sesso</span></td>
-                                            <td>@item.indirizzoUbicazione</td>
-                                            <td class="text-center">@item.numeroCivico</td>
-                                            <td class="text-center">@item.stato</td>
+                                            <td>@detentore</td>
+                                            <td>@sito</td>
+                                            <td>
+                                                @{
+                                                    switch (item.tipoUtenza)
+                                                    {
+                                                        case "UTENZA NON DOMESTICA":
+                                                            <span>Non Domestica</span>;
+                                                            break;
+                                                        case "UTENZA DOMESTICA":
+                                                            <span>Domestica</span>
+                                                            break;
+                                                        case "UTENZA COMMERCIALE":
+                                                            <span>Commerciale</span>;
+                                                            break;
+                                                        case "UTENZA USO ARTIGIANALE":
+                                                            <span>Uso Artigianale</span>;
+                                                            break;
+                                                        case "UTENZA SPECIALE TEMPORANEA":
+                                                            <span>Speciale Temporanea</span>;
+                                                            break;
+                                                        case "UTENZA USO INDUSTRIALE":
+                                                            <span>Uso Industriale</span>;
+                                                            break;
+                                                        default:
+                                                            <span>@item.tipoUtenza</span>;
+                                                            break;
+                                                    }
+                                                }
+                                            </td>
                                             <td class="text-center">
-                                                <a class="btn btn-sm btn-light border me-1" title="Modifica Utenza"
-                                                   href="@Url.Action("Modifica", "Utenze", new { id = item.id })">
-                                                    <i class="bi bi-pencil-square text-primary"></i>
+                                                <span class="">@statoUtenza</span>
+                                            </td>
+                                            <td class="text-center">
+                                               <a class="btn btn-modern-edit btn-sm" title="Modifica Utenza"
+                                                href="@Url.Action("Modifica", "Utenze", new { id = item.id })">
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -170,42 +165,48 @@
 </div>
 @section Scripts {
    <script>
+$(document).ready(function () {
+    $("#loadingBarContainer").show();
+    var progress = 0;
+    var interval = setInterval(function () {
+        if (progress < 90) {
+            progress += 10;
+            $("#loadingBar").css("width", progress + "%");
+        }
+    }, 300);
 
-     $(document).ready(function () {
-            $("#loadingBarContainer").show();
-                var progress = 0;
-                var interval = setInterval(function () {
-                    if (progress < 90) {
-                        progress += 10;
-                        $("#loadingBar").css("width", progress + "%");
-                    }
-                }, 300);
-                
-            var utenzeTable = $('#utenzeTable').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                responsive: true,
-                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
-                buttons: [
-                    {
-                        text: '<i class="bi bi-plus-circle me-1"></i> Aggiungi',
-                        className: 'btn btn-sm btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("Create", "Utenze", new { idEnte = @selectedEnteId })';
-                        }
-                    }
-                ],
-            }); 
-            utenzeTable.on('init', function () {
-                clearInterval(interval);
-                $("#loadingBar").css("width", "100%");
-                setTimeout(function () {
-                    $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); 
-                }, 500);
-            });
-        }); 
-   </script>
+    var utenzeTable = $('#utenzeTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        responsive: true,
+        pageLength: 25,
+        lengthMenu: [10, 25, 50, 100],
+        language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+        dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+        buttons: [],
+        drawCallback: function (settings) {
+            var api = this.api();
+            var pages = api.page.info().pages;
+            if (pages <= 1) {
+                $(api.table().container()).find('.dataTables_paginate').hide();
+                $(api.table().container()).find('.dataTables_length').hide();
+            } else {
+                $(api.table().container()).find('.dataTables_paginate').show();
+                $(api.table().container()).find('.dataTables_length').show();
+            }
+        }
+    });
+
+
+    utenzeTable.on('init', function () {
+        clearInterval(interval);
+        $("#loadingBar").css("width", "100%");
+        setTimeout(function () {
+            $("#loadingBarContainer").fadeOut();
+            $("#tableWrapper").fadeIn();
+        }, 500);
+    });
+});
+</script>
 }

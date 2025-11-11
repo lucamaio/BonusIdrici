@@ -70,6 +70,7 @@ namespace Controllers
             // 1. Verifico se esiste una sessione attiva e che il ruolo del utente è ADMIN
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di nuova elaborazione dati INPS.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
@@ -122,6 +123,7 @@ namespace Controllers
             // Fase 0: Verifico se esiste una sessione
             if (!VerificaSessione())
             {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di elaborazione dati INPS. Ha invocato la funzione Processing dei dati.");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }

@@ -131,6 +131,7 @@ namespace Controllers
                 HttpContext.Session.SetInt32("idUser", utente.id);
                 HttpContext.Session.SetString("Username", utente.Username);
                 HttpContext.Session.SetString("Role", utente.getRuolo());
+                HttpContext.Session.SetString("Tema", "Dark");
 
                 // 5) Salvo un messaggio di log per l'accesso effettuato
                 AccountController.logFile.LogInfo($"Utente logato: {utente.Username} ");
