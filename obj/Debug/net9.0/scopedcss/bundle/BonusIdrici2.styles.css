@@ -46,16 +46,6 @@ button.accept-policy[b-xrv69dks3l] {
   line-height: inherit;
 }
 
-.footer[b-xrv69dks3l] {
-    margin-top: 20px;
-    margin-bottom: 0px;
-    width: 100%;
-    line-height: 50px;
-    background-color: #F2F3F4;
-    color: #000;
-    position: static; /* importante rimuovere absolute */
-}
-
 main[b-xrv69dks3l] {
     padding-bottom: 50px;
 }
@@ -73,4 +63,19 @@ main[b-xrv69dks3l] {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+body[b-xrv69dks3l] {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content[b-xrv69dks3l] {
+    flex: 1 0 auto;
+}
+
+.py-5[b-xrv69dks3l] {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
 }

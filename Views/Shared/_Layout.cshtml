@@ -27,6 +27,7 @@
 
     <!-- ✅ CSS del progetto -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BonusIdrici2.styles.css" asp-append-version="true" />
 </head>
 
@@ -120,12 +121,45 @@
         </main>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="border-top footer text-muted py-3">
-        <div class="container text-center">
-            &copy; 2025 - Point Service S.r.l. - <a href="https://www.p-service.it/index.html">Contatti</a>
+    <!-- Footer -->
+    <footer class="footer-app mt-auto mb-0 py-10">
+        <div class="container">
+            <div class="row gy-4 align-items-center">
+
+                <!-- Brand -->
+                <div class="col-12 col-md-4 text-center text-md-start">
+                    <h5 class="fw-semibold mb-1">Software BonusIdrici</h5>
+                    <small class="text-muted" style="color: #fff !important;">
+                        Gestione pratiche per Bonus Idrico
+                    </small>
+                </div>
+
+                <!-- Link -->
+                <div class="col-12 col-md-4 text-center">
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item">
+                            <a asp-area="" asp-controller="Home" asp-action="Info" class="footer-link">Info</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="https://www.p-service.it/index.html?#chisiamo" class="footer-link">Chi siamo</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="https://www.p-service.it/index.html?#contattaci" class="footer-link">Contatti</a>
+                        </li>
+                    </ul>
+                </div> 
+
+                <!-- Copyright -->
+                <div class="col-12 col-md-4 text-center text-md-end">
+                    <small class="text-muted" style="color: #fff !important;">
+                        ©2026<a href="https://www.p-service.it" target="_blank" class="footer-link"> Point Service S.r.l.</a> - Tutti i diritti riservati.
+                    </small>
+                </div>
+
+            </div>
         </div>
     </footer>
+
 
     <!-- ✅ SCRIPT (ordinati e senza duplicati) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
