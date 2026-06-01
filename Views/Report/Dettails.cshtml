@@ -5,6 +5,7 @@
         var idReport = ViewBag.idReport; 
     var nomeEnte = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.nomeEnte.ToLower()) ?? "ND";
     var ruolo = ViewBag.Ruolo;
+    var isAdminUser = Convert.ToString(ViewBag.idUser) == "1";
 
     List<Domanda>? domande = ViewBag.Domande;
     var elaborazione = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.ElaborazioneDel.ToLower()) ?? "ND";
@@ -146,7 +147,15 @@
                                  <th class="text-center">idAto</th>
                                 <th class="text-center">Codice Bonus</th>
                                 <th class="text-center">Codice Fiscale Richiedente</th>
+                                @if (isAdminUser)
+                                {
+                                    <th class="text-center">ID Richiedente</th>
+                                }
                                 <th class="text-center">Id Fornitura</th>
+                                @if (isAdminUser)
+                                {
+                                    <th class="text-center">ID Utenza</th>
+                                }
                                 <th class="text-center">Componenti</th>
                                 <th class="text-center">Esito str</th>
                                 <th class="text-center">Esito</th>
@@ -161,7 +170,39 @@
                                     <td class="text-center"><span>@domanda.idAto</span></td>
                                     <td class="text-center"><span >@domanda.codiceBonus</span></td>
                                     <td class="text-center"><span>@domanda.codiceFiscaleRichiedente</span></td>
+                                    @if (isAdminUser)
+                                    {
+                                        <td class="text-center">
+                                            @if (domanda.idDichiarante.HasValue)
+                                            {
+                                                <a class="btn btn-sm btn-outline-primary" title="Apri scheda richiedente"
+                                                   href="@Url.Action("Modifica", "Anagrafe", new { id = domanda.idDichiarante.Value })">
+                                                    @domanda.idDichiarante
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                    }
                                     <td class="text-center"><span>@domanda.idFornitura</span></td>
+                                    @if (isAdminUser)
+                                    {
+                                        <td class="text-center">
+                                            @if (domanda.idUtenza.HasValue)
+                                            {
+                                                <a class="btn btn-sm btn-outline-primary" title="Apri scheda utenza"
+                                                   href="@Url.Action("Modifica", "Utenze", new { id = domanda.idUtenza.Value })">
+                                                    @domanda.idUtenza
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                    }
                                     <td class="text-center"><span>@domanda.numeroComponenti</span></td>
                                     <td class="text-center">
                                             @if (string.IsNullOrEmpty(domanda.esitoStr))

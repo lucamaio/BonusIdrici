@@ -1,0 +1,85 @@
+@model Models.ViewModels.AdminActivityDashboardViewModel
+
+@{
+    ViewData["Title"] = "Attivita Admin";
+}
+
+<main class="admin-activity-page">
+    <section class="data-hero data-hero-blue">
+        <div>
+            <p>Area ADMIN</p>
+            <h1>Ultime modifiche e operazioni</h1>
+            <span>Riepilogo generato il @Model.GeneratedAt.ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary">
+                <i class="bi bi-house-door"></i>
+                <span>Home</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="admin-activity-grid">
+        @foreach (var activitySection in Model.Sections)
+        {
+            <article class="admin-activity-card">
+                <div class="section-activity-feed-header">
+                    <div>
+                        <p>@activitySection.SectionName</p>
+                        <h4>Operazioni recenti</h4>
+                    </div>
+                    <span>@activitySection.RecentActivities.Count eventi</span>
+                </div>
+
+                <div class="admin-activity-last-update">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Ultimo aggiornamento: <strong>@(activitySection.LastUpdate?.ToString("dd/MM/yyyy HH:mm") ?? "Nessun dato")</strong></span>
+                </div>
+
+                @if (activitySection.RecentActivities.Any())
+                {
+                    <ul class="admin-activity-list">
+                        @foreach (var activity in activitySection.RecentActivities)
+                        {
+                            var routeValues = activity.RouteId.HasValue
+                                ? new Dictionary<string, object?> { [activity.RouteParameterName] = activity.RouteId }
+                                : null;
+
+                            <li>
+                                <span class="section-activity-icon @activity.Tone">
+                                    <i class="bi @activity.Icon"></i>
+                                </span>
+                                <div>
+                                    <div class="section-activity-row">
+                                        <strong>@activity.Operation</strong>
+                                        <time>@activity.Timestamp?.ToString("dd/MM/yyyy HH:mm")</time>
+                                    </div>
+                                    <p>@activity.Title</p>
+                                    @if (!string.IsNullOrWhiteSpace(activity.Detail))
+                                    {
+                                        <small>@activity.Detail</small>
+                                    }
+                                </div>
+                                @if (routeValues != null)
+                                {
+                                    <a class="section-activity-link"
+                                       href="@Url.Action(activity.Action, activity.Controller, routeValues)"
+                                       title="Apri dettaglio">
+                                        <i class="bi bi-arrow-up-right"></i>
+                                    </a>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="section-activity-empty">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Nessuna operazione registrata.</span>
+                    </div>
+                }
+            </article>
+        }
+    </section>
+</main>

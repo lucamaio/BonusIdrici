@@ -3,9 +3,12 @@
 
 @{
     var session = HttpContextAccessor.HttpContext?.Session;
-    var idUser = session?.GetString("idUser");
+    var idUser = session?.GetInt32("idUser");
     var username = session?.GetString("Username");
-    var isLogged = !string.IsNullOrEmpty(idUser);
+    var role = session?.GetString("Role");
+    var isLogged = idUser.HasValue && idUser.Value > 0;
+    var isAdmin = string.Equals(role, "ADMIN", StringComparison.OrdinalIgnoreCase);
+    var canUseOperations = isLogged && (isAdmin || string.Equals(role, "OPERATORE", StringComparison.OrdinalIgnoreCase));
 }
 
 <!DOCTYPE html>
@@ -32,24 +35,23 @@
 </head>
 
 <body>
-    <!-- HEADER -->
     <header>
-        <nav class="navbar navbar-expand-lg shadow-sm mb-5">
+        <nav class="navbar navbar-expand-lg app-navbar shadow-sm">
             <div class="container-fluid">
-
-                <!-- Pulsante Sidebar -->
-                <button class="btn btn-link text-white fs-4 me-3" type="button" onclick="toggleSidebar()">
-                    <i class="bi bi-list"></i>
+                <button class="app-menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Apri menu laterale">
+                    <i class="bi bi-layout-sidebar-inset"></i>
                 </button>
 
-                <!-- Logo -->
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-droplet-fill me-2"></i> BonusIdrici
+                <a class="navbar-brand app-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="app-brand-mark"><i class="bi bi-droplet-fill"></i></span>
+                    <span class="app-brand-text">
+                        <strong>BonusIdrici</strong>
+                        <small>Gestione pratiche</small>
+                    </span>
                 </a>
 
-                <!-- Menu principale -->
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav ms-auto">
+                <div class="navbar-collapse">
+                    <ul class="navbar-nav ms-auto align-items-center gap-1">
                         <li class="nav-item">
                             <a class="nav-link fw-semibold" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door me-1"></i> Home
@@ -61,12 +63,15 @@
                             </a>
                         </li>
 
-                        <!-- Dropdown profilo utente -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-semibold d-flex align-items-center" href="#"
+                            <a class="nav-link app-user-menu dropdown-toggle fw-semibold d-flex align-items-center" href="#"
                                id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i>
-                                @(isLogged && !string.IsNullOrWhiteSpace(username) ? username : "Profilo")
+                                <i class="bi bi-person-circle"></i>
+                                <span>@(isLogged && !string.IsNullOrWhiteSpace(username) ? username : "Profilo")</span>
+                                @if (!string.IsNullOrWhiteSpace(role))
+                                {
+                                    <em>@role</em>
+                                }
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                                 @if (isLogged)
@@ -98,64 +103,139 @@
             </div>
         </nav>
 
-        <!-- SIDEBAR -->
-        <div class="sidebar" id="sidebar">
-            <a class="dropdown-item" asp-controller="Home" asp-action="Index">
-                <i class="bi bi-house-door me-2"></i> Home
-            </a>
-            <a class="nav-link fw-semibold" asp-controller="Home" asp-action="Info">
-                <i class="fa-solid fa-circle-info me-1"></i> Info
-            </a>
-            <a class="nav-link fw-semibold" href="https://www.p-service.it/index.html" style="color: #fff !important">
-                <i class="bi bi-telephone me-2"></i> Contatti
-            </a>
-        </div>
+        <aside class="sidebar" id="sidebar" aria-label="Menu laterale">
+            <div class="sidebar-header">
+                <div>
+                    <span class="sidebar-kicker">Menu</span>
+                    <strong>BonusIdrici</strong>
+                </div>
+                <button type="button" class="sidebar-close" onclick="toggleSidebar()" aria-label="Chiudi menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <section class="sidebar-section">
+                    <span class="sidebar-section-title">Principale</span>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house-door"></i>
+                        <span>Home</span>
+                    </a>
+                    <a asp-controller="Home" asp-action="Info">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Info</span>
+                    </a>
+                    <a href="https://www.p-service.it/index.html" target="_blank" rel="noopener">
+                        <i class="bi bi-telephone"></i>
+                        <span>Contatti</span>
+                    </a>
+                </section>
+
+                @if (canUseOperations)
+                {
+                    <section class="sidebar-section">
+                        <span class="sidebar-section-title">Operazioni</span>
+                        <a asp-controller="Anagrafe" asp-action="Index">
+                            <i class="bi bi-people"></i>
+                            <span>Anagrafe</span>
+                        </a>
+                        <a asp-controller="Toponomi" asp-action="Index">
+                            <i class="bi bi-signpost"></i>
+                            <span>Toponomi</span>
+                        </a>
+                        <a asp-controller="Utenze" asp-action="Index">
+                            <i class="bi bi-droplet-half"></i>
+                            <span>Utenze Idriche</span>
+                        </a>
+                        <a asp-controller="Report" asp-action="Index">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                            <span>Elaborazioni</span>
+                        </a>
+                    </section>
+                }
+
+                @if (isAdmin)
+                {
+                    <section class="sidebar-section sidebar-admin-section">
+                        <span class="sidebar-section-title">Opzioni Admin</span>
+                        <a asp-controller="Anagrafe" asp-action="Upload">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <span>Carica Anagrafe</span>
+                        </a>
+                        <a asp-controller="Utenze" asp-action="Upload">
+                            <i class="bi bi-database-add"></i>
+                            <span>Carica Utenze</span>
+                        </a>
+                        <a asp-controller="Elaborazione" asp-action="NewProcessing">
+                            <i class="bi bi-play-circle"></i>
+                            <span>Nuova Elaborazione</span>
+                        </a>
+                        <a asp-controller="Enti" asp-action="Index">
+                            <i class="bi bi-building-gear"></i>
+                            <span>Gestione Enti</span>
+                        </a>
+                        <a asp-controller="Account" asp-action="Show">
+                            <i class="bi bi-person-gear"></i>
+                            <span>Gestione Utenti</span>
+                        </a>
+                        <a asp-controller="Log" asp-action="Index">
+                            <i class="bi bi-activity"></i>
+                            <span>Diagnostica</span>
+                        </a>
+                        <a asp-controller="Home" asp-action="Attivita">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Attività Recenti</span>
+                        </a>
+                        <a asp-controller="Statistiche" asp-action="Index">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span>Statistiche</span>
+                        </a>
+                    </section>
+                }
+            </nav>
+
+            @if (isLogged)
+            {
+                <div class="sidebar-user">
+                    <i class="bi bi-person-circle"></i>
+                    <div>
+                        <strong>@username</strong>
+                        <span>@role</span>
+                    </div>
+                </div>
+            }
+        </aside>
 
         <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
     </header>
 
     <!-- CONTENUTO PRINCIPALE -->
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container app-main-container">
+        <main role="main" class="app-main">
             @RenderBody()
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer-app mt-auto mb-0 py-10">
-        <div class="container">
-            <div class="row gy-4 align-items-center">
+    <footer class="footer-app mt-auto">
+        <div class="container-xxl footer-app__inner">
+            <div class="footer-app__brand">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="footer-app__title">
+                    <i class="bi bi-droplet-fill" aria-hidden="true"></i>
+                    <span>Software BonusIdrici</span>
+                </a>
+                <span class="footer-app__subtitle">Gestione pratiche per Bonus Idrico</span>
+            </div>
 
-                <!-- Brand -->
-                <div class="col-12 col-md-4 text-center text-md-start">
-                    <h5 class="fw-semibold mb-1">Software BonusIdrici</h5>
-                    <small class="text-muted" style="color: #fff !important;">
-                        Gestione pratiche per Bonus Idrico
-                    </small>
-                </div>
+            <nav class="footer-app__nav" aria-label="Collegamenti footer">
+                <a asp-area="" asp-controller="Home" asp-action="Info" class="footer-link">Info</a>
+                <a href="https://www.p-service.it/index.html?#chisiamo" class="footer-link" target="_blank" rel="noopener">Chi siamo</a>
+                <a href="https://www.p-service.it/index.html?#contattaci" class="footer-link" target="_blank" rel="noopener">Contatti</a>
+            </nav>
 
-                <!-- Link -->
-                <div class="col-12 col-md-4 text-center">
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item">
-                            <a asp-area="" asp-controller="Home" asp-action="Info" class="footer-link">Info</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="https://www.p-service.it/index.html?#chisiamo" class="footer-link">Chi siamo</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="https://www.p-service.it/index.html?#contattaci" class="footer-link">Contatti</a>
-                        </li>
-                    </ul>
-                </div> 
-
-                <!-- Copyright -->
-                <div class="col-12 col-md-4 text-center text-md-end">
-                    <small class="text-muted" style="color: #fff !important;">
-                        ©2026<a href="https://www.p-service.it" target="_blank" class="footer-link"> Point Service S.r.l.</a> - Tutti i diritti riservati.
-                    </small>
-                </div>
-
+            <div class="footer-app__copy">
+                <span>&copy; 2026</span>
+                <a href="https://www.p-service.it" target="_blank" rel="noopener" class="footer-link">Point Service S.r.l.</a>
+                <span>Tutti i diritti riservati.</span>
             </div>
         </div>
     </footer>

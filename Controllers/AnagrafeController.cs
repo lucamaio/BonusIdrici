@@ -4,6 +4,7 @@ using Models;
 using Data;
 using System.IO;
 using Models.ViewModels;
+using BonusIdrici2.Services;
 
 namespace Controllers
 {
@@ -12,16 +13,18 @@ namespace Controllers
         // Dichiarazione delle variabili di istanza
         private readonly ILogger<AnagrafeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly SectionActivityService _sectionActivityService;
         
         private string? ruolo;
         private int idUser;
         private string? username;
 
         // Costruttore
-        public AnagrafeController(ILogger<AnagrafeController> logger, ApplicationDbContext context)
+        public AnagrafeController(ILogger<AnagrafeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
         {
             _logger = logger;
             _context = context;
+            _sectionActivityService = sectionActivityService;
             
             if (VerificaSessione())
             {
@@ -140,6 +143,7 @@ namespace Controllers
 
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+            ViewBag.SectionActivity = _sectionActivityService.GetAnagrafeActivity(selectedEnteId);
 
             return View("Show", viewModelList);
         }

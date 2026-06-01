@@ -1,21 +1,110 @@
 .footer-app {
-    background: #023377;
+    flex: 0 0 auto;
+    background: #0f2f5f;
     color: #fff;
-    padding: 2rem 1rem;
     width: 100%;
-    margin-top: 0 !important;
-    align-items: center !important;
+    padding: 14px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -6px 18px rgba(15, 47, 95, 0.08);
 }
 
-/* Link */
-.footer-app .footer-link {
+.footer-app__inner {
+    min-height: 56px;
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto minmax(260px, 1fr);
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-app__brand {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.footer-app__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
     color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.2;
     text-decoration: none;
-    margin: 0 8px;
-    transition: color 0.2s ease;
+}
+
+.footer-app__title:hover {
+    color: #fff;
+}
+
+.footer-app__title i {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.footer-app__subtitle,
+.footer-app__copy {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.footer-app__nav,
+.footer-app__copy {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-app__nav {
+    justify-content: center;
+    gap: 4px;
+}
+
+.footer-app__copy {
+    justify-content: flex-end;
+    gap: 6px;
+    text-align: right;
+}
+
+.footer-app .footer-link {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 5px 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .footer-app .footer-link:hover {
     color: #fff;
-    text-decoration: underline;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 991.98px) {
+    .footer-app {
+        padding: 16px 0;
+    }
+
+    .footer-app__inner {
+        min-height: 0;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .footer-app__brand,
+    .footer-app__nav,
+    .footer-app__copy {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .footer-app__copy {
+        gap: 2px 6px;
+    }
 }

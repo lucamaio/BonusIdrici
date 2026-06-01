@@ -6,6 +6,7 @@ using System.Globalization;
 using Models.ViewModels; // Aggiungi questo using
 using System.IO;
 using System.Collections.Generic; 
+using BonusIdrici2.Services;
 
 namespace Controllers
 {
@@ -13,15 +14,17 @@ namespace Controllers
     {
         private readonly ILogger<ReportController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly SectionActivityService _sectionActivityService;
         private FileLog logFile = new FileLog($"wwwroot/log/Domande.log");
         private string? ruolo;
         private int idUser;
         private string? username;
 
-        public ReportController(ILogger<ReportController> logger, ApplicationDbContext context)
+        public ReportController(ILogger<ReportController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
         {
             _logger = logger;
             _context = context;
+            _sectionActivityService = sectionActivityService;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -142,13 +145,48 @@ namespace Controllers
                         .Select(u => u.Username)
                         .FirstOrDefault()
                 })
-                .OrderByDescending(r => r.DataCreazione)
+                .ToList()
+                .OrderByDescending(r => GetAnnoOrDefault(r.anno))
+                .ThenByDescending(r => GetMeseOrDefault(r.mese))
+                .ThenByDescending(r => r.serie)
+                .ThenByDescending(r => r.DataCreazione)
                 .ToList();
 
             ViewBag.Reports = reportEffettuati ?? null;
             ViewBag.idEnte = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.Where(e => e.id == selectedEnteId).Select(e => e.nome).FirstOrDefault();
+            ViewBag.SectionActivity = _sectionActivityService.GetReportsActivity(selectedEnteId);
             return View();
+        }
+
+        private static int GetAnnoOrDefault(string? anno)
+        {
+            return int.TryParse(anno, out var annoNumerico) ? annoNumerico : 0;
+        }
+
+        private static int GetMeseOrDefault(string? mese)
+        {
+            if (string.IsNullOrWhiteSpace(mese))
+            {
+                return 0;
+            }
+
+            if (int.TryParse(mese, out var meseNumerico))
+            {
+                return meseNumerico;
+            }
+
+            var monthNames = CultureInfo.CurrentCulture.DateTimeFormat.MonthNames;
+
+            for (var i = 0; i < monthNames.Length; i++)
+            {
+                if (string.Equals(monthNames[i], mese, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return i + 1;
+                }
+            }
+
+            return 0;
         }
 
         // Pagina 3: Consente la visualizzazione dei dati associati a un Domande

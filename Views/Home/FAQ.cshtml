@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "FAQ";
+}
+
+<div class="faq-page container-xxl py-4">
+    <section class="home-hero-panel faq-hero">
+        <div>
+            <p class="home-kicker">Supporto operativo</p>
+            <h1>Domande frequenti</h1>
+            <p>Una guida rapida per orientarsi tra caricamenti, elaborazioni e controlli sui dati.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-arrow-left"></i> Torna alla home
+        </a>
+    </section>
+
+    <section class="faq-list">
+        <article>
+            <h2><i class="bi bi-filetype-csv"></i> Quali file posso caricare?</h2>
+            <p>I file devono essere CSV con separatore punto e virgola. Per le elaborazioni INPS va caricato il CSV estratto dallo ZIP, non lo ZIP direttamente.</p>
+        </article>
+        <article>
+            <h2><i class="bi bi-calendar-check"></i> Come scelgo mese e anno dell'elaborazione?</h2>
+            <p>Usa il periodo indicato nel nome del file INPS o nel contenuto del flusso. La scheda elaborazioni viene ordinata per anno e mese decrescente.</p>
+        </article>
+        <article>
+            <h2><i class="bi bi-exclamation-triangle"></i> Dove controllo warning e anomalie?</h2>
+            <p>Gli amministratori possono consultare la sezione Diagnostica/Log e la pagina Statistiche per individuare esiti, incongruenze e dati da sistemare.</p>
+        </article>
+        <article>
+            <h2><i class="bi bi-person-gear"></i> Chi vede le opzioni Admin?</h2>
+            <p>Le funzioni di caricamento, diagnostica, gestione utenti e statistiche sono mostrate solo agli utenti con ruolo ADMIN.</p>
+        </article>
+    </section>
+</div>

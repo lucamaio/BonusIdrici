@@ -1,0 +1,353 @@
+@model List<Models.Domanda>
+@{
+    ViewData["Title"] = "Dettaglio Esito";
+    var esito = ViewBag.Esito as string ?? "ND";
+    var labelEsito = esito switch
+    {
+        "01" => "Esito 1",
+        "02" => "Esito 2",
+        "03" => "Esito 3",
+        "04" => "Esito 4",
+        _ => $"Esito {esito}"
+    };
+    var isAdminUser = Convert.ToString(ViewBag.idUser) == "1";
+}
+
+<div class="stats-detail-page">
+    <div class="stats-detail-shell">
+        <header class="detail-header">
+            <div>
+                <p class="detail-kicker">@labelEsito</p>
+                <h1>@ViewBag.NomeEnte</h1>
+                <span>Report #@ViewBag.IdReport - @ViewBag.Periodo - creato il @ViewBag.DataCreazione</span>
+            </div>
+            <div class="detail-actions">
+                <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Statistiche")">
+                    <i class="bi bi-arrow-left"></i> Statistiche
+                </a>
+                <a class="btn btn-primary" href="@Url.Action("Dettails", "Report", new { idReport = ViewBag.IdReport })">
+                    <i class="bi bi-file-earmark-text"></i> Report completo
+                </a>
+            </div>
+        </header>
+
+        <section class="detail-summary">
+            <div>
+                <span>Domande trovate</span>
+                <strong>@ViewBag.Totale</strong>
+            </div>
+            <div>
+                <span>Esito</span>
+                <strong>@labelEsito</strong>
+            </div>
+            <div>
+                <span>Ente</span>
+                <strong>@ViewBag.NomeEnte</strong>
+            </div>
+        </section>
+
+        <section class="detail-table-panel">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle detail-table">
+                        <thead>
+                            <tr>
+                                <th>Codice bonus</th>
+                                <th>Richiedente</th>
+                                <th>Codice fiscale</th>
+                                @if (isAdminUser)
+                                {
+                                    <th>ID Richiedente</th>
+                                }
+                                <th>Fornitura</th>
+                                @if (isAdminUser)
+                                {
+                                    <th>ID Utenza</th>
+                                }
+                                <th>Componenti</th>
+                                <th>Competenza</th>
+                                <th>Incongruenze</th>
+                                <th class="text-end">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var domanda in Model)
+                            {
+                                var nominativo = $"{domanda.cognomeDichiarante} {domanda.nomeDichiarante}".Trim();
+                                <tr>
+                                    <td>
+                                        <span class="strong-cell">@domanda.codiceBonus</span>
+                                        <small>ID ATO @domanda.idAto</small>
+                                    </td>
+                                    <td>@nominativo</td>
+                                    <td>@domanda.codiceFiscaleRichiedente</td>
+                                    @if (isAdminUser)
+                                    {
+                                        <td>
+                                            @if (domanda.idDichiarante.HasValue)
+                                            {
+                                                <a class="id-link" title="Apri scheda richiedente"
+                                                   href="@Url.Action("Modifica", "Anagrafe", new { id = domanda.idDichiarante.Value })">
+                                                    @domanda.idDichiarante
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td>@(domanda.idFornitura?.ToString() ?? "-")</td>
+                                    @if (isAdminUser)
+                                    {
+                                        <td>
+                                            @if (domanda.idUtenza.HasValue)
+                                            {
+                                                <a class="id-link" title="Apri scheda utenza"
+                                                   href="@Url.Action("Modifica", "Utenze", new { id = domanda.idUtenza.Value })">
+                                                    @domanda.idUtenza
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td>@(domanda.numeroComponenti?.ToString() ?? "-")</td>
+                                    <td>
+                                        @if (domanda.esitoStr.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="status-pill ok">Si</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-pill no">No</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (domanda.incongruenze == true)
+                                        {
+                                            <span class="status-pill warn">Da verificare</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-pill neutral">No</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Varia", "Report", new { id = domanda.id })">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <strong>Nessuna domanda trovata</strong>
+                    <span>Non ci sono domande con @labelEsito per questo report.</span>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<style>
+    .stats-detail-page {
+        background: #f5f7fb;
+        min-height: calc(100vh - 80px);
+        color: #1f2937;
+    }
+
+    .stats-detail-shell {
+        width: min(1320px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 48px;
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: flex-end;
+        margin-bottom: 18px;
+    }
+
+    .detail-kicker {
+        margin: 0 0 4px;
+        color: #2563eb;
+        font-size: .78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .detail-header h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .detail-header span,
+    .detail-summary span,
+    .detail-table small,
+    .empty-state span {
+        color: #64748b;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .detail-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .detail-summary div,
+    .detail-table-panel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    }
+
+    .detail-summary div {
+        min-height: 86px;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .detail-summary strong {
+        font-size: 1.45rem;
+        line-height: 1.15;
+    }
+
+    .detail-table-panel {
+        padding: 14px;
+    }
+
+    .detail-table {
+        margin: 0;
+    }
+
+    .detail-table th {
+        color: #475569;
+        font-size: .82rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        border-bottom-color: #e2e8f0;
+        white-space: nowrap;
+    }
+
+    .detail-table td {
+        vertical-align: middle;
+    }
+
+    .strong-cell {
+        display: block;
+        font-weight: 800;
+    }
+
+    .id-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        min-height: 30px;
+        padding: 4px 8px;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .id-link:hover {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-size: .8rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-pill.ok {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-pill.no {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-pill.warn {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-pill.neutral {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .empty-state {
+        min-height: 260px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .empty-state i {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 1.6rem;
+    }
+
+    @@media (max-width: 820px) {
+        .detail-header {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .detail-actions {
+            justify-content: flex-start;
+        }
+
+        .detail-summary {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

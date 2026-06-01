@@ -8,6 +8,7 @@
     var incongruenza = domanda.incongruenze.ToString();
     var datiBool = new List<string> {"True","False"};
     var statoReport = ViewBag.Stato;
+    var isAdminUser = Convert.ToString(ViewBag.idUser) == "1";
 }   
 
 <div class="domande-page container my-5">
@@ -70,16 +71,21 @@
                                                 <label for="idFornitura" class="form-label">ID Fornitura:</label>
                                                 <input type="text" class="form-control form-control-sm readonly-field" id="idFornitura" name="idFornitura" value="@domanda.idFornitura" readonly>
                                             </div>
+
+                                            <div class="col">
+                                                <label for="idUtenza" class="form-label">ID Utenza:</label>
+                                                <input type="text" class="form-control form-control-sm readonly-field" id="idUtenza" name="idUtenza" value="@domanda.idUtenza" readonly>
+                                            </div>
                                             
                                             <div class="col">
                                                 <label for="codiceFiscaleForintura" class="form-label">Codice Fiscale Fornitura:</label>
                                                 <input type="text" class="form-control form-control-sm readonly-field" id="codiceFiscaleForintura" name="codiceFiscaleForintura" value="@domanda.codiceFiscaleUtenzaTrovata" readonly>
                                             </div>
 
-                                            @if(domanda.idFornitura != null){
+                                            @if(isAdminUser && domanda.idUtenza != null){
                                                 <div class="col">
-                                                    <a href="@Url.Action("Modifica", "Utenze", new { id = domanda.idFornitura })" class="btn btn-sm btn-outline-primary">
-                                                                <i class="fa-solid fa-arrow-down"></i> Vai ai Dati Idrici
+                                                    <a href="@Url.Action("Modifica", "Utenze", new { id = domanda.idUtenza })" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fa-solid fa-arrow-down"></i> Apri scheda utenza #@domanda.idUtenza
                                                     </a>
                                                 </div>
                                             }
@@ -113,10 +119,16 @@
                                                 <input type="text" class="form-control form-control-sm" id="codiceFiscaleRichiedente" name="codiceFiscaleRichiedente"
                                                        value="@domanda.codiceFiscaleRichiedente" minlength="16" maxlength="16" required>
                                             </div>
-                                            @if(domanda.idUtenza != null){
+
+                                            <div class="col">
+                                                <label for="idDichiarante" class="form-label">ID Richiedente:</label>
+                                                <input type="text" class="form-control form-control-sm readonly-field" id="idDichiarante" name="idDichiarante" value="@domanda.idDichiarante" readonly>
+                                            </div>
+
+                                            @if(isAdminUser && domanda.idDichiarante != null){
                                                 <div class="col">
-                                                    <a href="@Url.Action("Modifica", "Anagrafe", new { id = domanda.idUtenza })" class="btn btn-sm btn-outline-primary">
-                                                                <i class="fa-solid fa-arrow-down"></i> Vai ai Dati Anagrafici
+                                                    <a href="@Url.Action("Modifica", "Anagrafe", new { id = domanda.idDichiarante })" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fa-solid fa-arrow-down"></i> Apri scheda richiedente #@domanda.idDichiarante
                                                     </a>
                                                 </div>
                                             }

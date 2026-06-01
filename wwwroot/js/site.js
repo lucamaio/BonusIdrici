@@ -111,46 +111,157 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchEnte');
     const select = document.getElementById('selectedEnteId');
     const list = document.getElementById('filteredEnteList');
+    const clearButton = document.getElementById('clearEnteSearch');
+    const submitButton = document.getElementById('entitySubmitButton');
+    const preview = document.getElementById('selectedEntePreview');
 
-    // Popola array degli enti
+    if (!searchInput || !select || !list) {
+        return;
+    }
+
     const enti = Array.from(select.options)
         .filter(opt => opt.value !== "")
         .map(opt => ({ id: opt.value, nome: opt.text }));
 
-    searchInput.addEventListener('input', function () {
-        const query = this.value.toLowerCase();
+    let activeIndex = -1;
+
+    function resetSelection() {
+        select.value = '';
+
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+
+        if (preview) {
+            preview.classList.remove('is-selected');
+            preview.replaceChildren();
+
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-info-circle';
+
+            const text = document.createElement('span');
+            text.textContent = 'Nessun ente selezionato';
+
+            preview.append(icon, text);
+        }
+    }
+
+    function selectEnte(ente) {
+        searchInput.value = ente.nome;
+        select.value = ente.id;
+        list.classList.add('d-none');
+        activeIndex = -1;
+
+        if (submitButton) {
+            submitButton.disabled = false;
+        }
+
+        if (preview) {
+            preview.classList.add('is-selected');
+            preview.replaceChildren();
+
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-check-circle';
+
+            const text = document.createElement('span');
+            const strong = document.createElement('strong');
+            strong.textContent = ente.nome;
+
+            text.append('Ente selezionato: ', strong, ' (ID ' + ente.id + ')');
+            preview.append(icon, text);
+        }
+    }
+
+    function renderResults(query) {
+        const normalized = query.trim().toLowerCase();
         list.innerHTML = '';
+        activeIndex = -1;
 
-        if (query.length === 0) {
+        if (!normalized) {
             list.classList.add('d-none');
-            select.value = '';
+            resetSelection();
             return;
         }
 
-        const filtered = enti.filter(e => e.nome.toLowerCase().includes(query));
+        const filtered = enti
+            .filter(e => e.nome.toLowerCase().includes(normalized) || e.id.toLowerCase().includes(normalized))
+            .slice(0, 12);
+
         if (filtered.length === 0) {
-            list.classList.add('d-none');
+            const empty = document.createElement('li');
+            empty.className = 'entity-results-empty';
+            empty.textContent = 'Nessun ente trovato';
+            list.appendChild(empty);
+            list.classList.remove('d-none');
+            resetSelection();
             return;
         }
 
-        filtered.forEach(e => {
-            const li = document.createElement('li');
-            li.textContent = e.nome;
-            li.className = 'list-group-item list-group-item-action';
-            li.addEventListener('click', () => {
-                searchInput.value = e.nome;
-                select.value = e.id;
-                list.classList.add('d-none');
+        filtered.forEach(ente => {
+            const item = document.createElement('li');
+            const name = document.createElement('span');
+            const id = document.createElement('small');
+
+            name.textContent = ente.nome;
+            id.textContent = 'ID ' + ente.id;
+            item.append(name, id);
+
+            item.addEventListener('mousedown', function (event) {
+                event.preventDefault();
+                selectEnte(ente);
             });
-            list.appendChild(li);
+            list.appendChild(item);
         });
 
         list.classList.remove('d-none');
+        resetSelection();
+    }
+
+    searchInput.addEventListener('input', function () {
+        renderResults(this.value);
     });
 
-    // Nasconde lista se clicchi fuori
-    document.addEventListener('click', function (e) {
-        if (!searchInput.contains(e.target) && !list.contains(e.target)) {
+    searchInput.addEventListener('keydown', function (event) {
+        const items = Array.from(list.querySelectorAll('li:not(.entity-results-empty)'));
+
+        if (!items.length || list.classList.contains('d-none')) {
+            return;
+        }
+
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            activeIndex = (activeIndex + 1) % items.length;
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            activeIndex = (activeIndex - 1 + items.length) % items.length;
+        } else if (event.key === 'Enter' && activeIndex >= 0) {
+            event.preventDefault();
+            items[activeIndex].dispatchEvent(new MouseEvent('mousedown'));
+            return;
+        } else if (event.key === 'Escape') {
+            list.classList.add('d-none');
+            return;
+        } else {
+            return;
+        }
+
+        items.forEach(item => item.classList.remove('active'));
+        items[activeIndex].classList.add('active');
+    });
+
+    if (clearButton) {
+        clearButton.addEventListener('click', function () {
+            searchInput.value = '';
+            list.classList.add('d-none');
+            resetSelection();
+            searchInput.focus();
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        const clickedClearButton = clearButton && clearButton.contains(event.target);
+
+        if (!searchInput.contains(event.target) && !list.contains(event.target) && !clickedClearButton) {
             list.classList.add('d-none');
         }
     });

@@ -4,107 +4,129 @@
     ViewData["Title"] = "Anagrafe Ente";
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
-    string nominativo= "", residenza ="";
+    var totalePersone = Model?.Count() ?? 0;
+    var famiglie = Model?.Select(x => x.CodiceFiscale).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().Count() ?? 0;
+    var sectionActivity = ViewBag.SectionActivity as Models.ViewModels.SectionActivitySummaryViewModel;
 }
 
-<div class="container-xxl flex-grow-1 py-5">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4 w-100">
-                <!-- Header -->
-                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <h3 class="mb-1 fw-bold">
-                        <i class="bi bi-people-fill me-2"></i> Anagrafe -
-                        <span class="fw-semibold">@selectedEnteNome</span>
-                    </h3>
-                    <small>ID Ente: @selectedEnteId</small>
-                </div>
-
-                <!-- Barra di caricamento -->
-                <div id="loadingBarContainer" style="display: none;">
-                    <div id="loadingBar" role="progressbar"></div>
-                </div>
-
-                <!-- Body -->
-                <div class="card-body p-4 position-relative">
-                    @if (Model != null && Model.Any())
-                    {
-                        <div class="info-text mb-4">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <span>Di seguito è elencata l'anagrafe per l'ente selezionato.</span>
-                        </div>
-
-                        <div class="d-flex justify-content-end mb-3">
-                        <a href="@Url.Action("Create", "Anagrafe")" class="btn btn-modern-add shadow-sm">
-                            <i class="bi bi-plus-circle me-2"></i> Aggiungi Persona
-                        </a>
-                    </div>
-
-                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
-                            <table id="anagrafeTable" class="table table-hover align-middle border-bottom w-100">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Nominativo</th>
-                                        <th class="text-center">Codice Fiscale</th>
-                                        <th class="text-center">Data Nascita</th>
-                                        <th class="text-center">Residente</th>
-                                        <th class="text-center">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        nominativo= item.Cognome + " " + item.Nome;
-                                        nominativo = FunzioniTrasversali.MaiuscoleIniziali(nominativo);
-                                        residenza = FunzioniTrasversali.MaiuscoleIniziali(item.IndirizzoResidenza)+ ", " + item.NumeroCivico;
-                                        <tr>
-                                            <td><span class="text-center">@nominativo</span></td>
-                                            <td><span class="text-center">@item.CodiceFiscale</span></td>
-                                            <td><span class="text-center">@item.DataNascita?.ToString("dd/MM/yyyy")</span></td>
-                                            <td><span class="text-center">@residenza</span></td>
-                                            <td class="text-center">
-                                                <a class="btn btn-modern-edit btn-sm" title="Modifica Persona"
-                                                   href="@Url.Action("Modifica", "Anagrafe", new { id = item.id })">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                          <div class="alert alert-warning text-center shadow-sm rounded-3 mb-3">
-                                <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato trovato per l'ente selezionato.
-                            </div>
-
-                            <div class="d-flex justify-content-end mb-3">
-                                <a href="@Url.Action("Create", "Anagrafe", new { idEnte = selectedEnteId })"
-                                class="btn btn-anagrafe btn-sm shadow-sm">
-                                    <i class="bi bi-plus-circle me-1"></i> Aggiungi
-                                </a>
-                            </div>
-                    }
-                    @if(ViewBag.Ruolo !="OPERATORE"){
-                        <div class="d-grid mt-4">
-                            <a href="@Url.Action("Index", "Anagrafe")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
-                            </a>
-                        </div>
-                    }else{
-                        <div class="d-grid mt-4">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
-                        </a>
-                    </div>
-                    }                    
-                </div>
-            </div>
+<main class="data-page">
+    <section class="data-hero data-hero-green">
+        <div>
+            <p>Anagrafe ente</p>
+            <h1>@selectedEnteNome</h1>
+            <span>ID Ente: @selectedEnteId</span>
         </div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("Create", "Anagrafe", new { idEnte = selectedEnteId })" class="btn data-primary-action">
+                <i class="bi bi-plus-circle"></i>
+                <span>Aggiungi persona</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="data-stats-grid">
+        <article class="data-stat-card">
+            <i class="bi bi-people-fill"></i>
+            <span>Persone registrate</span>
+            <strong>@totalePersone</strong>
+        </article>
+        <article class="data-stat-card">
+            <i class="bi bi-person-vcard"></i>
+            <span>Codici fiscali</span>
+            <strong>@famiglie</strong>
+        </article>
+        <article class="data-stat-card">
+            <i class="bi bi-building-check"></i>
+            <span>Ente selezionato</span>
+            <strong>@selectedEnteId</strong>
+        </article>
+    </section>
+
+    @if (sectionActivity != null)
+    {
+        @await Html.PartialAsync("_SectionActivityPanel", sectionActivity)
+    }
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio anagrafico</p>
+                <h2>Persone e nuclei collegati</h2>
+            </div>
+            <span>Ricerca, ordinamento e paginazione attivi</span>
+        </div>
+
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
+                <table id="anagrafeTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Nominativo</th>
+                            <th>Codice Fiscale</th>
+                            <th>Data Nascita</th>
+                            <th>Residenza</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var nominativo = FunzioniTrasversali.MaiuscoleIniziali((item.Cognome + " " + item.Nome).Trim());
+                            var residenza = FunzioniTrasversali.MaiuscoleIniziali(item.IndirizzoResidenza) + ", " + item.NumeroCivico;
+                            <tr>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@nominativo</strong>
+                                        <span>ID @item.id</span>
+                                    </div>
+                                </td>
+                                <td><span class="data-code">@item.CodiceFiscale</span></td>
+                                <td>@item.DataNascita?.ToString("dd/MM/yyyy")</td>
+                                <td>@residenza</td>
+                                <td class="text-center">
+                                    <a class="data-icon-button" title="Modifica persona"
+                                       href="@Url.Action("Modifica", "Anagrafe", new { id = item.id })">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun dato trovato</strong>
+                <span>Non risultano persone registrate per l'ente selezionato.</span>
+            </div>
+        }
+    </section>
+
+    <div class="data-bottom-actions">
+        @if (ViewBag.Ruolo != "OPERATORE")
+        {
+            <a href="@Url.Action("Index", "Anagrafe")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla selezione ente</span>
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla home</span>
+            </a>
+        }
     </div>
-</div>
+</main>
 
 @section Scripts {
     <script>
@@ -139,14 +161,14 @@
                         $(api.table().container()).find('.dataTables_length').show();
                     }
                 }
-            }); 
+            });
 
             table.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
                     $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); 
+                    $("#tableWrapper").fadeIn();
                 }, 500);
             });
         });

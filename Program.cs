@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Data;
 using MySql.EntityFrameworkCore;
+using BonusIdrici2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,11 @@ builder.Services.AddHttpContextAccessor();
 
 // ✅ MVC
 builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<LogCleanupOptions>(
+    builder.Configuration.GetSection(LogCleanupOptions.SectionName));
+builder.Services.AddHostedService<LogCleanupHostedService>();
+builder.Services.AddScoped<SectionActivityService>();
 
 // ✅ Connessione DB
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

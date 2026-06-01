@@ -6,6 +6,7 @@ using System.IO;
 
 using Microsoft.AspNetCore.Authentication;
 using Models.ViewModels; 
+using BonusIdrici2.Services;
 
 namespace Controllers
 {
@@ -14,15 +15,17 @@ namespace Controllers
         // Dichiarazione Variabili 
         private readonly ILogger<ToponomiController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
+        private readonly SectionActivityService _sectionActivityService;
 
         private string? ruolo;
         private int? idUser;
         private string? username;
 
-        public ToponomiController(ILogger<ToponomiController> logger, ApplicationDbContext context)
+        public ToponomiController(ILogger<ToponomiController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
         {
             _logger = logger;
             _context = context;
+            _sectionActivityService = sectionActivityService;
 
             if (VerificaSessione())
             {
@@ -132,6 +135,7 @@ namespace Controllers
             ViewBag.Toponimi = toponimi;
             ViewBag.SelectedEnteId = selectedEnteId;
             ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+            ViewBag.SectionActivity = _sectionActivityService.GetToponomiActivity(selectedEnteId);
 
             return View("Show");
         }

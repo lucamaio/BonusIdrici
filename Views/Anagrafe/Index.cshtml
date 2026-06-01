@@ -3,21 +3,31 @@
     var enti = ViewBag.Enti;
 }
 
-<div class="container d-flex justify-content-center" style="margin-top: 80px;">
-    <div class="card shadow-lg rounded-4 p-5 w-100" style="max-width: 600px;">
-        <div class="text-center mb-4">
-            <i class="bi bi-building text-primary" style="font-size: 3rem;"></i>
-            <h2 class="fw-bold mt-2">Seleziona il tuo Ente</h2>
-            <p class="text-muted">Trova facilmente l'ente e visualizza i dati</p>
+<div class="entity-select-page">
+    <section class="entity-select-card">
+        <div class="entity-select-header">
+            <span class="entity-select-icon entity-select-green">
+                <i class="bi bi-people-fill"></i>
+            </span>
+            <div>
+                <p>Consultazione dati</p>
+                <h1>Anagrafe ente</h1>
+                <span>Cerca e seleziona l'ente per visualizzare l'archivio anagrafico collegato.</span>
+            </div>
         </div>
 
-        <form asp-controller="Anagrafe" asp-action="Show" method="post">
-            <div class="mb-4 position-relative">
-                <input type="text" id="searchEnte" class="form-control shadow-sm rounded-pill ps-4 pe-5"
-                       placeholder="Cerca ente..." autocomplete="off">
-                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+        <form asp-controller="Anagrafe" asp-action="Show" method="post" class="entity-select-form">
+            <label for="searchEnte" class="entity-label">Ente</label>
+            <div class="entity-search-wrap">
+                <div class="entity-search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchEnte" class="entity-search-input" placeholder="Digita nome ente o ID..." autocomplete="off">
+                    <button type="button" id="clearEnteSearch" class="entity-clear-button" aria-label="Cancella ricerca">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
 
-                <select id="selectedEnteId" name="selectedEnteId" class="form-select d-none">
+                <select id="selectedEnteId" name="selectedEnteId" class="d-none" required>
                     <option value="">-- Seleziona un Ente --</option>
                     @if (enti != null)
                     {
@@ -28,15 +38,18 @@
                     }
                 </select>
 
-                <ul id="filteredEnteList" class="list-group position-absolute w-100 shadow-sm mt-1 d-none rounded-3 overflow-auto"
-                    style="z-index: 1000; max-height: 200px; background: #fff;"></ul>
+                <ul id="filteredEnteList" class="entity-results d-none"></ul>
             </div>
 
-            <div class="d-grid mt-3">
-                <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
-                    <i class="bi bi-arrow-right-circle me-2"></i> Visualizza Anagrafe Ente
-                </button>
+            <div id="selectedEntePreview" class="entity-selected-preview">
+                <i class="bi bi-info-circle"></i>
+                <span>Nessun ente selezionato</span>
             </div>
+
+            <button type="submit" id="entitySubmitButton" class="entity-submit-button" disabled>
+                <i class="bi bi-arrow-right-circle"></i>
+                <span>Visualizza anagrafe</span>
+            </button>
         </form>
 
         @if (!string.IsNullOrEmpty(ViewBag.Message))
@@ -45,6 +58,5 @@
                 <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
             </div>
         }
-    </div>
+    </section>
 </div>
-

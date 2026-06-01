@@ -1,211 +1,596 @@
 @{
     ViewData["Title"] = "Statistiche";
+    var enteCards = ViewBag.EnteCards;
+    var reportChart = ViewBag.ReportChart;
 }
 
-<div class="container-fluid py-4 bg-light text-dark min-vh-100">
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-0 text-dark">Dashboard Statistiche</h1>
-            <small class="text-muted">Panoramica aggiornata dei dati gestionali</small>
-        </div>
-        <button id="refreshButton" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-clockwise"></i> Aggiorna
-        </button>
-    </div>
+<div class="stats-page">
+    <div class="stats-shell">
+        <header class="stats-header">
+            <div>
+                <p class="stats-kicker">Dashboard</p>
+                <h1>Statistiche</h1>
+                <span>Vista operativa su enti, anagrafe, utenze e domande elaborate.</span>
+            </div>
+            <button id="refreshButton" type="button" class="btn stats-refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span>Aggiorna</span>
+            </button>
+        </header>
 
-    <!-- KPI CARDS -->
-    <div class="row g-4 mb-5">
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
-                <div class="mb-2 text-primary"><i class="bi bi-building fs-1"></i></div>
-                <h2 class="fw-bold text-dark">@ViewBag.TotaleEnti</h2>
-                <p class="text-muted mb-0">Totale Enti</p>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
-                <div class="mb-2 text-info"><i class="bi bi-droplet fs-1"></i></div>
-                <h2 class="fw-bold text-dark">@ViewBag.TotaleUtenze</h2>
-                <p class="text-muted mb-0">Utenze Idriche</p>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
-                <div class="mb-2 text-success"><i class="bi bi-geo-alt fs-1"></i></div>
-                <h2 class="fw-bold text-dark">@ViewBag.TotaleToponomi</h2>
-                <p class="text-muted mb-0">Totale Toponimi</p>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm border-0 text-center p-3 stat-card-light">
-                <div class="mb-2 text-danger"><i class="bi bi-exclamation-triangle fs-1"></i></div>
-                <h2 class="fw-bold text-dark">@ViewBag.TotaleToponomiDaSistemare</h2>
-                <p class="text-muted mb-0">Toponimi da Sistemare</p>
-            </div>
-        </div>
-    </div>
+        <section class="stats-kpis" aria-label="Indicatori principali">
+            <a class="stats-kpi kpi-enti" href="@Url.Action("Index", "Enti")">
+                <i class="bi bi-building"></i>
+                <span>Enti</span>
+                <strong>@ViewBag.TotaleEnti</strong>
+            </a>
+            <a class="stats-kpi kpi-utenze" href="@Url.Action("Index", "Utenze")">
+                <i class="bi bi-droplet-half"></i>
+                <span>Utenze</span>
+                <strong>@ViewBag.TotaleUtenze</strong>
+            </a>
+            <a class="stats-kpi kpi-anagrafe" href="@Url.Action("Index", "Anagrafe")">
+                <i class="bi bi-people"></i>
+                <span>Anagrafe</span>
+                <strong>@ViewBag.TotaleDichiaranti</strong>
+            </a>
+            <a class="stats-kpi kpi-domande" href="@Url.Action("Index", "Report")">
+                <i class="bi bi-file-earmark-check"></i>
+                <span>Domande</span>
+                <strong>@ViewBag.TotaleDomande</strong>
+            </a>
+            <a class="stats-kpi kpi-toponimi" href="@Url.Action("Index", "Toponomi")">
+                <i class="bi bi-signpost"></i>
+                <span>Toponimi</span>
+                <strong>@ViewBag.TotaleToponomi</strong>
+            </a>
+        </section>
 
-    <!-- GRAFICI -->
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 stat-card-light h-100">
-                <div class="card-header bg-transparent text-dark fw-bold">Domande per Ente</div>
-                <div class="card-body">
-                    <canvas id="domandeEnteChart" height="120"></canvas>
+        <section class="stats-panel chart-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2><i class="bi bi-bar-chart-fill panel-icon chart-icon"></i> Domande per ente ed esito</h2>
+                    <p>Ultimi 20 report. Clicca su una barra/esito per aprire l'elenco delle domande filtrate.</p>
                 </div>
+                <span class="last-update">Aggiornato: @ViewBag.AggiornatoAlle</span>
             </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 stat-card-light h-100">
-                <div class="card-header bg-transparent text-dark fw-bold">Esito Domande</div>
-                <div class="card-body">
-                    <canvas id="domandeEsitoChart" height="250"></canvas>
-                </div>
+            <div class="outcome-legend" aria-label="Legenda esiti">
+                <span class="outcome outcome-01"><i class="bi bi-check-circle-fill"></i> Esito 1</span>
+                <span class="outcome outcome-02"><i class="bi bi-info-circle-fill"></i> Esito 2</span>
+                <span class="outcome outcome-03"><i class="bi bi-exclamation-triangle-fill"></i> Esito 3</span>
+                <span class="outcome outcome-04"><i class="bi bi-x-circle-fill"></i> Esito 4</span>
             </div>
-        </div>
-    </div>
+            <div class="chart-wrap">
+                <canvas id="reportEsitiChart"></canvas>
+            </div>
+        </section>
 
-    <div class="row g-4 mt-1">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 stat-card-light h-100">
-                <div class="card-header bg-transparent text-dark fw-bold">Utenze Idriche per Ente</div>
-                <div class="card-body">
-                    <canvas id="utenzeEnteChart" height="200"></canvas>
+        <section class="stats-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2><i class="bi bi-grid-3x3-gap-fill panel-icon archive-icon"></i> Enti e archivi</h2>
+                    <p>Accesso rapido alle sezioni collegate per ogni ente.</p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 stat-card-light h-100">
-                <div class="card-header bg-transparent text-dark fw-bold">Anagrafe per Ente</div>
-                <div class="card-body">
-                    <canvas id="anagrafeChart" height="200"></canvas>
-                </div>
+
+            <div class="entity-grid">
+                @foreach (var ente in enteCards)
+                {
+                    <article class="entity-row">
+                        <div class="entity-title">
+                            <i class="bi bi-bank2 entity-icon"></i>
+                            <h3>@ente.nome</h3>
+                            <span>ID @ente.idEnte</span>
+                        </div>
+                        <a class="entity-metric metric-anagrafe" href="@Url.Action("Show", "Anagrafe", new { selectedEnteId = ente.idEnte })">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Anagrafe</span>
+                            <strong>@ente.anagrafe</strong>
+                        </a>
+                        <a class="entity-metric metric-utenze" href="@Url.Action("Show", "Utenze", new { selectedEnteId = ente.idEnte })">
+                            <i class="bi bi-droplet-fill"></i>
+                            <span>Utenze</span>
+                            <strong>@ente.utenze</strong>
+                        </a>
+                        <a class="entity-metric metric-report" href="@Url.Action("Show", "Report", new { selectedEnteId = ente.idEnte })">
+                            <i class="bi bi-file-earmark-bar-graph-fill"></i>
+                            <span>Report</span>
+                            <strong>@ente.report</strong>
+                        </a>
+                        <a class="entity-metric metric-toponimi @(ente.toponimiDaSistemare > 0 ? "has-warning" : "")" href="@Url.Action("Show", "Toponomi", new { selectedEnteId = ente.idEnte })">
+                            <i class="bi bi-signpost-fill"></i>
+                            <span>Toponimi</span>
+                            <strong>@ente.toponimi</strong>
+                            @if (ente.toponimiDaSistemare > 0)
+                            {
+                                <em>@ente.toponimiDaSistemare da sistemare</em>
+                            }
+                        </a>
+                    </article>
+                }
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 stat-card-light h-100">
-                <div class="card-header bg-transparent text-dark fw-bold">Toponimi per Ente</div>
-                <div class="card-body">
-                    <canvas id="toponimiChart" height="200"></canvas>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
 </div>
 
-<!-- STILE CUSTOM -->
 <style>
-    body {
-        background-color: #f8f9fa; /* Sfondo chiaro */
-        color: #212529; /* Testo scuro */
+    .stats-page {
+        background: #f5f7fb;
+        min-height: calc(100vh - 80px);
+        color: #1f2937;
     }
-    .stat-card-light {
+
+    .stats-shell {
+        width: min(1440px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 48px;
+    }
+
+    .stats-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 22px;
+    }
+
+    .stats-kicker {
+        margin: 0 0 4px;
+        color: #2563eb;
+        font-size: .78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .stats-header h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 3rem);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .stats-header span,
+    .panel-heading p,
+    .last-update {
+        color: #64748b;
+    }
+
+    .stats-refresh {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #cbd5e1;
         background: #ffffff;
-        border-radius: 1rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        color: #0f172a;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-weight: 700;
+        min-height: 44px;
     }
-    .stat-card-light:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.75rem 1.25rem rgba(0,0,0,0.1);
+
+    .stats-refresh i {
+        color: #2563eb;
     }
-    .stat-card-light h2 {
-        font-size: 2.2rem;
+
+    .stats-kpis {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 16px;
     }
-    .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.1);
+
+    .stats-kpi,
+    .stats-panel,
+    .entity-row {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
     }
-    .footer {
-        color: #212529 !important;
-        fill: #212529 !important;
+
+    .stats-kpi {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas: "icon label" "icon value";
+        gap: 0 12px;
+        align-items: center;
+        padding: 16px;
+        text-decoration: none;
+        color: inherit;
+        min-height: 92px;
+        transition: transform .16s ease, border-color .16s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-kpi::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: var(--accent);
+    }
+
+    .stats-kpi:hover,
+    .entity-metric:hover {
+        transform: translateY(-2px);
+        border-color: #93c5fd;
+    }
+
+    .stats-kpi i {
+        grid-area: icon;
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 8px;
+        font-size: 1.35rem;
+    }
+
+    .stats-kpi span {
+        grid-area: label;
+        color: #64748b;
+        font-size: .9rem;
+        font-weight: 700;
+    }
+
+    .stats-kpi strong {
+        grid-area: value;
+        font-size: 1.7rem;
+        line-height: 1.1;
+        color: var(--accent-dark);
+    }
+
+    .kpi-enti {
+        --accent: #2563eb;
+        --accent-dark: #1e3a8a;
+        --accent-bg: #eff6ff;
+    }
+
+    .kpi-utenze {
+        --accent: #0891b2;
+        --accent-dark: #155e75;
+        --accent-bg: #ecfeff;
+    }
+
+    .kpi-anagrafe {
+        --accent: #16a34a;
+        --accent-dark: #166534;
+        --accent-bg: #f0fdf4;
+    }
+
+    .kpi-domande {
+        --accent: #dc2626;
+        --accent-dark: #991b1b;
+        --accent-bg: #fef2f2;
+    }
+
+    .kpi-toponimi {
+        --accent: #d97706;
+        --accent-dark: #92400e;
+        --accent-bg: #fffbeb;
+    }
+
+    .stats-panel {
+        padding: 20px;
+        margin-top: 16px;
+    }
+
+    .panel-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 14px;
+    }
+
+    .panel-heading h2 {
+        margin: 0 0 4px;
+        font-size: 1.25rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .panel-heading p {
+        margin: 0;
+        font-size: .95rem;
+    }
+
+    .chart-wrap {
+        position: relative;
+        height: 420px;
+    }
+
+    .panel-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .chart-icon {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .archive-icon {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .outcome-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: -2px 0 14px;
+    }
+
+    .outcome {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 30px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: .84rem;
+        font-weight: 800;
+        border: 1px solid transparent;
+    }
+
+    .outcome-01 {
+        color: #166534;
+        background: #dcfce7;
+        border-color: #bbf7d0;
+    }
+
+    .outcome-02 {
+        color: #1e40af;
+        background: #dbeafe;
+        border-color: #bfdbfe;
+    }
+
+    .outcome-03 {
+        color: #92400e;
+        background: #fef3c7;
+        border-color: #fde68a;
+    }
+
+    .outcome-04 {
+        color: #991b1b;
+        background: #fee2e2;
+        border-color: #fecaca;
+    }
+
+    .entity-grid {
+        display: grid;
+        gap: 10px;
+    }
+
+    .entity-row {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.7fr) repeat(4, minmax(120px, 1fr));
+        gap: 10px;
+        align-items: stretch;
+        padding: 10px;
+        box-shadow: none;
+    }
+
+    .entity-title {
+        padding: 10px 12px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas: "icon title" "icon meta";
+        column-gap: 10px;
+        align-content: center;
+        min-width: 0;
+    }
+
+    .entity-icon {
+        grid-area: icon;
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: #eef2ff;
+        color: #3730a3;
+    }
+
+    .entity-title h3 {
+        grid-area: title;
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .entity-title > span {
+        grid-area: meta;
+    }
+
+    .entity-title span,
+    .entity-metric span,
+    .entity-metric em {
+        color: #64748b;
+        font-size: .82rem;
+        font-style: normal;
+    }
+
+    .entity-metric {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-decoration: none;
+        color: #0f172a;
+        transition: transform .16s ease, border-color .16s ease;
+        min-height: 70px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .entity-metric > i {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: var(--metric-accent);
+        opacity: .35;
+        font-size: 1rem;
+    }
+
+    .entity-metric strong {
+        font-size: 1.35rem;
+        line-height: 1.1;
+        color: var(--metric-accent);
+    }
+
+    .metric-anagrafe {
+        --metric-accent: #16a34a;
+        background: linear-gradient(180deg, #ffffff, #f0fdf4);
+    }
+
+    .metric-utenze {
+        --metric-accent: #0891b2;
+        background: linear-gradient(180deg, #ffffff, #ecfeff);
+    }
+
+    .metric-report {
+        --metric-accent: #2563eb;
+        background: linear-gradient(180deg, #ffffff, #eff6ff);
+    }
+
+    .metric-toponimi {
+        --metric-accent: #d97706;
+        background: linear-gradient(180deg, #ffffff, #fffbeb);
+    }
+
+    .entity-metric.has-warning {
+        border-color: #f59e0b;
+    }
+
+    .entity-metric.has-warning em {
+        width: fit-content;
+        margin-top: 4px;
+        padding: 3px 7px;
+        border-radius: 6px;
+        background: #fef3c7;
+        color: #92400e;
+        font-weight: 800;
+    }
+
+    @@media (max-width: 1100px) {
+        .stats-kpis {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .entity-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .entity-title {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .stats-shell {
+            width: min(100% - 20px, 1440px);
+            padding-top: 20px;
+        }
+
+        .stats-header,
+        .panel-heading {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .stats-kpis,
+        .entity-row {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrap {
+            height: 360px;
+        }
     }
 </style>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.getElementById('refreshButton').addEventListener('click', function() {
+        document.getElementById('refreshButton').addEventListener('click', function () {
             location.reload();
         });
 
-        // Colori chiari per i grafici
-        Chart.defaults.color = "#212529";
-        Chart.defaults.borderColor = "rgba(0,0,0,0.1)";
+        const reportStats = @Html.Raw(Json.Serialize(reportChart));
+        const labels = reportStats.map(item => `${item.ente} - ${item.data}`);
+        const detailUrls = {
+            "01": reportStats.map(item => '@Url.Action("DettaglioEsito", "Statistiche")' + `?idReport=${item.idReport}&esito=01`),
+            "02": reportStats.map(item => '@Url.Action("DettaglioEsito", "Statistiche")' + `?idReport=${item.idReport}&esito=02`),
+            "03": reportStats.map(item => '@Url.Action("DettaglioEsito", "Statistiche")' + `?idReport=${item.idReport}&esito=03`),
+            "04": reportStats.map(item => '@Url.Action("DettaglioEsito", "Statistiche")' + `?idReport=${item.idReport}&esito=04`)
+        };
 
-        // Domande per ente
-        const domandeLabels = @Html.Raw(Json.Serialize(ViewBag.DomandeLabels));
-        const domandeValues = @Html.Raw(Json.Serialize(ViewBag.DomandeValues));
-        
-        new Chart(document.getElementById('domandeEnteChart'), {
-            type: 'line',
-            data: {
-                labels: domandeLabels,
-                datasets: [{
-                    label: 'Domande effettuati',
-                    data: domandeValues,
-                    backgroundColor: 'rgba(54, 162, 235, 0.4)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    tension: 0.3,
-                    fill: false
-                }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
+        Chart.defaults.color = '#334155';
+        Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+        Chart.defaults.borderColor = 'rgba(148, 163, 184, .35)';
 
-        // Esito domande
-        new Chart(document.getElementById('domandeEsitoChart'), {
-            type: 'doughnut',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.DomandeLabels)),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(ViewBag.DomandeValues)),
-                    backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
-                }]
-            },
-            options: { responsive: true }
-        });
-
-        // Utenze idriche
-        new Chart(document.getElementById('utenzeEnteChart'), {
+        const ctx = document.getElementById('reportEsitiChart');
+        const reportEsitiChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.UtenzeIdricheLabels)),
-                datasets: [{
-                    label: 'Utenze Idriche',
-                    data: @Html.Raw(Json.Serialize(ViewBag.UtenzeIdricheValues)),
-                    backgroundColor: 'rgba(13, 110, 253, 0.4)',
-                    borderColor: '#0d6efd'
-                }]
+                labels,
+                datasets: [
+                    { label: 'Esito 1', esito: '01', data: reportStats.map(x => x.esito01), backgroundColor: '#16a34a', borderRadius: 4 },
+                    { label: 'Esito 2', esito: '02', data: reportStats.map(x => x.esito02), backgroundColor: '#2563eb', borderRadius: 4 },
+                    { label: 'Esito 3', esito: '03', data: reportStats.map(x => x.esito03), backgroundColor: '#f59e0b', borderRadius: 4 },
+                    { label: 'Esito 4', esito: '04', data: reportStats.map(x => x.esito04), backgroundColor: '#dc2626', borderRadius: 4 }
+                ]
             },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
-
-        // Anagrafe
-        new Chart(document.getElementById('anagrafeChart'), {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.AnagrafeLabels)),
-                datasets: [{
-                    label: 'Anagrafe',
-                    data: @Html.Raw(Json.Serialize(ViewBag.AnagrafeValues)),
-                    backgroundColor: 'rgba(25, 135, 84, 0.6)'
-                }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
-
-        // Toponimi
-        new Chart(document.getElementById('toponimiChart'), {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.ToponimiLabels)),
-                datasets: [{
-                    label: 'Toponimi',
-                    data: @Html.Raw(Json.Serialize(ViewBag.ToponimiValues)),
-                    backgroundColor: 'rgba(255, 193, 7, 0.6)'
-                }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'nearest', intersect: true },
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 14, usePointStyle: true } },
+                    tooltip: {
+                        callbacks: {
+                            afterTitle(items) {
+                                const item = reportStats[items[0].dataIndex];
+                                return `Report #${item.idReport} - ${item.periodo}`;
+                            },
+                            afterLabel(context) {
+                                const item = reportStats[context.dataIndex];
+                                return `Totale report: ${item.totale}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { stacked: true, ticks: { maxRotation: 45, minRotation: 0, autoSkip: false } },
+                    y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
+                },
+                onHover(event, elements) {
+                    event.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+                },
+                onClick(event, elements, chart) {
+                    if (!elements.length) return;
+                    const point = elements[0];
+                    const dataset = chart.data.datasets[point.datasetIndex];
+                    const value = dataset.data[point.index];
+                    if (!value) return;
+                    window.location.href = detailUrls[dataset.esito][point.index];
+                }
+            }
         });
     </script>
 }

@@ -2,35 +2,67 @@
     ViewData["Title"] = "Login";
 }
 
-<main class="fl-main">
-<div class="fl-container">
-    <div class="fl-left-panel">
-        <h1 class="fl-title">Benvenuto</h1>
-        <p class="fl-description">Inserisci le tue credenziali per accedere al sistema.</p>
-    </div>
-
-    <div class="fl-right-panel">
-        <div class="fl-login-icon-container">
-            <div class="fl-login-icon">
-                <i class="fa-solid fa-user"></i>
+<main class="login-page">
+    <section class="login-shell">
+        <div class="login-info-panel">
+            <div class="login-brand-block">
+                <span class="login-brand-mark">
+                    <i class="bi bi-droplet-fill"></i>
+                </span>
+                <div>
+                    <p class="login-kicker">Accesso riservato</p>
+                    <h1>BonusIdrici</h1>
+                </div>
+            </div>
+            <p class="login-info-copy">
+                Gestisci pratiche, archivi anagrafici, utenze idriche ed elaborazioni INPS da un unico ambiente operativo.
+            </p>
+            <div class="login-info-list">
+                <span><i class="bi bi-shield-check"></i> Sessione protetta</span>
+                <span><i class="bi bi-database-check"></i> Dati centralizzati</span>
+                <span><i class="bi bi-file-earmark-bar-graph"></i> Report e controlli</span>
             </div>
         </div>
-        <h2 class="fl-form-title">Accedi</h2>
-         @if (!string.IsNullOrEmpty(TempData["Message"] as string))
-        {
-            <div class="alert alert-info mt-4 shadow-sm border-0">
-                <i class="bi bi-info-circle me-2"></i> @TempData["Message"]
+
+        <div class="login-form-panel">
+            <div class="login-form-heading">
+                <span><i class="bi bi-person-lock"></i></span>
+                <div>
+                    <h2>Accedi</h2>
+                    <p>Inserisci le tue credenziali per continuare.</p>
+                </div>
             </div>
-        }
-        <form asp-controller="Login" asp-action="Accedi" method="POST" class="fl-form">
-            <label for="username" class="fl-label fw-bold">Username/email:</label>
-            <input type="text" id="username" name="username" class="fl-input" required>
 
-            <label for="password" class="fl-label fw-bold">Password:</label>
-            <input type="password" id="password" name="password" class="fl-input" required>
+            @if (!string.IsNullOrEmpty(TempData["Message"] as string))
+            {
+                <div class="login-alert">
+                    <i class="bi bi-info-circle"></i>
+                    <span>@TempData["Message"]</span>
+                </div>
+            }
 
-            <button type="submit" class="fl-button">Accedi</button>
-        </form>
-    </div>
-</div>
+            <form asp-controller="Login" asp-action="Accedi" method="POST" class="login-form">
+                <div class="login-field">
+                    <label for="username">Username o email</label>
+                    <div class="login-input-wrap">
+                        <i class="bi bi-person"></i>
+                        <input type="text" id="username" name="username" autocomplete="username" required>
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <label for="password">Password</label>
+                    <div class="login-input-wrap">
+                        <i class="bi bi-key"></i>
+                        <input type="password" id="password" name="password" autocomplete="current-password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-submit">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Entra nel sistema</span>
+                </button>
+            </form>
+        </div>
+    </section>
 </main>

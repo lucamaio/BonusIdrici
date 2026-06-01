@@ -3,8 +3,8 @@ for details on configuring this project to bundle and minify static web assets. 
 
 a.navbar-brand[b-xrv69dks3l] {
   white-space: normal;
-  text-align: center;
-  word-break: break-all;
+  text-align: left;
+  word-break: normal;
 }
 
 a[b-xrv69dks3l] {
@@ -46,7 +46,7 @@ button.accept-policy[b-xrv69dks3l] {
 }
 
 main[b-xrv69dks3l] {
-    padding-bottom: 50px;
+    padding-bottom: 0;
 }
 
 
@@ -68,13 +68,20 @@ body[b-xrv69dks3l] {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    background: #f5f7fb;
 }
 
-.main-content[b-xrv69dks3l] {
+.main-content[b-xrv69dks3l],
+.app-main-container[b-xrv69dks3l] {
     flex: 1 0 auto;
 }
 
 .py-5[b-xrv69dks3l] {
     padding-top: 3rem;
     padding-bottom: 3rem;
+}
+
+.app-navbar[b-xrv69dks3l] {
+    margin-bottom: 0 !important;
 }

@@ -1,0 +1,18 @@
+@model Models.ViewModels.SectionActivitySummaryViewModel
+
+@{
+    var lastUpdate = Model.LastUpdate?.ToString("dd/MM/yyyy HH:mm") ?? "Nessun aggiornamento registrato";
+}
+
+<section class="section-activity-panel section-activity-panel-compact mb-4">
+    <div class="section-activity-last">
+        <span class="section-activity-icon activity-green">
+            <i class="bi bi-clock-history"></i>
+        </span>
+        <div>
+            <p>Ultimo aggiornamento dati</p>
+            <strong>@lastUpdate</strong>
+            <span>@Model.SectionName</span>
+        </div>
+    </div>
+</section>

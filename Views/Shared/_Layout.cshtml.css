@@ -3,8 +3,8 @@ for details on configuring this project to bundle and minify static web assets. 
 
 a.navbar-brand {
   white-space: normal;
-  text-align: center;
-  word-break: break-all;
+  text-align: left;
+  word-break: normal;
 }
 
 a {
@@ -46,7 +46,7 @@ button.accept-policy {
 }
 
 main {
-    padding-bottom: 50px;
+    padding-bottom: 0;
 }
 
 
@@ -68,13 +68,20 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    background: #f5f7fb;
 }
 
-.main-content {
+.main-content,
+.app-main-container {
     flex: 1 0 auto;
 }
 
 .py-5 {
     padding-top: 3rem;
     padding-bottom: 3rem;
+}
+
+.app-navbar {
+    margin-bottom: 0 !important;
 }

@@ -1,112 +1,152 @@
 @using System.Globalization
 @model IEnumerable<Models.ViewModels.ReportViewModel>
 @{
-    ViewData["Title"] = "Riepilogo Dati Ente";
+    ViewData["Title"] = "Elaborazioni Ente";
     var selectedEnteId = ViewBag.idEnte;
-    var selectedEnteNome = ViewBag.SelectedEnteNome;
-    var ruolo = ViewBag.Ruolo;
-    var Reports = ViewBag.Reports;
+    var selectedEnteNome = ViewBag.SelectedEnteNome as string ?? "Ente";
+    var ruolo = ViewBag.Ruolo as string;
+    var reports = ViewBag.Reports as IEnumerable<Models.ViewModels.ReportViewModel>;
+    var reportsList = reports?.ToList() ?? new List<Models.ViewModels.ReportViewModel>();
+    var sectionActivity = ViewBag.SectionActivity as Models.ViewModels.SectionActivitySummaryViewModel;
+    var titleCaseEnte = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(selectedEnteNome.ToLower());
 }
 
-<div class="container-xxl flex-grow-1 py-5">
-    <div class="card shadow-sm border-0 rounded-4">
-        <!-- Header -->
-        <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-            <h3 class="mb-1 fw-bold">
-                <i class="bi bi-building me-2"></i> Elaborazioni Disponibili -
-                <span class="fw-semibold">@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(selectedEnteNome.ToLower())</span>
-            </h3>
-            <small>ID Ente: @selectedEnteId</small>
+<main class="data-page">
+    <section class="data-hero data-hero-red">
+        <div>
+            <p>Elaborazioni disponibili</p>
+            <h1>@titleCaseEnte</h1>
+            <span>ID Ente: @selectedEnteId</span>
         </div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("NewProcessing", "Elaborazione")" class="btn data-primary-action">
+                <i class="bi bi-gear-fill"></i>
+                <span>Nuova elaborazione</span>
+            </a>
+        </div>
+    </section>
 
-           <!-- Barra di caricamento -->
-            <div id="loadingBarContainer" style="display: none;">
-                <div id="loadingBar" role="progressbar"></div>
+    <section class="data-stats-grid">
+        <article class="data-stat-card stat-red">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i>
+            <span>Report generati</span>
+            <strong>@reportsList.Count</strong>
+        </article>
+        <article class="data-stat-card stat-green">
+            <i class="bi bi-check2-circle"></i>
+            <span>Approvati</span>
+            <strong>@reportsList.Count(x => string.Equals(x.stato, "Approvato", StringComparison.OrdinalIgnoreCase))</strong>
+        </article>
+        <article class="data-stat-card stat-blue">
+            <i class="bi bi-list-check"></i>
+            <span>Record totali</span>
+            <strong>@reportsList.Sum(x => x.count ?? 0)</strong>
+        </article>
+    </section>
+
+    @if (sectionActivity != null)
+    {
+        @await Html.PartialAsync("_SectionActivityPanel", sectionActivity)
+    }
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio elaborazioni</p>
+                <h2>Report INPS generati per periodo</h2>
             </div>
-
-        <!-- Body -->
-        <div class="card-body p-4">
-            @if (Reports != null)
-            {
-                <p class="lead mb-4 text-muted">Seleziona un'elaborazione per visualizzare le domande corrispondenti.</p>
-                
-                <div class="btn-group">
-                    <a href="@Url.Action("NewProcessing", "Elaborazione")" class="btn btn-outline-primary">
-                        <i class="bi bi-gear-fill me-1"></i>Nuova Elaborazione
-                    </a>
-                </div>
-                <div class="table-responsive">
-                    <table id="elencoDomande" class="table table-hover align-middle border-bottom">
-                        <thead>
-                            <tr>
-                                <th class="text-center">Elaborazione</th>
-                                <th class="text-center">Data Elaborazione</th>
-                                @if(ruolo == "ADMIN"){
-                                    <th class="text-center">Data Aggiornamento</th>
-                                }
-                                <th class="text-center">Stato</th>
-                                <th class="text-center">Serie</th>
-                                <th class="text-center">Numero Record</th>
-                                <th class="text-center">Elabotato da</th>
-                                <th class="text-center">Azioni</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var report in Reports)
-                            {
-                                @* var dataUrl = report.DataCreazione.ToString("yyyy-MM-dd HH:mm:ss"); *@
-                                var dataUrl = report.DataCreazione.ToString("dd/MM/yyyy HH:mm:ss");
-                                var dataAggiornamento = report.DataAggiornamento?.ToString("dd/MM/yyyy HH:mm:ss") ?? "ND";
-                                 @* Formattazione mese e anno *@
-                                var esportatoda = report.mese + " " + report.anno;
-                                esportatoda = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(esportatoda.ToLower());
-                                  <tr>
-                                    <td class="text-center"><span>@esportatoda</span></td>
-                                    <td class="text-center"><span>@dataUrl</span></td>
-                                    @if(ruolo == "ADMIN"){
-                                        <td class="text-center"><span>@dataAggiornamento</span></td>
-                                    }
-                                    <td class="text-center"><span>@report.stato</span></td>
-                                    <td class="text-center"><span>@report.serie</span></td>
-                                    <td class="text-center"><span>@report.count</span></td>
-                                    <td class="text-center"><span>@report.Username</span></td>
-                                    
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center gap-2">
-                                            <!-- Pulsante Dettaglio -->
-                                            <a class="btn btn-sm btn-light border" 
-                                            href="@Url.Action("Dettails", new { idReport = report.id })"
-                                            title="Visualizza dettaglio report">
-                                                <i class="bi bi-eye text-primary"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-warning text-center shadow-sm rounded-3">
-                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato disponibile per l'ente selezionato.
-                </div>
-            }
-
-            @if(ruolo != "OPERATORE"){
-                        <div class="d-grid mt-4">
-                            <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                                <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione Ente
-                            </a>
-                        </div>
-                    }else{
-                        <div class="d-grid mt-4">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
-                        </a>
-                    </div>
-                    }      
+            <span>Ordinati per anno, mese, serie e data elaborazione</span>
         </div>
+
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
+        </div>
+
+        @if (reportsList.Any())
+        {
+            <div class="table-responsive" id="tableWrapper" style="display: none;">
+                <table id="elencoDomande" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Elaborazione</th>
+                            <th>Data Elaborazione</th>
+                            @if (ruolo == "ADMIN")
+                            {
+                                <th>Data Aggiornamento</th>
+                            }
+                            <th>Stato</th>
+                            <th>Serie</th>
+                            <th>Record</th>
+                            <th>Elaborato da</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var report in reportsList)
+                        {
+                            var dataUrl = report.DataCreazione.ToString("dd/MM/yyyy HH:mm:ss");
+                            var dataAggiornamento = report.DataAggiornamento?.ToString("dd/MM/yyyy HH:mm:ss") ?? "ND";
+                            var periodo = CultureInfo.CurrentCulture.TextInfo.ToTitleCase((report.mese + " " + report.anno).ToLower());
+                            var statusClass = report.stato switch
+                            {
+                                "Approvato" => "status-success",
+                                "Emesso" => "status-info",
+                                "Annullato" => "status-danger",
+                                _ => "status-warning"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@periodo</strong>
+                                        <span>Report #@report.id</span>
+                                    </div>
+                                </td>
+                                <td>@dataUrl</td>
+                                @if (ruolo == "ADMIN")
+                                {
+                                    <td>@dataAggiornamento</td>
+                                }
+                                <td><span class="data-status @statusClass">@report.stato</span></td>
+                                <td><span class="data-code">@report.serie</span></td>
+                                <td>@report.count</td>
+                                <td>@report.Username</td>
+                                <td class="text-center">
+                                    <a class="data-icon-button" title="Visualizza dettaglio report"
+                                       href="@Url.Action("Dettails", "Report", new { idReport = report.id })">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun report disponibile</strong>
+                <span>Non risultano elaborazioni generate per l'ente selezionato.</span>
+            </div>
+        }
+    </section>
+
+    <div class="data-bottom-actions">
+        @if (ruolo != "OPERATORE")
+        {
+            <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla selezione ente</span>
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla home</span>
+            </a>
+        }
     </div>
-</div>
+</main>

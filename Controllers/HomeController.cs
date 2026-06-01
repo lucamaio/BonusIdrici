@@ -7,6 +7,7 @@ using System.IO;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using BonusIdrici2.Services;
 
 namespace Controllers
 {
@@ -14,6 +15,7 @@ namespace Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
+        private readonly SectionActivityService _sectionActivityService;
 
         // Variuabili di sessione
 
@@ -23,10 +25,11 @@ namespace Controllers
 
         private string tema;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
         {
             _logger = logger;
             _context = context;
+            _sectionActivityService = sectionActivityService;
 
             if (VerificaSessione())
             {
@@ -131,6 +134,26 @@ namespace Controllers
         public IActionResult Info()
         {
             return View();
+        }
+
+        public IActionResult FAQ()
+        {
+            if (!VerificaSessione())
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            return View();
+        }
+
+        public IActionResult Attivita()
+        {
+            if (!VerificaSessione("ADMIN"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(_sectionActivityService.GetAdminActivityDashboard());
         }
     }
     

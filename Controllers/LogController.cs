@@ -20,7 +20,15 @@ namespace Controllers
         private int? idUser;
         private string? username;
 
-        private List<string> tipologieLog = new List<string> { "Accessi", "Esportazioni", "CaricamentoUtenze", "CaricamentoAnagrafiche" };
+        private readonly List<(string Key, string Title, string Description, string Icon, string AccentClass, string Path)> logDefinitions = new()
+        {
+            ("Accessi", "Accessi utenti", "Login, logout e tentativi di accesso al sistema.", "bi-person-check", "diag-blue", "wwwroot/log/utenti.log"),
+            ("Esportazioni", "Elaborazioni INPS", "Operazioni di elaborazione file INPS e generazione domande.", "bi-file-earmark-bar-graph", "diag-red", "wwwroot/log/Elaborazione_INPS.log"),
+            ("CaricamentoUtenze", "Caricamento utenze", "Importazione e controllo dei flussi utenze idriche.", "bi-droplet-half", "diag-cyan", "wwwroot/log/Lettura_UtenzeIdriche.log"),
+            ("CaricamentoAnagrafiche", "Caricamento anagrafe", "Importazione e aggiornamento dati anagrafici.", "bi-people", "diag-green", "wwwroot/log/Elaborazione_Anagrafe.log"),
+            ("Domande", "Domande e report", "Operazioni sulle domande elaborate e sui report.", "bi-journal-check", "diag-purple", "wwwroot/log/Domande.log"),
+            ("Report", "Report applicativi", "Tracciamento tecnico dei report e delle esportazioni.", "bi-clipboard-data", "diag-amber", "wwwroot/log/Report.log")
+        };
 
         // Costruttore
 
@@ -90,8 +98,7 @@ namespace Controllers
                 ViewBag.Messaggio = "Accesso non autorizzato.";
                 return RedirectToAction("Index", "Home");
             }
-            ViewBag.TipologieLog = tipologieLog;
-            return View();
+            return View(BuildDiagnostics());
         }
 
         // Pagina 2 - Visualizzazione del log delle operazioni
@@ -105,40 +112,20 @@ namespace Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (string.IsNullOrEmpty(tipoLog) || (tipoLog != "Accessi" && tipoLog != "Esportazioni" && tipoLog != "CaricamentoUtenze" && tipoLog != "CaricamentoAnagrafiche"))
+            var logDefinition = logDefinitions.FirstOrDefault(l => l.Key == tipoLog);
+
+            if (string.IsNullOrEmpty(tipoLog) || string.IsNullOrWhiteSpace(logDefinition.Key))
             {
                 ViewBag.Messaggio = "Tipologia di log non valida.";
                 return RedirectToAction("Index");
             }
 
-            string? percorsoFile = string.Empty;
-            List<string>? righeFile = new List<string>();
-
-            switch (tipoLog)
-            {
-                case "Accessi":
-                    percorsoFile = ($"wwwroot/log/utenti.log");
-                    righeFile = FileReader.ReadLines(percorsoFile);
-                    break;
-                case "Esportazioni":
-                    percorsoFile = ($"wwwroot/log/Elaborazione_INPS.log");
-                    righeFile = FileReader.ReadLines(percorsoFile);
-                    break;
-                case "CaricamentoUtenze":
-                    percorsoFile = ($"wwwroot/log/Lettura_UtenzeIdriche.log");
-                    righeFile = FileReader.ReadLines(percorsoFile);
-                    break;
-                case "CaricamentoAnagrafiche":
-                    percorsoFile = ($"wwwroot/log/Elaborazione_Anagrafe.log");
-                    righeFile = FileReader.ReadLines(percorsoFile);
-                    break;
-                default:
-                    return RedirectToAction("Index", "Home");
-            }
+            var righeFile = ReadLogLines(logDefinition.Path);
 
             if (righeFile == null || righeFile.Count == 0)
             {
                 ViewBag.Messaggio = "Nessun log disponibile per la tipologia selezionata.";
+                ViewBag.TipoLog = logDefinition.Title;
                 return View();
             }
 
@@ -157,7 +144,7 @@ namespace Controllers
                 }
             }
 
-            ViewBag.TipoLog = tipoLog;
+            ViewBag.TipoLog = logDefinition.Title;
             logs.Reverse();  // Invertito per mostrare prima i log più recenti
             ViewBag.Logs = logs;
             return View();
@@ -181,6 +168,104 @@ namespace Controllers
             }
 
             return View(log);
+        }
+
+        private LogDiagnosticViewModel BuildDiagnostics()
+        {
+            var files = logDefinitions.Select(definition =>
+            {
+                var fullPath = ResolvePath(definition.Path);
+                var exists = System.IO.File.Exists(fullPath);
+                var size = exists ? new FileInfo(fullPath).Length : 0;
+                var lines = exists ? ReadLogLines(definition.Path) : new List<string>();
+                var parsedLogs = ParseLogs(lines);
+                var errorCount = parsedLogs.Count(l => string.Equals(l.TipoLog, "ERROR", StringComparison.OrdinalIgnoreCase));
+                var warningCount = parsedLogs.Count(l => string.Equals(l.TipoLog, "WARNING", StringComparison.OrdinalIgnoreCase));
+                var status = !exists ? "missing" : errorCount > 0 ? "danger" : warningCount > 0 ? "warning" : "ok";
+
+                return new LogFileDiagnosticViewModel
+                {
+                    Key = definition.Key,
+                    Title = definition.Title,
+                    Description = definition.Description,
+                    Icon = definition.Icon,
+                    AccentClass = definition.AccentClass,
+                    Path = definition.Path,
+                    Exists = exists,
+                    SizeBytes = size,
+                    Rows = lines.Count,
+                    InfoCount = parsedLogs.Count(l => string.Equals(l.TipoLog, "INFO", StringComparison.OrdinalIgnoreCase)),
+                    WarningCount = warningCount,
+                    ErrorCount = errorCount,
+                    LastEvent = parsedLogs.OrderByDescending(l => l.Timestamp).FirstOrDefault()?.Timestamp,
+                    Status = status,
+                    StatusLabel = status switch
+                    {
+                        "missing" => "File assente",
+                        "danger" => "Errori presenti",
+                        "warning" => "Warning presenti",
+                        _ => "Regolare"
+                    }
+                };
+            }).ToList();
+
+            return new LogDiagnosticViewModel
+            {
+                Files = files,
+                TotalFiles = files.Count,
+                TotalBytes = files.Sum(f => f.SizeBytes),
+                TotalRows = files.Sum(f => f.Rows),
+                TotalWarnings = files.Sum(f => f.WarningCount),
+                TotalErrors = files.Sum(f => f.ErrorCount),
+                LastEvent = files.Where(f => f.LastEvent.HasValue).OrderByDescending(f => f.LastEvent).FirstOrDefault()?.LastEvent
+            };
+        }
+
+        private List<Log> ParseLogs(List<string> lines)
+        {
+            var logs = new List<Log>();
+
+            foreach (var line in lines)
+            {
+                try
+                {
+                    logs.Add(new Log(line));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug(ex, "Riga log non leggibile in diagnostica.");
+                }
+            }
+
+            return logs;
+        }
+
+        private List<string> ReadLogLines(string relativePath)
+        {
+            var fullPath = ResolvePath(relativePath);
+
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return new List<string>();
+            }
+
+            using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(stream);
+            var lines = new List<string>();
+
+            while (reader.ReadLine() is { } line)
+            {
+                lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        private string ResolvePath(string path)
+        {
+            return Path.IsPathRooted(path)
+                ? path
+                : Path.Combine(Directory.GetCurrentDirectory(), path);
         }
     }
 }
