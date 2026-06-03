@@ -2,10 +2,9 @@
 @{
     ViewData["Title"] = "Riepilogo Domande";
     var idEnte = ViewBag.idEnte ?? "ND";
-        var idReport = ViewBag.idReport; 
+    var idReport = ViewBag.idReport; 
     var nomeEnte = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.nomeEnte.ToLower()) ?? "ND";
     var ruolo = ViewBag.Ruolo;
-    var isAdminUser = Convert.ToString(ViewBag.idUser) == "1";
 
     List<Domanda>? domande = ViewBag.Domande;
     var elaborazione = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.ElaborazioneDel.ToLower()) ?? "ND";
@@ -38,18 +37,19 @@
                         @{
                             var stats = new[]
                             {
-                                new { Icon="fa-solid fa-file fa-2x text-primary", Label="Totale Domande", Value=ViewBag.TotaleDomande },
-                                new { Icon="fa-solid fa-xmark fa-2x text-danger", Label="Incongruenze Trovate", Value=ViewBag.incongruenze },
-                                new { Icon="a-solid fa-circle-check fa-2x text-success", Label="Esito 1", Value=ViewBag.DomandeValide },
-                                new { Icon="fa-solid fa-lightbulb fa-2x text-primary", Label="Esito 2", Value=ViewBag.DomandeEsito2 },
-                                new { Icon="fa-solid fa-exclamation-triangle fa-2x text-warning", Label="Esito 3", Value=ViewBag.DomandeEsito3 },
-                                new { Icon="fa-solid fa-times-circle fa-2x text-danger", Label="Esito 4", Value=ViewBag.DomandeEsito4 }
+                                new { Icon="fa-solid fa-file fa-2x text-primary", Label="Totale Domande", Value=ViewBag.TotaleDomande, Url="" },
+                                new { Icon="fa-solid fa-xmark fa-2x text-danger", Label="Incongruenze Trovate", Value=ViewBag.incongruenze, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Incongruenze" }) ?? "" },
+                                new { Icon="fa-solid fa-circle-check fa-2x text-success", Label="Esito 1", Value=ViewBag.DomandeEsito1, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "01" }) ?? "" },
+                                new { Icon="fa-solid fa-lightbulb fa-2x text-primary", Label="Esito 2", Value=ViewBag.DomandeEsito2, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "02" }) ?? "" },
+                                new { Icon="fa-solid fa-exclamation-triangle fa-2x text-warning", Label="Esito 3", Value=ViewBag.DomandeEsito3, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "03" }) ?? "" },
+                                new { Icon="fa-solid fa-times-circle fa-2x text-danger", Label="Esito 4", Value=ViewBag.DomandeEsito4, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "04" }) ?? "" }
                             };
                         }
                         @foreach (var s in stats)
                         {
                             <div class="col-6 col-md-4 col-lg-4">
-                                <div class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow">
+                                <a href="@(string.IsNullOrEmpty(s.Url) ? "#" : s.Url)"
+                                   class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow w-100 text-decoration-none text-reset @(string.IsNullOrEmpty(s.Url) ? "pe-none" : "")">
                                     <div class="card-body py-4">
                                         <div class="icon-circle mx-auto mb-3 bg-light shadow-sm">
                                             <i class="fa-solid @s.Icon fs-4"></i>
@@ -57,7 +57,7 @@
                                         <h6 class="fw-semibold mb-1">@s.Label</h6>
                                         <h4 class="fw-bold text-dark mb-0">@s.Value</h4>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         }
                     </div>
@@ -83,6 +83,11 @@
                             <li>
                                 <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Competenza Territoriale" })">
                                     <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i> Competenza Territoriale
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Domande Incongruenti" })">
+                                    <i class="bi bi-file-earmark-medical me-2 text-warning"></i> Domande Incongruenti
                                 </a>
                             </li>
                             @* Voci admin *@
@@ -147,15 +152,7 @@
                                  <th class="text-center">idAto</th>
                                 <th class="text-center">Codice Bonus</th>
                                 <th class="text-center">Codice Fiscale Richiedente</th>
-                                @if (isAdminUser)
-                                {
-                                    <th class="text-center">ID Richiedente</th>
-                                }
                                 <th class="text-center">Id Fornitura</th>
-                                @if (isAdminUser)
-                                {
-                                    <th class="text-center">ID Utenza</th>
-                                }
                                 <th class="text-center">Componenti</th>
                                 <th class="text-center">Esito str</th>
                                 <th class="text-center">Esito</th>
@@ -170,39 +167,7 @@
                                     <td class="text-center"><span>@domanda.idAto</span></td>
                                     <td class="text-center"><span >@domanda.codiceBonus</span></td>
                                     <td class="text-center"><span>@domanda.codiceFiscaleRichiedente</span></td>
-                                    @if (isAdminUser)
-                                    {
-                                        <td class="text-center">
-                                            @if (domanda.idDichiarante.HasValue)
-                                            {
-                                                <a class="btn btn-sm btn-outline-primary" title="Apri scheda richiedente"
-                                                   href="@Url.Action("Modifica", "Anagrafe", new { id = domanda.idDichiarante.Value })">
-                                                    @domanda.idDichiarante
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </td>
-                                    }
                                     <td class="text-center"><span>@domanda.idFornitura</span></td>
-                                    @if (isAdminUser)
-                                    {
-                                        <td class="text-center">
-                                            @if (domanda.idUtenza.HasValue)
-                                            {
-                                                <a class="btn btn-sm btn-outline-primary" title="Apri scheda utenza"
-                                                   href="@Url.Action("Modifica", "Utenze", new { id = domanda.idUtenza.Value })">
-                                                    @domanda.idUtenza
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </td>
-                                    }
                                     <td class="text-center"><span>@domanda.numeroComponenti</span></td>
                                     <td class="text-center">
                                             @if (string.IsNullOrEmpty(domanda.esitoStr))

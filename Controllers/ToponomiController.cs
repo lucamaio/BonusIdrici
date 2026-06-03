@@ -193,10 +193,20 @@ namespace Controllers
                 return RedirectToAction("Index", "Home");
             }
             
+            var denominazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(denominazione);
+            var normalizzazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(normalizzazione);
+            var denominazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(denominazioneSeparata.Toponimo);
+            var normalizzazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(normalizzazioneSeparata.Toponimo);
+
+            if (!string.IsNullOrWhiteSpace(denominazioneSeparata.CivicoEstratto))
+            {
+                AccountController.logFile.LogInfo($"Civico estratto da toponimo in creazione: '{denominazione}' -> toponimo '{denominazioneSeparata.Toponimo}', civico '{denominazioneSeparata.CivicoEstratto}'.");
+            }
+
             var nuovoToponimo = new Toponimo
             {
-                denominazione = denominazione.Trim().ToUpper(),
-                normalizzazione = normalizzazione.Trim().ToUpper(),
+                denominazione = denominazioneSeparata.Toponimo,
+                normalizzazione = string.IsNullOrWhiteSpace(normalizzazioneNormalizzata) ? denominazioneNormalizzata : normalizzazioneNormalizzata,
                 IdEnte = idEnte,
                 dataCreazione = DateTime.Now,
                 dataAggiornamento = null
@@ -227,8 +237,18 @@ namespace Controllers
             }
 
             // Aggiorna le proprietà
-            toponimoEsistente.denominazione = denominazione.Trim().ToUpper();
-            toponimoEsistente.normalizzazione = normalizzazione.Trim().ToUpper();
+            var denominazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(denominazione);
+            var normalizzazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(normalizzazione);
+            var denominazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(denominazioneSeparata.Toponimo);
+            var normalizzazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(normalizzazioneSeparata.Toponimo);
+
+            if (!string.IsNullOrWhiteSpace(denominazioneSeparata.CivicoEstratto))
+            {
+                AccountController.logFile.LogInfo($"Civico estratto da toponimo in modifica: '{denominazione}' -> toponimo '{denominazioneSeparata.Toponimo}', civico '{denominazioneSeparata.CivicoEstratto}'.");
+            }
+
+            toponimoEsistente.denominazione = denominazioneSeparata.Toponimo;
+            toponimoEsistente.normalizzazione = string.IsNullOrWhiteSpace(normalizzazioneNormalizzata) ? denominazioneNormalizzata : normalizzazioneNormalizzata;
             toponimoEsistente.dataAggiornamento = DateTime.Now;
             // data_creazione non viene modificata
             toponimoEsistente.IdEnte = idEnte;
@@ -238,6 +258,34 @@ namespace Controllers
             return RedirectToAction("Show", "Toponomi", new { selectedEnteId = idEnte });
         }
         
+        public IActionResult EsportaCsv(int selectedEnteId)
+        {
+            if (!VerificaSessione("ADMIN") || idUser != 1)
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad esportare i toponimi CSV.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ente = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId);
+            if (ente == null)
+            {
+                return BadRequest("Ente non trovato!");
+            }
+
+            var dati = _context.Toponomi
+                .Where(t => t.IdEnte == selectedEnteId)
+                .OrderBy(t => t.denominazione)
+                .ThenBy(t => t.id)
+                .ToList();
+
+            var fileBytes = CsvGenerator.GeneraCsvToponomi(dati);
+            var fileName = $"Toponomi_{ente.partitaIva}_{DateTime.Now:yyyyMMddHHmmss}.csv";
+
+            AccountController.logFile.LogInfo("L'Utente " + username + " ha esportato il file " + fileName + " per l'ente ID " + selectedEnteId);
+            return File(fileBytes, "text/csv", fileName);
+        }
+
         // Fine - Funzioni da eseguire a seconda della operazione
 
     }

@@ -248,6 +248,58 @@ namespace Controllers
             return View();
         }
 
+        public IActionResult DomandeFiltrate(int idReport, string filtroTipo, string? filtroValore = null)
+        {
+            if (!VerificaSessione())
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di dettaglio filtrato domande. Ha tentato di visualizzare il report ID " + idReport);
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (idReport == 0 || string.IsNullOrWhiteSpace(filtroTipo))
+            {
+                return BadRequest("Parametri filtro non validi.");
+            }
+
+            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (reportEsistente == null)
+            {
+                return BadRequest("Report non trovato!");
+            }
+
+            IQueryable<Domanda> query = _context.Domande.Where(d => d.idReport == idReport);
+            string titoloFiltro;
+
+            if (string.Equals(filtroTipo, "Incongruenze", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(d => d.incongruenze == true);
+                titoloFiltro = "Domande con incongruenze";
+            }
+            else if (string.Equals(filtroTipo, "Esito", StringComparison.OrdinalIgnoreCase)
+                && filtroValore is "01" or "02" or "03" or "04")
+            {
+                query = query.Where(d => d.esito == filtroValore);
+                titoloFiltro = $"Domande con esito {filtroValore}";
+            }
+            else
+            {
+                return BadRequest("Filtro non riconosciuto.");
+            }
+
+            var domande = query
+                .OrderBy(d => d.codiceBonus)
+                .ToList();
+
+            ViewBag.idReport = idReport;
+            ViewBag.idEnte = reportEsistente.idEnte;
+            ViewBag.TitoloFiltro = titoloFiltro;
+            ViewBag.ElaborazioneDel = (reportEsistente.mese + " " + reportEsistente.anno).Trim();
+            ViewBag.nomeEnte = _context.Enti.Where(e => e.id == reportEsistente.idEnte).Select(e => e.nome).FirstOrDefault() ?? "ND";
+
+            return View("DomandeFiltrate", domande);
+        }
+
         // Pagina 4: Consente di variare la serie per un insieme di Domande
 
         public IActionResult VariaSerie(int idReport)
@@ -362,13 +414,17 @@ namespace Controllers
             // 4) Addesso recupero i dati dal DB
             List<Domanda> domande = new List<Domanda>();
 
-            if (tipoEsportazione != "Siscom")
+            if (tipoEsportazione == "Siscom")
             {
-                domande = _context.Domande.Where(r => r.idReport == idReport).ToList();
+                domande = _context.Domande.Where(r => r.idReport == idReport && r.esito == "01" && r.esitoStr == "Si").ToList();
+            }
+            else if (tipoEsportazione == "Domande Incongruenti")
+            {
+                domande = _context.Domande.Where(r => r.idReport == idReport && r.incongruenze == true).ToList();
             }
             else
             {
-                domande = _context.Domande.Where(r => r.idReport == idReport && r.esito == "01" && r.esitoStr == "Si").ToList();
+                domande = _context.Domande.Where(r => r.idReport == idReport).ToList();
             }
 
             // 5) Definizione delle variabili neccessarie a generare il file
@@ -387,13 +443,18 @@ namespace Controllers
             }
             else if (tipoEsportazione == "Esito Competenza Territoriale")
             {
-                fileName = $"{p_iva}_BID_{reportEsistente.DataCreazione:yyyyMM}_EBI_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
+                fileName = $"{p_iva}_BID_{reportEsistente.DataCreazione:yyyyMM}_ECT_{timeStamp:yyyyMMddHHmmss}_{pogressivo}.csv";
                 fileBytes = CsvGenerator.GeneraCsvCompetenzaTerritoriale(domande); // Chiamata alla funzione specifica
             }
             else if (tipoEsportazione == "Siscom")
             {
                 fileName = $"Esportazione Bonus Idrici {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
                 fileBytes = CsvGenerator.GeneraCsvSiscom(domande, serie);
+            }
+            else if (tipoEsportazione == "Domande Incongruenti")
+            {
+                fileName = $"Domande Incongruenti {nomeEnte} del {timeStamp:yyyyMMddHHmmss}.csv";
+                fileBytes = CsvGenerator.GeneraCsvDomandeIncongruenti(domande);
             }
             else if (tipoEsportazione == "Debug")
             {

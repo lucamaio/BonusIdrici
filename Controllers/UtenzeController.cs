@@ -413,16 +413,64 @@ namespace Controllers
                 if (utenzeTopNull.Count > 0)
                 {
                     // Dizionario dei toponimi già presenti, con denominazione normalizzata
+                    var toponimiEnte = _context.Toponomi.Where(t => t.IdEnte == selectedEnteId).ToList();
+
                     foreach (var utenza in utenzeTopNull)
                     {
                         // Normalizzo i valori per evitare mismatch dovuti a maiuscole/spazi/virgolette
-                        string indirizzoNorm = FunzioniTrasversali.rimuoviVirgolette(utenza.indirizzoUbicazione ?? "").ToUpper();
+                        var indirizzoSeparato = FunzioniTrasversali.ExtractToponimoAndCivico(utenza.indirizzoUbicazione, utenza.numeroCivico);
+                        string indirizzoOriginale = indirizzoSeparato.Toponimo;
+                        string indirizzoNorm = FunzioniTrasversali.NormalizeToponimo(indirizzoOriginale);
 
-                        var topRelativo = _context.Toponomi.FirstOrDefault(t => t.IdEnte == selectedEnteId && t.denominazione == indirizzoNorm);
+                        if (!string.IsNullOrWhiteSpace(indirizzoSeparato.CivicoEstratto))
+                        {
+                            _logger.LogInformation("Civico estratto da indirizzo: '{IndirizzoOriginale}' -> toponimo '{Toponimo}', civico '{Civico}'.", utenza.indirizzoUbicazione, indirizzoSeparato.Toponimo, indirizzoSeparato.CivicoEstratto);
+                        }
+
+                        var topRelativo = toponimiEnte.FirstOrDefault(t =>
+                            string.Equals(t.denominazione, indirizzoOriginale, StringComparison.OrdinalIgnoreCase) ||
+                            FunzioniTrasversali.NormalizeToponimo(t.denominazione) == indirizzoNorm ||
+                            FunzioniTrasversali.NormalizeToponimo(t.normalizzazione) == indirizzoNorm);
+
+                        if (topRelativo == null)
+                        {
+                            var candidatiCompatibili = toponimiEnte
+                                .Where(t => FunzioniTrasversali.AreToponimiCompatibili(t.denominazione, indirizzoOriginale) ||
+                                            FunzioniTrasversali.AreToponimiCompatibili(t.normalizzazione, indirizzoOriginale))
+                                .ToList();
+
+                            if (candidatiCompatibili.Count == 1)
+                            {
+                                topRelativo = candidatiCompatibili[0];
+                                _logger.LogInformation("Toponimo compatibile per iniziale nome proprio: '{IndirizzoOriginale}' -> '{Toponimo}'.", indirizzoOriginale, topRelativo.denominazione);
+                            }
+                            else if (candidatiCompatibili.Count > 1)
+                            {
+                                _logger.LogWarning("Toponimo non associato automaticamente per ambiguità iniziale nome proprio: '{IndirizzoOriginale}'. Candidati: {NumeroCandidati}.", indirizzoOriginale, candidatiCompatibili.Count);
+                            }
+                        }
 
                         if (topRelativo == null)
                         {
                             continue;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(indirizzoSeparato.CivicoEstratto))
+                        {
+                            var civicoSeparato = FunzioniTrasversali.FormattaNumeroCivico(utenza.numeroCivico);
+                            if (string.IsNullOrWhiteSpace(civicoSeparato))
+                            {
+                                utenza.numeroCivico = indirizzoSeparato.CivicoEstratto;
+                            }
+                            else if (civicoSeparato != indirizzoSeparato.CivicoEstratto)
+                            {
+                                _logger.LogWarning("Conflitto civico: indirizzo '{Indirizzo}' contiene civico '{CivicoEstratto}', ma il campo civico separato contiene '{CivicoSeparato}'.", utenza.indirizzoUbicazione, indirizzoSeparato.CivicoEstratto, civicoSeparato);
+                            }
+                        }
+
+                        if (!string.Equals(topRelativo.denominazione, indirizzoOriginale, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _logger.LogInformation("Toponimo associato tramite normalizzazione: '{IndirizzoOriginale}' -> '{IndirizzoNormalizzato}'. ID toponimo: {IdToponimo}", indirizzoOriginale, indirizzoNorm, topRelativo.id);
                         }
 
                         // Aggiorno l'utenza con il nuovo idToponimo
@@ -462,6 +510,34 @@ namespace Controllers
             return Upload();
         }
 
+
+        public IActionResult EsportaCsv(int selectedEnteId)
+        {
+            if (!VerificaSessione("ADMIN") || idUser != 1)
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad esportare le utenze idriche CSV.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ente = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId);
+            if (ente == null)
+            {
+                return BadRequest("Ente non trovato!");
+            }
+
+            var dati = _context.UtenzeIdriche
+                .Where(u => u.IdEnte == selectedEnteId)
+                .OrderBy(u => u.idAcquedotto)
+                .ThenBy(u => u.id)
+                .ToList();
+
+            var fileBytes = CsvGenerator.GeneraCsvUtenzeIdriche(dati);
+            var fileName = $"UtenzeIdriche_{ente.partitaIva}_{DateTime.Now:yyyyMMddHHmmss}.csv";
+
+            AccountController.logFile.LogInfo("L'Utente " + username + " ha esportato il file " + fileName + " per l'ente ID " + selectedEnteId);
+            return File(fileBytes, "text/csv", fileName);
+        }
 
         // Fine - Funzioni da eseguire a seconda della operazione
     }

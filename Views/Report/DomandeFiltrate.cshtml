@@ -1,0 +1,152 @@
+@using System.Globalization
+@model IEnumerable<Domanda>
+
+@{
+    ViewData["Title"] = ViewBag.TitoloFiltro ?? "Domande filtrate";
+    var idReport = ViewBag.idReport;
+    var idEnte = ViewBag.idEnte;
+    var nomeEnte = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Convert.ToString(ViewBag.nomeEnte ?? "ND")!.ToLower());
+    var elaborazione = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Convert.ToString(ViewBag.ElaborazioneDel ?? "ND")!.ToLower());
+    var domande = Model?.ToList() ?? new List<Domanda>();
+}
+
+<div class="container-xxl flex-grow-1 py-5">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4 w-100">
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <div class="d-flex fw-bold justify-content-center align-items-center">
+                        <i class="bi bi-filter-square-fill me-2"></i>
+                        <h3 class="fw-bold mb-0">@ViewBag.TitoloFiltro</h3>
+                    </div>
+                    <p class="mb-0 small opacity-75">Elaborazione: <span class="fw-semibold">@elaborazione</span> - Ente: <span class="fw-semibold">@nomeEnte</span></p>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="info-text mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span>Record trovati: <strong>@domande.Count</strong></span>
+                        </div>
+                        <a href="@Url.Action("Dettails", "Report", new { idReport = idReport })" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left-circle me-2"></i> Torna al report completo
+                        </a>
+                    </div>
+
+                    @if (domande.Any())
+                    {
+                        <div class="table-responsive w-100">
+                            <table id="domandeFiltrateTable" class="table table-hover align-middle border-bottom w-100 rounded-3 shadow-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">idAto</th>
+                                        <th class="text-center">Codice Bonus</th>
+                                        <th class="text-center">Codice Fiscale Richiedente</th>
+                                        <th class="text-center">Id Fornitura</th>
+                                        <th class="text-center">Componenti</th>
+                                        <th class="text-center">Esito str</th>
+                                        <th class="text-center">Esito</th>
+                                        <th class="text-center">Incongruente</th>
+                                        <th>NOTE</th>
+                                        <th class="text-center">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var domanda in domande)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@domanda.idAto</td>
+                                            <td class="text-center">@domanda.codiceBonus</td>
+                                            <td class="text-center">@domanda.codiceFiscaleRichiedente</td>
+                                            <td class="text-center">@domanda.idFornitura</td>
+                                            <td class="text-center">@domanda.numeroComponenti</td>
+                                            <td class="text-center">
+                                                @if (string.IsNullOrEmpty(domanda.esitoStr))
+                                                {
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                }
+                                                else if (domanda.esitoStr.Equals("Si", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <span class="badge bg-success">Si</span>
+                                                }
+                                                else if (domanda.esitoStr.Equals("No", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <span class="badge bg-danger">No</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">@domanda.esitoStr</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @switch (domanda.esito)
+                                                {
+                                                    case "01":
+                                                        <span class="badge bg-success">1</span>
+                                                        break;
+                                                    case "02":
+                                                        <span class="badge bg-primary">2</span>
+                                                        break;
+                                                    case "03":
+                                                        <span class="badge bg-warning text-dark">3</span>
+                                                        break;
+                                                    case "04":
+                                                        <span class="badge bg-danger">4</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary">N/A</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (domanda.incongruenze == true)
+                                                {
+                                                    <span class="badge bg-success">Vero</span>
+                                                }
+                                                else if (domanda.incongruenze == false)
+                                                {
+                                                    <span class="badge bg-danger">Falso</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                }
+                                            </td>
+                                            <td style="min-width: 260px; white-space: pre-wrap;">@domanda.note</td>
+                                            <td class="text-center">
+                                                <a class="btn btn-modern-edit btn-sm" title="Varia"
+                                                   href="@Url.Action("Varia", "Report", new { id = domanda.id })">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center shadow-sm rounded-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i> Nessun record trovato per il filtro selezionato.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#domandeFiltrateTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" }
+            });
+        });
+    </script>
+}

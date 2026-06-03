@@ -21,6 +21,13 @@
                 <i class="bi bi-plus-circle"></i>
                 <span>Aggiungi persona</span>
             </a>
+            @if (ViewBag.Ruolo == "ADMIN" && ViewBag.idUser == 1)
+            {
+                <a href="@Url.Action("EsportaCsv", "Anagrafe", new { selectedEnteId = selectedEnteId })" class="btn btn-outline-light">
+                    <i class="bi bi-download"></i>
+                    <span>Esporta CSV</span>
+                </a>
+            }
         </div>
     </section>
 

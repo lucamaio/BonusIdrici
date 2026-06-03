@@ -392,6 +392,35 @@ namespace Controllers
             return Upload(); // Torna alla pagina di upload con il messaggio di stato
         }
 
+        public IActionResult EsportaCsv(int selectedEnteId)
+        {
+            if (!VerificaSessione("ADMIN") || idUser != 1)
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad esportare l'anagrafe CSV.");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ente = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId);
+            if (ente == null)
+            {
+                return BadRequest("Ente non trovato!");
+            }
+
+            var dati = _context.Dichiaranti
+                .Where(d => d.IdEnte == selectedEnteId)
+                .OrderBy(d => d.Cognome)
+                .ThenBy(d => d.Nome)
+                .ThenBy(d => d.DataNascita)
+                .ToList();
+
+            var fileBytes = CsvGenerator.GeneraCsvAnagrafe(dati);
+            var fileName = $"Anagrafe_{ente.partitaIva}_{DateTime.Now:yyyyMMddHHmmss}.csv";
+
+            AccountController.logFile.LogInfo("L'Utente " + username + " ha esportato il file " + fileName + " per l'ente ID " + selectedEnteId);
+            return File(fileBytes, "text/csv", fileName);
+        }
+
         // Fine - Funzioni da eseguire a seconda della operazione
 
     }

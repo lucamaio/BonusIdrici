@@ -531,7 +531,24 @@ public class CSVReader
 
                 // j) Verifico se il campo numero civico è presente
 
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[IndiceNumeroCivico])))
+                var indirizzoCompletoPerCivico = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIndirizzoUbicazione]).ToUpper();
+                var numeroCivicoSeparato = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceNumeroCivico]).ToUpper();
+                var indirizzoSeparato = FunzioniTrasversali.ExtractToponimoAndCivico(indirizzoCompletoPerCivico, numeroCivicoSeparato);
+
+                if (!string.IsNullOrWhiteSpace(indirizzoSeparato.CivicoEstratto))
+                {
+                    logFile.LogInfo($"Civico estratto da indirizzo: '{indirizzoCompletoPerCivico}' -> toponimo '{indirizzoSeparato.Toponimo}', civico '{indirizzoSeparato.CivicoEstratto}'.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(indirizzoSeparato.CivicoEstratto) &&
+                    !string.IsNullOrWhiteSpace(numeroCivicoSeparato) &&
+                    FunzioniTrasversali.FormattaNumeroCivico(numeroCivicoSeparato) != indirizzoSeparato.CivicoEstratto)
+                {
+                    warning.Add($"Conflitto civico: indirizzo '{indirizzoCompletoPerCivico}' contiene civico '{indirizzoSeparato.CivicoEstratto}', ma il campo civico separato contiene '{FunzioniTrasversali.FormattaNumeroCivico(numeroCivicoSeparato)}'. | Riga {rigaCorrente}");
+                    logFile.LogInfo($"Conflitto civico: indirizzo '{indirizzoCompletoPerCivico}' contiene civico '{indirizzoSeparato.CivicoEstratto}', ma il campo civico separato contiene '{FunzioniTrasversali.FormattaNumeroCivico(numeroCivicoSeparato)}'.");
+                }
+
+                if (string.IsNullOrWhiteSpace(indirizzoSeparato.NumeroCivico))
                 {
                     errori.Add($"Attenzione: Numero civico mancante, saltata. | Riga {rigaCorrente} | idAcquedotto : {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIdAcquedotto])} | Matricola Contatore: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceMatricolaContatore])}");
                     error = true;
@@ -541,10 +558,11 @@ public class CSVReader
 
                 //  a) Variabili di supporto
                 var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCodiceFiscale]).ToUpper();
-                var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIndirizzoUbicazione]).ToUpper();
+                var indirizzoUbicazione = indirizzoSeparato.Toponimo;
+                var indirizzoUbicazioneNormalizzato = FunzioniTrasversali.NormalizeToponimo(indirizzoUbicazione);
                 var indirizzoFormattato = FunzioniTrasversali.FormattaIndirizzo(_context, indirizzoUbicazione, cod_fisc, selectedEnteId);
                 
-                string? indirizzoRicavato = indirizzoFormattato != null ? indirizzoFormattato.ToUpper() : null;
+                string? indirizzoRicavato = !string.IsNullOrWhiteSpace(indirizzoFormattato) ? FunzioniTrasversali.NormalizeToponimo(indirizzoFormattato) : indirizzoUbicazioneNormalizzato;
 
                 // Mi ricavo il tipo di toponimo e l'intestazione base
 
@@ -555,11 +573,39 @@ public class CSVReader
                 int? idToponimo = null;
 
                 // b) Controllo nel DB se esiste già il toponimo
-                Toponimo? toponimoTrova = _context.Toponomi.FirstOrDefault(s => s.denominazione == indirizzoUbicazione && s.IdEnte == selectedEnteId);
+                Toponimo? toponimoTrova = toponimi
+                    .FirstOrDefault(s => s.IdEnte == selectedEnteId &&
+                        (s.denominazione == indirizzoUbicazione ||
+                         FunzioniTrasversali.NormalizeToponimo(s.denominazione) == indirizzoUbicazioneNormalizzato ||
+                         FunzioniTrasversali.NormalizeToponimo(s.normalizzazione) == indirizzoUbicazioneNormalizzato));
+
+                if (toponimoTrova == null)
+                {
+                    var candidatiCompatibili = toponimi
+                        .Where(s => s.IdEnte == selectedEnteId &&
+                            (FunzioniTrasversali.AreToponimiCompatibili(s.denominazione, indirizzoUbicazione) ||
+                             FunzioniTrasversali.AreToponimiCompatibili(s.normalizzazione, indirizzoUbicazione)))
+                        .ToList();
+
+                    if (candidatiCompatibili.Count == 1)
+                    {
+                        toponimoTrova = candidatiCompatibili[0];
+                        logFile.LogInfo($"Toponimo compatibile per iniziale nome proprio: '{indirizzoUbicazione}' -> '{toponimoTrova.denominazione}'.");
+                    }
+                    else if (candidatiCompatibili.Count > 1)
+                    {
+                        warning.Add($"Toponimo non associato automaticamente per ambiguità iniziale nome proprio: '{indirizzoUbicazione}'. Candidati: {candidatiCompatibili.Count}. | Riga {rigaCorrente}");
+                        logFile.LogInfo($"Toponimo non associato automaticamente per ambiguità iniziale nome proprio: '{indirizzoUbicazione}'. Candidati: {candidatiCompatibili.Count}.");
+                    }
+                }
 
                 if (toponimoTrova != null)
                 {
                     idToponimo = toponimoTrova.id;
+                    if (!string.Equals(toponimoTrova.denominazione, indirizzoUbicazione, StringComparison.OrdinalIgnoreCase))
+                    {
+                        logFile.LogInfo($"Toponimo associato tramite normalizzazione: '{indirizzoUbicazione}' -> '{indirizzoUbicazioneNormalizzato}'. ID toponimo: {idToponimo}");
+                    }
                     //logFile.LogDebug($"Riga {rigaCorrente} | Trovato toponimo ID: {idToponimo} per indirizzo: {indirizzoUbicazione}");
 
                     // c) Aggiorno solo se non è già normalizzato e se ho un indirizzo ricavato valido
@@ -586,7 +632,30 @@ public class CSVReader
                 }
                 else
                 {
-                    var toponimoLista = datiComplessivi.Toponimi?.FirstOrDefault(t => t.denominazione == indirizzoUbicazione && t.IdEnte == selectedEnteId);
+                    var toponimoLista = datiComplessivi.Toponimi?.FirstOrDefault(t => t.IdEnte == selectedEnteId &&
+                        (t.denominazione == indirizzoUbicazione ||
+                         FunzioniTrasversali.NormalizeToponimo(t.denominazione) == indirizzoUbicazioneNormalizzato ||
+                         FunzioniTrasversali.NormalizeToponimo(t.normalizzazione) == indirizzoUbicazioneNormalizzato));
+
+                    if (toponimoLista == null && datiComplessivi.Toponimi != null)
+                    {
+                        var candidatiCompatibiliLista = datiComplessivi.Toponimi
+                            .Where(t => t.IdEnte == selectedEnteId &&
+                                (FunzioniTrasversali.AreToponimiCompatibili(t.denominazione, indirizzoUbicazione) ||
+                                 FunzioniTrasversali.AreToponimiCompatibili(t.normalizzazione, indirizzoUbicazione)))
+                            .ToList();
+
+                        if (candidatiCompatibiliLista.Count == 1)
+                        {
+                            toponimoLista = candidatiCompatibiliLista[0];
+                            logFile.LogInfo($"Toponimo compatibile per iniziale nome proprio: '{indirizzoUbicazione}' -> '{toponimoLista.denominazione}'.");
+                        }
+                        else if (candidatiCompatibiliLista.Count > 1)
+                        {
+                            warning.Add($"Toponimo non associato automaticamente per ambiguità iniziale nome proprio: '{indirizzoUbicazione}'. Candidati in import: {candidatiCompatibiliLista.Count}. | Riga {rigaCorrente}");
+                            logFile.LogInfo($"Toponimo non associato automaticamente per ambiguità iniziale nome proprio: '{indirizzoUbicazione}'. Candidati in import: {candidatiCompatibiliLista.Count}.");
+                        }
+                    }
 
                     if (toponimoLista != null)
                     {
@@ -595,7 +664,7 @@ public class CSVReader
                         {
                             toponimoLista.normalizzazione = indirizzoRicavato;
                             // mi ricavo il tipo di toponimo e l'intestazione in forma normale
-                            (string? tipoToponimoNormale, string? intestazioneNormale) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(toponimoTrova.normalizzazione ?? "");
+                            (string? tipoToponimoNormale, string? intestazioneNormale) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(toponimoLista.normalizzazione ?? "");
                             toponimoLista.intestazioneNormalizzata = intestazioneNormale;
                             toponimoLista.dataAggiornamento = DateTime.Now;
                         }
@@ -649,7 +718,7 @@ public class CSVReader
                     periodoFinale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[IndicePeriodoFinale])),
                     matricolaContatore = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceMatricolaContatore]).ToUpper(),
                     indirizzoUbicazione = indirizzoUbicazione,
-                    numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[IndiceNumeroCivico]).ToUpper(),
+                    numeroCivico = (indirizzoSeparato.NumeroCivico ?? string.Empty).ToUpper(),
                     subUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceSubUbicazione]).ToUpper(),
                     scalaUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceScalaUbicazione]),
                     piano = FunzioniTrasversali.rimuoviVirgolette(campi[IndicePiano]),
@@ -941,30 +1010,60 @@ public class CSVReader
                 // Verifico se la riga ha almeno 1 campi
                 if (campi.Length < 16)
                 {
-                    errori.Add($"Riga {rigaCorrente} malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 16.");
-                    error = true;
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, null, null, "TRACCIATO", $"riga malformata, saltata. Numero di campi: {campi.Length}. Attesi almeno 16."));
+                    continue;
                 }
 
+                string idAtoCsv = NormalizeCsvValue(campi[0]);
+                string codiceBonusCsv = NormalizeCsvValue(campi[1]).ToUpperInvariant();
+                string codiceFiscaleCsv = NormalizeCsvValue(campi[2]).ToUpperInvariant();
+                string annoValiditaCsv = NormalizeCsvValue(campi[6]);
+                string dataInizioCsv = NormalizeCsvValue(campi[7]);
+                string dataFineCsv = NormalizeCsvValue(campi[8]);
+                string istatCsv = NormalizeCsvValue(campi[11]).ToUpperInvariant();
+                string capCsv = NormalizeCsvValue(campi[12]).ToUpperInvariant();
+                string provinciaCsv = NormalizeCsvValue(campi[13]).ToUpperInvariant();
+                string presenzaPodCsv = NormalizeSiNo(campi[14]);
+                string numeroComponentiCsv = NormalizeCsvValue(campi[15]);
+                DateTime dataInizioValiditaParsed;
+                DateTime dataFineValiditaParsed;
+                string[] codiciFiscaliFamigliariNormalizzati = Array.Empty<string>();
+
                 // Verifico se il campo idAto è presente e nonn vuoto
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[0])))
+                if (string.IsNullOrWhiteSpace(idAtoCsv))
                 {
-                    errori.Add($"ID_ATO mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ID_ATO", "campo mancante."));
+                    error = true;
+                }
+                else if (!IsNumeric(idAtoCsv))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ID_ATO", "non numerico."));
+                    error = true;
+                }
+                else if (!IsMaxLength(idAtoCsv, 4))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ID_ATO", "lunghezza superiore a 4 caratteri."));
                     error = true;
                 }
 
                 // Verifico se il campo codice_bonus è presente, non vuoto è ha una lunhezza di 15 carratteri
 
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[1])) || FunzioniTrasversali.rimuoviVirgolette(campi[1]).Length != 15)
+                if (string.IsNullOrWhiteSpace(codiceBonusCsv))
                 {
-                    errori.Add($"Attenzione: Codice Bonus mancante o non valido, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "COD_BONUS_IDRICO", "campo mancante."));
+                    error = true;
+                }
+                else if (!IsLength(codiceBonusCsv, 15))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "COD_BONUS_IDRICO", "lunghezza diversa da 15 caratteri."));
                     error = true;
                 }
 
                 // Verifico se il campo Codice Fiscale è presente e non vuoto
 
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[2])))
+                if (!string.IsNullOrWhiteSpace(codiceFiscaleCsv) && !IsValidCodiceFiscaleLength(codiceFiscaleCsv))
                 {
-                    errori.Add($"Attenzione: Codice Fiscale mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "CF_DICHIARANTE", "lunghezza diversa da 16 caratteri."));
                     error = true;
                 }
 
@@ -977,23 +1076,34 @@ public class CSVReader
 
                 // Verifico se il campo Anno_validità è presente e non vuoto
 
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[6])))
+                if (string.IsNullOrWhiteSpace(annoValiditaCsv))
                 {
-                    errori.Add($"Attenzione: Anno di validità mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ANNO_VALIDITA", "campo mancante."));
                     error = true;
                 }
 
                 // verifico se il campo Data_inizio_validità è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[7])))
+                else if (!IsNumeric(annoValiditaCsv))
                 {
-                    errori.Add($"Attenzione: Data di inizio validità mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ANNO_VALIDITA", "non numerico."));
+                    error = true;
+                }
+                else if (!IsLength(annoValiditaCsv, 4))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ANNO_VALIDITA", "lunghezza diversa da 4 caratteri."));
+                    error = true;
+                }
+
+                if (!IsValidDateDdMmYyyy(dataInizioCsv, out dataInizioValiditaParsed))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "DATA_INIZIO", "non valida. Formato atteso GG/MM/AAAA."));
                     error = true;
                 }
 
                 // Verifico se il campo Data_fine_validità è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[8])))
+                if (!IsValidDateDdMmYyyy(dataFineCsv, out dataFineValiditaParsed))
                 {
-                    errori.Add($"Attenzione: Data di fine validità mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "DATA_FINE", "non valida. Formato atteso GG/MM/AAAA."));
                     error = true;
                 }
 
@@ -1012,42 +1122,45 @@ public class CSVReader
                 }
 
                 // Verifico se il campo iSTAT è presente e non vuoto
-                string istat = FunzioniTrasversali.rimuoviVirgolette(campi[11]);
+                string istat = istatCsv;
 
-                if (string.IsNullOrWhiteSpace(istat) || istat.Length != 6)
+                if (string.IsNullOrWhiteSpace(istatCsv) || !IsNumeric(istatCsv) || !IsLength(istatCsv, 6))
                 {
-                    errori.Add($"Attenzione: ISTAT mancante o malformata, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "ISTAT", "campo mancante, non numerico o lunghezza diversa da 6 caratteri."));
                     error = true;
                 }
 
                 // VERIFICO Se il campo cap è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[12])) || FunzioniTrasversali.rimuoviVirgolette(campi[12]).Length != 5)
+                if (string.IsNullOrWhiteSpace(capCsv) || !IsNumeric(capCsv) || !IsLength(capCsv, 5))
                 {
-                    errori.Add($"Attenzione: CAP mancante o malformato, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "CAP_ABITAZIONE", "campo mancante, non numerico o lunghezza diversa da 5 caratteri."));
                     error = true;
                 }
 
                 // vrifico se il campo provincia_abitazione è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[13])) || FunzioniTrasversali.rimuoviVirgolette(campi[13]).Length != 2)
+                if (string.IsNullOrWhiteSpace(provinciaCsv) || !IsLength(provinciaCsv, 2))
                 {
-                    errori.Add($"Attenzione: Provincia abitazione mancante o malformata, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "PROVINCIA_ABITAZIONE", "campo mancante o lunghezza diversa da 2 caratteri."));
                     error = true;
                 }
 
                 // Verifico se il campo Presenza_POD è presente ed è valido
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[14])) ||
-                    (!FunzioniTrasversali.rimuoviVirgolette(campi[14]).Equals("SI", StringComparison.OrdinalIgnoreCase) &&
-                     !FunzioniTrasversali.rimuoviVirgolette(campi[14]).Equals("NO", StringComparison.OrdinalIgnoreCase)))
+                if (string.IsNullOrWhiteSpace(presenzaPodCsv))
                 {
-                    errori.Add($"Attenzione: Presenza POD mancante o non valida, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "PRESENZA_POD", "campo mancante o valore diverso da SI/NO."));
                     error = true;
                 }
 
                 // verifdico se il campo n_componenti è presente e non vuoto
-                if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[15])))
+                if (string.IsNullOrWhiteSpace(numeroComponentiCsv) || !IsNumeric(numeroComponentiCsv) || !IsMaxLength(numeroComponentiCsv, 2) || !int.TryParse(numeroComponentiCsv, out var numeroComponentiValidato) || numeroComponentiValidato <= 0)
                 {
-                    errori.Add($"Attenzione: Numero componenti mancante, saltata. Riga {rigaCorrente}");
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "NUMERO_COMPONENTI", "campo mancante, non numerico, lunghezza superiore a 2 caratteri o valore non maggiore di 0."));
                     error = true;
+                }
+
+                if (!ValidateCodiciFiscaliComponenti(campi[5], out codiciFiscaliFamigliariNormalizzati, out string? erroreCodiciFamigliari))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonusCsv, codiceFiscaleCsv, "CF_COMPONENTI", erroreCodiciFamigliari ?? "lista codici fiscali non valida."));
                 }
 
                 // Parte 4: Controllo se sono presenti Errori
@@ -1063,26 +1176,26 @@ public class CSVReader
 
                 // 1.b) Mi salvo i campi presi dal file CSV in modo da poter effettuare le operazioni successive
                 // logFile.LogInfo($"Sto Inizializzando le variabili con i dati del File CSV!");
-                string? idAto = FunzioniTrasversali.rimuoviVirgolette(campi[0]);
-                string? codiceBonus = FunzioniTrasversali.rimuoviVirgolette(campi[1]).ToUpper();
-                string? codiceFiscale = FunzioniTrasversali.rimuoviVirgolette(campi[2]).ToUpper();
+                string? idAto = idAtoCsv;
+                string? codiceBonus = codiceBonusCsv;
+                string? codiceFiscale = codiceFiscaleCsv;
 
-                string? nomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[3]).ToUpper();
-                string? cognomeDichiarante = FunzioniTrasversali.rimuoviVirgolette(campi[4]).ToUpper();
-                string[]? codiciFiscaliFamigliari = FunzioniTrasversali.splitCodiceFiscale(campi[5]);
+                string? nomeDichiarante = NormalizeCsvValue(campi[3]).ToUpperInvariant();
+                string? cognomeDichiarante = NormalizeCsvValue(campi[4]).ToUpperInvariant();
+                string[]? codiciFiscaliFamigliari = codiciFiscaliFamigliariNormalizzati;
 
-                string? annoValidita = FunzioniTrasversali.rimuoviVirgolette(campi[6]);
-                DateTime dataInizioValidita = FunzioniTrasversali.ConvertiData(campi[7], DateTime.MinValue);
-                DateTime dataFineValidita = FunzioniTrasversali.ConvertiData(campi[8], DateTime.MinValue);
+                string? annoValidita = annoValiditaCsv;
+                DateTime dataInizioValidita = dataInizioValiditaParsed;
+                DateTime dataFineValidita = dataFineValiditaParsed;
 
-                string? indirizzoAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[9]).ToUpper();
+                string? indirizzoAbitazione = NormalizeCsvValue(campi[9]).ToUpperInvariant();
                 string? numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[10]).ToUpper();
-                string? istatAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[11]).ToUpper();
-                string? capAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[12]).ToUpper();
-                string? provinciaAbitazione = FunzioniTrasversali.rimuoviVirgolette(campi[13]).ToUpper();
+                string? istatAbitazione = istatCsv;
+                string? capAbitazione = capCsv;
+                string? provinciaAbitazione = provinciaCsv;
 
-                string presenzaPod = FunzioniTrasversali.rimuoviVirgolette(campi[14]).ToUpper();
-                string numeroComponenti_str = FunzioniTrasversali.rimuoviVirgolette(campi[15]).ToUpper();
+                string presenzaPod = presenzaPodCsv;
+                string numeroComponenti_str = numeroComponentiCsv;
                 int numeroComponenti = int.Parse(numeroComponenti_str);
                 // logFile.LogInfo("Ho istanziato tutti i campi con i dati del CSV");
 
@@ -1175,12 +1288,16 @@ public class CSVReader
 
                                 if (famigliari.Count > 0)
                                 {
+                                    bool trovatoEsito01Famigliare = false;
+                                    bool trovatoEsito03Famigliare = false;
+                                    int? idUtenzaFallback03 = null;
+                                    int? idFornituraFallback03 = null;
+                                    string? codiceFiscaleFallback03 = null;
                                     foreach (var membro in famigliari)
                                     {
                                         // logFile.LogInfo($"Verifica 2 Esistenza Fornitura. Membro: {membro.ToString()}");
 
                                         (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare, int? idUtenzaMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
-                                        idFornituraIdrica = idFornituraMembro;
                                         // logFile.LogInfo($"Post pre verifica fornitura 2. Dati restituiti. Esito: {esitoRestituito} | id Fornitura: {idFornituraTrovato} | id Utenza {idUtenza} | Messaggio:\n {messagge}");
 
                                         if (messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
@@ -1191,17 +1308,22 @@ public class CSVReader
                                         if (esitoFamigliare == "01")
                                         {
                                             idUtenza = idUtenzaMembro;
+                                            idFornituraIdrica = idFornituraMembro;
                                             codiceFiscaleDichiarateTrovato = membro.CodiceFiscale;
                                             note = null;
                                             esito = "01"; // Se uno dei membri della famiglia ha una fornitura diretta, l'esito è 01
+                                            trovatoEsito01Famigliare = true;
                                             break;
                                         }
                                         else if (esitoFamigliare == "03")
                                         {
-                                            idUtenza = idUtenzaMembro;
-                                            codiceFiscaleDichiarateTrovato = membro.CodiceFiscale;
-                                            esito = "03";
-                                            break;
+                                            if (!trovatoEsito03Famigliare)
+                                            {
+                                                trovatoEsito03Famigliare = true;
+                                                idUtenzaFallback03 = idUtenzaMembro;
+                                                idFornituraFallback03 = idFornituraMembro;
+                                                codiceFiscaleFallback03 = membro.CodiceFiscale;
+                                            }
                                         }
                                         else if (esitoFamigliare == "04")
                                         {
@@ -1213,6 +1335,18 @@ public class CSVReader
                                             }
                                         }
 
+                                    }
+
+                                    if (!trovatoEsito01Famigliare && trovatoEsito03Famigliare)
+                                    {
+                                        esito = "03";
+                                        idUtenza = idUtenzaFallback03;
+                                        idFornituraIdrica = idFornituraFallback03;
+                                        codiceFiscaleDichiarateTrovato = codiceFiscaleFallback03;
+                                    }
+                                    else if (!trovatoEsito01Famigliare && presenzaPod.Equals("SI", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        esito = "02";
                                     }
 
                                 }
@@ -1262,6 +1396,14 @@ public class CSVReader
                 {
                     verificare = true;
                     note = note + messaggio;
+                }
+
+                if (!IsValidEsitoBonus(esito))
+                {
+                    errori.Add(FormatInpsLogMessage(rigaCorrente, codiceBonus, codiceFiscale, "ESITO", $"valore non valido '{esito}'. Impostato a 04."));
+                    esito = "04";
+                    verificare = true;
+                    note = (note ?? string.Empty) + "\nAttenzione: esito non valido normalizzato a 04.";
                 }
 
                 // Dati neccessari per l'esportazione siscom
@@ -1487,6 +1629,98 @@ public class CSVReader
         }
 
         return datiComplessivi;
+    }
+
+    private static bool IsNumeric(string? value)
+    {
+        return !string.IsNullOrWhiteSpace(value) && value.All(char.IsDigit);
+    }
+
+    private static bool IsLength(string? value, int length)
+    {
+        return !string.IsNullOrWhiteSpace(value) && value.Length == length;
+    }
+
+    private static bool IsMaxLength(string? value, int maxLength)
+    {
+        return !string.IsNullOrWhiteSpace(value) && value.Length <= maxLength;
+    }
+
+    private static bool IsValidCodiceFiscaleLength(string? value)
+    {
+        return IsLength(NormalizeCsvValue(value), 16);
+    }
+
+    private static bool IsValidDateDdMmYyyy(string? value, out DateTime date)
+    {
+        return DateTime.TryParseExact(
+            NormalizeCsvValue(value),
+            "dd/MM/yyyy",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out date);
+    }
+
+    private static string NormalizeCsvValue(string? value)
+    {
+        return FunzioniTrasversali.rimuoviVirgolette(value ?? string.Empty).Trim();
+    }
+
+    private static string NormalizeSiNo(string? value)
+    {
+        var normalized = NormalizeCsvValue(value).ToUpperInvariant();
+        return normalized == "SI" || normalized == "NO" ? normalized : string.Empty;
+    }
+
+    private static bool ValidateCodiciFiscaliComponenti(string? value, out string[] codiciFiscali, out string? errore)
+    {
+        errore = null;
+        var normalized = NormalizeCsvValue(value);
+
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            codiciFiscali = Array.Empty<string>();
+            return true;
+        }
+
+        var codici = normalized
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(codice => codice.ToUpperInvariant())
+            .ToArray();
+
+        var codiceNonValido = codici.FirstOrDefault(codice => !IsValidCodiceFiscaleLength(codice));
+        if (codiceNonValido != null)
+        {
+            codiciFiscali = codici.Where(IsValidCodiceFiscaleLength).ToArray();
+            errore = $"codice fiscale {codiceNonValido} con lunghezza diversa da 16 caratteri.";
+            return false;
+        }
+
+        codiciFiscali = codici;
+        return true;
+    }
+
+    private static bool IsValidEsitoBonus(string? esito)
+    {
+        return esito is "01" or "02" or "03" or "04";
+    }
+
+    private static string FormatInpsLogMessage(int riga, string? codiceBonus, string? codiceFiscale, string campo, string motivo)
+    {
+        var parti = new List<string> { $"Riga {riga}" };
+
+        if (!string.IsNullOrWhiteSpace(codiceBonus))
+        {
+            parti.Add($"COD_BONUS_IDRICO {codiceBonus}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(codiceFiscale))
+        {
+            parti.Add($"CF_DICHIARANTE {codiceFiscale}");
+        }
+
+        parti.Add($"{campo} {motivo}");
+        return string.Join(" - ", parti);
     }
 
     // Funzione 4: Calcolo dei metri cubi da assegnare in base ai giorni di validità e numero di componenti

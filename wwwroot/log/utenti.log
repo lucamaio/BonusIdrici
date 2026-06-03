@@ -112,3 +112,27 @@
 2026-06-01 15:31:31 [INFO] Utente logato: Pointservice 
 2026-06-01 15:34:21 [INFO] Utente logato: Pointservice 
 2026-06-01 15:42:34 [INFO] Utente logato: Pointservice 
+2026-06-03 08:36:13 [INFO] Utente logato: Pointservice 
+2026-06-03 09:04:47 [INFO] L'Utente Pointservice ha scaricato il file 01345160830_BID_202511_EBI_20260603090447_1.csv relativo al report ID 1
+2026-06-03 09:04:50 [INFO] L'Utente Pointservice ha scaricato il file 01345160830_BID_202511_EBI_20260603090450_1.csv relativo al report ID 1
+2026-06-03 09:04:54 [INFO] L'Utente Pointservice ha scaricato il file Debug Domande TORRENOVA del 20260603090454.csv relativo al report ID 1
+2026-06-03 09:32:51 [INFO] Utente logato: Pointservice 
+2026-06-03 09:40:12 [INFO] Utente logato: Pointservice 
+2026-06-03 09:41:14 [INFO] L'utente Pointservice ha effetuato un nuova elaborazione del file csv del INPS per l'ente 1
+2026-06-03 09:41:57 [INFO] L'Utente Pointservice ha scaricato il file 01345160830_BID_202606_EBI_20260603094157_1.csv relativo al report ID 5
+2026-06-03 09:49:16 [WARNING] Utente non autorizzato ad accedere alla pagina di visualizzazione domande. Ha tentato di visualizzare il report ID 5
+2026-06-03 09:54:53 [INFO] Utente logato: Pointservice 
+2026-06-03 09:55:40 [WARNING] Utente non autorizzato ad accedere alla pagina di visualizzazione domande. Ha tentato di visualizzare il report ID 5
+2026-06-03 09:56:00 [INFO] Utente logato: Pointservice 
+2026-06-03 10:09:28 [INFO] L'Utente Pointservice ha scaricato il file Domande Incongruenti TORRENOVA del 20260603100928.csv relativo al report ID 5
+2026-06-03 10:25:03 [WARNING] Utente non autorizzato ad accedere alla pagina di visualizzazione domande. Ha tentato di visualizzare il report ID 5
+2026-06-03 10:25:16 [INFO] Utente logato: Pointservice 
+2026-06-03 10:25:41 [INFO] L'Utente Pointservice ha modificato lo stato del report ID 5 in Annullato
+2026-06-03 10:26:03 [INFO] L'utente Pointservice ha effetuato un nuova elaborazione del file csv del INPS per l'ente 1
+2026-06-03 10:26:26 [INFO] L'Utente Pointservice ha modificato lo stato del report ID 5 in Approvato
+2026-06-03 10:26:40 [INFO] L'Utente Pointservice ha scaricato il file Domande Incongruenti TORRENOVA del 20260603102640.csv relativo al report ID 5
+2026-06-03 10:31:54 [INFO] L'Utente Pointservice ha scaricato il file 01345160830_BID_202606_EBI_20260603103154_1.csv relativo al report ID 5
+2026-06-03 10:31:58 [INFO] L'Utente Pointservice ha scaricato il file 01345160830_BID_202606_ECT_20260603103158_1.csv relativo al report ID 5
+2026-06-03 12:52:57 [WARNING] Utente non autorizzato ad accedere alla pagina di visualizzazione domande. Ha tentato di visualizzare il report ID 5
+2026-06-03 12:53:05 [INFO] Utente logato: Pointservice 
+2026-06-03 15:13:11 [INFO] Utente logato: Pointservice 
