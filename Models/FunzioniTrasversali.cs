@@ -473,6 +473,114 @@ namespace Models
             return ("03", idFornituraTrovata, message, fornitura.id);
         }
 
+       public static (string esito, int? idFornitura, string? messaggio, int? idUtenza) VerificaEsistenzaFornitura(Dichiarante dichiarante, int selectedEnteId, ApplicationDbContext context, string indirizzoINPS, string numeroCivicoINPS, bool confrontoCivico, int annoReport, int meseReport, bool usaSnapshotUtenze)
+        {
+            if (!usaSnapshotUtenze)
+            {
+                return VerificaEsistenzaFornitura(dichiarante, selectedEnteId, context, indirizzoINPS, numeroCivicoINPS, confrontoCivico);
+            }
+
+            var dataRiferimento = new DateTime(annoReport, meseReport, DateTime.DaysInMonth(annoReport, meseReport));
+            var snapshotPeriodo = context.UtenzeIdricheSnapshot
+                .Where(x => x.IdEnte == selectedEnteId
+                    && x.AnnoRiferimento == annoReport
+                    && x.MeseRiferimento == meseReport)
+                .ToList();
+
+            if (snapshotPeriodo.Count == 0)
+            {
+                var fallback = VerificaEsistenzaFornitura(dichiarante, selectedEnteId, context, indirizzoINPS, numeroCivicoINPS, confrontoCivico);
+                string messaggioFallback = "Snapshot utenze non disponibile per il mese/anno del report. La verifica della fornitura è stata effettuata sui dati correnti.";
+                return (fallback.esito, fallback.idFornitura, UnisciMessaggi(messaggioFallback, fallback.messaggio), fallback.idUtenza);
+            }
+
+            var fornitureSnapshot = snapshotPeriodo
+                .Where(x =>
+                    (!string.IsNullOrWhiteSpace(x.CodiceFiscale) && x.CodiceFiscale == dichiarante.CodiceFiscale)
+                    || (
+                        x.Cognome == dichiarante.Cognome
+                        && x.Nome == dichiarante.Nome
+                        && x.DataNascita == dichiarante.DataNascita
+                    ))
+                .ToList();
+
+            if (fornitureSnapshot.Count == 0)
+            {
+                bool esisteCorrente = context.UtenzeIdriche.Any(s =>
+                    ((s.codiceFiscale == dichiarante.CodiceFiscale || (s.cognome == dichiarante.Cognome && s.nome == dichiarante.Nome && s.DataNascita == dichiarante.DataNascita))
+                    && s.IdEnte == selectedEnteId));
+                string messaggio = esisteCorrente
+                    ? "FonteFornitura=NESSUNA_FORNITURA. Nella snapshot utenze del periodo non risulta una fornitura per il soggetto; nei dati correnti invece esiste almeno una fornitura non usata."
+                    : "FonteFornitura=NESSUNA_FORNITURA. Nessuna fornitura trovata nella snapshot utenze del periodo.";
+                return ("04", null, messaggio, null);
+            }
+
+            var candidate = fornitureSnapshot
+                .Select(f => new
+                {
+                    Fornitura = f,
+                    Domestica = string.Equals(f.TipoUtenza, "UTENZA DOMESTICA", StringComparison.OrdinalIgnoreCase),
+                    ValidaPeriodo = IsFornituraValidaNelPeriodo(f, dataRiferimento),
+                    IndirizzoAnagrafe = ConfrontaIndirizzi(f.IndirizzoUbicazione, f.NumeroCivico, dichiarante.IndirizzoResidenza, dichiarante.NumeroCivico, confrontoCivico),
+                    IndirizzoInps = ConfrontaIndirizzi(f.IndirizzoUbicazione, f.NumeroCivico, indirizzoINPS, numeroCivicoINPS, confrontoCivico)
+                })
+                .OrderByDescending(x => x.Domestica)
+                .ThenByDescending(x => x.ValidaPeriodo)
+                .ThenByDescending(x => x.IndirizzoInps)
+                .ThenByDescending(x => x.IndirizzoAnagrafe)
+                .ToList();
+
+            var scelta = candidate.FirstOrDefault(x => x.IndirizzoInps || x.IndirizzoAnagrafe) ?? candidate.First();
+            int? idFornituraTrovata = int.TryParse(scelta.Fornitura.IdAcquedotto, out int idF) ? idF : null;
+            string codiceFornitura = scelta.Fornitura.IdAcquedotto ?? string.Empty;
+            string messaggioSnapshot = $"FonteFornitura=SNAPSHOT_UTENZE; CodiceFornituraUsato={codiceFornitura}; IdUtenzaSnapshot={scelta.Fornitura.Id}.";
+
+            if (candidate.Count(x => x.Domestica && x.ValidaPeriodo && (x.IndirizzoInps || x.IndirizzoAnagrafe)) > 1)
+            {
+                messaggioSnapshot += " Trovate piu forniture compatibili nella snapshot; scelta quella con maggiore coerenza.";
+            }
+
+            if (!scelta.Domestica)
+            {
+                return ("03", idFornituraTrovata, UnisciMessaggi(messaggioSnapshot, "Attenzione: La fornitura trovata non è di tipo 'UTENZA DOMESTICA'."), scelta.Fornitura.Id);
+            }
+
+            if (!scelta.ValidaPeriodo)
+            {
+                return ("03", idFornituraTrovata, UnisciMessaggi(messaggioSnapshot, "Attenzione: La fornitura snapshot non è valida alla data di riferimento del report."), scelta.Fornitura.Id);
+            }
+
+            if (!scelta.IndirizzoInps && !scelta.IndirizzoAnagrafe)
+            {
+                return ("03", idFornituraTrovata, UnisciMessaggi(messaggioSnapshot, "Errore: L'indirizzo di ubicazione della fornitura snapshot non corrisponde a quello di residenza del dichiarante e/o quello fornito dall'INPS."), scelta.Fornitura.Id);
+            }
+
+            return VerificaStatoFornitura(scelta.Fornitura.Stato, idFornituraTrovata, messaggioSnapshot, scelta.Fornitura.Id);
+        }
+
+        private static bool IsFornituraValidaNelPeriodo(UtenzaIdricaSnapshot fornitura, DateTime dataRiferimento)
+        {
+            bool statoValido = fornitura.Stato >= 1 && fornitura.Stato <= 3;
+            bool inizioValido = !fornitura.PeriodoIniziale.HasValue || fornitura.PeriodoIniziale.Value.Date <= dataRiferimento.Date;
+            bool fineValida = !fornitura.PeriodoFinale.HasValue || fornitura.PeriodoFinale.Value.Date >= dataRiferimento.Date;
+            return statoValido && inizioValido && fineValida;
+        }
+
+        private static string UnisciMessaggi(string? primo, string? secondo)
+        {
+            if (string.IsNullOrWhiteSpace(primo))
+            {
+                return secondo ?? string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(secondo))
+            {
+                return primo;
+            }
+
+            return primo + "\n" + secondo;
+        }
+
 
         // Metodo ausiliario per verificare lo stato
         private static (string esito, int? idFornitura, string? messaggio, int? idUtenza) VerificaStatoFornitura(int? stato, int? idFornitura, string? messaggio, int? idUtenza)

@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Configurazione Sessione
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddSession(options =>
 {
@@ -26,6 +27,7 @@ builder.Services.Configure<LogCleanupOptions>(
     builder.Configuration.GetSection(LogCleanupOptions.SectionName));
 builder.Services.AddHostedService<LogCleanupHostedService>();
 builder.Services.AddScoped<SectionActivityService>();
+builder.Services.AddSingleton<AppCacheService>();
 
 // ✅ Connessione DB
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

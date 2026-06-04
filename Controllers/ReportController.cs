@@ -7,6 +7,7 @@ using Models.ViewModels; // Aggiungi questo using
 using System.IO;
 using System.Collections.Generic; 
 using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -15,16 +16,18 @@ namespace Controllers
         private readonly ILogger<ReportController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly SectionActivityService _sectionActivityService;
+        private readonly AppCacheService _cache;
         private FileLog logFile = new FileLog($"wwwroot/log/Domande.log");
         private string? ruolo;
         private int idUser;
         private string? username;
 
-        public ReportController(ILogger<ReportController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
+        public ReportController(ILogger<ReportController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
             _sectionActivityService = sectionActivityService;
+            _cache = cache;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -99,7 +102,10 @@ namespace Controllers
                 
             }
             // 2.c) Se sono amministratore me li mostri tutti
-            enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            enti = _cache.GetOrCreate(
+                "enti:all",
+                () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                AppCacheService.EntiExpiration);
             ViewBag.Enti = enti;
             return View();
         }
@@ -119,42 +125,52 @@ namespace Controllers
 
             if (selectedEnteId == 0)
             {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
+                ViewBag.Enti = _cache.GetOrCreate(
+                    "enti:all",
+                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                    AppCacheService.EntiExpiration);
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
                 return View("Index", "Domande");
             }
 
             // Mi recupuero tutti i report relativi all'ente
 
-            var reportEffettuati = _context.Reports
-                .Where(r => r.idEnte == selectedEnteId)
-                .GroupBy(r => new { r.id, r.idEnte, r.idUser, r.serie, r.DataCreazione, r.stato, r.mese, r.anno })
-                .Select(g => new Models.ViewModels.ReportViewModel
-                {
-                    id = g.Key.id,
-                    idEnte = g.Key.idEnte,
-                    DataCreazione = g.Key.DataCreazione,
-                    DataAggiornamento = g.Max(r => r.DataAggiornamento),
-                    mese = g.Key.mese,
-                    anno = g.Key.anno,
-                    stato = g.Key.stato,
-                    serie = g.Key.serie,
-                    count = _context.Domande.Where(d => d.idReport == g.Key.id).Count(),
-                    Username = _context.Users
-                        .Where(u => u.id == g.Key.idUser)
-                        .Select(u => u.Username)
-                        .FirstOrDefault()
-                })
-                .ToList()
-                .OrderByDescending(r => GetAnnoOrDefault(r.anno))
-                .ThenByDescending(r => GetMeseOrDefault(r.mese))
-                .ThenByDescending(r => r.serie)
-                .ThenByDescending(r => r.DataCreazione)
-                .ToList();
+            var reportEffettuati = _cache.GetOrCreate(
+                $"reports:ente:{selectedEnteId}",
+                () => _context.Reports
+                    .AsNoTracking()
+                    .Where(r => r.idEnte == selectedEnteId)
+                    .GroupBy(r => new { r.id, r.idEnte, r.idUser, r.serie, r.DataCreazione, r.stato, r.mese, r.anno })
+                    .Select(g => new Models.ViewModels.ReportViewModel
+                    {
+                        id = g.Key.id,
+                        idEnte = g.Key.idEnte,
+                        DataCreazione = g.Key.DataCreazione,
+                        DataAggiornamento = g.Max(r => r.DataAggiornamento),
+                        mese = g.Key.mese,
+                        anno = g.Key.anno,
+                        stato = g.Key.stato,
+                        serie = g.Key.serie,
+                        count = _context.Domande.Count(d => d.idReport == g.Key.id),
+                        Username = _context.Users
+                            .Where(u => u.id == g.Key.idUser)
+                            .Select(u => u.Username)
+                            .FirstOrDefault()
+                    })
+                    .ToList()
+                    .OrderByDescending(r => GetAnnoOrDefault(r.anno))
+                    .ThenByDescending(r => GetMeseOrDefault(r.mese))
+                    .ThenByDescending(r => r.serie)
+                    .ThenByDescending(r => r.DataCreazione)
+                    .ToList(),
+                AppCacheService.ReportExpiration);
 
             ViewBag.Reports = reportEffettuati ?? null;
             ViewBag.idEnte = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.Where(e => e.id == selectedEnteId).Select(e => e.nome).FirstOrDefault();
+            ViewBag.SelectedEnteNome = _cache.GetOrCreate(
+                $"enti:detail:{selectedEnteId}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == selectedEnteId),
+                AppCacheService.EntiExpiration)?.nome;
             ViewBag.SectionActivity = _sectionActivityService.GetReportsActivity(selectedEnteId);
             return View();
         }
@@ -212,7 +228,10 @@ namespace Controllers
 
             // 3. Verifico che l'id esiste nel db
 
-            var reportEsistente = _context.Reports.FirstOrDefault(r => r.id == idReport);
+            var reportEsistente = _cache.GetOrCreate(
+                $"report:detail:{idReport}",
+                () => _context.Reports.AsNoTracking().FirstOrDefault(r => r.id == idReport),
+                AppCacheService.ReportExpiration);
             if (reportEsistente == null)
             {
                 ViewBag.Message = "ID report non trovato! Riprova";
@@ -223,13 +242,19 @@ namespace Controllers
 
             // 4. Mi ricavo tutte le domande associate al report
 
-            var domandeReport = _context.Domande.Where(d => d.idReport == idReport).ToList();
+            var domandeReport = _cache.GetOrCreate(
+                $"domande:report:{idReport}",
+                () => _context.Domande.AsNoTracking().Where(d => d.idReport == idReport).ToList(),
+                AppCacheService.ReportExpiration);
             ViewBag.Domande = domandeReport;
 
             // 5. Salvo la data di elaborazione e il nome dal ente in modo da poterli visualizzare
             var elaborazione = reportEsistente.mese + " " + reportEsistente.anno;
             ViewBag.ElaborazioneDel = elaborazione;
-            ViewBag.nomeEnte = _context.Enti.Where(e => e.id == reportEsistente.idEnte).Select(e => e.nome).FirstOrDefault();
+            ViewBag.nomeEnte = _cache.GetOrCreate(
+                $"enti:detail:{reportEsistente.idEnte}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == reportEsistente.idEnte),
+                AppCacheService.EntiExpiration)?.nome;
 
             // 6. Mi ricavo le informazioni aggiuntive per la parte relativa alle statistiche
 
@@ -535,6 +560,7 @@ namespace Controllers
 
             // 6) Salvo i cambiamenti
             _context.SaveChanges();
+            InvalidaReportCache(reportEsistente);
             AccountController.logFile.LogInfo("L'Utente " + username + " ha modificato la serie del report ID " + reportEsistente.id + " in " + serie);
 
             // 7) Torno alla pagina principale
@@ -623,6 +649,7 @@ namespace Controllers
                 AccountController.logFile.LogInfo("L'Utente " + username + " ha modificato la domanda ID " + domandaEsistente.id);
                 domandaEsistente.DataAggiornamento = DateTime.Now;
                 _context.SaveChanges();
+                InvalidaReportCache(reportEsistente);
             }
 
             // 9) Ritorno alla pagina details
@@ -681,11 +708,20 @@ namespace Controllers
 
             // 6) Salvo i cambiamenti
             _context.SaveChanges();
+            InvalidaReportCache(reportEsistente);
 
             // 7) Torno alla pagina principale
             return RedirectToAction("Dettails", "Report", new { idReport = idReport});
         }
 
         // Fine - Funzioni
+
+        private void InvalidaReportCache(Report report)
+        {
+            _cache.ClearReportCache(report.id);
+            _cache.RemoveByPrefix($"reports:ente:{report.idEnte}");
+            _cache.RemoveByPrefix($"statistiche:ente:{report.idEnte}");
+            _cache.Remove("dashboard:admin");
+        }
     }
 }

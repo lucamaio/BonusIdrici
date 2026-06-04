@@ -48,7 +48,7 @@ public static class CsvGenerator
 
                 if (esito == "01")
                 {
-                    codiceFornitura = domanda.idFornitura.ToString();
+                    codiceFornitura = EstraiCodiceFornitura(domanda);
                     codiceFiscale = !string.IsNullOrWhiteSpace(domanda.codiceFiscaleUtenzaTrovata)
                         ? domanda.codiceFiscaleUtenzaTrovata.Trim()
                         : domanda.codiceFiscaleRichiedente?.Trim() ?? string.Empty;
@@ -391,7 +391,7 @@ public static class CsvGenerator
             foreach (var domanda in dati)
             {
                 StringBuilder riga = new StringBuilder();
-                riga.Append(EscapeCsvField(domanda.idFornitura.ToString() ?? "", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(EstraiCodiceFornitura(domanda), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.annoValidita.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(serie.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.numeroComponenti.ToString() ?? "", Delimitatore)).Append(Delimitatore);
@@ -410,7 +410,7 @@ public static class CsvGenerator
      public static byte[] GeneraCsvDebug(List<Domanda> dati, int serie)
     {
         StringBuilder csvContent = new StringBuilder();
-        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale Richiedente", "Codice Fiscale x bonus", "Id utenza", "Nome Dichiarante", "Cognome Dichiarante", "ID Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "PRESENZA POD", "SERIE", "MC", "Incongruenze", "Note", "Numero Componenti", "Data Aggiornamento" };
+        List<string> headers = new List<string> { "ID", "ID_ATO", "Codice Bonus", "ID_Fornitura", "Esito STR", "Esito", "Codice Fiscale Richiedente", "Codice Fiscale x bonus", "Id utenza", "Nome Dichiarante", "Cognome Dichiarante", "ID Dichiarante", "Anno Validità", "Indirizzo Abitazione", "Numero civico", "Istat", "CAP", "PROVINCIA", "INIZIO VALIDITA", "FINE VALIDITA", "PRESENZA POD", "SERIE", "MC", "Incongruenze", "Note", "Numero Componenti", "Data Aggiornamento", "UsaSnapshotUtenze", "FonteFornitura", "CodiceFornituraUsato", "IdUtenzaSnapshot" };
         csvContent.AppendLine(string.Join(Delimitatore, headers));
 
         if (dati != null && dati.Any())
@@ -421,7 +421,7 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(domanda.id.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.idAto.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.codiceBonus.ToString(), Delimitatore)).Append(Delimitatore);
-                riga.Append(EscapeCsvField(domanda.idFornitura.ToString() ?? "", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(EstraiCodiceFornitura(domanda), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.esitoStr.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.esito.ToString(), Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.codiceFiscaleRichiedente.ToString(), Delimitatore)).Append(Delimitatore);
@@ -445,10 +445,41 @@ public static class CsvGenerator
                 riga.Append(EscapeCsvField(domanda.note?.ToString() ?? "", Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.numeroComponenti.ToString() ?? "", Delimitatore)).Append(Delimitatore);
                 riga.Append(EscapeCsvField(domanda.DataAggiornamento?.ToString("yyyy-MM-dd HH:mm:ss") ?? "", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(domanda.note?.Contains("FonteFornitura=SNAPSHOT_UTENZE") == true ? "true" : "false", Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(EstraiValoreNota(domanda.note, "FonteFornitura"), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(EstraiCodiceFornitura(domanda), Delimitatore)).Append(Delimitatore);
+                riga.Append(EscapeCsvField(EstraiValoreNota(domanda.note, "IdUtenzaSnapshot"), Delimitatore)).Append(Delimitatore);
                 csvContent.AppendLine(riga.ToString());
             }
         }
 
         return Encoding.UTF8.GetBytes(csvContent.ToString());
+    }
+
+    private static string EstraiCodiceFornitura(Domanda domanda)
+    {
+        var codiceDaNote = EstraiValoreNota(domanda.note, "CodiceFornituraUsato");
+        return !string.IsNullOrWhiteSpace(codiceDaNote)
+            ? codiceDaNote
+            : domanda.idFornitura?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+    }
+
+    private static string EstraiValoreNota(string? note, string chiave)
+    {
+        if (string.IsNullOrWhiteSpace(note))
+        {
+            return string.Empty;
+        }
+
+        var marker = chiave + "=";
+        var start = note.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (start < 0)
+        {
+            return string.Empty;
+        }
+
+        start += marker.Length;
+        var end = note.IndexOfAny(new[] { ';', '\n', '\r', '.' }, start);
+        return end < 0 ? note[start..].Trim() : note[start..end].Trim();
     }
 }

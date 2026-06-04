@@ -5,6 +5,8 @@ using Models;
 using Data;
 using Models.ViewModels; // Aggiungi questo using
 using System.IO;
+using System.Text.RegularExpressions;
+using BonusIdrici2.Services;
 
 namespace Controllers
 {
@@ -12,15 +14,17 @@ namespace Controllers
     {
         private readonly ILogger<AzioniController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly AppCacheService _cache;
 
         private string? ruolo;
         private int idUser;
         private string? username;
 
-        public AzioniController(ILogger<AzioniController> logger, ApplicationDbContext context)
+        public AzioniController(ILogger<AzioniController> logger, ApplicationDbContext context, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
+            _cache = cache;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -164,6 +168,8 @@ namespace Controllers
                     await csv_file.CopyToAsync(stream);
                 }
 
+                var (annoReport, meseReport) = DeterminaPeriodoReport(csv_file.FileName, mese, anno);
+
                 // Verifico se non esiste alcun report con i dati passati
                 var reportEsistente = _context.Reports.FirstOrDefault(f=> f.mese == mese && f.anno == anno && f.idEnte==selectedEnteId);
                 int idReport;
@@ -188,7 +194,7 @@ namespace Controllers
                     idReport = report.id;
                 }            
                 // Leggi il file CSV con la tua classe CSVReaders
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idReport, confrontoCivico, escludiComponenti);
+                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idReport, confrontoCivico, escludiComponenti, annoReport, meseReport);
                 AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -223,6 +229,10 @@ namespace Controllers
                         }
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
+                        _cache.ClearReportCache(idReport);
+                        _cache.RemoveByPrefix($"reports:ente:{selectedEnteId}");
+                        _cache.RemoveByPrefix($"statistiche:ente:{selectedEnteId}");
+                        _cache.Remove("dashboard:admin");
                         ViewBag.Message = $"Dati caricati e salvati con successo!\n Aggiunti: {datiComplessivi.domande.Count}, Aggiornati: {datiComplessivi.domandeDaAggiornare.Count}";
                     }
                     catch (Exception dbEx)
@@ -250,5 +260,31 @@ namespace Controllers
              return RedirectToAction("LoadFileINPS"); 
         }
         // Fine - Funzioni
+
+        private static (int anno, int mese) DeterminaPeriodoReport(string fileName, string mese, string anno)
+        {
+            var match = Regex.Match(fileName, @"_BID_(?<anno>\d{4})(?<mese>\d{2})", RegexOptions.IgnoreCase);
+            if (match.Success
+                && int.TryParse(match.Groups["anno"].Value, out int annoDaFile)
+                && int.TryParse(match.Groups["mese"].Value, out int meseDaFile)
+                && meseDaFile >= 1
+                && meseDaFile <= 12)
+            {
+                return (annoDaFile, meseDaFile);
+            }
+
+            int annoReport = int.TryParse(anno, out int annoDaForm) ? annoDaForm : DateTime.Now.Year;
+            int meseReport = DateTimeFormatInfo.CurrentInfo.MonthNames
+                .Where(m => !string.IsNullOrWhiteSpace(m))
+                .Select((nome, index) => new { nome, index })
+                .FirstOrDefault(m => string.Equals(m.nome, mese, StringComparison.CurrentCultureIgnoreCase))?.index + 1 ?? 0;
+
+            if (meseReport < 1 || meseReport > 12)
+            {
+                meseReport = DateTime.Now.Month;
+            }
+
+            return (annoReport, meseReport);
+        }
     }
 }

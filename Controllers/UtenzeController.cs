@@ -5,6 +5,7 @@ using Data;
 using System.IO;
 using Models.ViewModels;
 using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -14,6 +15,7 @@ namespace Controllers
         private readonly ILogger<UtenzeController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly SectionActivityService _sectionActivityService;
+        private readonly AppCacheService _cache;
 
         private string? ruolo;
         private int? idUser;
@@ -21,11 +23,12 @@ namespace Controllers
 
         // Costruttore
 
-        public UtenzeController(ILogger<UtenzeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
+        public UtenzeController(ILogger<UtenzeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
             _sectionActivityService = sectionActivityService;
+            _cache = cache;
 
             if (VerificaSessione())
             {
@@ -98,7 +101,10 @@ namespace Controllers
                 }
             }
 
-            enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            enti = _cache.GetOrCreate(
+                "enti:all",
+                () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                AppCacheService.EntiExpiration);
             ViewBag.Enti = enti;
             return View();
         }
@@ -115,12 +121,18 @@ namespace Controllers
 
             if (selectedEnteId == 0)
             {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
+                ViewBag.Enti = _cache.GetOrCreate(
+                    "enti:all",
+                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                    AppCacheService.EntiExpiration);
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
                 return View("Index", "Utenze");
             }
 
-            var dati = _context.UtenzeIdriche.Where(r => r.IdEnte == selectedEnteId).ToList();
+            var dati = _cache.GetOrCreate(
+                $"utenze:ente:{selectedEnteId}",
+                () => _context.UtenzeIdriche.AsNoTracking().Where(r => r.IdEnte == selectedEnteId).ToList(),
+                AppCacheService.UtenzeExpiration);
 
             var viewModelList = dati.Select(x => new UtenzeViewModel
             {
@@ -154,7 +166,10 @@ namespace Controllers
             ViewBag.UtenzeNonDomestiche = viewModelList.Count(s => s.tipoUtenza != "UTENZA DOMESTICA");
 
             ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+            ViewBag.SelectedEnteNome = _cache.GetOrCreate(
+                $"enti:detail:{selectedEnteId}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == selectedEnteId),
+                AppCacheService.EntiExpiration)?.nome ?? "Ente Sconosciuto";
             ViewBag.SectionActivity = _sectionActivityService.GetUtenzeActivity(selectedEnteId);
 
             return View("Show", viewModelList);
@@ -241,6 +256,7 @@ namespace Controllers
 
             _context.UtenzeIdriche.Add(nuovaUtenza);
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
 
             return RedirectToAction("Show", "Utenze", new { selectedEnteId = idEnte });
         }
@@ -276,6 +292,7 @@ namespace Controllers
             UtenzaEsistente.data_aggiornamento = DateTime.Now;
 
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
 
             return RedirectToAction("Show", "Utenze", new { selectedEnteId = idEnte });
         }
@@ -285,7 +302,7 @@ namespace Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile csv_file, int selectedEnteId)
+        public async Task<IActionResult> Upload(IFormFile csv_file, int selectedEnteId, int meseRiferimento, int annoRiferimento)
         {
             // Controllo se l'utente può accedere alla pagina desideratà
             if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
@@ -310,6 +327,13 @@ namespace Controllers
             }
 
             // Verifico che l'ente selezionato è valido 
+            int annoMassimo = DateTime.Now.Year + 1;
+            if (meseRiferimento < 1 || meseRiferimento > 12 || annoRiferimento < 2021 || annoRiferimento > annoMassimo)
+            {
+                ViewBag.Message = $"Mese o anno di riferimento non validi. Il mese deve essere tra 1 e 12 e l'anno tra 2021 e {annoMassimo}.";
+                return Upload();
+            }
+
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
 
             if (selectedEnte == null)
@@ -331,7 +355,7 @@ namespace Controllers
 
 
                 // Lettura del file CSV
-                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche(filePath, selectedEnteId, _context, idUser ?? 0);
+                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche(filePath, selectedEnteId, _context, idUser ?? 0, annoRiferimento, meseRiferimento);
 
                 if (datiComplessivi == null)
                 {
@@ -387,6 +411,11 @@ namespace Controllers
                             }
                         }
 
+                        if (datiComplessivi.UtenzeIdricheSnapshot.Count > 0)
+                        {
+                            datiPresenti = true;
+                        }
+
                         // Verifico se sono non sono presenti dei dati
                         if (!datiPresenti)
                         {
@@ -394,9 +423,26 @@ namespace Controllers
                             return Upload();
                         }
 
+                        var snapshotEsistenti = _context.UtenzeIdricheSnapshot
+                            .Where(s => s.IdEnte == selectedEnteId
+                                && s.AnnoRiferimento == annoRiferimento
+                                && s.MeseRiferimento == meseRiferimento);
+
+                        _context.UtenzeIdricheSnapshot.RemoveRange(snapshotEsistenti);
+
+                        if (datiComplessivi.UtenzeIdricheSnapshot.Count > 0)
+                        {
+                            _context.UtenzeIdricheSnapshot.AddRange(datiComplessivi.UtenzeIdricheSnapshot);
+                        }
+
                         // Salvataggio le modifiche iniziali
                         await _context.SaveChangesAsync();
                         transaction.Commit();  // Confermo la transizione
+                        _cache.ClearEnteCache(selectedEnteId);
+                        if (idUser.HasValue)
+                        {
+                            _cache.ClearUserCache(idUser.Value);
+                        }
                     }
                     catch (Exception dbEx)
                     {
@@ -482,7 +528,7 @@ namespace Controllers
                 }
 
                 // Messaggio da stampare 
-                ViewBag.Message = $"File '{csv_file.FileName}' caricato con successo.\nNuove Utenze: {datiComplessivi.UtenzeIdriche.Count}.\tAggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}\n";
+                ViewBag.Message = $"File '{csv_file.FileName}' caricato con successo.\nNuove Utenze: {datiComplessivi.UtenzeIdriche.Count}.\tAggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}\nSnapshot {meseRiferimento:D2}/{annoRiferimento}: {datiComplessivi.UtenzeIdricheSnapshot.Count}\n";
 
                 // Informo l'utente  se deve procedere ad Aggiornare i Toponomi
 

@@ -16,6 +16,7 @@ namespace Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
         private readonly SectionActivityService _sectionActivityService;
+        private readonly AppCacheService _cache;
 
         // Variuabili di sessione
 
@@ -25,11 +26,12 @@ namespace Controllers
 
         private string tema;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
             _sectionActivityService = sectionActivityService;
+            _cache = cache;
 
             if (VerificaSessione())
             {
@@ -154,6 +156,20 @@ namespace Controllers
             }
 
             return View(_sectionActivityService.GetAdminActivityDashboard());
+        }
+
+        public IActionResult ClearCache()
+        {
+            if (!VerificaSessione("ADMIN") || idUser != 1)
+            {
+                AccountController.logFile.LogWarning("Tentativo non autorizzato di svuotamento cache applicativa.");
+                return Forbid();
+            }
+
+            _cache.ClearAll();
+            AccountController.logFile.LogInfo("Cache applicativa svuotata manualmente dall'amministratore.");
+            ViewBag.Message = "Cache applicativa svuotata correttamente.";
+            return RedirectToAction("Index", "Home");
         }
     }
     

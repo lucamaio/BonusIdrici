@@ -9,6 +9,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Models.ViewModels; 
+using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -16,15 +18,17 @@ namespace Controllers
     {
         private readonly ILogger<EntiController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
+        private readonly AppCacheService _cache;
 
          private string? ruolo;
         private int? idUser;
         private string? username;
 
-        public EntiController(ILogger<EntiController> logger, ApplicationDbContext context)
+        public EntiController(ILogger<EntiController> logger, ApplicationDbContext context, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
+            _cache = cache;
 
             if (VerificaSessione())
             {
@@ -91,7 +95,10 @@ namespace Controllers
             ViewBag.Username = HttpContext.Session.GetString("Username");
             ViewBag.Ruolo = HttpContext.Session.GetString("Role");
 
-            var dati = _context.Enti.ToList();
+            var dati = _cache.GetOrCreate(
+                "enti:all",
+                () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                AppCacheService.EntiExpiration);
             var viewModelList = dati.Select(x => new EntiViewModel
             {
                 id = x.id,
@@ -144,7 +151,10 @@ namespace Controllers
             ViewBag.Username = HttpContext.Session.GetString("Username");
             ViewBag.Ruolo = HttpContext.Session.GetString("Role");
 
-            var ente = _context.Enti.FirstOrDefault(s => s.id == id);
+            var ente = _cache.GetOrCreate(
+                $"enti:detail:{id}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(s => s.id == id),
+                AppCacheService.EntiExpiration);
             if (ente == null)
             {
                 ViewBag.Message = "Ente non trovato";
@@ -237,6 +247,8 @@ namespace Controllers
             enteEsistente.Selene = Selene ?? false;
 
             _context.SaveChanges();
+            _cache.Remove("enti:all");
+            _cache.ClearEnteCache(id);
             ViewBag.Message = "Dati ente aggiornati con successo";
             return Index();
         }

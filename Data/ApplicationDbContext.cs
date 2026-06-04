@@ -13,9 +13,11 @@ namespace Data
         {
         }
         public DbSet<Dichiarante> Dichiaranti { get; set; }
+        public DbSet<DichiaranteSnapshot> DichiarantiSnapshot { get; set; }
         public DbSet<Ente> Enti { get; set; }
 
         public DbSet<UtenzaIdrica> UtenzeIdriche { get; set; }        
+        public DbSet<UtenzaIdricaSnapshot> UtenzeIdricheSnapshot { get; set; }
         public DbSet<Domanda> Domande { get; set; }
         public DbSet<Toponimo> Toponomi { get; set; }
         public DbSet<Report> Reports {get; set;}
@@ -51,6 +53,43 @@ namespace Data
                 entity.Property(f => f.IdUser).HasColumnName("idUser").IsRequired();
             });
 
+            modelBuilder.Entity<DichiaranteSnapshot>(entity =>
+            {
+                entity.ToTable("dichiaranti_snapshot");
+                entity.HasKey(d => d.Id);
+                entity.Property(f => f.Id).HasColumnName("id");
+                entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+                entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
+                entity.Property(f => f.AnnoRiferimento).HasColumnName("anno_riferimento").IsRequired();
+                entity.Property(f => f.MeseRiferimento).HasColumnName("mese_riferimento").IsRequired();
+                entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").IsRequired().HasMaxLength(16);
+                entity.Property(f => f.Cognome).HasColumnName("cognome").IsRequired().HasMaxLength(125);
+                entity.Property(f => f.Nome).HasColumnName("nome").IsRequired().HasMaxLength(125);
+                entity.Property(f => f.Sesso).HasColumnName("sesso").IsRequired().HasMaxLength(1);
+                entity.Property(f => f.DataNascita).HasColumnName("data_nascita").IsRequired();
+                entity.Property(f => f.ComuneNascita).HasColumnName("comune_nascita").HasMaxLength(250);
+                entity.Property(f => f.IndirizzoResidenza).HasColumnName("indirizzo_residenza").IsRequired().HasMaxLength(250);
+                entity.Property(f => f.NumeroCivico).HasColumnName("numero_civico").IsRequired().HasMaxLength(250);
+                entity.Property(f => f.Parentela).HasColumnName("parentela").HasMaxLength(128);
+                entity.Property(f => f.CodiceFamiglia).HasColumnName("codice_famiglia");
+                entity.Property(f => f.CodiceAbitante).HasColumnName("codice_abitante");
+                entity.Property(f => f.NumeroComponenti).HasColumnName("numero_componenti");
+                entity.Property(f => f.CodiceFiscaleIntestatarioScheda).HasColumnName("codice_fiscale_intestatario_scheda").HasMaxLength(16);
+                entity.Property(f => f.DataCancellazione).HasColumnName("data_cancellazione");
+                entity.Property(f => f.DataImportazione).HasColumnName("data_importazione").IsRequired();
+                entity.Property(f => f.HashRecord).HasColumnName("hash_record").IsRequired().HasMaxLength(64);
+
+                entity.HasIndex(f => new { f.IdEnte, f.AnnoRiferimento, f.MeseRiferimento })
+                    .HasDatabaseName("ix_dichiaranti_snapshot_periodo");
+                entity.HasIndex(f => new { f.IdEnte, f.CodiceFiscale, f.AnnoRiferimento, f.MeseRiferimento })
+                    .HasDatabaseName("ix_dichiaranti_snapshot_cf_periodo")
+                    .IsUnique();
+                entity.HasIndex(f => new { f.IdEnte, f.CodiceFamiglia, f.AnnoRiferimento, f.MeseRiferimento })
+                    .HasDatabaseName("ix_dichiaranti_snapshot_famiglia_periodo");
+                entity.HasIndex(f => f.HashRecord)
+                    .HasDatabaseName("ix_dichiaranti_snapshot_hash");
+            });
+
             // Configurazione per la classe Ente
             modelBuilder.Entity<Ente>(entity =>
             {
@@ -71,7 +110,7 @@ namespace Data
             });
 
 
-            modelBuilder.Entity<UtenzaIdrica>(entity =>
+        modelBuilder.Entity<UtenzaIdrica>(entity =>
         {
             entity.ToTable("utenzeidriche"); // Mappa la classe uTENZE Idrica alla tabella 'utenzeidriche' nel DB
 
@@ -101,6 +140,53 @@ namespace Data
             entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
             entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
             entity.Property(f => f.idToponimo).HasColumnName("id_toponimo");
+        });
+
+        modelBuilder.Entity<UtenzaIdricaSnapshot>(entity =>
+        {
+            entity.ToTable("utenzeidriche_snapshot");
+            entity.HasKey(f => f.Id);
+            entity.Property(f => f.Id).HasColumnName("id");
+            entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+            entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
+            entity.Property(f => f.AnnoRiferimento).HasColumnName("anno_riferimento").IsRequired();
+            entity.Property(f => f.MeseRiferimento).HasColumnName("mese_riferimento").IsRequired();
+            entity.Property(f => f.IdUtenzaOriginale).HasColumnName("id_utenza_originale");
+            entity.Property(f => f.IdAcquedotto).HasColumnName("id_acquedotto").HasMaxLength(35);
+            entity.Property(f => f.MatricolaContatore).HasColumnName("matricola_contatore").HasMaxLength(50);
+            entity.Property(f => f.Stato).HasColumnName("stato");
+            entity.Property(f => f.PeriodoIniziale).HasColumnName("periodo_iniziale");
+            entity.Property(f => f.PeriodoFinale).HasColumnName("periodo_finale");
+            entity.Property(f => f.IndirizzoUbicazione).HasColumnName("indirizzo_ubicazione").HasMaxLength(255);
+            entity.Property(f => f.NumeroCivico).HasColumnName("numero_civico").HasMaxLength(10);
+            entity.Property(f => f.SubUbicazione).HasColumnName("sub_ubicazione").HasMaxLength(20);
+            entity.Property(f => f.ScalaUbicazione).HasColumnName("scala_ubicazione").HasMaxLength(50);
+            entity.Property(f => f.Piano).HasColumnName("piano").HasMaxLength(20);
+            entity.Property(f => f.Interno).HasColumnName("interno").HasMaxLength(20);
+            entity.Property(f => f.TipoUtenza).HasColumnName("tipo_utenza").HasMaxLength(100);
+            entity.Property(f => f.Cognome).HasColumnName("cognome").HasMaxLength(100);
+            entity.Property(f => f.Nome).HasColumnName("nome").HasMaxLength(100);
+            entity.Property(f => f.Sesso).HasColumnName("sesso").HasMaxLength(1);
+            entity.Property(f => f.DataNascita).HasColumnName("data_nascita");
+            entity.Property(f => f.CodiceFiscale).HasColumnName("codice_fiscale").HasMaxLength(16);
+            entity.Property(f => f.PartitaIva).HasColumnName("partita_iva");
+            entity.Property(f => f.IdToponimo).HasColumnName("id_toponimo");
+            entity.Property(f => f.IdDichiarante).HasColumnName("id_dichiarante");
+            entity.Property(f => f.DataImportazione).HasColumnName("data_importazione").IsRequired();
+            entity.Property(f => f.HashRecord).HasColumnName("hash_record").IsRequired().HasMaxLength(64);
+
+            entity.HasIndex(f => new { f.IdEnte, f.AnnoRiferimento, f.MeseRiferimento })
+                .HasDatabaseName("ix_utenze_snapshot_periodo");
+            entity.HasIndex(f => new { f.IdEnte, f.CodiceFiscale, f.AnnoRiferimento, f.MeseRiferimento })
+                .HasDatabaseName("ix_utenze_snapshot_cf_periodo");
+            entity.HasIndex(f => new { f.IdEnte, f.IdAcquedotto, f.AnnoRiferimento, f.MeseRiferimento })
+                .HasDatabaseName("ix_utenze_snapshot_acquedotto_periodo");
+            entity.HasIndex(f => new { f.IdEnte, f.MatricolaContatore, f.AnnoRiferimento, f.MeseRiferimento })
+                .HasDatabaseName("ix_utenze_snapshot_matricola_periodo");
+            entity.HasIndex(f => new { f.IdEnte, f.Cognome, f.Nome, f.DataNascita, f.AnnoRiferimento, f.MeseRiferimento })
+                .HasDatabaseName("ix_utenze_snapshot_nominativo_periodo");
+            entity.HasIndex(f => f.HashRecord)
+                .HasDatabaseName("ix_utenze_snapshot_hash");
         });
 
         modelBuilder.Entity<Domanda>(entity =>

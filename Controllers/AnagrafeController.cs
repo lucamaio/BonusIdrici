@@ -5,6 +5,7 @@ using Data;
 using System.IO;
 using Models.ViewModels;
 using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -14,17 +15,19 @@ namespace Controllers
         private readonly ILogger<AnagrafeController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly SectionActivityService _sectionActivityService;
+        private readonly AppCacheService _cache;
         
         private string? ruolo;
         private int idUser;
         private string? username;
 
         // Costruttore
-        public AnagrafeController(ILogger<AnagrafeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
+        public AnagrafeController(ILogger<AnagrafeController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
             _sectionActivityService = sectionActivityService;
+            _cache = cache;
             
             if (VerificaSessione())
             {
@@ -98,7 +101,10 @@ namespace Controllers
                 }
             }
 
-            enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            enti = _cache.GetOrCreate(
+                "enti:all",
+                () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                AppCacheService.EntiExpiration);
             ViewBag.Enti = enti;
             return View();
         }
@@ -115,15 +121,20 @@ namespace Controllers
 
             if (selectedEnteId == 0)
             {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
+                ViewBag.Enti = _cache.GetOrCreate(
+                    "enti:all",
+                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                    AppCacheService.EntiExpiration);
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
                 return View("Index", "Anagrafe");
             }
 
-            var dati = _context.Dichiaranti.Where(r => r.IdEnte == selectedEnteId).ToList();
+            var dati = _cache.GetOrCreate(
+                $"anagrafe:ente:{selectedEnteId}",
+                () => _context.Dichiaranti.AsNoTracking().Where(r => r.IdEnte == selectedEnteId).ToList(),
+                AppCacheService.AnagrafeExpiration);
 
-           var viewModelList = _context.Dichiaranti
-                .Where(r => r.IdEnte == selectedEnteId)
+           var viewModelList = dati
                 .OrderBy(x => x.Cognome)
                 .ThenBy(x => x.Nome)
                 .ThenBy(x => x.DataNascita)
@@ -142,7 +153,10 @@ namespace Controllers
                 .ToList();
 
             ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+            ViewBag.SelectedEnteNome = _cache.GetOrCreate(
+                $"enti:detail:{selectedEnteId}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == selectedEnteId),
+                AppCacheService.EntiExpiration)?.nome ?? "Ente Sconosciuto";
             ViewBag.SectionActivity = _sectionActivityService.GetAnagrafeActivity(selectedEnteId);
 
             return View("Show", viewModelList);
@@ -235,6 +249,7 @@ namespace Controllers
 
             _context.Dichiaranti.Add(nuovaPersona);
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
             if (codiceFamiglia == null)
             {
                 return RedirectToAction("Modifica", "Anagrafe", new { id = nuovaPersona.id });
@@ -248,6 +263,7 @@ namespace Controllers
                 _context.Dichiaranti.Update(membro);
             }
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
         }
@@ -276,6 +292,7 @@ namespace Controllers
             DichiaranteEsistente.data_aggiornamento = DateTime.Now;
 
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
 
             return RedirectToAction("Show", "Anagrafe", new { selectedEnteId = idEnte });
         }
@@ -283,7 +300,7 @@ namespace Controllers
         // Funzione 2: consente di caricare l'anagrafe di un ente partendo da un file csv
 
          [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile csv_file, int selectedEnteId) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
+        public async Task<IActionResult> Upload(IFormFile csv_file, int selectedEnteId, int meseRiferimento, int annoRiferimento) // Il nome del parametro deve corrispondere al 'name' dell'input file nel form
         {
             // Controllo se l'utente può accedere alla pagina desideratà
             if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
@@ -306,6 +323,13 @@ namespace Controllers
                 return Upload();
             }
 
+            int annoMassimo = DateTime.Now.Year + 1;
+            if (meseRiferimento < 1 || meseRiferimento > 12 || annoRiferimento < 2021 || annoRiferimento > annoMassimo)
+            {
+                ViewBag.Message = $"Mese o anno di riferimento non validi. Il mese deve essere tra 1 e 12 e l'anno tra 2021 e {annoMassimo}.";
+                return Upload();
+            }
+
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
 
             if (selectedEnte == null)
@@ -325,7 +349,7 @@ namespace Controllers
                 }
 
                 // Leggi il file CSV con la tua classe CSVReader
-                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, _context, idUser);
+                var datiComplessivi = CSVReader.LoadAnagrafe(filePath, selectedEnteId, _context, idUser, annoRiferimento, meseRiferimento);
 
                 // Inizia una transazione per assicurare che tutti i dati vengano salvati
                 // o nessuno in caso di errore. (Opzionale ma buona pratica per operazioni multiple)
@@ -354,16 +378,34 @@ namespace Controllers
                                 _context.Dichiaranti.Update(dichiarante);
                             }
                         }
+                        if (datiComplessivi.DichiarantiSnapshot.Count > 0)
+                        {
+                            trovati = true;
+                        }
                         if(!trovati)
                         {
                             ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
                             return Upload(); // Torna alla pagina di upload con un messaggio
                         }
+
+                        var snapshotEsistenti = _context.DichiarantiSnapshot
+                            .Where(s => s.IdEnte == selectedEnteId
+                                && s.AnnoRiferimento == annoRiferimento
+                                && s.MeseRiferimento == meseRiferimento);
+
+                        _context.DichiarantiSnapshot.RemoveRange(snapshotEsistenti);
+
+                        if (datiComplessivi.DichiarantiSnapshot.Count > 0)
+                        {
+                            _context.DichiarantiSnapshot.AddRange(datiComplessivi.DichiarantiSnapshot);
+                        }
                         
                         await _context.SaveChangesAsync();
 
                         transaction.Commit(); // Conferma la transazione se tutto è andato bene
-                        ViewBag.Message = $"Dati salvati con successo!\nAggiunti: {datiComplessivi.Dichiaranti.Count}, Aggiornati: {datiComplessivi.DichiarantiDaAggiornare.Count}";
+                        _cache.ClearEnteCache(selectedEnteId);
+                        _cache.ClearUserCache(idUser);
+                        ViewBag.Message = $"Dati salvati con successo!\nAggiunti: {datiComplessivi.Dichiaranti.Count}, Aggiornati: {datiComplessivi.DichiarantiDaAggiornare.Count}, Snapshot {meseRiferimento:D2}/{annoRiferimento}: {datiComplessivi.DichiarantiSnapshot.Count}";
                     }
                     catch (Exception dbEx)
                     {

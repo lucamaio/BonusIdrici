@@ -7,6 +7,7 @@ using System.IO;
 using Microsoft.AspNetCore.Authentication;
 using Models.ViewModels; 
 using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -16,16 +17,18 @@ namespace Controllers
         private readonly ILogger<ToponomiController> _logger;
         private readonly ApplicationDbContext _context; // Inietta il DbContext
         private readonly SectionActivityService _sectionActivityService;
+        private readonly AppCacheService _cache;
 
         private string? ruolo;
         private int? idUser;
         private string? username;
 
-        public ToponomiController(ILogger<ToponomiController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService)
+        public ToponomiController(ILogger<ToponomiController> logger, ApplicationDbContext context, SectionActivityService sectionActivityService, AppCacheService cache)
         {
             _logger = logger;
             _context = context;
             _sectionActivityService = sectionActivityService;
+            _cache = cache;
 
             if (VerificaSessione())
             {
@@ -98,7 +101,10 @@ namespace Controllers
                 }
             }
 
-            enti = _context.Enti.OrderBy(e => e.nome).ToList();
+            enti = _cache.GetOrCreate(
+                "enti:all",
+                () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                AppCacheService.EntiExpiration);
             ViewBag.Enti = enti;
             return View();
         }
@@ -119,12 +125,18 @@ namespace Controllers
 
             if (selectedEnteId == 0)
             {
-                ViewBag.Enti = _context.Enti.OrderBy(e => e.nome).ToList();
+                ViewBag.Enti = _cache.GetOrCreate(
+                    "enti:all",
+                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                    AppCacheService.EntiExpiration);
                 ViewBag.Message = "Per favore, seleziona un ente valido.";
                 return View("Index", "Toponomi");
             }
             // Mi ricavo i toponimi relativi all'ente selezionato
-            var toponimi = _context.Toponomi.Where(r => r.IdEnte == selectedEnteId).OrderByDescending(x => x.denominazione).ToList();
+            var toponimi = _cache.GetOrCreate(
+                $"toponimi:ente:{selectedEnteId}",
+                () => _context.Toponomi.AsNoTracking().Where(r => r.IdEnte == selectedEnteId).OrderByDescending(x => x.denominazione).ToList(),
+                AppCacheService.ToponimiExpiration);
 
             // Statistiche
             ViewBag.TotaleToponomi = toponimi.Count;
@@ -134,7 +146,10 @@ namespace Controllers
             // Passo i dati alla view
             ViewBag.Toponimi = toponimi;
             ViewBag.SelectedEnteId = selectedEnteId;
-            ViewBag.SelectedEnteNome = _context.Enti.FirstOrDefault(e => e.id == selectedEnteId)?.nome ?? "Ente Sconosciuto";
+            ViewBag.SelectedEnteNome = _cache.GetOrCreate(
+                $"enti:detail:{selectedEnteId}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == selectedEnteId),
+                AppCacheService.EntiExpiration)?.nome ?? "Ente Sconosciuto";
             ViewBag.SectionActivity = _sectionActivityService.GetToponomiActivity(selectedEnteId);
 
             return View("Show");
@@ -214,6 +229,7 @@ namespace Controllers
 
             _context.Toponomi.Add(nuovoToponimo);
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
 
             return RedirectToAction("Show", "Toponomi", new { selectedEnteId = idEnte });
         }
@@ -254,6 +270,7 @@ namespace Controllers
             toponimoEsistente.IdEnte = idEnte;
 
             _context.SaveChanges();
+            _cache.ClearEnteCache(idEnte);
 
             return RedirectToAction("Show", "Toponomi", new { selectedEnteId = idEnte });
         }

@@ -5,6 +5,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using System.Text;
 using Data;
 using Controllers;
 
@@ -37,7 +39,7 @@ public class CSVReader
     */
 
     // Funzione 1: Carica il file CSV dell'anagrafe e restituisce una lista di dichiaranti da aggiungere o aggiornare
-    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
+    public static DatiCsvCompilati LoadAnagrafe(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser, int annoRiferimento, int meseRiferimento)
     {
         // Parte 1: Creazione della variabile da restituire e apertura file di log
         var datiComplessivi = new DatiCsvCompilati();
@@ -149,6 +151,8 @@ public class CSVReader
                     IdEnte = selectedEnteId,
                     IdUser = idUser
                 };
+
+                datiComplessivi.DichiarantiSnapshot.Add(CreaSnapshot(dichiarante, annoRiferimento, meseRiferimento));
 
                 // Parte 4: Aggiungo il dichiarante alla lista dei dichiaranti da aggiungere se non esiste già
 
@@ -326,7 +330,7 @@ public class CSVReader
     }
 
     // Funzione 2: Carica il file CSV delle utenze idriche e restituisce una lista di utenze da aggiungere o aggiornare
-    public static DatiCsvCompilati LeggiFileUtenzeIdriche(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser)
+    public static DatiCsvCompilati LeggiFileUtenzeIdriche(string percorsoFile, int selectedEnteId, ApplicationDbContext _context, int idUser, int annoRiferimento, int meseRiferimento)
     {
         // Parte 1: Creazione della variabile da restituire e apertura file di log
 
@@ -419,8 +423,7 @@ public class CSVReader
 
                 if (string.IsNullOrEmpty(FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIdAcquedotto])))
                 {
-                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. | Riga {rigaCorrente} | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCognome])} {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceNome])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCodiceFiscale])}");
-                    error = true;
+                    warning.Add($"Attenzione: Id Acquedotto mancante. Per la snapshot verra usata una chiave alternativa basata su CodiceFiscale, Matricola, Indirizzo e Civico. | Riga {rigaCorrente} | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCognome])} {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceNome])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCodiceFiscale])}");
                 }
 
                 // d) Controllo se il campo Codice Fiscale è valido è != null
@@ -480,8 +483,7 @@ public class CSVReader
 
                 if (string.IsNullOrWhiteSpace(FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIdAcquedotto])))
                 {
-                    errori.Add($"Attenzione: Id Acquedotto mancante, saltata. Riga {rigaCorrente}  | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCognome])} {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceNome])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCodiceFiscale])}");
-                    error = true;
+                    warning.Add($"Attenzione: Id Acquedotto mancante. Riga {rigaCorrente}  | Nominativo: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCognome])} {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceNome])} | Codice Fiscale: {FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCodiceFiscale])}");
                 }
 
                 // f) Controllo se i campi nomi, cognome e sesso sono presenti
@@ -710,9 +712,15 @@ public class CSVReader
 
                 // Creo un utenza
 
+                var idAcquedottoImport = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIdAcquedotto]);
+                if (string.IsNullOrWhiteSpace(idAcquedottoImport))
+                {
+                    idAcquedottoImport = CreaChiaveAlternativaUtenza(cod_fisc, FunzioniTrasversali.rimuoviVirgolette(campi[IndiceMatricolaContatore]), indirizzoUbicazione, indirizzoSeparato.NumeroCivico);
+                }
+
                 var utenza = new UtenzaIdrica
                 {
-                    idAcquedotto = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIdAcquedotto]),
+                    idAcquedotto = idAcquedottoImport,
                     stato = int.TryParse(FunzioniTrasversali.rimuoviVirgolette(campi[IndiceStato]), out int stato) ? stato : 0,
                     periodoIniziale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[IndicePeriodoIniziale])),
                     periodoFinale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[IndicePeriodoFinale])),
@@ -751,6 +759,15 @@ public class CSVReader
                 var utenzaEsistente = utenzeIdriche.FirstOrDefault(u =>
                     u.idAcquedotto == utenza.idAcquedotto &&
                     u.codiceFiscale == utenza.codiceFiscale);
+
+                if (!datiComplessivi.UtenzeIdricheSnapshot.Any(s =>
+                        s.IdEnte == selectedEnteId
+                        && s.AnnoRiferimento == annoRiferimento
+                        && s.MeseRiferimento == meseRiferimento
+                        && s.IdAcquedotto == utenza.idAcquedotto))
+                {
+                    datiComplessivi.UtenzeIdricheSnapshot.Add(CreaSnapshotUtenza(utenza, utenzaEsistente?.id, annoRiferimento, meseRiferimento));
+                }
 
                 // caso a) Se l'utenza non esiste allora la creo
                 if (utenzaEsistente == null)
@@ -978,7 +995,7 @@ public class CSVReader
     }
 
     // Funzione 3: Legge il file CSV proveniente da INPS per generare i domande delle persone con bonus idrico
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idReport, bool confrontoCivico, bool escludiComponenti)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idReport, bool confrontoCivico, bool escludiComponenti, int annoReport, int meseReport)
     {
         // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
@@ -988,9 +1005,30 @@ public class CSVReader
         try
         {
             var righe = File.ReadAllLines(percorsoFile).Skip(1);
+            var inizioMeseReport = new DateTime(annoReport, meseReport, 1);
+            var snapshotPeriodo = context.DichiarantiSnapshot
+                .Where(s => s.IdEnte == selectedEnteId
+                    && s.AnnoRiferimento == annoReport
+                    && s.MeseRiferimento == meseReport)
+                .ToList();
+            bool snapshotDisponibile = snapshotPeriodo.Count > 0;
+            const string avvisoSnapshotAssente = "Elaborazione effettuata senza snapshot anagrafica del mese/anno di riferimento. Verificare numero componenti e nucleo familiare.";
+            bool snapshotUtenzeDisponibile = context.UtenzeIdricheSnapshot.Any(s =>
+                s.IdEnte == selectedEnteId
+                && s.AnnoRiferimento == annoReport
+                && s.MeseRiferimento == meseReport);
+            const string avvisoSnapshotUtenzeAssente = "Snapshot utenze non disponibile per il mese/anno del report. La verifica della fornitura è stata effettuata sui dati correnti.";
 
             int rigaCorrente = 1;
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
+            if (!snapshotDisponibile)
+            {
+                logFile.LogWarning($"Nessuna snapshot anagrafica trovata per ente {selectedEnteId}, periodo {meseReport:D2}/{annoReport}. Uso anagrafe corrente come fallback.");
+            }
+            if (!snapshotUtenzeDisponibile)
+            {
+                logFile.LogWarning($"Nessuna snapshot utenze trovata per ente {selectedEnteId}, periodo {meseReport:D2}/{annoReport}. Uso utenze correnti come fallback.");
+            }
             // logFile.LogInfo($"Confranto Numero civico: {confrontoCivico.ToString()}");
             // var dichiaranti = context.Dichiaranti.ToList();
 
@@ -1207,6 +1245,16 @@ public class CSVReader
                 string esito = "04"; // 01 = fornitura diretta, 02 = fornitura indiretta, 03 = fornitura diretta non rispetta requisiti, 04 =  fornitura indiretta non rispetta requisiti 
                 int? idFornituraIdrica = null;
                 string? note = null;
+                bool verificare = false;
+                if (!snapshotDisponibile)
+                {
+                    note = avvisoSnapshotAssente;
+                }
+                if (!snapshotUtenzeDisponibile)
+                {
+                    note = (note ?? string.Empty) + "\n" + avvisoSnapshotUtenzeAssente;
+                    verificare = true;
+                }
 
                 // 2.a) mi salvo i campi relativi all'ente in modo da poter effetuare le operazioni successive
 
@@ -1224,7 +1272,6 @@ public class CSVReader
 
                 string? messaggio = null;
                 int? mc = null;
-                bool verificare = false;
                 int? idDichiarante = null;
                 string? codiceFiscaleDichiarateTrovato = null;
                 int? idUtenza = null;
@@ -1233,17 +1280,29 @@ public class CSVReader
                 if (!(istatEnte != istatAbitazione || capEnte != capAbitazione || provinciaAbitazione != ente.Provincia))
                 {
                     // 2.c) se i campi corispondono verifico se il richiedente è residente nel comune selezionato
-                    var dichiaranteTrovato = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId);
+                    var snapshotDichiarante = snapshotPeriodo.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale);
+                    bool usaSnapshot = snapshotDichiarante != null;
+                    var dichiaranteCorrente = context.Dichiaranti.FirstOrDefault(s => s.CodiceFiscale == codiceFiscale && s.IdEnte == selectedEnteId);
+                    var dichiaranteTrovato = usaSnapshot
+                        ? CreaDichiaranteDaSnapshot(snapshotDichiarante!)
+                        : dichiaranteCorrente;
+
+                    if (snapshotDisponibile && snapshotDichiarante == null)
+                    {
+                        note = (note ?? string.Empty) + $"\nAttenzione: snapshot anagrafica assente per il codice fiscale {codiceFiscale} nel periodo {meseReport:D2}/{annoReport}. Usata anagrafe corrente come fallback.";
+                        verificare = true;
+                        logFile.LogWarning($"Snapshot assente per CF {codiceFiscale}, ente {selectedEnteId}, periodo {meseReport:D2}/{annoReport}. Uso anagrafe corrente come fallback.");
+                    }
                     if (dichiaranteTrovato != null)
                     {
                         // logFile.LogInfo($"Ho trovato un dichiarante: {dichiaranteTrovato.ToString()}");
                         // 2.c.1) se è residente nel comune selzionato allora esito è uguale a Si
                         esitoStr = "Si";
-                        idDichiarante = dichiaranteTrovato.id;
+                        idDichiarante = dichiaranteCorrente?.id;
                         //3.a) verifica se il richiedente ha una fornitura idrica diretta 
 
                         // logFile.LogInfo("Pre verifica esistenza fornitura");
-                        (string esitoRestituito, int? idFornituraTrovato, string? messagge, int? idUtenzaDichiarante) = FunzioniTrasversali.VerificaEsistenzaFornitura(dichiaranteTrovato, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
+                        (string esitoRestituito, int? idFornituraTrovato, string? messagge, int? idUtenzaDichiarante) = FunzioniTrasversali.VerificaEsistenzaFornitura(dichiaranteTrovato, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico, annoReport, meseReport, true);
                         idFornituraIdrica = idFornituraTrovato;
                         // logFile.LogInfo($"Post pre verifica fornitura. Dati restituiti. Esito: {esitoRestituito} | id Fornitura: {idFornituraTrovato} | id Utenza {idUtenza} | Messaggio:\n {messagge}");
 
@@ -1269,22 +1328,30 @@ public class CSVReader
                         }
                         else if (esitoRestituito == "04")
                         {
-                            if (dichiaranteTrovato.NumeroComponenti > 1)
+                            int numeroComponentiAnagrafico = usaSnapshot
+                                ? CalcolaNumeroComponentiStorico(snapshotPeriodo, snapshotDichiarante!, inizioMeseReport)
+                                : dichiaranteTrovato.NumeroComponenti;
+
+                            if (numeroComponentiAnagrafico > 1)
                             {
                                 // logFile.LogInfo("Cerco i Famigliari!");
                                 // Cerco tra i famigliari
                                 var today = DateTime.Today;
                                 var cutoff = today.AddYears(-18);
 
-                                var famigliari = context.Dichiaranti
-                                    .Where(s =>
-                                        (s.CodiceFamiglia == dichiaranteTrovato.CodiceFamiglia
-                                        || s.CodiceFiscaleIntestatarioScheda == dichiaranteTrovato.CodiceFiscaleIntestatarioScheda)
-                                        && s.IdEnte == selectedEnteId
-                                        && s.CodiceFiscale != dichiaranteTrovato.CodiceFiscale
-                                        && s.DataNascita <= cutoff
-                                    )
-                                    .ToList();
+                                var famigliari = usaSnapshot
+                                    ? TrovaFamigliariSnapshot(snapshotPeriodo, snapshotDichiarante!, inizioMeseReport, cutoff)
+                                        .Select(CreaDichiaranteDaSnapshot)
+                                        .ToList()
+                                    : context.Dichiaranti
+                                        .Where(s =>
+                                            (s.CodiceFamiglia == dichiaranteTrovato.CodiceFamiglia
+                                            || s.CodiceFiscaleIntestatarioScheda == dichiaranteTrovato.CodiceFiscaleIntestatarioScheda)
+                                            && s.IdEnte == selectedEnteId
+                                            && s.CodiceFiscale != dichiaranteTrovato.CodiceFiscale
+                                            && s.DataNascita <= cutoff
+                                        )
+                                        .ToList();
 
                                 if (famigliari.Count > 0)
                                 {
@@ -1297,7 +1364,7 @@ public class CSVReader
                                     {
                                         // logFile.LogInfo($"Verifica 2 Esistenza Fornitura. Membro: {membro.ToString()}");
 
-                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare, int? idUtenzaMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico);
+                                        (string esitoFamigliare, int? idFornituraMembro, string? messaggeFamigliare, int? idUtenzaMembro) = FunzioniTrasversali.VerificaEsistenzaFornitura(membro, selectedEnteId, context, indirizzoAbitazione, numeroCivico, confrontoCivico, annoReport, meseReport, true);
                                         // logFile.LogInfo($"Post pre verifica fornitura 2. Dati restituiti. Esito: {esitoRestituito} | id Fornitura: {idFornituraTrovato} | id Utenza {idUtenza} | Messaggio:\n {messagge}");
 
                                         if (messaggeFamigliare != "Nessuna fornitura trovata per il dichiarante.")
@@ -1369,18 +1436,23 @@ public class CSVReader
                         }
 
                         // Verifico se il numero di componenti fornito corisponte a quello effetivo di selene
-                        if (dichiaranteTrovato.NumeroComponenti != numeroComponenti && !escludiComponenti)
+                        int numeroComponentiConfronto = usaSnapshot
+                            ? CalcolaNumeroComponentiStorico(snapshotPeriodo, snapshotDichiarante!, inizioMeseReport)
+                            : dichiaranteTrovato.NumeroComponenti;
+
+                        if (numeroComponentiConfronto != numeroComponenti && !escludiComponenti)
                         {
                             if (ente.Selene == true)
                             {
-                                note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). é stato impostato come valore quello ricavato dal anagrafe.";
-                                numeroComponenti = dichiaranteTrovato.NumeroComponenti;
+                                note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({numeroComponentiConfronto}). é stato impostato come valore quello ricavato dal anagrafe.";
+                                numeroComponenti = numeroComponentiConfronto;
                             }
                             else
                             {
-                                note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}).";
+                                note = note + $"\nAttenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({numeroComponentiConfronto}).";
                             }
-                            logFile.LogWarning($"Attenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({dichiaranteTrovato.NumeroComponenti}). Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
+                            verificare = true;
+                            logFile.LogWarning($"Attenzione: Il numero di componenti fornito ({numeroComponenti}) non corrisponde a quello effettivo ({numeroComponentiConfronto}). Codice Bonus: {codiceBonus} | Codice Fiscale: {codiceFiscale}");
                         }
                     }
 
@@ -1629,6 +1701,194 @@ public class CSVReader
         }
 
         return datiComplessivi;
+    }
+
+    private static DichiaranteSnapshot CreaSnapshot(Dichiarante dichiarante, int annoRiferimento, int meseRiferimento)
+    {
+        var snapshot = new DichiaranteSnapshot
+        {
+            IdEnte = dichiarante.IdEnte,
+            IdUser = dichiarante.IdUser,
+            AnnoRiferimento = annoRiferimento,
+            MeseRiferimento = meseRiferimento,
+            CodiceFiscale = dichiarante.CodiceFiscale,
+            Cognome = dichiarante.Cognome,
+            Nome = dichiarante.Nome,
+            Sesso = dichiarante.Sesso,
+            DataNascita = dichiarante.DataNascita,
+            ComuneNascita = dichiarante.ComuneNascita,
+            IndirizzoResidenza = dichiarante.IndirizzoResidenza,
+            NumeroCivico = dichiarante.NumeroCivico,
+            Parentela = dichiarante.Parentela,
+            CodiceFamiglia = dichiarante.CodiceFamiglia,
+            CodiceAbitante = dichiarante.CodiceAbitante,
+            NumeroComponenti = dichiarante.NumeroComponenti,
+            CodiceFiscaleIntestatarioScheda = dichiarante.CodiceFiscaleIntestatarioScheda,
+            DataCancellazione = dichiarante.data_cancellazione,
+            DataImportazione = DateTime.Now,
+            HashRecord = string.Empty
+        };
+
+        snapshot.HashRecord = CalcolaHashSnapshot(snapshot);
+        return snapshot;
+    }
+
+    private static string CalcolaHashSnapshot(DichiaranteSnapshot snapshot)
+    {
+        string raw = string.Join("|",
+            snapshot.IdEnte,
+            snapshot.AnnoRiferimento,
+            snapshot.MeseRiferimento,
+            snapshot.CodiceFiscale,
+            snapshot.Cognome,
+            snapshot.Nome,
+            snapshot.Sesso,
+            snapshot.DataNascita.ToString("O"),
+            snapshot.ComuneNascita,
+            snapshot.IndirizzoResidenza,
+            snapshot.NumeroCivico,
+            snapshot.Parentela,
+            snapshot.CodiceFamiglia,
+            snapshot.CodiceAbitante,
+            snapshot.NumeroComponenti,
+            snapshot.CodiceFiscaleIntestatarioScheda,
+            snapshot.DataCancellazione?.ToString("O"));
+
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
+        return Convert.ToHexString(bytes);
+    }
+
+    private static Dichiarante CreaDichiaranteDaSnapshot(DichiaranteSnapshot snapshot)
+    {
+        return new Dichiarante
+        {
+            id = null,
+            Cognome = snapshot.Cognome,
+            Nome = snapshot.Nome,
+            CodiceFiscale = snapshot.CodiceFiscale,
+            Sesso = snapshot.Sesso,
+            DataNascita = snapshot.DataNascita,
+            ComuneNascita = snapshot.ComuneNascita,
+            IndirizzoResidenza = snapshot.IndirizzoResidenza,
+            NumeroCivico = snapshot.NumeroCivico,
+            CodiceAbitante = snapshot.CodiceAbitante,
+            CodiceFamiglia = snapshot.CodiceFamiglia,
+            Parentela = snapshot.Parentela,
+            CodiceFiscaleIntestatarioScheda = snapshot.CodiceFiscaleIntestatarioScheda,
+            NumeroComponenti = snapshot.NumeroComponenti,
+            IdEnte = snapshot.IdEnte,
+            IdUser = snapshot.IdUser,
+            data_cancellazione = snapshot.DataCancellazione
+        };
+    }
+
+    private static int CalcolaNumeroComponentiStorico(List<DichiaranteSnapshot> snapshotPeriodo, DichiaranteSnapshot dichiarante, DateTime inizioMeseReport)
+    {
+        var componenti = TrovaNucleoSnapshot(snapshotPeriodo, dichiarante, inizioMeseReport).Count;
+        return componenti > 0 ? componenti : dichiarante.NumeroComponenti;
+    }
+
+    private static List<DichiaranteSnapshot> TrovaFamigliariSnapshot(List<DichiaranteSnapshot> snapshotPeriodo, DichiaranteSnapshot dichiarante, DateTime inizioMeseReport, DateTime maggiorenneDa)
+    {
+        return TrovaNucleoSnapshot(snapshotPeriodo, dichiarante, inizioMeseReport)
+            .Where(s => s.CodiceFiscale != dichiarante.CodiceFiscale && s.DataNascita <= maggiorenneDa)
+            .ToList();
+    }
+
+    private static List<DichiaranteSnapshot> TrovaNucleoSnapshot(List<DichiaranteSnapshot> snapshotPeriodo, DichiaranteSnapshot dichiarante, DateTime inizioMeseReport)
+    {
+        return snapshotPeriodo
+            .Where(s =>
+                s.IdEnte == dichiarante.IdEnte
+                && !IsCancellatoPrimaDelPeriodo(s, inizioMeseReport)
+                && (
+                    (dichiarante.CodiceFamiglia.HasValue && s.CodiceFamiglia == dichiarante.CodiceFamiglia)
+                    || (!string.IsNullOrWhiteSpace(dichiarante.CodiceFiscaleIntestatarioScheda)
+                        && s.CodiceFiscaleIntestatarioScheda == dichiarante.CodiceFiscaleIntestatarioScheda)
+                    || s.CodiceFiscale == dichiarante.CodiceFiscale
+                ))
+            .ToList();
+    }
+
+    private static bool IsCancellatoPrimaDelPeriodo(DichiaranteSnapshot snapshot, DateTime inizioMeseReport)
+    {
+        return snapshot.DataCancellazione.HasValue && snapshot.DataCancellazione.Value.Date < inizioMeseReport.Date;
+    }
+
+    private static UtenzaIdricaSnapshot CreaSnapshotUtenza(UtenzaIdrica utenza, int? idUtenzaOriginale, int annoRiferimento, int meseRiferimento)
+    {
+        var snapshot = new UtenzaIdricaSnapshot
+        {
+            IdEnte = utenza.IdEnte,
+            IdUser = utenza.IdUser,
+            AnnoRiferimento = annoRiferimento,
+            MeseRiferimento = meseRiferimento,
+            IdUtenzaOriginale = idUtenzaOriginale,
+            IdAcquedotto = utenza.idAcquedotto,
+            MatricolaContatore = utenza.matricolaContatore,
+            Stato = utenza.stato,
+            PeriodoIniziale = utenza.periodoIniziale,
+            PeriodoFinale = utenza.periodoFinale,
+            IndirizzoUbicazione = utenza.indirizzoUbicazione,
+            NumeroCivico = utenza.numeroCivico,
+            SubUbicazione = utenza.subUbicazione,
+            ScalaUbicazione = utenza.scalaUbicazione,
+            Piano = utenza.piano,
+            Interno = utenza.interno,
+            TipoUtenza = utenza.tipoUtenza,
+            Cognome = utenza.cognome,
+            Nome = utenza.nome,
+            Sesso = utenza.sesso,
+            DataNascita = utenza.DataNascita,
+            CodiceFiscale = utenza.codiceFiscale,
+            PartitaIva = utenza.partitaIva,
+            IdToponimo = utenza.idToponimo,
+            IdDichiarante = utenza.IdDichiarante,
+            DataImportazione = DateTime.Now,
+            HashRecord = string.Empty
+        };
+
+        snapshot.HashRecord = CalcolaHashSnapshotUtenza(snapshot);
+        return snapshot;
+    }
+
+    private static string CreaChiaveAlternativaUtenza(string? codiceFiscale, string? matricola, string? indirizzo, string? civico)
+    {
+        var raw = string.Join("|", codiceFiscale, matricola, indirizzo, civico);
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
+        return "ALT-" + Convert.ToHexString(bytes)[..31];
+    }
+
+    private static string CalcolaHashSnapshotUtenza(UtenzaIdricaSnapshot snapshot)
+    {
+        string raw = string.Join("|",
+            snapshot.IdEnte,
+            snapshot.AnnoRiferimento,
+            snapshot.MeseRiferimento,
+            snapshot.IdUtenzaOriginale,
+            snapshot.IdAcquedotto,
+            snapshot.MatricolaContatore,
+            snapshot.Stato,
+            snapshot.PeriodoIniziale?.ToString("O"),
+            snapshot.PeriodoFinale?.ToString("O"),
+            snapshot.IndirizzoUbicazione,
+            snapshot.NumeroCivico,
+            snapshot.SubUbicazione,
+            snapshot.ScalaUbicazione,
+            snapshot.Piano,
+            snapshot.Interno,
+            snapshot.TipoUtenza,
+            snapshot.Cognome,
+            snapshot.Nome,
+            snapshot.Sesso,
+            snapshot.DataNascita?.ToString("O"),
+            snapshot.CodiceFiscale,
+            snapshot.PartitaIva,
+            snapshot.IdToponimo,
+            snapshot.IdDichiarante);
+
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
+        return Convert.ToHexString(bytes);
     }
 
     private static bool IsNumeric(string? value)

@@ -26,6 +26,27 @@
                             </select>
                         </div>
 
+                        <div class="alert alert-secondary small" role="alert">
+                            Il mese e l'anno indicano la fotografia anagrafica da usare nelle elaborazioni Bonus Idrico dello stesso periodo. Se la snapshot esiste gia, verra sostituita dal nuovo import.
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="meseRiferimento" class="form-label">Mese riferimento anagrafe</label>
+                                <select id="meseRiferimento" name="meseRiferimento" class="form-select" required>
+                                    <option value="">-- Seleziona mese --</option>
+                                    @for (var mese = 1; mese <= 12; mese++)
+                                    {
+                                        <option value="@mese">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mese)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="annoRiferimento" class="form-label">Anno riferimento anagrafe</label>
+                                <input type="number" id="annoRiferimento" name="annoRiferimento" class="form-control" min="2021" max="@(DateTime.Now.Year + 1)" value="@DateTime.Now.Year" required>
+                            </div>
+                        </div>
+
                           <div class="mb-3">
                             <label for="csv_file" class="form-label">Seleziona file Anagrafe (formato CSV)</label>
                             <input type="file" name="csv_file" class="form-control" required accept=".csv">

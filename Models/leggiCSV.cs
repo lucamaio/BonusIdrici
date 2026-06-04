@@ -10,9 +10,13 @@ namespace leggiCSV
 
         public List<Dichiarante> DichiarantiDaAggiornare { get; set; }
 
+        public List<DichiaranteSnapshot> DichiarantiSnapshot { get; set; }
+
         public List<UtenzaIdrica> UtenzeIdriche { get; set; }
 
         public List<UtenzaIdrica> UtenzeIdricheEsistente { get; set; }
+
+        public List<UtenzaIdricaSnapshot> UtenzeIdricheSnapshot { get; set; }
 
         public int? countIndirizziMalFormati { get; set; }
         
@@ -32,9 +36,13 @@ namespace leggiCSV
 
             DichiarantiDaAggiornare = new List<Dichiarante>();
 
+            DichiarantiSnapshot = new List<DichiaranteSnapshot>();
+
             UtenzeIdriche = new List<UtenzaIdrica>();
 
             UtenzeIdricheEsistente = new List<UtenzaIdrica>();
+
+            UtenzeIdricheSnapshot = new List<UtenzaIdricaSnapshot>();
 
             domande = new List<Domanda>();
 
