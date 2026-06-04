@@ -208,20 +208,10 @@ namespace Controllers
                 return RedirectToAction("Index", "Home");
             }
             
-            var denominazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(denominazione);
-            var normalizzazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(normalizzazione);
-            var denominazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(denominazioneSeparata.Toponimo);
-            var normalizzazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(normalizzazioneSeparata.Toponimo);
-
-            if (!string.IsNullOrWhiteSpace(denominazioneSeparata.CivicoEstratto))
-            {
-                AccountController.logFile.LogInfo($"Civico estratto da toponimo in creazione: '{denominazione}' -> toponimo '{denominazioneSeparata.Toponimo}', civico '{denominazioneSeparata.CivicoEstratto}'.");
-            }
-
             var nuovoToponimo = new Toponimo
             {
-                denominazione = denominazioneSeparata.Toponimo,
-                normalizzazione = string.IsNullOrWhiteSpace(normalizzazioneNormalizzata) ? denominazioneNormalizzata : normalizzazioneNormalizzata,
+                denominazione = denominazione.Trim().ToUpper(),
+                normalizzazione = normalizzazione.Trim().ToUpper(),
                 IdEnte = idEnte,
                 dataCreazione = DateTime.Now,
                 dataAggiornamento = null
@@ -253,18 +243,8 @@ namespace Controllers
             }
 
             // Aggiorna le proprietà
-            var denominazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(denominazione);
-            var normalizzazioneSeparata = FunzioniTrasversali.ExtractToponimoAndCivico(normalizzazione);
-            var denominazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(denominazioneSeparata.Toponimo);
-            var normalizzazioneNormalizzata = FunzioniTrasversali.NormalizeToponimo(normalizzazioneSeparata.Toponimo);
-
-            if (!string.IsNullOrWhiteSpace(denominazioneSeparata.CivicoEstratto))
-            {
-                AccountController.logFile.LogInfo($"Civico estratto da toponimo in modifica: '{denominazione}' -> toponimo '{denominazioneSeparata.Toponimo}', civico '{denominazioneSeparata.CivicoEstratto}'.");
-            }
-
-            toponimoEsistente.denominazione = denominazioneSeparata.Toponimo;
-            toponimoEsistente.normalizzazione = string.IsNullOrWhiteSpace(normalizzazioneNormalizzata) ? denominazioneNormalizzata : normalizzazioneNormalizzata;
+            toponimoEsistente.denominazione = denominazione.Trim().ToUpper();
+            toponimoEsistente.normalizzazione = normalizzazione.Trim().ToUpper();
             toponimoEsistente.dataAggiornamento = DateTime.Now;
             // data_creazione non viene modificata
             toponimoEsistente.IdEnte = idEnte;

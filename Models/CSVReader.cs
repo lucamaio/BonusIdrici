@@ -560,11 +560,11 @@ public class CSVReader
 
                 //  a) Variabili di supporto
                 var cod_fisc = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceCodiceFiscale]).ToUpper();
-                var indirizzoUbicazione = indirizzoSeparato.Toponimo;
+                var indirizzoUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIndirizzoUbicazione]).ToUpper();
                 var indirizzoUbicazioneNormalizzato = FunzioniTrasversali.NormalizeToponimo(indirizzoUbicazione);
                 var indirizzoFormattato = FunzioniTrasversali.FormattaIndirizzo(_context, indirizzoUbicazione, cod_fisc, selectedEnteId);
                 
-                string? indirizzoRicavato = !string.IsNullOrWhiteSpace(indirizzoFormattato) ? FunzioniTrasversali.NormalizeToponimo(indirizzoFormattato) : indirizzoUbicazioneNormalizzato;
+                string? indirizzoRicavato = indirizzoFormattato != null ? indirizzoFormattato.ToUpper() : null;
 
                 // Mi ricavo il tipo di toponimo e l'intestazione base
 
@@ -576,12 +576,9 @@ public class CSVReader
 
                 // b) Controllo nel DB se esiste già il toponimo
                 Toponimo? toponimoTrova = toponimi
-                    .FirstOrDefault(s => s.IdEnte == selectedEnteId &&
-                        (s.denominazione == indirizzoUbicazione ||
-                         FunzioniTrasversali.NormalizeToponimo(s.denominazione) == indirizzoUbicazioneNormalizzato ||
-                         FunzioniTrasversali.NormalizeToponimo(s.normalizzazione) == indirizzoUbicazioneNormalizzato));
+                    .FirstOrDefault(s => s.denominazione == indirizzoUbicazione && s.IdEnte == selectedEnteId);
 
-                if (toponimoTrova == null)
+                if (false && toponimoTrova == null)
                 {
                     var candidatiCompatibili = toponimi
                         .Where(s => s.IdEnte == selectedEnteId &&
@@ -617,14 +614,12 @@ public class CSVReader
 
                         // mi ricavo il tipo di toponimo e l'intestazione in forma normale
 
-                        (string? tipoToponimoNormale, string? intestazioneNormale) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(toponimoTrova.normalizzazione ?? "");
-                        toponimoTrova.intestazioneNormalizzata = intestazioneNormale;
                         toponimoTrova.dataAggiornamento = DateTime.Now;
                         datiComplessivi.ToponimiDaAggiornare.Add(toponimoTrova);
                     }
 
                     // d) Verifico se il tipo di toponimo è cambiato e lo aggiorno
-                    if (tipoToponimo != null && toponimoTrova.tipoToponimo != tipoToponimo)
+                    if (false && tipoToponimo != null && toponimoTrova.tipoToponimo != tipoToponimo)
                     {
                         toponimoTrova.tipoToponimo = tipoToponimo;
                         toponimoTrova.dataAggiornamento = DateTime.Now;
@@ -634,12 +629,10 @@ public class CSVReader
                 }
                 else
                 {
-                    var toponimoLista = datiComplessivi.Toponimi?.FirstOrDefault(t => t.IdEnte == selectedEnteId &&
-                        (t.denominazione == indirizzoUbicazione ||
-                         FunzioniTrasversali.NormalizeToponimo(t.denominazione) == indirizzoUbicazioneNormalizzato ||
-                         FunzioniTrasversali.NormalizeToponimo(t.normalizzazione) == indirizzoUbicazioneNormalizzato));
+                    var toponimoLista = datiComplessivi.Toponimi?
+                        .FirstOrDefault(t => t.denominazione == indirizzoUbicazione && t.IdEnte == selectedEnteId);
 
-                    if (toponimoLista == null && datiComplessivi.Toponimi != null)
+                    if (false && toponimoLista == null && datiComplessivi.Toponimi != null)
                     {
                         var candidatiCompatibiliLista = datiComplessivi.Toponimi
                             .Where(t => t.IdEnte == selectedEnteId &&
@@ -666,12 +659,10 @@ public class CSVReader
                         {
                             toponimoLista.normalizzazione = indirizzoRicavato;
                             // mi ricavo il tipo di toponimo e l'intestazione in forma normale
-                            (string? tipoToponimoNormale, string? intestazioneNormale) = FunzioniTrasversali.AnalizzaIndirizzoPerToponimo(toponimoLista.normalizzazione ?? "");
-                            toponimoLista.intestazioneNormalizzata = intestazioneNormale;
                             toponimoLista.dataAggiornamento = DateTime.Now;
                         }
 
-                        if (tipoToponimo != null && toponimoLista.tipoToponimo != tipoToponimo)
+                        if (false && tipoToponimo != null && toponimoLista.tipoToponimo != tipoToponimo)
                         {
                             toponimoLista.tipoToponimo = tipoToponimo;
                             toponimoLista.dataAggiornamento = DateTime.Now;
@@ -684,8 +675,6 @@ public class CSVReader
                         var nuovoToponimo = new Toponimo
                         {
                             denominazione = indirizzoUbicazione,
-                            tipoToponimo = tipoToponimo,
-                            intestazione = intestazione,
                             IdEnte = selectedEnteId,
                             dataCreazione = DateTime.Now,
                             normalizzazione = indirizzoRicavato // valorizzo subito se disponibile
@@ -715,7 +704,7 @@ public class CSVReader
                 var idAcquedottoImport = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceIdAcquedotto]);
                 if (string.IsNullOrWhiteSpace(idAcquedottoImport))
                 {
-                    idAcquedottoImport = CreaChiaveAlternativaUtenza(cod_fisc, FunzioniTrasversali.rimuoviVirgolette(campi[IndiceMatricolaContatore]), indirizzoUbicazione, indirizzoSeparato.NumeroCivico);
+                    idAcquedottoImport = CreaChiaveAlternativaUtenza(cod_fisc, FunzioniTrasversali.rimuoviVirgolette(campi[IndiceMatricolaContatore]), indirizzoUbicazione, FunzioniTrasversali.FormattaNumeroCivico(campi[IndiceNumeroCivico]));
                 }
 
                 var utenza = new UtenzaIdrica
@@ -726,7 +715,7 @@ public class CSVReader
                     periodoFinale = FunzioniTrasversali.ConvertiData(FunzioniTrasversali.rimuoviVirgolette(campi[IndicePeriodoFinale])),
                     matricolaContatore = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceMatricolaContatore]).ToUpper(),
                     indirizzoUbicazione = indirizzoUbicazione,
-                    numeroCivico = (indirizzoSeparato.NumeroCivico ?? string.Empty).ToUpper(),
+                    numeroCivico = FunzioniTrasversali.FormattaNumeroCivico(campi[IndiceNumeroCivico]).ToUpper(),
                     subUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceSubUbicazione]).ToUpper(),
                     scalaUbicazione = FunzioniTrasversali.rimuoviVirgolette(campi[IndiceScalaUbicazione]),
                     piano = FunzioniTrasversali.rimuoviVirgolette(campi[IndicePiano]),

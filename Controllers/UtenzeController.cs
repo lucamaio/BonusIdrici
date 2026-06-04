@@ -454,7 +454,7 @@ namespace Controllers
                 }
 
                 // Associazione utenze senza idToponimo
-                var utenzeTopNull = _context.UtenzeIdriche.Where(s => s.idToponimo == null && s.IdEnte == selectedEnteId).ToList();
+                var utenzeTopNull = new List<UtenzaIdrica>();
 
                 if (utenzeTopNull.Count > 0)
                 {

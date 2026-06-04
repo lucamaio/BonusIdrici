@@ -11,7 +11,7 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(20); // Timeout di 20 minuti
+    options.IdleTimeout = TimeSpan.FromMinutes(45); // Timeout di 45 minuti
     options.Cookie.HttpOnly = true;                // Non accessibile da JS
     options.Cookie.IsEssential = true;             // Necessario per GDPR
     options.Cookie.Name = ".BonusIdrici.Session";  // Nome personalizzato cookie
