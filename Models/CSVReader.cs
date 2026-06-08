@@ -335,7 +335,7 @@ public class CSVReader
         // Parte 1: Creazione della variabile da restituire e apertura file di log
 
         var datiComplessivi = new DatiCsvCompilati();
-        FileLog logFile = new FileLog($"wwwroot/log/Lettura_UtenzeIdriche.log");  // Creo/Apro il file di log
+        FileLog logFile = new FileLog($"wwwroot/log/Elaborazione_Utenze.log");  // Creo/Apro il file di log
         List<string> errori = new List<string>();
         List<string> warning = new List<string>();
         // Inizializzo una variabile per tenere traccia del numero di Indirizzi mal formati trovatti
@@ -346,7 +346,31 @@ public class CSVReader
         {
             // Leggo il numero righe da processare escludendo l'intestazione
 
-            var righe = File.ReadAllLines(percorsoFile).Skip(1);
+            var righeFile = File.ReadAllLines(percorsoFile);
+            var intestazioni = righeFile.FirstOrDefault()?
+                .Split(CsvDelimiter)
+                .Select(NormalizzaIntestazioneCsv)
+                .ToList() ?? new List<string>();
+            var righe = righeFile.Skip(1);
+
+            int IndiceIdAcquedotto = TrovaIndiceColonna(intestazioni, 0, "IDAcquedotto");
+            int IndiceStato = TrovaIndiceColonna(intestazioni, 9, "Stato");
+            int IndiceMatricolaContatore = TrovaIndiceColonna(intestazioni, 12, "MatContatore");
+            int IndicePeriodoIniziale = TrovaIndiceColonna(intestazioni, 13, "PeriodoInizio");
+            int IndicePeriodoFinale = TrovaIndiceColonna(intestazioni, 14, "PeriodoFine");
+            int IndiceIndirizzoUbicazione = TrovaIndiceColonna(intestazioni, 16, "ToponimiUbiDescrizione");
+            int IndiceNumeroCivico = TrovaIndiceColonna(intestazioni, 17, "NCivico");
+            int IndiceSubUbicazione = TrovaIndiceColonna(intestazioni, 18, "Sub");
+            int IndiceScalaUbicazione = TrovaIndiceColonna(intestazioni, 19, "Scala");
+            int IndicePiano = TrovaIndiceColonna(intestazioni, 20, "Piano");
+            int IndiceInterno = TrovaIndiceColonna(intestazioni, 21, "Interno");
+            int IndiceTipoUtenza = TrovaIndiceColonna(intestazioni, 27, "CategoriaDDesCategoria", "TipoUtenzaDom");
+            int IndiceCognome = TrovaIndiceColonna(intestazioni, 33, "AnagraficaCognome");
+            int IndiceNome = TrovaIndiceColonna(intestazioni, 34, "AnagraficaNome");
+            int IndiceSesso = TrovaIndiceColonna(intestazioni, 35, "Sesso");
+            int IndiceDataNascita = TrovaIndiceColonna(intestazioni, 36, "DataNascita");
+            int IndiceCodiceFiscale = TrovaIndiceColonna(intestazioni, 37, "CodiceFiscale");
+            int IndicePartitaIva = TrovaIndiceColonna(intestazioni, 38, "PartitaIVA");
 
             // Imposto la riga corrente ad 1 
             int rigaCorrente = 1;
@@ -400,24 +424,6 @@ public class CSVReader
                     continue;
                 }
 
-                const int IndiceIdAcquedotto = 0;
-                const int IndiceStato = 9;
-                const int IndiceMatricolaContatore = 12;
-                const int IndicePeriodoIniziale = 13;
-                const int IndicePeriodoFinale = 14;
-                const int IndiceIndirizzoUbicazione = 16;
-                const int IndiceNumeroCivico = 17;
-                const int IndiceSubUbicazione = 18;
-                const int IndiceScalaUbicazione = 19;
-                const int IndicePiano = 20;
-                const int IndiceInterno = 21;
-                const int IndiceTipoUtenza = 27;
-                const int IndiceCognome = 33;
-                const int IndiceNome = 34;
-                const int IndiceSesso = 35;
-                const int IndiceDataNascita = 36;
-                const int IndiceCodiceFiscale = 37;
-                const int IndicePartitaIva = 38;
 
                 // c) Verifico che esiste il campo idAcquedotto è presente
 
@@ -575,6 +581,13 @@ public class CSVReader
                 int? idToponimo = null;
 
                 // b) Controllo nel DB se esiste già il toponimo
+                /*
+                 * Logica legacy mantenuta per fallback. La nuova normalizzazione
+                 * deve usare VieEnte e IndirizziNormalizzati.
+                 *
+                 * Questo blocco continua a cercare Toponomi esistenti durante
+                 * l'import utenze, cosi da mantenere attivo il comportamento storico.
+                 */
                 Toponimo? toponimoTrova = toponimi
                     .FirstOrDefault(s => s.denominazione == indirizzoUbicazione && s.IdEnte == selectedEnteId);
 
@@ -615,6 +628,7 @@ public class CSVReader
                         // mi ricavo il tipo di toponimo e l'intestazione in forma normale
 
                         toponimoTrova.dataAggiornamento = DateTime.Now;
+                        // Logica legacy mantenuta per fallback. La nuova normalizzazione deve usare VieEnte e IndirizziNormalizzati.
                         datiComplessivi.ToponimiDaAggiornare.Add(toponimoTrova);
                     }
 
@@ -623,6 +637,7 @@ public class CSVReader
                     {
                         toponimoTrova.tipoToponimo = tipoToponimo;
                         toponimoTrova.dataAggiornamento = DateTime.Now;
+                        // Logica legacy mantenuta per fallback. La nuova normalizzazione deve usare VieEnte e IndirizziNormalizzati.
                         datiComplessivi.ToponimiDaAggiornare.Add(toponimoTrova);
                     }
 
@@ -672,6 +687,13 @@ public class CSVReader
                     else
                     {
                         // Caso: completamente nuovo → lo aggiungo alla lista
+                        /*
+                         * Logica legacy mantenuta per fallback. La nuova normalizzazione
+                         * deve usare VieEnte e IndirizziNormalizzati.
+                         *
+                         * La creazione del Toponimo resta attiva per compatibilita
+                         * con il flusso precedente dell'import utenze.
+                         */
                         var nuovoToponimo = new Toponimo
                         {
                             denominazione = indirizzoUbicazione,
@@ -734,6 +756,13 @@ public class CSVReader
                     IdDichiarante = idDichiarante,
                 };
 
+                /*
+                 * Logica legacy mantenuta per fallback. La nuova normalizzazione
+                 * deve usare VieEnte e IndirizziNormalizzati.
+                 *
+                 * Il collegamento idToponimo sull'utenza resta attivo per non
+                 * rompere report e controlli che dipendono dalla tabella Toponomi.
+                 */
                 if (idToponimo != null)
                 {
                     utenza.idToponimo = idToponimo;
@@ -878,6 +907,13 @@ public class CSVReader
                         aggiornare = true;
                     }
 
+                    /*
+                     * Logica legacy mantenuta per fallback. La nuova normalizzazione
+                     * deve usare VieEnte e IndirizziNormalizzati.
+                     *
+                     * L'aggiornamento dell'idToponimo resta attivo per compatibilita
+                     * con la precedente normalizzazione basata su Toponomi.
+                     */
                     if (utenzaEsistente.idToponimo != null && utenza.idToponimo != null && utenzaEsistente.idToponimo != utenza.idToponimo)
                     {
                         // countVariazioneToponomi++;
@@ -1690,6 +1726,31 @@ public class CSVReader
         }
 
         return datiComplessivi;
+    }
+
+    private static int TrovaIndiceColonna(IReadOnlyList<string> intestazioni, int indiceFallback, params string[] nomiColonna)
+    {
+        foreach (var nomeColonna in nomiColonna)
+        {
+            var nomeNormalizzato = NormalizzaIntestazioneCsv(nomeColonna);
+            for (int i = 0; i < intestazioni.Count; i++)
+            {
+                if (string.Equals(intestazioni[i], nomeNormalizzato, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+        }
+
+        return indiceFallback;
+    }
+
+    private static string NormalizzaIntestazioneCsv(string? intestazione)
+    {
+        return FunzioniTrasversali.rimuoviVirgolette(intestazione)
+            .Trim()
+            .Replace(" ", string.Empty)
+            .ToUpperInvariant();
     }
 
     private static DichiaranteSnapshot CreaSnapshot(Dichiarante dichiarante, int annoRiferimento, int meseRiferimento)

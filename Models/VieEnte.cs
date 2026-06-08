@@ -1,48 +1,64 @@
-// using System;
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using Controllers;
 
 namespace Models
 {
-    /*
-      
-    */
     public class VieEnte
     {
-        // Chiave primaria
         [Key]
-        public int? id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public required string denominazione { get; set; }
+        public int IdEnte { get; set; }
 
-        public required string tipoVia { get; set; }    
-
-        // Date di creazione e aggiornamento - tengo traccia delle operazioni di inserimento e modifica dei dati
-        
-        public DateTime? dataCreazione { get; set; }
-
-        public DateTime? dataAggiornamento { get; set; }
-
-
-        // Ente a cui appartiene il toponimo
         [Required]
-        public required int IdEnte { get; set; }
+        public required string DenominazioneOriginale { get; set; }
 
-        // Relazione con il toponimo - ovvero con l'indirizzo normalizzato
-        
         [Required]
-        public required int IdIndirizzoNormalizzato { get; set; }
-        
+        public required string DenominazionePulita { get; set; }
 
-        // Funzione che restiuisce i tipi di vie validi
+        public string? DenominazioneNormalizzataProposta { get; set; }
 
-        
-        private static List<string> tipiVieEnteValidi = new List<string>
+        [Required]
+        public required string TipologiaVia { get; set; }
+
+        public string? CivicoEstratto { get; set; }
+
+        [Required]
+        public required string Fonte { get; set; }
+
+        public int Occorrenze { get; set; }
+
+        [Required]
+        public required string Stato { get; set; }
+
+        public int? IdIndirizzoNormalizzato { get; set; }
+
+        public DateTime? DataCreazione { get; set; }
+
+        public DateTime? DataAggiornamento { get; set; }
+
+        [Required]
+        public int IdUser { get; set; }
+
+        public string? Note { get; set; }
+
+        public IndirizzoNormalizzato? IndirizzoNormalizzato { get; set; }
+
+        private static readonly List<string> tipiVieEnteValidi = new()
         {
-            "Via","Vicolo","Largo","Piazza","Viale","Corso","Viadotto","Strada","Piazzetta","Parco","Contrada"
+            "Via", "Vicolo", "Largo", "Piazza", "Viale", "Corso", "Viadotto", "Strada", "Piazzetta", "Parco", "Contrada"
+        };
+
+        private static readonly List<string> fontiValide = new()
+        {
+            "ANAGRAFE", "UTENZE", "ANAGRAFE_SNAPSHOT", "UTENZE_SNAPSHOT"
+        };
+
+        private static readonly List<string> statiValidi = new()
+        {
+            "DA_ANALIZZARE", "PROPOSTA", "COLLEGATA", "AMBIGUA", "SCARTATA"
         };
 
         public static List<string> GetTipiVieEnteValidi()
@@ -50,39 +66,83 @@ namespace Models
             return tipiVieEnteValidi;
         }
 
-        private static bool IsTipoViaEnteValido(string tipo)
+        public static List<string> GetFontiValide()
         {
-            return tipiVieEnteValidi.Contains(tipo);
+            return fontiValide;
         }
 
-        // Funzione ToString per visualizzare la via in modo leggibile
-        public override string ToString()
+        public static List<string> GetStatiValidi()
         {
-            return $"{denominazione} ({tipoVia}, IdEnte: {IdEnte}, IdIndirizzoNormalizzato: {IdIndirizzoNormalizzato})";
+            return statiValidi;
+        }
+
+        [NotMapped]
+        public int? id
+        {
+            get => Id == 0 ? null : Id;
+            set => Id = value ?? 0;
+        }
+
+        [NotMapped]
+        public string denominazione
+        {
+            get => DenominazioneOriginale;
+            set
+            {
+                DenominazioneOriginale = value;
+                DenominazionePulita = string.IsNullOrWhiteSpace(DenominazionePulita) ? value : DenominazionePulita;
+            }
+        }
+
+        [NotMapped]
+        public string tipoVia
+        {
+            get => TipologiaVia;
+            set => TipologiaVia = value;
+        }
+
+        [NotMapped]
+        public DateTime? dataCreazione
+        {
+            get => DataCreazione;
+            set => DataCreazione = value;
+        }
+
+        [NotMapped]
+        public DateTime? dataAggiornamento
+        {
+            get => DataAggiornamento;
+            set => DataAggiornamento = value;
         }
 
         [SetsRequiredMembers]
         public VieEnte()
         {
-            denominazione = string.Empty;
-            tipoVia = string.Empty;
-            IdEnte = 0;
-            IdIndirizzoNormalizzato = 0;
-            this.dataCreazione = DateTime.Now;
-            this.dataAggiornamento = null;
+            DenominazioneOriginale = string.Empty;
+            DenominazionePulita = string.Empty;
+            TipologiaVia = string.Empty;
+            Fonte = "UTENZE";
+            Stato = "DA_ANALIZZARE";
+            Occorrenze = 1;
+            DataCreazione = DateTime.Now;
+            DataAggiornamento = null;
         }
 
         [SetsRequiredMembers]
         public VieEnte(int id, string denominazione, string tipoVia, int idEnte, int idIndirizzoNormalizzato)
+            : this()
         {
-            this.id = id;
-            this.denominazione = denominazione;
-            this.tipoVia = IsTipoViaEnteValido(tipoVia) ? tipoVia : throw new ArgumentException($"Tipo di via non valido: {tipoVia}");
-            this.IdEnte = idEnte;
-            this.IdIndirizzoNormalizzato = idIndirizzoNormalizzato;
-            this.dataCreazione = DateTime.Now;
-            this.dataAggiornamento = null;
+            Id = id;
+            IdEnte = idEnte;
+            DenominazioneOriginale = denominazione;
+            DenominazionePulita = denominazione;
+            TipologiaVia = tipoVia;
+            IdIndirizzoNormalizzato = idIndirizzoNormalizzato;
         }
 
+        public override string ToString()
+        {
+            return $"{DenominazioneOriginale} ({TipologiaVia}, IdEnte: {IdEnte}, IdIndirizzoNormalizzato: {IdIndirizzoNormalizzato})";
+        }
     }
 }

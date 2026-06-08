@@ -175,6 +175,50 @@ namespace Controllers
             return View("Show", viewModelList);
         }
 
+        public IActionResult Snapshot(int selectedEnteId)
+        {
+            if (!VerificaSessione())
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (selectedEnteId == 0 || !_context.Enti.AsNoTracking().Any(e => e.id == selectedEnteId))
+            {
+                ViewBag.Enti = _cache.GetOrCreate(
+                    "enti:all",
+                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                    AppCacheService.EntiExpiration);
+                ViewBag.Message = "Per favore, seleziona un ente valido.";
+                return View("Index", "Utenze");
+            }
+
+            var snapshot = _context.UtenzeIdricheSnapshot
+                .AsNoTracking()
+                .Where(s => s.IdEnte == selectedEnteId)
+                .GroupBy(s => new { s.IdEnte, s.AnnoRiferimento, s.MeseRiferimento })
+                .Select(g => new SnapshotSummaryViewModel
+                {
+                    IdEnte = g.Key.IdEnte,
+                    AnnoRiferimento = g.Key.AnnoRiferimento,
+                    MeseRiferimento = g.Key.MeseRiferimento,
+                    NumeroRecord = g.Count(),
+                    PrimaImportazione = g.Min(s => s.DataImportazione),
+                    UltimaImportazione = g.Max(s => s.DataImportazione)
+                })
+                .OrderByDescending(s => s.AnnoRiferimento)
+                .ThenByDescending(s => s.MeseRiferimento)
+                .ToList();
+
+            ViewBag.SelectedEnteId = selectedEnteId;
+            ViewBag.SelectedEnteNome = _cache.GetOrCreate(
+                $"enti:detail:{selectedEnteId}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == selectedEnteId),
+                AppCacheService.EntiExpiration)?.nome ?? "Ente Sconosciuto";
+
+            return View("Snapshot", snapshot);
+        }
+
         // Pagina 3: Pagina che consente l'inserimento di una nuova utenza
         public IActionResult Create(int idEnte)
         {
@@ -373,26 +417,17 @@ namespace Controllers
                     {
                         bool datiPresenti = false;
 
-                        /*
-                        * LOGICA DISATTIVATA - NUOVO MODELLO INDIRIZZI
-                        *
-                        * In precedenza, durante il caricamento delle utenze idriche,
-                        * venivano creati automaticamente nuovi Toponomi partendo
-                        * dagli indirizzi presenti nel file CSV.
-                        *
-                        * Questa logica non è più corretta, perché gli indirizzi delle utenze
-                        * possono essere sporchi, abbreviati o contenere il numero civico
-                        * nel campo indirizzo.
-                        *
-                        * Con la nuova architettura:
-                        * - l'import delle utenze deve salvare utenze e snapshot;
-                        * - eventuali vie/indirizzi rilevati dovranno essere raccolti
-                        *   in una tabella dedicata, ad esempio VieRilevate/VieComunali;
-                        * - la creazione degli IndirizziNormalizzati dovrà avvenire
-                        *   tramite procedura separata avviata dall'admin.
-                        */
 
                         /*
+                         * LOGICA LEGACY TOPONOMI - MANTENUTA PER COMPATIBILITA E FALLBACK
+                         *
+                         * Questa sezione rappresenta la vecchia logica di gestione dei Toponomi.
+                         * Durante l'import delle utenze idriche, il sistema continua a creare
+                         * record nella tabella Toponomi partendo dagli indirizzi presenti nel CSV.
+                         *
+                         * La nuova normalizzazione deve usare VieEnte e IndirizziNormalizzati,
+                         * ma questa logica resta attiva per garantire il comportamento precedente.
+                         */
                         if (datiComplessivi.Toponimi.Count > 0)
                         {
                             datiPresenti = true;
@@ -401,17 +436,15 @@ namespace Controllers
                                 _context.Toponomi.Add(top);
                             }
                         }
-                        */
+
 
                         /*
-                        * LOGICA DISATTIVATA - AGGIORNAMENTO TOPONIMI DURANTE IMPORT
-                        *
-                        * L'import delle utenze non deve modificare i Toponomi esistenti.
-                        * Eventuali correzioni/normalizzazioni devono essere gestite
-                        * tramite l'iter amministrativo dedicato.
-                        */
-
-                        /*
+                         * LOGICA LEGACY TOPONOMI - MANTENUTA PER COMPATIBILITA E FALLBACK
+                         *
+                         * Gli aggiornamenti dei Toponomi rimangono attivi per non rompere
+                         * il flusso precedente dell'import utenze. La nuova strada principale
+                         * per le normalizzazioni sara basata su VieEnte e IndirizziNormalizzati.
+                         */
                         if (datiComplessivi.ToponimiDaAggiornare.Count > 0)
                         {
                             datiPresenti = true;
@@ -421,7 +454,6 @@ namespace Controllers
                                 _context.Toponomi.Update(top);
                             }
                         }
-                        */
 
                         // Inserimento nuove utenze idriche
                         if (datiComplessivi.UtenzeIdriche.Count > 0)

@@ -1,0 +1,90 @@
+@model IEnumerable<Models.ViewModels.SnapshotSummaryViewModel>
+
+@{
+    ViewData["Title"] = "Snapshot Anagrafe";
+    var selectedEnteId = ViewBag.SelectedEnteId;
+    var selectedEnteNome = ViewBag.SelectedEnteNome;
+}
+
+<main class="data-page">
+    <section class="data-hero data-hero-green">
+        <div>
+            <p>Snapshot anagrafe</p>
+            <h1>@selectedEnteNome</h1>
+            <span>ID Ente: @selectedEnteId</span>
+        </div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("Show", "Anagrafe", new { selectedEnteId = selectedEnteId })" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Anagrafe</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio snapshot</p>
+                <h2>Fotografie anagrafiche importate</h2>
+            </div>
+            <span>Elenco raggruppato per mese e anno di riferimento</span>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive w-100">
+                <table id="snapshotAnagrafeTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Periodo</th>
+                            <th class="text-end">Record</th>
+                            <th>Prima importazione</th>
+                            <th>Ultima importazione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@item.MeseRiferimento.ToString("D2")/@item.AnnoRiferimento</strong>
+                                        <span>ID Ente @item.IdEnte</span>
+                                    </div>
+                                </td>
+                                <td class="text-end"><span class="data-code">@item.NumeroRecord</span></td>
+                                <td>@item.PrimaImportazione.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.UltimaImportazione.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessuna snapshot trovata</strong>
+                <span>Non risultano fotografie anagrafiche importate per l'ente selezionato.</span>
+            </div>
+        }
+    </section>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#snapshotAnagrafeTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>'
+            });
+        });
+    </script>
+}

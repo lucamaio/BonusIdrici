@@ -1,74 +1,102 @@
-// using System;
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using Controllers;
 
 namespace Models
 {
-    /*
-       
-
-    */
     public class IndirizzoNormalizzato
     {
-        // Chiave primaria
         [Key]
-        public int? id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public required string denominazione { get; set; }
+        public int IdEnte { get; set; }
 
-        public required string stato { get; set; }    
+        [Required]
+        public required string DenominazioneNormalizzata { get; set; }
 
-        // Date
+        public DateTime? DataCreazione { get; set; }
 
-        public DateTime? dataCreazione { get; set; }
+        public DateTime? DataAggiornamento { get; set; }
 
-        public DateTime? dataAggiornamento { get; set; }
+        [Required]
+        public int IdUser { get; set; }
 
-        // Valori possibili per lo stato del toponimo
+        public bool Attivo { get; set; }
 
-        private static List<string> statiToponimoValidi = new List<string>
+        public string? Note { get; set; }
+
+        public List<VieEnte> VieEnte { get; set; } = new();
+
+        [NotMapped]
+        public int? id
         {
-            "Da verificare","Verificato","Sospeso","Rifiutato"
-        };
-
-        public static List<string> GetStatiToponimoValidi()
-        {
-            return statiToponimoValidi;
+            get => Id == 0 ? null : Id;
+            set => Id = value ?? 0;
         }
 
-        private static bool IsStatoToponimoValido(string stato)
+        [NotMapped]
+        public string denominazione
         {
-            return statiToponimoValidi.Contains(stato);
+            get => DenominazioneNormalizzata;
+            set => DenominazioneNormalizzata = value;
+        }
+
+        [NotMapped]
+        public string stato
+        {
+            get => Attivo ? "Verificato" : "Da verificare";
+            set => Attivo = string.Equals(value, "Verificato", StringComparison.OrdinalIgnoreCase);
+        }
+
+        [NotMapped]
+        public DateTime? dataCreazione
+        {
+            get => DataCreazione;
+            set => DataCreazione = value;
+        }
+
+        [NotMapped]
+        public DateTime? dataAggiornamento
+        {
+            get => DataAggiornamento;
+            set => DataAggiornamento = value;
         }
 
         [SetsRequiredMembers]
         public IndirizzoNormalizzato()
         {
-            denominazione = string.Empty;
-            stato = string.Empty;
+            DenominazioneNormalizzata = string.Empty;
+            Attivo = true;
+            DataCreazione = DateTime.Now;
+            DataAggiornamento = null;
         }
 
         [SetsRequiredMembers]
-        public IndirizzoNormalizzato(string denominazione, string stato)
+        public IndirizzoNormalizzato(string denominazioneNormalizzata, int idEnte, int idUser, string? note = null)
         {
-            this.denominazione = denominazione;
-            this.stato = IsStatoToponimoValido(stato) ? stato : throw new ArgumentException($"Stato del toponimo non valido: {stato}");
-            this.dataCreazione = DateTime.Now;
-            this.dataAggiornamento = null;
+            IdEnte = idEnte;
+            DenominazioneNormalizzata = denominazioneNormalizzata;
+            IdUser = idUser;
+            Attivo = true;
+            Note = note;
+            DataCreazione = DateTime.Now;
+            DataAggiornamento = null;
         }
 
-        // Costruttore con validazione dello stato del toponimo
+        [SetsRequiredMembers]
+        public IndirizzoNormalizzato(string denominazioneNormalizzata, string stato)
+            : this()
+        {
+            DenominazioneNormalizzata = denominazioneNormalizzata;
+            this.stato = stato;
+        }
+
         [SetsRequiredMembers]
         public IndirizzoNormalizzato(int id, string denominazione, string stato)
+            : this(denominazione, stato)
         {
-            this.id = id;
-            this.denominazione = denominazione;
-            this.stato = IsStatoToponimoValido(stato) ? stato : throw new ArgumentException($"Stato del toponimo non valido: {stato}");
-            this.dataCreazione = DateTime.Now;
-            this.dataAggiornamento = null;
+            Id = id;
         }
     }
 }

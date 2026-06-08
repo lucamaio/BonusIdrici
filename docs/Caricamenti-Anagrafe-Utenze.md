@@ -211,7 +211,7 @@ Questo passaggio recupera casi in cui il toponimo e' stato creato nello stesso c
 Log principali:
 
 - `wwwroot/log/Elaborazione_Anagrafe.log`;
-- `wwwroot/log/Lettura_UtenzeIdriche.log`.
+- `wwwroot/log/Elaborazione_Utenze.log`.
 
 I messaggi mostrati all'utente riportano:
 

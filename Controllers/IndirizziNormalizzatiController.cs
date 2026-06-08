@@ -20,18 +20,20 @@ namespace Controllers
         private readonly ApplicationDbContext _context; // Inietta il DbContext
         private readonly AppCacheService _cache;
         private readonly IndirizziService _indirizziService;
+        private readonly VieEnteService _vieEnteService;
         private readonly FileLog _logIndirizzi = new FileLog("wwwroot/log/IndirizziNormalizzati.log");
 
          private string? ruolo;
         private int? idUser;
         private string? username;
 
-        public IndirizziNormalizzatiController(ILogger<IndirizziNormalizzatiController> logger, ApplicationDbContext context, AppCacheService cache, IndirizziService indirizziService)
+        public IndirizziNormalizzatiController(ILogger<IndirizziNormalizzatiController> logger, ApplicationDbContext context, AppCacheService cache, IndirizziService indirizziService, VieEnteService vieEnteService)
         {
             _logger = logger;
             _context = context;
             _cache = cache;
             _indirizziService = indirizziService;
+            _vieEnteService = vieEnteService;
 
             if (VerificaSessione())
             {
@@ -138,20 +140,28 @@ namespace Controllers
                 return View("Index", "Toponomi");
             }
             // Mi ricavo gli indirizzi normalizzati relativi all'ente selezionato
-            List<IndirizzoNormalizzato> indirizziNormalizzati = _context.IndirizzoNormalizzato
+            List<IndirizzoNormalizzato> indirizziNormalizzati = _context.IndirizziNormalizzati
                 .AsNoTracking()
-                .Where(i => _context.ViaEnte.Any(v => v.IdIndirizzoNormalizzato == i.id && v.IdEnte == selectedEnteId))
+                .Where(i => i.IdEnte == selectedEnteId)
+                .OrderBy(i => i.DenominazioneNormalizzata)
                 .ToList();
+
+            var vieEnte = IsAdminPrincipale()
+                ? _context.VieEnte.AsNoTracking()
+                    .Where(v => v.IdEnte == selectedEnteId)
+                    .OrderBy(v => v.DenominazionePulita)
+                    .ThenBy(v => v.Fonte)
+                    .ToList()
+                : new List<VieEnte>();
 
             ViewBag.selectedEnteId = selectedEnteId;
             ViewBag.IndirizziNormalizzati = indirizziNormalizzati;
-            ViewBag.VieEnte = IsAdminPrincipale()
-                ? _context.ViaEnte.AsNoTracking()
-                    .Where(v => v.IdEnte == selectedEnteId)
-                    .OrderBy(v => v.denominazione)
-                    .ThenBy(v => v.tipoVia)
-                    .ToList()
-                : new List<VieEnte>();
+            ViewBag.VieEnte = vieEnte;
+            ViewBag.TotaleVieEnte = vieEnte.Count;
+            ViewBag.VieDaAnalizzare = vieEnte.Count(v => v.Stato == "DA_ANALIZZARE" || v.Stato == "PROPOSTA");
+            ViewBag.VieCollegate = vieEnte.Count(v => v.Stato == "COLLEGATA");
+            ViewBag.VieAmbigue = vieEnte.Count(v => v.Stato == "AMBIGUA");
+            ViewBag.TotaleIndirizziNormalizzati = indirizziNormalizzati.Count;
             ViewBag.NomeEnte = _context.Enti.Where(e => e.id == selectedEnteId).Select(e => e.nome).FirstOrDefault() ?? "N/D";
 
             return View("Show");
@@ -159,150 +169,68 @@ namespace Controllers
         }
 
 
-        public IActionResult PopolaVie(int id)
+        [HttpPost]
+        public async Task<IActionResult> PopolaVieEnte(int selectedEnteId)
         {
             if (!VerificaSessione("ADMIN") || !IsAdminPrincipale())
             {
-                _logIndirizzi.LogWarning($"Utente non autorizzato. Tentativo di generazione vie ente. IdEnte: {id}, Utente: {username}, IdUser: {idUser}");
-
+                _logIndirizzi.LogWarning($"Utente non autorizzato. Tentativo di popolamento VieEnte. IdEnte: {selectedEnteId}, Utente: {username}, IdUser: {idUser}");
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
                 return RedirectToAction("Index", "Home");
             }
 
-            // 1. Verifico che l'ente selezionato sia valido
-            if (id <= 0 || !_context.Enti.Any(e => e.id == id))
+            if (selectedEnteId <= 0 || !await _context.Enti.AnyAsync(e => e.id == selectedEnteId))
             {
-                _logIndirizzi.LogWarning($"Tentativo di generazione indirizzi con ente non valido. IdEnte: {id}, Utente: {username}, IdUser: {idUser}");
-
-                ViewBag.Enti = _cache.GetOrCreate(
-                    "enti:all",
-                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
-                    AppCacheService.EntiExpiration
-                );
-
-                ViewBag.Message = "Per favore, seleziona un ente valido.";
-                return View("Index");
+                TempData["Message"] = "Per favore, seleziona un ente valido.";
+                return RedirectToAction("Index");
             }
 
             try
             {
-                _logIndirizzi.LogInfo($"Avvio generazione vie ente. IdEnte: {id}, Utente: {username}, IdUser: {idUser}");
-
-                // 2. Mi ricavo i toponimi relativi all'ente selezionato
-                var risultati = _indirizziService.RicavaViePerEnte(id);
-
-                // 3. Log del risultato
-                if (risultati == null)
-                {
-                    _logIndirizzi.LogError($"La funzione RicavaViePerEnte ha restituito NULL. IdEnte: {id}, Utente: {username}, IdUser: {idUser}");
-
-                    ViewBag.Message = "Errore durante la generazione degli indirizzi normalizzati.";
-                    return RedirectToAction("Index");
-                }
-
-                if (risultati.Count == 0)
-                {
-                    _logIndirizzi.LogWarning($"La funzione RicavaViePerEnte non ha restituito alcun indirizzo. IdEnte: {id}, Utente: {username}, IdUser: {idUser}");
-                }
-                else
-                {
-                    _logIndirizzi.LogInfo($"Generazione indirizzi normalizzati completata correttamente. IdEnte: {id}, NumeroIndirizzi: {risultati.Count}, Utente: {username}, IdUser: {idUser}");
-
-                    foreach (var via in risultati)
-                    {
-                        _logIndirizzi.LogInfo($"Indirizzo generato - Id: {via.id}, Denominazione: {via.denominazione}, TipoVia: {via.tipoVia}, IdEnte: {via.IdEnte}, IdIndirizzoNormalizzato: {via.IdIndirizzoNormalizzato}");
-                    }
-
-                    using var transaction = _context.Database.BeginTransaction();
-
-                    var indirizziEsistenti = _context.IndirizzoNormalizzato
-                        .ToList()
-                        .GroupBy(i => NormalizzaChiave(i.denominazione))
-                        .ToDictionary(g => g.Key, g => g.First());
-
-                    var vieDaSalvare = risultati
-                        .Where(v => !string.IsNullOrWhiteSpace(v.denominazione))
-                        .GroupBy(v => $"{NormalizzaChiave(v.denominazione)}|{v.tipoVia.ToUpperInvariant()}")
-                        .Select(g => g.First())
-                        .ToList();
-
-                    foreach (var via in vieDaSalvare)
-                    {
-                        var chiaveIndirizzo = NormalizzaChiave(via.denominazione);
-
-                        if (!indirizziEsistenti.ContainsKey(chiaveIndirizzo))
-                        {
-                            var nuovoIndirizzo = new IndirizzoNormalizzato(via.denominazione.Trim().ToUpperInvariant(), "Da verificare");
-                            _context.IndirizzoNormalizzato.Add(nuovoIndirizzo);
-                            indirizziEsistenti.Add(chiaveIndirizzo, nuovoIndirizzo);
-                        }
-                    }
-
-                    _context.SaveChanges();
-
-                    var vieEsistenti = _context.ViaEnte
-                        .Where(v => v.IdEnte == id)
-                        .ToList()
-                        .Select(v => $"{NormalizzaChiave(v.denominazione)}|{v.tipoVia.ToUpperInvariant()}")
-                        .ToHashSet();
-
-                    var vieAggiunte = 0;
-
-                    foreach (var via in vieDaSalvare)
-                    {
-                        var chiaveVia = $"{NormalizzaChiave(via.denominazione)}|{via.tipoVia.ToUpperInvariant()}";
-
-                        if (vieEsistenti.Contains(chiaveVia))
-                        {
-                            continue;
-                        }
-
-                        var indirizzoNormalizzato = indirizziEsistenti[NormalizzaChiave(via.denominazione)];
-
-                        if (!indirizzoNormalizzato.id.HasValue)
-                        {
-                            continue;
-                        }
-
-                        via.IdIndirizzoNormalizzato = indirizzoNormalizzato.id.Value;
-                        via.denominazione = via.denominazione.Trim().ToUpperInvariant();
-                        via.dataCreazione = DateTime.Now;
-                        via.dataAggiornamento = null;
-
-                        _context.ViaEnte.Add(via);
-                        vieEsistenti.Add(chiaveVia);
-                        vieAggiunte++;
-                    }
-
-                    _context.SaveChanges();
-                    transaction.Commit();
-
-                    _logIndirizzi.LogInfo($"Salvate {vieAggiunte} nuove vie sul DB per IdEnte: {id}");
-                }
-
-                TempData["Message"] = "Generazione delle vie ente completata correttamente.";
-
-                return RedirectToAction("Show", new { selectedEnteId = id });
+                var result = await _vieEnteService.PopolaVieEnteAsync(selectedEnteId, idUser ?? 0);
+                _cache.ClearEnteCache(selectedEnteId);
+                TempData["Message"] = $"VieEnte popolate. Analizzate: {result.TotaleAnalizzate}, Nuove: {result.Nuove}, Aggiornate: {result.Aggiornate}, Civici estratti: {result.ConCivicoEstratto}.";
+                return RedirectToAction("Show", new { selectedEnteId });
             }
             catch (Exception ex)
             {
-                _logIndirizzi.LogError($"Errore durante l'esecuzione di RicavaViePerEnte. IdEnte: {id}, Utente: {username}, IdUser: {idUser}, Errore: {ex.Message}");
-                _logger.LogError(
-                    ex,
-                    "Errore durante l'esecuzione di RicavaViePerEnte. IdEnte: {IdEnte}, Utente: {Username}, IdUser: {IdUser}",
-                    id,
-                    username,
-                    idUser
-                );
-
-                ViewBag.Message = "Si è verificato un errore durante la generazione degli indirizzi normalizzati.";
-                return RedirectToAction("Index");
+                _logIndirizzi.LogError($"Errore durante PopolaVieEnte. IdEnte: {selectedEnteId}, Utente: {username}, IdUser: {idUser}, Errore: {ex.Message}");
+                _logger.LogError(ex, "Errore durante PopolaVieEnte. IdEnte: {IdEnte}, Utente: {Username}, IdUser: {IdUser}", selectedEnteId, username, idUser);
+                TempData["Message"] = "Si e verificato un errore durante il popolamento delle VieEnte.";
+                return RedirectToAction("Show", new { selectedEnteId });
             }
         }
 
-        private static string NormalizzaChiave(string? valore)
+        [HttpPost]
+        public async Task<IActionResult> CreaIndirizziNormalizzati(int selectedEnteId)
         {
-            return string.Join(" ", (valore ?? string.Empty).Trim().ToUpperInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries));
+            if (!VerificaSessione("ADMIN") || !IsAdminPrincipale())
+            {
+                _logIndirizzi.LogWarning($"Utente non autorizzato. Tentativo di creazione IndirizziNormalizzati. IdEnte: {selectedEnteId}, Utente: {username}, IdUser: {idUser}");
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (selectedEnteId <= 0 || !await _context.Enti.AnyAsync(e => e.id == selectedEnteId))
+            {
+                TempData["Message"] = "Per favore, seleziona un ente valido.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                var result = await _vieEnteService.CreaIndirizziNormalizzatiAsync(selectedEnteId, idUser ?? 0);
+                _cache.ClearEnteCache(selectedEnteId);
+                TempData["Message"] = $"Indirizzi normalizzati creati. Gruppi: {result.GruppiAnalizzati}, Creati: {result.IndirizziCreati}, Vie collegate: {result.VieCollegate}, Ambigue: {result.VieAmbigue}.";
+                return RedirectToAction("Show", new { selectedEnteId });
+            }
+            catch (Exception ex)
+            {
+                _logIndirizzi.LogError($"Errore durante CreaIndirizziNormalizzati. IdEnte: {selectedEnteId}, Utente: {username}, IdUser: {idUser}, Errore: {ex.Message}");
+                _logger.LogError(ex, "Errore durante CreaIndirizziNormalizzati. IdEnte: {IdEnte}, Utente: {Username}, IdUser: {IdUser}", selectedEnteId, username, idUser);
+                TempData["Message"] = "Si e verificato un errore durante la creazione degli indirizzi normalizzati.";
+                return RedirectToAction("Show", new { selectedEnteId });
+            }
         }
     }
 

@@ -25,13 +25,54 @@
         @if (isAdminPrincipale)
         {
             <div class="data-hero-actions">
-                <a href="@Url.Action("PopolaVie", "IndirizziNormalizzati",  new { id = selectedEnteId })" class="btn data-primary-action">
-                    <i class="bi bi-gear-fill"></i>
-                    <span>Popola le vie dell'ente</span>
-                </a>
+                <form asp-controller="IndirizziNormalizzati" asp-action="PopolaVieEnte" method="post" class="d-inline">
+                    <input type="hidden" name="selectedEnteId" value="@selectedEnteId" />
+                    <button type="submit" class="btn data-primary-action" title="Legge gli indirizzi da anagrafe e utenze e popola la tabella VieEnte">
+                        <i class="bi bi-signpost-split-fill"></i>
+                        <span>Popola Vie Ente</span>
+                    </button>
+                </form>
+                <form asp-controller="IndirizziNormalizzati" asp-action="CreaIndirizziNormalizzati" method="post" class="d-inline">
+                    <input type="hidden" name="selectedEnteId" value="@selectedEnteId" />
+                    <button type="submit" class="btn btn-outline-light" title="Crea e collega le normalizzazioni partendo dalle VieEnte gia raccolte">
+                        <i class="bi bi-link-45deg"></i>
+                        <span>Crea Indirizzi Normalizzati</span>
+                    </button>
+                </form>
             </div>
         }
     </section>
+
+    @if (isAdminPrincipale)
+    {
+        <section class="data-stats-grid">
+            <article class="data-stat-card stat-blue">
+                <i class="bi bi-signpost-split-fill"></i>
+                <span>Totale VieEnte</span>
+                <strong>@ViewBag.TotaleVieEnte</strong>
+            </article>
+            <article class="data-stat-card stat-red">
+                <i class="bi bi-gear-fill"></i>
+                <span>Vie da analizzare</span>
+                <strong>@ViewBag.VieDaAnalizzare</strong>
+            </article>
+            <article class="data-stat-card stat-green">
+                <i class="bi bi-check2-circle"></i>
+                <span>Vie collegate</span>
+                <strong>@ViewBag.VieCollegate</strong>
+            </article>
+            <article class="data-stat-card">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>Vie ambigue</span>
+                <strong>@ViewBag.VieAmbigue</strong>
+            </article>
+            <article class="data-stat-card stat-blue">
+                <i class="bi bi-list-check"></i>
+                <span>Indirizzi normalizzati</span>
+                <strong>@ViewBag.TotaleIndirizziNormalizzati</strong>
+            </article>
+        </section>
+    }
 
     @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
     {
@@ -78,10 +119,14 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Denominazione</th>
-                                <th>Tipo via</th>
+                                <th>Denominazione originale</th>
+                                <th>Denominazione pulita</th>
+                                <th>Tipo</th>
+                                <th>Fonte</th>
+                                <th>Stato</th>
+                                <th>Occorrenze</th>
+                                <th>Civico</th>
                                 <th>ID indirizzo normalizzato</th>
-                                <th>Data creazione</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -91,15 +136,19 @@
                                     <td><span class="data-code">@via.id</span></td>
                                     <td>
                                         <div class="data-main-cell">
-                                            <strong>@via.denominazione</strong>
+                                            <strong>@via.DenominazioneOriginale</strong>
                                             <span>Via ente</span>
                                         </div>
                                     </td>
+                                    <td>@via.DenominazionePulita</td>
                                     <td>
-                                        <span class="data-status status-success">@via.tipoVia</span>
+                                        <span class="data-status status-success">@via.TipologiaVia</span>
                                     </td>
+                                    <td>@via.Fonte</td>
+                                    <td>@via.Stato</td>
+                                    <td>@via.Occorrenze</td>
+                                    <td>@(string.IsNullOrWhiteSpace(via.CivicoEstratto) ? "N/D" : via.CivicoEstratto)</td>
                                     <td><span class="data-code">@via.IdIndirizzoNormalizzato</span></td>
-                                    <td>@via.dataCreazione?.ToString("dd/MM/yyyy")</td>
                                 </tr>
                             }
                         </tbody>

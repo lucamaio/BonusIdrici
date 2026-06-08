@@ -15,16 +15,18 @@ namespace Controllers
         private readonly ILogger<elaborazioneController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly AppCacheService _cache;
+        private readonly INPSReaderNormalizzatoService _inpsReaderNormalizzatoService;
 
         private string? ruolo;
         private int idUser;
         private string? username;
 
-        public elaborazioneController(ILogger<elaborazioneController> logger, ApplicationDbContext context, AppCacheService cache)
+        public elaborazioneController(ILogger<elaborazioneController> logger, ApplicationDbContext context, AppCacheService cache, INPSReaderNormalizzatoService inpsReaderNormalizzatoService)
         {
             _logger = logger;
             _context = context;
             _cache = cache;
+            _inpsReaderNormalizzatoService = inpsReaderNormalizzatoService;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -206,8 +208,23 @@ namespace Controllers
                     
                     idReport = report.id;
                 }            
-                // Leggi il file CSV con classe CSVReaders la quale elabora i dati e genera i risultati
-                var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idReport, confrontoCivico, escludiComponenti, annoReport, meseReport);
+                /*
+                 * LOGICA LEGACY INPS - MANTENUTA COME FALLBACK
+                 *
+                 * La vecchia lettura INPS tramite CSVReader.LeggiFileINPS resta
+                 * commentata per poter tornare rapidamente alla precedente elaborazione.
+                 * La nuova elaborazione usa INPSReaderNormalizzatoService e sostituisce
+                 * esclusivamente il confronto indirizzi tramite VieEnte e IndirizziNormalizzati.
+                 */
+                // var datiComplessivi = CSVReader.LeggiFileINPS(filePath, _context, selectedEnteId, idReport, confrontoCivico, escludiComponenti, annoReport, meseReport);
+                var datiComplessivi = await _inpsReaderNormalizzatoService.LeggiFileINPSNormalizzatoAsync(
+                    filePath,
+                    selectedEnteId,
+                    idReport,
+                    confrontoCivico,
+                    escludiComponenti,
+                    annoReport,
+                    meseReport);
                 AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");
                 using (var transaction = _context.Database.BeginTransaction())
                 {

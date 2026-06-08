@@ -24,7 +24,7 @@ namespace Controllers
         {
             ("Accessi", "Accessi utenti", "Login, logout e tentativi di accesso al sistema.", "bi-person-check", "diag-blue", "wwwroot/log/utenti.log"),
             ("Esportazioni", "Elaborazioni INPS", "Operazioni di elaborazione file INPS e generazione domande.", "bi-file-earmark-bar-graph", "diag-red", "wwwroot/log/Elaborazione_INPS.log"),
-            ("CaricamentoUtenze", "Caricamento utenze", "Importazione e controllo dei flussi utenze idriche.", "bi-droplet-half", "diag-cyan", "wwwroot/log/Lettura_UtenzeIdriche.log"),
+            ("CaricamentoUtenze", "Caricamento utenze", "Importazione e controllo dei flussi utenze idriche.", "bi-droplet-half", "diag-cyan", "wwwroot/log/    .log"),
             ("CaricamentoAnagrafiche", "Caricamento anagrafe", "Importazione e aggiornamento dati anagrafici.", "bi-people", "diag-green", "wwwroot/log/Elaborazione_Anagrafe.log"),
             ("Domande", "Domande e report", "Operazioni sulle domande elaborate e sui report.", "bi-journal-check", "diag-purple", "wwwroot/log/Domande.log"),
             ("Report", "Report applicativi", "Tracciamento tecnico dei report e delle esportazioni.", "bi-clipboard-data", "diag-amber", "wwwroot/log/Report.log")

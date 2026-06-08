@@ -23,6 +23,8 @@ namespace Models
 {
     public class FunzioniTrasversali
     {
+        private static readonly System.Threading.AsyncLocal<Func<string?, string?, string?, string?, bool, Func<string?, string?, string?, string?, bool, bool>, bool>?> ConfrontoIndirizziOverride = new();
+
         private static readonly Dictionary<string, string> Ordinali = new()
         {
             ["I"] = "PRIMO", ["II"] = "SECONDO", ["III"] = "TERZO", ["IV"] = "QUARTO", ["V"] = "QUINTO",
@@ -56,6 +58,13 @@ namespace Models
         public static string FormattaNumeroCivico(string? stringa)
         {
             return NormalizeNumeroCivico(stringa);
+        }
+
+        public static IDisposable UsaConfrontoIndirizziNormalizzato(Func<string?, string?, string?, string?, bool, Func<string?, string?, string?, string?, bool, bool>, bool> confronto)
+        {
+            var precedente = ConfrontoIndirizziOverride.Value;
+            ConfrontoIndirizziOverride.Value = confronto;
+            return new RipristinaConfrontoIndirizzi(() => ConfrontoIndirizziOverride.Value = precedente);
         }
 
         public static (string Toponimo, string? NumeroCivico, string? CivicoEstratto) ExtractToponimoAndCivico(string? indirizzoCompleto, string? numeroCivicoSeparato = null)
@@ -598,6 +607,18 @@ namespace Models
         // Metodo per confrontare due indirizzi (con o senza civico)
         private static bool ConfrontaIndirizzi(string? indirizzo1, string? civico1, string? indirizzo2, string? civico2, bool confrontoCivico)
         {
+            var overrideConfronto = ConfrontoIndirizziOverride.Value;
+
+            if (overrideConfronto != null)
+            {
+                return overrideConfronto(indirizzo1, civico1, indirizzo2, civico2, confrontoCivico, ConfrontaIndirizziLegacy);
+            }
+
+            return ConfrontaIndirizziLegacy(indirizzo1, civico1, indirizzo2, civico2, confrontoCivico);
+        }
+
+        private static bool ConfrontaIndirizziLegacy(string? indirizzo1, string? civico1, string? indirizzo2, string? civico2, bool confrontoCivico)
+        {
             string indirizzoNormalizzato1 = NormalizeToponimo(indirizzo1);
             string indirizzoNormalizzato2 = NormalizeToponimo(indirizzo2);
 
@@ -618,6 +639,28 @@ namespace Models
 
             return string.Equals(indirizzoNormalizzato1, indirizzoNormalizzato2, StringComparison.OrdinalIgnoreCase) ||
                 AreToponimiCompatibili(indirizzo1, indirizzo2);
+        }
+
+        private sealed class RipristinaConfrontoIndirizzi : IDisposable
+        {
+            private readonly Action _ripristina;
+            private bool _disposed;
+
+            public RipristinaConfrontoIndirizzi(Action ripristina)
+            {
+                _ripristina = ripristina;
+            }
+
+            public void Dispose()
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                _ripristina();
+                _disposed = true;
+            }
         }
 
         public static string? FormattaIndirizzo(ApplicationDbContext context, string indirizzo_ubicazione, string codiceFiscale, int IdEnte)

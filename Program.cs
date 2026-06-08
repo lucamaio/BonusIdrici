@@ -39,6 +39,8 @@ builder.Services.Configure<LogCleanupOptions>(
 builder.Services.AddHostedService<LogCleanupHostedService>();
 builder.Services.AddScoped<SectionActivityService>();
 builder.Services.AddScoped<IndirizziService>();
+builder.Services.AddScoped<VieEnteService>();
+builder.Services.AddScoped<INPSReaderNormalizzatoService>();
 builder.Services.AddSingleton<AppCacheService>();
 
 // ✅ Connessione DB

@@ -20,7 +20,9 @@ namespace Data
         public DbSet<UtenzaIdricaSnapshot> UtenzeIdricheSnapshot { get; set; }
         public DbSet<Domanda> Domande { get; set; }
         public DbSet<Toponimo> Toponomi { get; set; }
+        public DbSet<VieEnte> VieEnte { get; set; }
         public DbSet<VieEnte> ViaEnte { get; set; }
+        public DbSet<IndirizzoNormalizzato> IndirizziNormalizzati { get; set; }
         public DbSet<IndirizzoNormalizzato> IndirizzoNormalizzato { get; set; }
         public DbSet<Report> Reports {get; set;}
 
@@ -255,25 +257,56 @@ namespace Data
             // Configurazione per la classe VieEnte
             modelBuilder.Entity<VieEnte>(entity =>
             {
-                entity.ToTable("vie_ente"); // Assicurati che il nome della tabella sia "enti"
-                entity.HasKey(f => f.id); // La chiave primaria è 'id'
-                entity.Property(f => f.denominazione).HasColumnName("denominazione").IsRequired().HasMaxLength(255);
-                entity.Property(f => f.tipoVia).HasColumnName("tipo_via").IsRequired().HasMaxLength(50);
-                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
-                entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.ToTable("vie_ente");
+                entity.HasKey(f => f.Id);
+                entity.Property(f => f.Id).HasColumnName("id");
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
-                entity.Property(f => f.IdIndirizzoNormalizzato).HasColumnName("id_indirizzo_normalizzato").IsRequired(); // Da gestire in quanto alla creazione della via_ente il toponimo potrebbe non essere ancora presente. Valutare se rendere questo campo nullable e gestire la logica di associazione in un secondo momento.
+                entity.Property(f => f.DenominazioneOriginale).HasColumnName("denominazione_originale").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.DenominazionePulita).HasColumnName("denominazione_pulita").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.DenominazioneNormalizzataProposta).HasColumnName("denominazione_normalizzata_proposta").HasMaxLength(255);
+                entity.Property(f => f.TipologiaVia).HasColumnName("tipologia_via").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.CivicoEstratto).HasColumnName("civico_estratto").HasMaxLength(50);
+                entity.Property(f => f.Fonte).HasColumnName("fonte").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.Occorrenze).HasColumnName("occorrenze").IsRequired();
+                entity.Property(f => f.Stato).HasColumnName("stato").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.IdIndirizzoNormalizzato).HasColumnName("id_indirizzo_normalizzato");
+                entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
+                entity.Property(f => f.Note).HasColumnName("note");
+
+                entity.HasIndex(f => new { f.IdEnte, f.DenominazioneOriginale, f.Fonte })
+                    .HasDatabaseName("ix_vie_ente_originale_fonte");
+                entity.HasIndex(f => new { f.IdEnte, f.DenominazionePulita })
+                    .HasDatabaseName("ix_vie_ente_pulita");
+                entity.HasIndex(f => new { f.IdEnte, f.Stato })
+                    .HasDatabaseName("ix_vie_ente_stato");
+                entity.HasIndex(f => f.IdIndirizzoNormalizzato)
+                    .HasDatabaseName("ix_vie_ente_indirizzo_normalizzato");
+
+                entity.HasOne(f => f.IndirizzoNormalizzato)
+                    .WithMany(f => f.VieEnte)
+                    .HasForeignKey(f => f.IdIndirizzoNormalizzato)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Configurazione per la classe IndirizzoNormalizzato
             modelBuilder.Entity<IndirizzoNormalizzato>(entity =>
             {
-                entity.ToTable("indirizzi_normalizzati"); // Assicurati che il nome della tabella sia "enti"
-                entity.HasKey(f => f.id); // La chiave primaria è 'id'
-                entity.Property(f => f.denominazione).HasColumnName("denominazione").IsRequired().HasMaxLength(255);
-                entity.Property(f => f.stato).HasColumnName("stato").IsRequired().HasMaxLength(50);
-                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
-                entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.ToTable("indirizzi_normalizzati");
+                entity.HasKey(f => f.Id);
+                entity.Property(f => f.Id).HasColumnName("id");
+                entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+                entity.Property(f => f.DenominazioneNormalizzata).HasColumnName("denominazione_normalizzata").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.DataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.IdUser).HasColumnName("id_user").IsRequired();
+                entity.Property(f => f.Attivo).HasColumnName("attivo").IsRequired();
+                entity.Property(f => f.Note).HasColumnName("note");
+
+                entity.HasIndex(f => new { f.IdEnte, f.DenominazioneNormalizzata })
+                    .HasDatabaseName("ux_indirizzi_normalizzati_ente_denominazione")
+                    .IsUnique();
             });
 
             // Configurazione per la clase User

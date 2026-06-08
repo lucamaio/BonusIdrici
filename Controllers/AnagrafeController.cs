@@ -162,6 +162,50 @@ namespace Controllers
             return View("Show", viewModelList);
         }
 
+        public IActionResult Snapshot(int selectedEnteId)
+        {
+            if (!VerificaSessione())
+            {
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (selectedEnteId == 0 || !_context.Enti.AsNoTracking().Any(e => e.id == selectedEnteId))
+            {
+                ViewBag.Enti = _cache.GetOrCreate(
+                    "enti:all",
+                    () => _context.Enti.AsNoTracking().OrderBy(e => e.nome).ToList(),
+                    AppCacheService.EntiExpiration);
+                ViewBag.Message = "Per favore, seleziona un ente valido.";
+                return View("Index", "Anagrafe");
+            }
+
+            var snapshot = _context.DichiarantiSnapshot
+                .AsNoTracking()
+                .Where(s => s.IdEnte == selectedEnteId)
+                .GroupBy(s => new { s.IdEnte, s.AnnoRiferimento, s.MeseRiferimento })
+                .Select(g => new SnapshotSummaryViewModel
+                {
+                    IdEnte = g.Key.IdEnte,
+                    AnnoRiferimento = g.Key.AnnoRiferimento,
+                    MeseRiferimento = g.Key.MeseRiferimento,
+                    NumeroRecord = g.Count(),
+                    PrimaImportazione = g.Min(s => s.DataImportazione),
+                    UltimaImportazione = g.Max(s => s.DataImportazione)
+                })
+                .OrderByDescending(s => s.AnnoRiferimento)
+                .ThenByDescending(s => s.MeseRiferimento)
+                .ToList();
+
+            ViewBag.SelectedEnteId = selectedEnteId;
+            ViewBag.SelectedEnteNome = _cache.GetOrCreate(
+                $"enti:detail:{selectedEnteId}",
+                () => _context.Enti.AsNoTracking().FirstOrDefault(e => e.id == selectedEnteId),
+                AppCacheService.EntiExpiration)?.nome ?? "Ente Sconosciuto";
+
+            return View("Snapshot", snapshot);
+        }
+
         // Pagina per la creazione di un nuovo dichiarante
         public IActionResult Create(int idEnte, int? codiceFamiglia, string? codiceIntestarioScheda, string? indirizzoResidenza, string? civico)
         {

@@ -79,12 +79,18 @@ namespace BonusIdrici2.Services
 
             return new VieEnte
             {
-                denominazione = denominazione,
-                tipoVia = RicavaTipoVia(denominazione),
+                DenominazioneOriginale = denominazione,
+                DenominazionePulita = denominazione,
+                DenominazioneNormalizzataProposta = NormalizzaTesto(denominazione),
+                TipologiaVia = RicavaTipoVia(denominazione),
                 IdEnte = idEnte,
-                IdIndirizzoNormalizzato = 0,
-                dataCreazione = DateTime.Now,
-                dataAggiornamento = null
+                IdIndirizzoNormalizzato = null,
+                Fonte = "UTENZE",
+                Occorrenze = 1,
+                Stato = "DA_ANALIZZARE",
+                DataCreazione = DateTime.Now,
+                DataAggiornamento = null,
+                IdUser = 0
             };
         }
 

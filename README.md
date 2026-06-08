@@ -138,7 +138,7 @@ I log principali sono:
 
 - `wwwroot/log/utenti.log`;
 - `wwwroot/log/Elaborazione_Anagrafe.log`;
-- `wwwroot/log/Lettura_UtenzeIdriche.log`;
+- `wwwroot/log/Elaborazione_Utenze.log`;
 - `wwwroot/log/Elaborazione_INPS.log`.
 
 I warning non bloccano sempre il caricamento. Gli errori indicano righe saltate o dati insufficienti.

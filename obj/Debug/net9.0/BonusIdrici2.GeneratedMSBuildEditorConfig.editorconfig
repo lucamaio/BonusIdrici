@@ -72,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcU2hvdy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Snapshot.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcU25hcHNob3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/User000015/Documents/BonusIdrici2/Views/Anagrafe/Upload.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hZ3JhZmVcVXBsb2FkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -218,6 +222,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Show.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXFNob3cuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Snapshot.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRlbnplXFNuYXBzaG90LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User000015/Documents/BonusIdrici2/Views/Utenze/Upload.cshtml]
