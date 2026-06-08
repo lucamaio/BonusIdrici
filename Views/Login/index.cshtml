@@ -54,7 +54,11 @@
                     <label for="password">Password</label>
                     <div class="login-input-wrap">
                         <i class="bi bi-key"></i>
-                        <input type="password" id="password" name="password" autocomplete="current-password" required>
+                        <input type="password" id="password" name="password" autocomplete="current-password" aria-describedby="capsLockWarning" required>
+                    </div>
+                    <div id="capsLockWarning" class="login-caps-warning" role="alert" aria-live="polite" hidden>
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Caps Lock attivo: la password verra inserita in maiuscolo.</span>
                     </div>
                 </div>
 
@@ -66,3 +70,27 @@
         </div>
     </section>
 </main>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('password');
+            const capsLockWarning = document.getElementById('capsLockWarning');
+
+            if (!passwordInput || !capsLockWarning) {
+                return;
+            }
+
+            function updateCapsLockWarning(event) {
+                const isCapsLockActive = event.getModifierState && event.getModifierState('CapsLock');
+                capsLockWarning.hidden = !isCapsLockActive;
+            }
+
+            passwordInput.addEventListener('keydown', updateCapsLockWarning);
+            passwordInput.addEventListener('keyup', updateCapsLockWarning);
+            passwordInput.addEventListener('blur', function () {
+                capsLockWarning.hidden = true;
+            });
+        });
+    </script>
+}

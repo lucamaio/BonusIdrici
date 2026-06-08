@@ -30,6 +30,10 @@ namespace leggiCSV
 
         public List<Report> Reports {get;set;}
 
+        public List<IndirizzoNormalizzato> IndirizziNormalizzati { get; set; }
+
+        public List<VieEnte> VieEnte { get; set; }
+
         public DatiCsvCompilati() // Costruttore per inizializzare le liste
         {
             Dichiaranti = new List<Dichiarante>();
@@ -55,6 +59,9 @@ namespace leggiCSV
             Reports = new List<Report>();
 
             countIndirizziMalFormati = null;
+            
+            IndirizziNormalizzati = new List<IndirizzoNormalizzato>();
+            VieEnte = new List<VieEnte>();
         }
     }
 }

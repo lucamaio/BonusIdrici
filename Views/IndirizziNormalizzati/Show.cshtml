@@ -1,0 +1,255 @@
+@{
+    ViewData["Title"] = "Indirizzi Normalizzati - Ente";
+    List<IndirizzoNormalizzato>? IndirizziNormalizzati = ViewBag.IndirizziNormalizzati;
+    List<VieEnte>? VieEnte = ViewBag.VieEnte;
+    var sectionActivity = ViewBag.SectionActivity as Models.ViewModels.SectionActivitySummaryViewModel;
+    var nomeEnte = ViewBag.NomeEnte as string ?? "Ente";
+    var selectedEnteId = ViewBag.selectedEnteId as int? ?? 0;
+    var isAdminPrincipale = ViewBag.Ruolo == "ADMIN" && ViewBag.idUser == 1;
+}
+
+<main class="data-page">
+
+    
+    @if (sectionActivity != null)
+    {
+        @await Html.PartialAsync("_SectionActivityPanel", sectionActivity)
+    }
+
+    <section class="data-hero data-hero-red">
+        <div>
+            <p>Elaborazioni disponibili</p>
+            <h1>Indirizzi Normalizzati</h1>
+            <span>Ente: @nomeEnte</span>
+        </div>
+        @if (isAdminPrincipale)
+        {
+            <div class="data-hero-actions">
+                <a href="@Url.Action("PopolaVie", "IndirizziNormalizzati",  new { id = selectedEnteId })" class="btn data-primary-action">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Popola le vie dell'ente</span>
+                </a>
+            </div>
+        }
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
+    {
+        <div class="alert alert-info border-0 shadow-sm rounded-3">
+            <i class="bi bi-info-circle me-2"></i> @TempData["Message"]
+        </div>
+    }
+
+    @* Statisiche sugli indirizzi normalizzati *@
+
+    <section class="data-stats-grid">
+        <article class="data-stat-card stat-red">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i>
+            <span>Indirizzi normalizzati trovati</span>
+            <strong>@IndirizziNormalizzati.Count</strong>
+        </article>
+        <article class="data-stat-card stat-green">
+            <i class="bi bi-check2-circle"></i>
+            <span>Approvati</span>
+            <strong>@IndirizziNormalizzati.Count(x => string.Equals(x.stato, "Verificato", StringComparison.OrdinalIgnoreCase))</strong>
+        </article>
+        <article class="data-stat-card stat-blue">
+            <i class="bi bi-list-check"></i>
+            <span>Da verificare</span>
+            <strong>@IndirizziNormalizzati.Count(x => string.Equals(x.stato, "Da Verificare", StringComparison.OrdinalIgnoreCase))</strong>
+        </article>
+    </section>
+
+    @if (isAdminPrincipale)
+    {
+        <section class="data-table-card">
+            <div class="data-table-header">
+                <div>
+                    <p>Archivio vie ente</p>
+                    <h2>Vie collegate all'ente</h2>
+                </div>
+                <span>Sezione visibile solo all'ADMIN principale</span>
+            </div>
+
+            @if (VieEnte != null && VieEnte.Count > 0)
+            {
+                <div class="table-responsive w-100">
+                    <table id="vieEnteTable" class="table table-hover align-middle data-table w-100">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Denominazione</th>
+                                <th>Tipo via</th>
+                                <th>ID indirizzo normalizzato</th>
+                                <th>Data creazione</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var via in VieEnte)
+                            {
+                                <tr>
+                                    <td><span class="data-code">@via.id</span></td>
+                                    <td>
+                                        <div class="data-main-cell">
+                                            <strong>@via.denominazione</strong>
+                                            <span>Via ente</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="data-status status-success">@via.tipoVia</span>
+                                    </td>
+                                    <td><span class="data-code">@via.IdIndirizzoNormalizzato</span></td>
+                                    <td>@via.dataCreazione?.ToString("dd/MM/yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="data-empty-state">
+                    <i class="bi bi-signpost"></i>
+                    <strong>Nessuna via ente trovata</strong>
+                    <span>Usa il comando di popolamento per generare le vie collegate all'ente.</span>
+                </div>
+            }
+        </section>
+    }
+
+    @* Tabella degli indirizzi normalizzati *@
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio Indirizzi normalizzati</p>
+                <h2>Denominazioni e normalizzazioni</h2>
+            </div>
+            <span>Controlla gli indirizzi prima delle elaborazioni</span>
+        </div>
+
+        <div id="loadingBarContainer" class="progress rounded-0" style="height: 6px; display: none;">
+            <div id="loadingBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                 role="progressbar" style="width: 0%"></div>
+        </div>
+
+        @if (IndirizziNormalizzati != null && IndirizziNormalizzati.Count > 0)
+        {
+            <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
+                <table id="IndirizziTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Denominazione</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var indirizzo in IndirizziNormalizzati)
+                        {
+                            
+                            <tr>
+                                <td><span class="data-code">@indirizzo.id</span></td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@indirizzo.denominazione</strong>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a class="data-icon-button" title="Modifica indirizzo"
+                                       href="@Url.Action("Modifica", "IndirizziNormalizzati", new { id = indirizzo.id })">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun indirizzo normalizzato trovato</strong>
+                <span>Non risultano indirizzi normalizzati registrati per l'ente selezionato.</span>
+            </div>
+        }
+    </section>
+
+    <div class="data-bottom-actions">
+        @if (ViewBag.Ruolo != "OPERATORE")
+        {
+            <a href="@Url.Action("Index", "IndirizziNormalizzati")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla selezione ente</span>
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla home</span>
+            </a>
+        }
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#loadingBarContainer").show();
+            var progress = 0;
+            var interval = setInterval(function () {
+                if (progress < 90) {
+                    progress += 10;
+                    $("#loadingBar").css("width", progress + "%");
+                }
+            }, 300);
+
+            var indirizziTable = $('#IndirizziTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var pages = api.page.info().pages;
+                    if (pages <= 1) {
+                        $(api.table().container()).find('.dataTables_paginate').hide();
+                        $(api.table().container()).find('.dataTables_length').hide();
+                    } else {
+                        $(api.table().container()).find('.dataTables_paginate').show();
+                        $(api.table().container()).find('.dataTables_length').show();
+                    }
+                }
+            });
+
+            indirizziTable.on('init', function () {
+                clearInterval(interval);
+                $("#loadingBar").css("width", "100%");
+                setTimeout(function () {
+                    $("#loadingBarContainer").fadeOut();
+                    $("#tableWrapper").fadeIn();
+                }, 500);
+            });
+
+            if ($('#vieEnteTable').length) {
+                $('#vieEnteTable').DataTable({
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true,
+                    pageLength: 25,
+                    lengthMenu: [10, 25, 50, 100],
+                    language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                    dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>'
+                });
+            }
+        });
+    </script>
+}

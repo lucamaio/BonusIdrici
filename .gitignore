@@ -40,6 +40,7 @@ project.assets.json
 wwwroot/log/*.log
 *.log
 App_Data/log-cleanup.state
+App_Data/DataProtectionKeys/
 
 # Uploaded and temporary files
 wwwroot/Uploads/

@@ -2,8 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using Data;
 using MySql.EntityFrameworkCore;
 using BonusIdrici2.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+var dataProtectionKeysPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "DataProtectionKeys");
+Directory.CreateDirectory(dataProtectionKeysPath);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
+    .SetApplicationName("BonusIdrici2");
 
 // ✅ Configurazione Sessione
 builder.Services.AddDistributedMemoryCache();
@@ -11,7 +22,7 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(45); // Timeout di 45 minuti
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Timeout di 30 minuti
     options.Cookie.HttpOnly = true;                // Non accessibile da JS
     options.Cookie.IsEssential = true;             // Necessario per GDPR
     options.Cookie.Name = ".BonusIdrici.Session";  // Nome personalizzato cookie
@@ -27,6 +38,7 @@ builder.Services.Configure<LogCleanupOptions>(
     builder.Configuration.GetSection(LogCleanupOptions.SectionName));
 builder.Services.AddHostedService<LogCleanupHostedService>();
 builder.Services.AddScoped<SectionActivityService>();
+builder.Services.AddScoped<IndirizziService>();
 builder.Services.AddSingleton<AppCacheService>();
 
 // ✅ Connessione DB

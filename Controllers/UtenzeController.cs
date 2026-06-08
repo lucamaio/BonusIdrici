@@ -264,7 +264,6 @@ namespace Controllers
 
         // Funzione 2: Consente l'update dei dati di una Utenza
 
-        [HttpPost]
         public IActionResult Update(int id, string idAcquedotto, int? stato, DateTime? periodoIniziale, DateTime? periodoFinale, string? matricolaContatore, string? indirizzo_ubicazione, string? numero_civico, string tipo_utenza, string? cognome, string? nome, string? sesso, string? codice_fiscale, string? partita_iva, int idEnte)
         {
             var UtenzaEsistente = _context.UtenzeIdriche.FirstOrDefault(t => t.id == id);
@@ -297,14 +296,19 @@ namespace Controllers
             return RedirectToAction("Show", "Utenze", new { selectedEnteId = idEnte });
         }
 
-        // Funzione 3: Consente di caricare le utenze del file csv sul db
 
+         // Funzione 3: Consente di caricare le utenze del file CSV sul DB.
+        // NOTA NUOVA LOGICA:
+        // L'import delle utenze NON deve più creare automaticamente nuovi Toponomi
+        // e NON deve più aggiornare automaticamente i Toponomi esistenti.
+        // La normalizzazione degli indirizzi deve essere gestita in una fase separata,
+        // avviata dall'admin tramite una funzione dedicata, ad esempio:
+        // "Genera indirizzi normalizzati".
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile csv_file, int selectedEnteId, int meseRiferimento, int annoRiferimento)
+        public async Task<IActionResult> Upload( IFormFile csv_file, int selectedEnteId, int meseRiferimento, int annoRiferimento)
         {
-            // Controllo se l'utente può accedere alla pagina desideratà
+            // Controllo se l'utente può accedere alla pagina desiderata
             if (string.IsNullOrEmpty(ruolo) || ruolo != "ADMIN")
             {
                 ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
@@ -326,7 +330,7 @@ namespace Controllers
                 return Upload();
             }
 
-            // Verifico che l'ente selezionato è valido 
+            // Validazione mese/anno di riferimento snapshot
             int annoMassimo = DateTime.Now.Year + 1;
             if (meseRiferimento < 1 || meseRiferimento > 12 || annoRiferimento < 2021 || annoRiferimento > annoMassimo)
             {
@@ -334,6 +338,7 @@ namespace Controllers
                 return Upload();
             }
 
+            // Verifico che l'ente selezionato sia valido
             var selectedEnte = await _context.Enti.FindAsync(selectedEnteId);
 
             if (selectedEnte == null)
@@ -353,9 +358,8 @@ namespace Controllers
                     await csv_file.CopyToAsync(stream);
                 }
 
-
                 // Lettura del file CSV
-                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche(filePath, selectedEnteId, _context, idUser ?? 0, annoRiferimento, meseRiferimento);
+                var datiComplessivi = CSVReader.LeggiFileUtenzeIdriche( filePath, selectedEnteId, _context, idUser ?? 0, annoRiferimento, meseRiferimento);
 
                 if (datiComplessivi == null)
                 {
@@ -363,15 +367,32 @@ namespace Controllers
                     return Upload();
                 }
 
-                using (var transaction = _context.Database.BeginTransaction())
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
-                        // Da Implementare aggiornamento dati UtenzeIdriche
-                        var datiPresenti = false;
+                        bool datiPresenti = false;
 
-                        // Controllo se sono presenti dei dati da caricare sul DB
+                        /*
+                        * LOGICA DISATTIVATA - NUOVO MODELLO INDIRIZZI
+                        *
+                        * In precedenza, durante il caricamento delle utenze idriche,
+                        * venivano creati automaticamente nuovi Toponomi partendo
+                        * dagli indirizzi presenti nel file CSV.
+                        *
+                        * Questa logica non è più corretta, perché gli indirizzi delle utenze
+                        * possono essere sporchi, abbreviati o contenere il numero civico
+                        * nel campo indirizzo.
+                        *
+                        * Con la nuova architettura:
+                        * - l'import delle utenze deve salvare utenze e snapshot;
+                        * - eventuali vie/indirizzi rilevati dovranno essere raccolti
+                        *   in una tabella dedicata, ad esempio VieRilevate/VieComunali;
+                        * - la creazione degli IndirizziNormalizzati dovrà avvenire
+                        *   tramite procedura separata avviata dall'admin.
+                        */
 
+                        /*
                         if (datiComplessivi.Toponimi.Count > 0)
                         {
                             datiPresenti = true;
@@ -380,7 +401,17 @@ namespace Controllers
                                 _context.Toponomi.Add(top);
                             }
                         }
+                        */
 
+                        /*
+                        * LOGICA DISATTIVATA - AGGIORNAMENTO TOPONIMI DURANTE IMPORT
+                        *
+                        * L'import delle utenze non deve modificare i Toponomi esistenti.
+                        * Eventuali correzioni/normalizzazioni devono essere gestite
+                        * tramite l'iter amministrativo dedicato.
+                        */
+
+                        /*
                         if (datiComplessivi.ToponimiDaAggiornare.Count > 0)
                         {
                             datiPresenti = true;
@@ -390,20 +421,24 @@ namespace Controllers
                                 _context.Toponomi.Update(top);
                             }
                         }
+                        */
 
+                        // Inserimento nuove utenze idriche
                         if (datiComplessivi.UtenzeIdriche.Count > 0)
                         {
                             datiPresenti = true;
-                            // Inserimento nuove utenze
+
                             foreach (var utenza in datiComplessivi.UtenzeIdriche)
                             {
                                 _context.UtenzeIdriche.Add(utenza);
                             }
                         }
 
+                        // Aggiornamento utenze idriche già esistenti
                         if (datiComplessivi.UtenzeIdricheEsistente.Count > 0)
                         {
                             datiPresenti = true;
+
                             foreach (var utenza in datiComplessivi.UtenzeIdricheEsistente)
                             {
                                 utenza.data_aggiornamento = DateTime.Now;
@@ -411,22 +446,25 @@ namespace Controllers
                             }
                         }
 
+                        // Snapshot utenze idriche del mese/anno di riferimento
                         if (datiComplessivi.UtenzeIdricheSnapshot.Count > 0)
                         {
                             datiPresenti = true;
                         }
 
-                        // Verifico se sono non sono presenti dei dati
+                        // Se non ci sono dati utili da salvare, interrompo l'import
                         if (!datiPresenti)
                         {
                             ViewBag.Message = "Nessun dato valido trovato nel file CSV.";
                             return Upload();
                         }
 
-                        var snapshotEsistenti = _context.UtenzeIdricheSnapshot
-                            .Where(s => s.IdEnte == selectedEnteId
-                                && s.AnnoRiferimento == annoRiferimento
-                                && s.MeseRiferimento == meseRiferimento);
+                        /*
+                        * Gestione snapshot mensile:
+                        * per lo stesso ente/mese/anno elimino la snapshot precedente
+                        * e inserisco quella nuova generata dall'import corrente.
+                        */
+                        var snapshotEsistenti = _context.UtenzeIdricheSnapshot.Where(s => s.IdEnte == selectedEnteId && s.AnnoRiferimento == annoRiferimento && s.MeseRiferimento == meseRiferimento);
 
                         _context.UtenzeIdricheSnapshot.RemoveRange(snapshotEsistenti);
 
@@ -435,10 +473,15 @@ namespace Controllers
                             _context.UtenzeIdricheSnapshot.AddRange(datiComplessivi.UtenzeIdricheSnapshot);
                         }
 
-                        // Salvataggio le modifiche iniziali
+                        // Salvataggio modifiche
                         await _context.SaveChangesAsync();
-                        transaction.Commit();  // Confermo la transizione
+
+                        // Confermo la transazione
+                        await transaction.CommitAsync();
+
+                        // Pulizia cache ente/utente
                         _cache.ClearEnteCache(selectedEnteId);
+
                         if (idUser.HasValue)
                         {
                             _cache.ClearUserCache(idUser.Value);
@@ -446,99 +489,65 @@ namespace Controllers
                     }
                     catch (Exception dbEx)
                     {
-                        transaction.Rollback();
+                        await transaction.RollbackAsync();
+
                         _logger.LogError(dbEx, "Errore durante il salvataggio dei dati nel database.");
+
                         ViewBag.Message = $"Errore durante il salvataggio dei dati nel database: {dbEx.Message}";
                         return Upload();
                     }
                 }
 
-                // Associazione utenze senza idToponimo
+                /*
+                * LOGICA RIMOSSA - ASSOCIAZIONE AUTOMATICA UTENZE/TOPONIMI
+                *
+                * In precedenza questa sezione provava ad associare automaticamente
+                * le utenze senza idToponimo ai Toponomi esistenti, usando confronti
+                * diretti, normalizzazioni e compatibilità tra abbreviazioni.
+                *
+                * Con la nuova architettura questa operazione non deve più avvenire qui.
+                *
+                * Nuova logica prevista:
+                * - durante l'import si raccolgono le vie/indirizzi rilevati;
+                * - se una via rilevata è già collegata a un IndirizzoNormalizzato,
+                *   l'associazione può essere recuperata;
+                * - se non esiste un collegamento certo, l'indirizzo resta da analizzare;
+                * - l'admin avvierà successivamente la funzione
+                *   "Genera indirizzi normalizzati".
+                */
+
+                /*
                 var utenzeTopNull = new List<UtenzaIdrica>();
 
                 if (utenzeTopNull.Count > 0)
                 {
-                    // Dizionario dei toponimi già presenti, con denominazione normalizzata
-                    var toponimiEnte = _context.Toponomi.Where(t => t.IdEnte == selectedEnteId).ToList();
-
-                    foreach (var utenza in utenzeTopNull)
-                    {
-                        // Normalizzo i valori per evitare mismatch dovuti a maiuscole/spazi/virgolette
-                        var indirizzoSeparato = FunzioniTrasversali.ExtractToponimoAndCivico(utenza.indirizzoUbicazione, utenza.numeroCivico);
-                        string indirizzoOriginale = indirizzoSeparato.Toponimo;
-                        string indirizzoNorm = FunzioniTrasversali.NormalizeToponimo(indirizzoOriginale);
-
-                        if (!string.IsNullOrWhiteSpace(indirizzoSeparato.CivicoEstratto))
-                        {
-                            _logger.LogInformation("Civico estratto da indirizzo: '{IndirizzoOriginale}' -> toponimo '{Toponimo}', civico '{Civico}'.", utenza.indirizzoUbicazione, indirizzoSeparato.Toponimo, indirizzoSeparato.CivicoEstratto);
-                        }
-
-                        var topRelativo = toponimiEnte.FirstOrDefault(t =>
-                            string.Equals(t.denominazione, indirizzoOriginale, StringComparison.OrdinalIgnoreCase) ||
-                            FunzioniTrasversali.NormalizeToponimo(t.denominazione) == indirizzoNorm ||
-                            FunzioniTrasversali.NormalizeToponimo(t.normalizzazione) == indirizzoNorm);
-
-                        if (topRelativo == null)
-                        {
-                            var candidatiCompatibili = toponimiEnte
-                                .Where(t => FunzioniTrasversali.AreToponimiCompatibili(t.denominazione, indirizzoOriginale) ||
-                                            FunzioniTrasversali.AreToponimiCompatibili(t.normalizzazione, indirizzoOriginale))
-                                .ToList();
-
-                            if (candidatiCompatibili.Count == 1)
-                            {
-                                topRelativo = candidatiCompatibili[0];
-                                _logger.LogInformation("Toponimo compatibile per iniziale nome proprio: '{IndirizzoOriginale}' -> '{Toponimo}'.", indirizzoOriginale, topRelativo.denominazione);
-                            }
-                            else if (candidatiCompatibili.Count > 1)
-                            {
-                                _logger.LogWarning("Toponimo non associato automaticamente per ambiguità iniziale nome proprio: '{IndirizzoOriginale}'. Candidati: {NumeroCandidati}.", indirizzoOriginale, candidatiCompatibili.Count);
-                            }
-                        }
-
-                        if (topRelativo == null)
-                        {
-                            continue;
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(indirizzoSeparato.CivicoEstratto))
-                        {
-                            var civicoSeparato = FunzioniTrasversali.FormattaNumeroCivico(utenza.numeroCivico);
-                            if (string.IsNullOrWhiteSpace(civicoSeparato))
-                            {
-                                utenza.numeroCivico = indirizzoSeparato.CivicoEstratto;
-                            }
-                            else if (civicoSeparato != indirizzoSeparato.CivicoEstratto)
-                            {
-                                _logger.LogWarning("Conflitto civico: indirizzo '{Indirizzo}' contiene civico '{CivicoEstratto}', ma il campo civico separato contiene '{CivicoSeparato}'.", utenza.indirizzoUbicazione, indirizzoSeparato.CivicoEstratto, civicoSeparato);
-                            }
-                        }
-
-                        if (!string.Equals(topRelativo.denominazione, indirizzoOriginale, StringComparison.OrdinalIgnoreCase))
-                        {
-                            _logger.LogInformation("Toponimo associato tramite normalizzazione: '{IndirizzoOriginale}' -> '{IndirizzoNormalizzato}'. ID toponimo: {IdToponimo}", indirizzoOriginale, indirizzoNorm, topRelativo.id);
-                        }
-
-                        // Aggiorno l'utenza con il nuovo idToponimo
-                        utenza.idToponimo = topRelativo.id != null ? topRelativo.id : null;
-
-                        _context.UtenzeIdriche.Update(utenza);
-                    }
-                    await _context.SaveChangesAsync();
+                    ...
                 }
+                */
 
-                // Messaggio da stampare 
-                ViewBag.Message = $"File '{csv_file.FileName}' caricato con successo.\nNuove Utenze: {datiComplessivi.UtenzeIdriche.Count}.\tAggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}\nSnapshot {meseRiferimento:D2}/{annoRiferimento}: {datiComplessivi.UtenzeIdricheSnapshot.Count}\n";
+                // Messaggio da mostrare all'utente
+                ViewBag.Message =
+                    $"File '{csv_file.FileName}' caricato con successo.\n" +
+                    $"Nuove Utenze: {datiComplessivi.UtenzeIdriche.Count}.\t" +
+                    $"Aggiornate: {datiComplessivi.UtenzeIdricheEsistente.Count}\n" +
+                    $"Snapshot {meseRiferimento:D2}/{annoRiferimento}: {datiComplessivi.UtenzeIdricheSnapshot.Count}\n";
 
-                // Informo l'utente  se deve procedere ad Aggiornare i Toponomi
-
+                /*
+                * Informazione sugli indirizzi mal formati.
+                * Gli indirizzi mal formati non vengono trasformati automaticamente
+                * in Toponomi/IndirizziNormalizzati.
+                * Devono essere gestiti tramite procedura separata.
+                */
                 if (datiComplessivi.countIndirizziMalFormati == null || datiComplessivi.countIndirizziMalFormati == 0)
                 {
-                    ViewBag.Message = ViewBag.Message + "Non sono stati riscontrati indirizzi mal formati!";
+                    ViewBag.Message += "Non sono stati riscontrati indirizzi mal formati.";
                 }
                 else
                 {
-                    ViewBag.Message = ViewBag.Message + $"Sono stati trovati {datiComplessivi.countIndirizziMalFormati} indirizzi malformati si consiglia di andare ad aggiornare i toponimi in modo tale da prevenire eventuali incongruenze durante la generazione dei domande";
+                    ViewBag.Message +=
+                        $"Sono stati trovati {datiComplessivi.countIndirizziMalFormati} indirizzi mal formati. " +
+                        "Si consiglia di avviare la procedura 'Genera indirizzi normalizzati' " +
+                        "per collegare le vie rilevate agli indirizzi normalizzati corretti.";
                 }
             }
             catch (Exception ex)
@@ -553,9 +562,9 @@ namespace Controllers
                     System.IO.File.Delete(filePath);
                 }
             }
+
             return Upload();
         }
-
 
         public IActionResult EsportaCsv(int selectedEnteId)
         {

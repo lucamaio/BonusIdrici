@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Selezione Ente";
+    var enti = ViewBag.Enti;
+}
+
+<div class="entity-select-page">
+    <section class="entity-select-card">
+        <div class="entity-select-header">
+            <span class="entity-select-icon entity-select-blue">
+                <i class="bi bi-signpost-fill"></i>
+            </span>
+            <div>
+                <p>Consultazione dati</p>
+                <h1>Indirizzi normalizzati per l'ente</h1>
+                <span>Seleziona l'ente per consultare denominazioni, normalizzazioni e indirizzi da sistemare.</span>
+            </div>
+        </div>
+
+        <form asp-controller="IndirizziNormalizzati" asp-action="Show" method="post" class="entity-select-form">
+            <label for="searchEnte" class="entity-label">Ente</label>
+            <div class="entity-search-wrap">
+                <div class="entity-search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchEnte" class="entity-search-input" placeholder="Digita nome ente o ID..." autocomplete="off">
+                    <button type="button" id="clearEnteSearch" class="entity-clear-button" aria-label="Cancella ricerca">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+
+                <select id="selectedEnteId" name="selectedEnteId" class="d-none" required>
+                    <option value="">-- Seleziona un Ente --</option>
+                    @if (enti != null)
+                    {
+                        foreach (var ente in enti)
+                        {
+                            <option value="@ente.id">@ente.nome</option>
+                        }
+                    }
+                </select>
+
+                <ul id="filteredEnteList" class="entity-results d-none"></ul>
+            </div>
+
+            <div id="selectedEntePreview" class="entity-selected-preview">
+                <i class="bi bi-info-circle"></i>
+                <span>Nessun ente selezionato</span>
+            </div>
+
+            <button type="submit" id="entitySubmitButton" class="entity-submit-button" disabled>
+                <i class="bi bi-arrow-right-circle"></i>
+                <span>Visualizza vie ente</span>
+            </button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info mt-4 shadow-sm border-0 rounded-3">
+                <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
+            </div>
+        }
+    </section>
+</div>

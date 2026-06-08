@@ -20,6 +20,8 @@ namespace Data
         public DbSet<UtenzaIdricaSnapshot> UtenzeIdricheSnapshot { get; set; }
         public DbSet<Domanda> Domande { get; set; }
         public DbSet<Toponimo> Toponomi { get; set; }
+        public DbSet<VieEnte> ViaEnte { get; set; }
+        public DbSet<IndirizzoNormalizzato> IndirizzoNormalizzato { get; set; }
         public DbSet<Report> Reports {get; set;}
 
         public DbSet<User> Users { get; set; }
@@ -234,7 +236,8 @@ namespace Data
                 entity.Property(f=>f.idEnte).HasColumnName("id_ente").IsRequired();
                 entity.Property(f=>f.idUser).HasColumnName("id_user").IsRequired();
             });
-            // Configurazione per la classe Ente
+
+            // Configurazione per la classe Toponimo
             modelBuilder.Entity<Toponimo>(entity =>
             {
                 entity.ToTable("toponomi"); // Assicurati che il nome della tabella sia "enti"
@@ -247,6 +250,30 @@ namespace Data
                 entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
                 entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+            });
+
+            // Configurazione per la classe VieEnte
+            modelBuilder.Entity<VieEnte>(entity =>
+            {
+                entity.ToTable("vie_ente"); // Assicurati che il nome della tabella sia "enti"
+                entity.HasKey(f => f.id); // La chiave primaria è 'id'
+                entity.Property(f => f.denominazione).HasColumnName("denominazione").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.tipoVia).HasColumnName("tipo_via").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
+                entity.Property(f => f.IdEnte).HasColumnName("id_ente").IsRequired();
+                entity.Property(f => f.IdIndirizzoNormalizzato).HasColumnName("id_indirizzo_normalizzato").IsRequired(); // Da gestire in quanto alla creazione della via_ente il toponimo potrebbe non essere ancora presente. Valutare se rendere questo campo nullable e gestire la logica di associazione in un secondo momento.
+            });
+
+            // Configurazione per la classe IndirizzoNormalizzato
+            modelBuilder.Entity<IndirizzoNormalizzato>(entity =>
+            {
+                entity.ToTable("indirizzi_normalizzati"); // Assicurati che il nome della tabella sia "enti"
+                entity.HasKey(f => f.id); // La chiave primaria è 'id'
+                entity.Property(f => f.denominazione).HasColumnName("denominazione").IsRequired().HasMaxLength(255);
+                entity.Property(f => f.stato).HasColumnName("stato").IsRequired().HasMaxLength(50);
+                entity.Property(f => f.dataCreazione).HasColumnName("data_creazione");
+                entity.Property(f => f.dataAggiornamento).HasColumnName("data_aggiornamento");
             });
 
             // Configurazione per la clase User
