@@ -65,19 +65,13 @@
         @if (reportsList.Any())
         {
             <div class="table-responsive" id="tableWrapper" style="display: none;">
-                <table id="elencoDomande" class="table table-hover align-middle data-table w-100">
+                <table id="elencoDomande" class="table table-hover align-middle data-table report-table w-100">
                     <thead>
                         <tr>
                             <th>Elaborazione</th>
-                            <th>Data Elaborazione</th>
-                            @if (ruolo == "ADMIN")
-                            {
-                                <th>Data Aggiornamento</th>
-                            }
-                            <th>Stato</th>
-                            <th>Serie</th>
+                            <th>Date</th>
+                            <th class="report-note-column">Note</th>
                             <th>Record</th>
-                            <th>Elaborato da</th>
                             <th class="text-center">Azioni</th>
                         </tr>
                     </thead>
@@ -99,18 +93,21 @@
                                 <td>
                                     <div class="data-main-cell">
                                         <strong>@periodo</strong>
-                                        <span>Report #@report.id</span>
+                                        <span class="data-status @statusClass">Stato Report #@report.stato</span>
                                     </div>
                                 </td>
-                                <td>@dataUrl</td>
-                                @if (ruolo == "ADMIN")
-                                {
-                                    <td>@dataAggiornamento</td>
-                                }
-                                <td><span class="data-status @statusClass">@report.stato</span></td>
-                                <td><span class="data-code">@report.serie</span></td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@dataUrl</strong>
+                                        <span>Aggiornamento: @dataAggiornamento</span>
+                                    </div>
+                                </td>
+                                <td class="report-note-column">
+                                    <div class="report-note-text">
+                                        @(string.IsNullOrWhiteSpace(report.note) ? "N/D" : report.note)
+                                    </div>
+                                </td>
                                 <td>@report.count</td>
-                                <td>@report.Username</td>
                                 <td class="text-center">
                                     <a class="data-icon-button" title="Visualizza dettaglio report"
                                        href="@Url.Action("Dettails", "Report", new { idReport = report.id })">
@@ -150,3 +147,50 @@
         }
     </div>
 </main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#loadingBarContainer").show();
+            var progress = 0;
+            var interval = setInterval(function () {
+                if (progress < 90) {
+                    progress += 10;
+                    $("#loadingBar").css("width", progress + "%");
+                }
+            }, 300);
+
+            var reportTable = $('#elencoDomande').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: false,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                buttons: [],
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var pages = api.page.info().pages;
+                    if (pages <= 1) {
+                        $(api.table().container()).find('.dataTables_paginate').hide();
+                        $(api.table().container()).find('.dataTables_length').hide();
+                    } else {
+                        $(api.table().container()).find('.dataTables_paginate').show();
+                        $(api.table().container()).find('.dataTables_length').show();
+                    }
+                }
+            });
+
+            reportTable.on('init', function () {
+                clearInterval(interval);
+                $("#loadingBar").css("width", "100%");
+                setTimeout(function () {
+                    $("#loadingBarContainer").fadeOut();
+                    $("#tableWrapper").fadeIn();
+                }, 500);
+            });
+        });
+    </script>
+}

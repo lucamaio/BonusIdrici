@@ -9,249 +9,314 @@
     List<Domanda>? domande = ViewBag.Domande;
     var elaborazione = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ViewBag.ElaborazioneDel.ToLower()) ?? "ND";
     var statoReport = ViewBag.StatoReport ?? "ND";
+
 }
 
-<div class="container-xxl flex-grow-1 py-5">
-     <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4 w-100">
-                <!-- Header -->
-                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <div class="d-flex fw-bold justify-content-center align-items-center">
-                        <i class="bi bi-droplet-fill me-2"></i>
-                        <h3 class="fw-bold mb-0">Elaborazione - <span class="fw-semibold">@elaborazione</span></h3>
-                    </div>
-                    <p class="mb-0 small opacity-75">Ente: <span class="fw-semibold">@nomeEnte</span></p>
-                </div>
+<main class="data-page">
+    <section class="data-hero data-hero-red">
+        <div>
+            <p>Consulta Elaborazione</p>
+            <h1>@elaborazione</h1>
+            <span>Ente: @nomeEnte</span>
+        </div>
 
-                <!-- Barra di caricamento -->
-                <div id="loadingBarContainer" style="display: none;">
-                    <div id="loadingBar" role="progressbar"></div>
-                </div>
+        @* Pulsante delle azioni - contente le varie operazioni possibili a seconda del ruolo dell'utente *@
+        <div class="data-hero-actions d-flex justify-content-end mb-3">
+            <button id="myDropdownToggle" type="button" class="btn data-primary-action dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear-fill me-1"></i> Azioni
+            </button>
+            <ul class="dropdown-menu shadow-sm">
+                <!-- Sezione: Esportazioni -->
+                <li class="dropdown-header text-muted">Esportazioni</li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Bonus Idrico" })">
+                        <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i> Esito Bonus Idrico
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Competenza Territoriale" })">
+                        <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i> Competenza Territoriale
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Domande Incongruenti" })">
+                        <i class="bi bi-file-earmark-medical me-2 text-warning"></i> Domande Incongruenti
+                    </a>
+                </li>
+                @* Voci admin *@
+                @if(ruolo == "ADMIN") {
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header text-muted">Esportazioni Amministratore</li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Siscom" })">
+                            <i class="bi bi-database-down me-2 text-success"></i> File Siscom
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Debug" })">
+                            <i class="bi bi-bug-fill me-2 text-danger"></i> Debug
+                        </a>
+                    </li>
+                }
 
-            <!-- Body -->
-            <div class="card-body p-4 position-relative position-relative">
-                @if (domande != null && domande.Count > 0)
-                {
-                    <div class="row g-4 mb-4">
-                        @{
-                            var stats = new[]
-                            {
-                                new { Icon="fa-solid fa-file fa-2x text-primary", Label="Totale Domande", Value=ViewBag.TotaleDomande, Url="" },
-                                new { Icon="fa-solid fa-xmark fa-2x text-danger", Label="Incongruenze Trovate", Value=ViewBag.incongruenze, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Incongruenze" }) ?? "" },
-                                new { Icon="fa-solid fa-circle-check fa-2x text-success", Label="Esito 1", Value=ViewBag.DomandeEsito1, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "01" }) ?? "" },
-                                new { Icon="fa-solid fa-lightbulb fa-2x text-primary", Label="Esito 2", Value=ViewBag.DomandeEsito2, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "02" }) ?? "" },
-                                new { Icon="fa-solid fa-exclamation-triangle fa-2x text-warning", Label="Esito 3", Value=ViewBag.DomandeEsito3, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "03" }) ?? "" },
-                                new { Icon="fa-solid fa-times-circle fa-2x text-danger", Label="Esito 4", Value=ViewBag.DomandeEsito4, Url=Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "04" }) ?? "" }
-                            };
-                        }
-                        @foreach (var s in stats)
+                <li><hr class="dropdown-divider"></li>
+
+                <!-- Sezione: Modifiche -->
+                <li class="dropdown-header text-muted">Modifiche</li>
+                <li>
+                    <a class="dropdown-item text-warning" href="@Url.Action("VariaSerie", "Report", new { idReport = idReport })">
+                        <i class="bi bi-pencil-square me-2"></i> Varia Serie
+                    </a>
+                </li>
+
+                <li><hr class="dropdown-divider"></li>
+
+                <!-- Sezione: Stato Report -->
+                <li class="dropdown-header text-muted">Aggiornamento Stato</li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Da verificare" })">
+                        <i class="bi bi-exclamation-circle me-2 text-warning"></i> Segnala come Da Verificare
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Emesso" })">
+                        <i class="bi bi-check2-circle me-2 text-info"></i> Segnala come Emesso
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Approvato" })">
+                        <i class="bi bi-patch-check-fill me-2 text-success"></i> Segnala come Approvato
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Annullato" })">
+                        <i class="bi bi-x-circle-fill me-2 text-danger"></i> Segnala come Annullato
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    @* Parte delle statistiche *@
+
+  <section class="data-stats-grid">
+    @{
+        var stats = new[]
+        {
+            new
+            {
+                Icon = "bi bi-file-earmark-bar-graph-fill",
+                CssClass = "stat-red",
+                Label = "Totale Domande",
+                Value = ViewBag.TotaleDomande,
+                Url = ""
+            },
+            new
+            {
+                Icon = "bi bi-check2-circle",
+                CssClass = "stat-red",
+                Label = "Incongruenze Trovate",
+                Value = ViewBag.incongruenze,
+                Url = Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Incongruenze" }) ?? ""
+            },
+            new
+            {
+                Icon = "bi bi-list-check",
+                CssClass = "stat-blue",
+                Label = "Serie",
+                Value = ViewBag.Serie,
+                Url = ""
+            },
+            new
+            {
+                Icon = "fa-solid fa-circle-check",
+                CssClass = "stat-success",
+                Label = "Esito 1",
+                Value = ViewBag.DomandeEsito1,
+                Url = Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "01" }) ?? ""
+            },
+            new
+            {
+                Icon = "fa-solid fa-lightbulb",
+                CssClass = "stat-blue",
+                Label = "Esito 2",
+                Value = ViewBag.DomandeEsito2,
+                Url = Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "02" }) ?? ""
+            },
+            new
+            {
+                Icon = "fa-solid fa-exclamation-triangle",
+                CssClass = "stat-blue text-warning",
+                Label = "Esito 3",
+                Value = ViewBag.DomandeEsito3,
+                Url = Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "03" }) ?? ""
+            },
+            new
+            {
+                Icon = "fa-solid fa-times-circle",
+                CssClass = "stat-red text-danger",
+                Label = "Esito 4",
+                Value = ViewBag.DomandeEsito4,
+                Url = Url.Action("DomandeFiltrate", "Report", new { idReport = idReport, filtroTipo = "Esito", filtroValore = "04" }) ?? ""
+            }
+        };
+    }
+
+    @foreach (var s in stats)
+    {
+        <a href="@(string.IsNullOrEmpty(s.Url) ? "#" : s.Url)"
+           class="text-decoration-none text-reset @(string.IsNullOrEmpty(s.Url) ? "pe-none" : "")">
+
+            <article class="data-stat-card @s.CssClass">
+                <i class="@s.Icon"></i>
+                <span>@s.Label</span>
+                <strong>@s.Value</strong>
+            </article>
+
+        </a>
+    }
+</section>
+
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Domande Elaborazione</p>
+                <h2>Domande relative all'elaborazione n°@idReport</h2>
+            </div>
+            <span>Ordinati per idAto, codice bonus e codice fiscale richiedente</span>
+        </div>
+
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
+        </div>
+
+        @if (domande != null && domande.Count > 0)
+        {
+            <div class="table-responsive" id="tableWrapper" style="visibility: hidden;">
+                <table id="dettagliDomandeTable" class="table table-hover align-middle data-table report-table report-detail-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Id Ato</th>
+                            <th>Codice Bonus</th>
+                            <th>CF Richiedente</th>
+                            <th>Id Fornitura</th>
+                            <th>Componenti</th>
+                            <th>Esito</th>
+                            <th>Esito str</th>
+                            <th>Incongruenze</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var domanda in domande)
                         {
-                            <div class="col-6 col-md-4 col-lg-4">
-                                <a href="@(string.IsNullOrEmpty(s.Url) ? "#" : s.Url)"
-                                   class="card border-0 shadow-sm stat-card text-center h-100 hover-shadow w-100 text-decoration-none text-reset @(string.IsNullOrEmpty(s.Url) ? "pe-none" : "")">
-                                    <div class="card-body py-4">
-                                        <div class="icon-circle mx-auto mb-3 bg-light shadow-sm">
-                                            <i class="fa-solid @s.Icon fs-4"></i>
-                                        </div>
-                                        <h6 class="fw-semibold mb-1">@s.Label</h6>
-                                        <h4 class="fw-bold text-dark mb-0">@s.Value</h4>
-                                    </div>
-                                </a>
-                            </div>
-                        }
-                    </div>
 
-                    <div class="info-text mb-4">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <span>Consulta tutte le domande relative all'elaborazione selezionata</span>
-                    </div>
-
-                    @* Pulsante azioni *@
-                    <div class="d-flex justify-content-end mb-3">
-                        <button id="myDropdownToggle" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-gear-fill me-1"></i> Azioni
-                        </button>
-                        <ul class="dropdown-menu shadow-sm">
-                            <!-- Sezione: Esportazioni -->
-                            <li class="dropdown-header text-muted">Esportazioni</li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Bonus Idrico" })">
-                                    <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i> Esito Bonus Idrico
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Esito Competenza Territoriale" })">
-                                    <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i> Competenza Territoriale
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Domande Incongruenti" })">
-                                    <i class="bi bi-file-earmark-medical me-2 text-warning"></i> Domande Incongruenti
-                                </a>
-                            </li>
-                            @* Voci admin *@
-                            @if(ruolo == "ADMIN") {
-                                <li><hr class="dropdown-divider"></li>
-                                <li class="dropdown-header text-muted">Esportazioni Amministratore</li>
-                                <li>
-                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Siscom" })">
-                                        <i class="bi bi-database-down me-2 text-success"></i> File Siscom
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="@Url.Action("ScaricaCsv", new { idReport = idReport, tipoEsportazione = "Debug" })">
-                                        <i class="bi bi-bug-fill me-2 text-danger"></i> Debug
-                                    </a>
-                                </li>
-                            }
-
-                            <li><hr class="dropdown-divider"></li>
-
-                            <!-- Sezione: Modifiche -->
-                            <li class="dropdown-header text-muted">Modifiche</li>
-                            <li>
-                                <a class="dropdown-item text-warning" href="@Url.Action("VariaSerie", "Report", new { idReport = idReport })">
-                                    <i class="bi bi-pencil-square me-2"></i> Varia Serie
-                                </a>
-                            </li>
-
-                            <li><hr class="dropdown-divider"></li>
-
-                            <!-- Sezione: Stato Report -->
-                            <li class="dropdown-header text-muted">Aggiornamento Stato</li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Da verificare" })">
-                                    <i class="bi bi-exclamation-circle me-2 text-warning"></i> Segnala come Da Verificare
-                                </a>
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Emesso" })">
-                                    <i class="bi bi-check2-circle me-2 text-info"></i> Segnala come Emesso
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Approvato" })">
-                                    <i class="bi bi-patch-check-fill me-2 text-success"></i> Segnala come Approvato
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="@Url.Action("AggiornaStatoReport", new { idReport = idReport, nuovoStato = "Annullato" })">
-                                    <i class="bi bi-x-circle-fill me-2 text-danger"></i> Segnala come Annullato
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                @* Tabella con le domande *@
-                <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
-                    <table id="dettagliDomandeTable" class="table table-hover align-middle border-bottom w-100 rounded-3 shadow-sm">
-                        <thead>
                             <tr>
-                                 <th class="text-center">idAto</th>
-                                <th class="text-center">Codice Bonus</th>
-                                <th class="text-center">Codice Fiscale Richiedente</th>
-                                <th class="text-center">Id Fornitura</th>
-                                <th class="text-center">Componenti</th>
-                                <th class="text-center">Esito str</th>
-                                <th class="text-center">Esito</th>
-                                <th class="text-center">Incongruente</th>
-                                <th class="text-center">Azioni</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var domanda in domande)
-                            {
-                                <tr>
-                                    <td class="text-center"><span>@domanda.idAto</span></td>
-                                    <td class="text-center"><span >@domanda.codiceBonus</span></td>
-                                    <td class="text-center"><span>@domanda.codiceFiscaleRichiedente</span></td>
-                                    <td class="text-center"><span>@domanda.idFornitura</span></td>
-                                    <td class="text-center"><span>@domanda.numeroComponenti</span></td>
-                                    <td class="text-center">
-                                            @if (string.IsNullOrEmpty(domanda.esitoStr))
-                                            {
-                                                <span class="badge bg-secondary">N/A</span>
-                                            }
-                                            else if (domanda.esitoStr.Equals("Si", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="badge bg-success">Si</span>
-                                            }
-                                            else if (domanda.esitoStr.Equals("No", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="badge bg-danger">No</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-warning text-dark">@domanda.esitoStr</span>
-                                            }
-                                    </td>
-                                    <td class="text-center">
-                                        @switch (domanda.esito)
+                                <td>
+                                    <div class="data-main-cell">
+                                        @domanda.idAto
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="data-main-cell">
+                                       @domanda.codiceBonus
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        @domanda.codiceFiscaleRichiedente
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        @domanda.idFornitura
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="data-main-cell">
+                                        @domanda.numeroComponenti
+                                    </div>
+                                </td>
+                                <td>
+                                    @switch (domanda.esito)
                                         {
                                             case "01":
-                                                <span class="badge bg-success">1</span>
+                                                <label class="badge bg-success">1</label>
                                                 break;
                                             case "02":
-                                                <span class="badge bg-primary">2</span>
+                                                <label class="badge bg-primary">2</label>
                                                 break;
                                             case "03":
-                                                <span class="badge bg-warning text-dark">3</span>
+                                                <label class="badge bg-warning text-dark">3</label>
                                                 break;
                                             case "04":
-                                                <span class="badge bg-danger">4</span>
+                                                <label class="badge bg-danger">4</label>
                                                 break;
                                             default:
-                                                <span class="badge bg-secondary">N/A</span>
+                                                <label class="badge bg-secondary">N/A</label>
                                                 break;
                                         }
-                                    </td>
-                                    <td class="text-center">
-                                         @if (domanda.incongruenze == false)
-                                            {
-                                                <span class="badge bg-danger">Falso</span>
-                                            }
-                                            else if (domanda.incongruenze == true)
-                                            {
-                                                <span class="badge bg-success">Vero</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">N/A</span>
-                                            }
-                                    </td>
-                                
-                                    <td class="text-center">
-                                        <a class="btn btn-modern-edit btn-sm" title="Varia"
-                                            href="@Url.Action("Varia", "Report", new { id = domanda.id })">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-warning text-center shadow-sm rounded-3">
-                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato disponibile per l'ente selezionato.
-                </div>
-            }
-            <hr class="my-4" />
-            @* Pulsante per tornare alla pagina precedente *@
-            <div class="d-grid mt-4">
-                <a href="@Url.Action("Show", "Report", new {selectedEnteId = idEnte})" class="btn btn-outline-secondary btn-lg shadow-sm">
-                    <i class="bi bi-arrow-left-circle me-2"></i> Torna alla pagina Elaborazioni Ente
-                </a>
+                                </td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        @domanda.esitoStr
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        @if(domanda.incongruenze == true)
+                                        {
+                                            <span class="badge bg-danger text-white">Sì</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success text-white">No</span>
+                                        }
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <a class="btn btn-modern-edit btn-sm" title="Varia"
+                                        href="@Url.Action("Varia", "Report", new { id = domanda.id })">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-                   
-                  
-        </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun report disponibile</strong>
+                <span>Non risultano elaborazioni generate per l'ente selezionato.</span>
+            </div>
+        }
+    </section>
+
+    <div class="data-bottom-actions">
+        @if (ruolo != "OPERATORE")
+        {
+            <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla selezione ente</span>
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alla home</span>
+            </a>
+        }
     </div>
-</div>
+</main>
 @* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> *@
 @section Scripts {
     <script>
@@ -269,7 +334,12 @@
                 paging: true,
                 searching: true,
                 ordering: true,
-                responsive: true,
+                responsive: false,
+                autoWidth: false,
+                columnDefs: [
+                    { targets: [0, 3, 4, 5, 6, 7, 8], className: 'text-nowrap' },
+                    { targets: [4, 5, 7, 8], orderable: true }
+                ],
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
                 //dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
             }); 
@@ -278,7 +348,8 @@
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
                     $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); 
+                    dettagliTable.columns.adjust();
+                    $("#tableWrapper").css("visibility", "visible"); 
                 }, 500);
             });
         }); 

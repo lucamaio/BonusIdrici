@@ -1020,7 +1020,7 @@ public class CSVReader
     }
 
     // Funzione 3: Legge il file CSV proveniente da INPS per generare i domande delle persone con bonus idrico
-    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idReport, bool confrontoCivico, bool escludiComponenti, int annoReport, int meseReport)
+    public static DatiCsvCompilati LeggiFileINPS(string percorsoFile, ApplicationDbContext context, int selectedEnteId, int idReport, bool confrontoCivico, bool escludiComponenti, bool escludiAlertSnapshot, int annoReport, int meseReport)
     {
         // Parte 1: Inizializzazione delle variabili
         var datiComplessivi = new DatiCsvCompilati();
@@ -1043,6 +1043,31 @@ public class CSVReader
                 && s.AnnoRiferimento == annoReport
                 && s.MeseRiferimento == meseReport);
             const string avvisoSnapshotUtenzeAssente = "Snapshot utenze non disponibile per il mese/anno del report. La verifica della fornitura è stata effettuata sui dati correnti.";
+
+            var avvisiSnapshotReport = new List<string>();
+            if (!snapshotDisponibile)
+            {
+                avvisiSnapshotReport.Add(avvisoSnapshotAssente);
+            }
+            if (!snapshotUtenzeDisponibile)
+            {
+                avvisiSnapshotReport.Add(avvisoSnapshotUtenzeAssente);
+            }
+            var report = context.Reports.FirstOrDefault(r => r.id == idReport);
+            if (report != null)
+            {
+                foreach (var avvisoSnapshotReport in avvisiSnapshotReport)
+                {
+                    if (string.IsNullOrWhiteSpace(report.note))
+                    {
+                        report.note = avvisoSnapshotReport;
+                    }
+                    else if (!report.note.Contains(avvisoSnapshotReport, StringComparison.OrdinalIgnoreCase))
+                    {
+                        report.note = report.note + "\n" + avvisoSnapshotReport;
+                    }
+                }
+            }
 
             int rigaCorrente = 1;
             logFile.LogInfo($"Numero di righe da elaborare: {righe.Count()}");
@@ -1271,11 +1296,11 @@ public class CSVReader
                 int? idFornituraIdrica = null;
                 string? note = null;
                 bool verificare = false;
-                if (!snapshotDisponibile)
+                if (!snapshotDisponibile && !escludiAlertSnapshot)
                 {
                     note = avvisoSnapshotAssente;
                 }
-                if (!snapshotUtenzeDisponibile)
+                if (!snapshotUtenzeDisponibile && !escludiAlertSnapshot)
                 {
                     note = (note ?? string.Empty) + "\n" + avvisoSnapshotUtenzeAssente;
                     verificare = true;

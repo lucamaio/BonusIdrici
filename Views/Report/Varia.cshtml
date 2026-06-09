@@ -2,6 +2,7 @@
     ViewData["Title"] = "Varia Domande";
     var serie = ViewBag.Serie;
     var domanda = ViewBag.Domanda;
+    var noteVisibili = DomandaNoteFormatter.NascondiNoteTecniche(Convert.ToString(domanda.note));
     var esitoStr = domanda.esitoStr;
     var pod = domanda.presenzaPod;
     var esiti = new List<string> { "Si", "No" };
@@ -235,7 +236,7 @@
                                                         id="note"
                                                         name="note"
                                                         rows="3"
-                                                        readonly>@domanda.note</textarea>
+                                                        readonly>@noteVisibili</textarea>
                                             </div>
 
                                         </div>

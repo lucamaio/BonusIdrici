@@ -59,58 +59,6 @@
 //     });
 // });
 
-// Load-Bar
-
- $(document).ready(function () {
-    if (!$('#elencoDomande').length) {
-        return;
-    }
-
-    $("#loadingBarContainer").show();
-    var progress = 0;
-    var interval = setInterval(function () {
-        if (progress < 90) {
-            progress += 10;
-            $("#loadingBar").css("width", progress + "%");
-        }
-    }, 300);
-
-    // Tabella Domande
-
-    var domandeTable = $('#elencoDomande').DataTable({
-        paging: true,
-        searching: true,
-        ordering: true,
-        responsive: true,
-        pageLength: 25,
-        lengthMenu: [10, 25, 50, 100],
-        language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-        dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
-        buttons: [],
-        drawCallback: function (settings) {
-            var api = this.api();
-            var pages = api.page.info().pages;
-            if (pages <= 1) {
-                $(api.table().container()).find('.dataTables_paginate').hide();
-                $(api.table().container()).find('.dataTables_length').hide();
-            } else {
-                $(api.table().container()).find('.dataTables_paginate').show();
-                $(api.table().container()).find('.dataTables_length').show();
-            }
-        }
-    }); 
-
-    domandeTable.on('init', function () {
-        clearInterval(interval);
-        $("#loadingBar").css("width", "100%");
-        setTimeout(function () {
-            $("#loadingBarContainer").fadeOut();
-            $("#tableWrapper").fadeIn(); 
-        }, 500);
-    });
-
-});
-
 (function (window, $) {
     if (!$) {
         return;

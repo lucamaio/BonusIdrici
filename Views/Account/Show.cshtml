@@ -1,113 +1,126 @@
 @{
     ViewData["Title"] = "Esplora tutti gli Account";
-    var utenti = ViewBag.Utenti;
+    var utenti = ViewBag.Utenti as IEnumerable<Models.User>;
+    var utentiList = utenti?.ToList() ?? new List<Models.User>();
 }
-<div class="container-xxl flex-grow-1 py-5">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4 w-100">
-                <!-- Header -->
-                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <div class="d-flex fw-bold justify-content-center align-items-center">
-                        <i class="bi bi-people-fill me-2"></i>
-                        <h3 class="fw-bold mb-0">Utenze</span></h3>
-                    </div>
-                </div>
 
-                <!-- Barra di caricamento -->
-                <div id="loadingBarContainer" style="display: none;">
-                    <div id="loadingBar" role="progressbar"></div>
-                </div>
-
-                <!-- Body -->
-                <div class="card-body p-4 position-relative">
-                    @if (utenti != null && utenti?.Count > 0)
-                    {
-                       <div class="info-text mb-4">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <span>Di seguito sono elencate tutti gli account abilitati ad accedere al sistema.</span>
-                        </div>
-
-                         <div class="d-flex justify-content-end mb-3">
-                        <a href="@Url.Action("Create", "Account")" class="btn btn-modern-add shadow-sm">
-                            <i class="bi bi-plus-circle me-2"></i> Aggiungi Utente
-                        </a>
-                    </div>
-
-                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
-                            <table id="accountTable" class="table table-hover align-middle border-bottom w-100">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Username</th>
-                                        <th class="text-center">Email</th>
-                                        <th class="text-center">Cognome</th>
-                                        <th class="text-center">Nome</th>
-                                        <th class="text-center">Ruolo</th>
-                                        <th class="text-center">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var utente in utenti)
-                                    {
-                                        <tr>
-                                            <td><span class="fw-semibold">@utente.Username</span></td>
-                                            <td><span class="fw-semibold">@utente.Email</span></td>
-                                            <td><span>@utente.Cognome</span></td>
-                                            <td><span>@utente.Nome</span></td>
-                                            <td class="text-center">
-                                                @if (utente.getRuolo() == "ADMIN")
-                                                {
-                                                    <span class="badge bg-danger">ADMIN</span>
-                                                }
-                                                else if (utente.getRuolo() == "OPERATORE")
-                                                {
-                                                    <span class="badge bg-success">OPERATORE</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-secondary">N/A</span>
-                                                }
-                                            </td>
-                                            <td class="text-center">
-                                                <a class="btn btn-modern-edit btn-sm" title="Modifica Profilo"
-                                                   href="@Url.Action("Modifica", "Account", new { id = utente.id })">
-                                                    <i class="bi bi-pencil-square text-primary"></i>
-                                                </a> 
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning text-center shadow-sm rounded-3 mb-3">
-                            <i class="bi bi-exclamation-triangle me-2"></i> Nessun Utente trovato!.
-                        </div>
-
-                        <div class="d-flex justify-content-end mb-3">
-                            <a href="@Url.Action("Create", "Account")"
-                               class="btn btn-account btn-sm shadow-sm">
-                                <i class="bi bi-plus-circle me-1"></i> Aggiungi
-                            </a>
-                        </div>
-                    }       
-                </div>
-            </div>
+<main class="data-page">
+    <section class="data-hero data-hero-blue">
+        <div>
+            <p>Gestione utenti</p>
+            <h1>Utenti</h1>
+            <span>Account abilitati ad accedere al sistema</span>
         </div>
-    </div>
-</div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("Create", "Account")" class="btn data-primary-action">
+                <i class="bi bi-plus-circle"></i>
+                <span>Aggiungi utente</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="data-stats-grid">
+        <article class="data-stat-card stat-blue">
+            <i class="bi bi-people-fill"></i>
+            <span>Utenti registrati</span>
+            <strong>@utentiList.Count</strong>
+        </article>
+        <article class="data-stat-card stat-red">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span>Admin</span>
+            <strong>@utentiList.Count(x => x.getRuolo() == "ADMIN")</strong>
+        </article>
+        <article class="data-stat-card stat-green">
+            <i class="bi bi-person-check-fill"></i>
+            <span>Operatori</span>
+            <strong>@utentiList.Count(x => x.getRuolo() == "OPERATORE")</strong>
+        </article>
+    </section>
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio utenti</p>
+                <h2>Account, ruoli e profili</h2>
+            </div>
+            <span>Ricerca, ordinamento e paginazione attivi</span>
+        </div>
+
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
+        </div>
+
+        @if (utentiList.Any())
+        {
+            <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
+                <table id="accountTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Utente</th>
+                            <th>Email</th>
+                            <th>Cognome</th>
+                            <th>Nome</th>
+                            <th>Ruolo</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var utente in utentiList)
+                        {
+                            var ruolo = utente.getRuolo();
+                            var statusClass = ruolo switch
+                            {
+                                "ADMIN" => "status-danger",
+                                "OPERATORE" => "status-success",
+                                _ => "status-warning"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@utente.Username</strong>
+                                        <span>ID @utente.id</span>
+                                    </div>
+                                </td>
+                                <td>@utente.Email</td>
+                                <td>@utente.Cognome</td>
+                                <td>@utente.Nome</td>
+                                <td><span class="data-status @statusClass">@ruolo</span></td>
+                                <td class="text-center">
+                                    <a class="data-icon-button" title="Modifica profilo"
+                                       href="@Url.Action("Modifica", "Account", new { id = utente.id })">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun utente trovato</strong>
+                <span>Non risultano account registrati nel sistema.</span>
+            </div>
+        }
+    </section>
+</main>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Mostra il loader e nascondi la tabella all'inizio
-            // La tabella è già nascosta da style="display: none;"
             $("#loadingBarContainer").show();
+            var progress = 0;
+            var interval = setInterval(function () {
+                if (progress < 90) {
+                    progress += 10;
+                    $("#loadingBar").css("width", progress + "%");
+                }
+            }, 300);
 
-            // Inizializza DataTable, che farà tutto il lavoro.
-            // L'evento initComplete gestirà la fine del caricamento.
             var accountTable = $('#accountTable').DataTable({
                 paging: true,
                 searching: true,
@@ -131,10 +144,13 @@
                 }
             });
 
-            // Quando DataTable è pronto, nascondi il loader e mostra la tabella
             accountTable.on('init', function () {
-                $("#loadingBarContainer").hide();
-                $("#tableWrapper").show();
+                clearInterval(interval);
+                $("#loadingBar").css("width", "100%");
+                setTimeout(function () {
+                    $("#loadingBarContainer").fadeOut();
+                    $("#tableWrapper").fadeIn();
+                }, 500);
             });
         });
     </script>

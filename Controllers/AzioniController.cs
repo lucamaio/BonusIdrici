@@ -7,6 +7,7 @@ using Models.ViewModels; // Aggiungi questo using
 using System.IO;
 using System.Text.RegularExpressions;
 using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -210,6 +211,7 @@ namespace Controllers
                     idReport,
                     confrontoCivico,
                     escludiComponenti,
+                    false,
                     annoReport,
                     meseReport);
                 AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");
@@ -218,6 +220,7 @@ namespace Controllers
                     try
                     {
                         bool datiSalvati = false;
+                        bool reportAggiornato = _context.ChangeTracker.Entries<Report>().Any(e => e.State == EntityState.Modified);
 
                         if (datiComplessivi.domande.Count > 0)
                         {
@@ -236,6 +239,12 @@ namespace Controllers
                             {
                                 _context.Domande.Update(domande);
                             }
+                            await _context.SaveChangesAsync();
+                        }
+
+                        if (!datiSalvati && reportAggiornato)
+                        {
+                            datiSalvati = true;
                             await _context.SaveChangesAsync();
                         }
 

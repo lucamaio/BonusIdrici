@@ -64,6 +64,7 @@ namespace BonusIdrici2.Services
                 idReport,
                 confrontoCivico,
                 escludiComponenti,
+                escludiAlertSnapshot,
                 annoReport,
                 meseReport);
 
@@ -217,6 +218,7 @@ namespace BonusIdrici2.Services
         {
             var noteDistinte = noteConfronto
                 .Where(n => !string.IsNullOrWhiteSpace(n))
+                .Where(n => !DomandaNoteFormatter.IsNotaTecnica(n))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Take(5)
                 .ToList();

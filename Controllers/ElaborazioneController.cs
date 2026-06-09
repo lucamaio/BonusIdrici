@@ -7,6 +7,7 @@ using Models.ViewModels; // Aggiungi questo using
 using System.IO;
 using System.Text.RegularExpressions;
 using BonusIdrici2.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -233,6 +234,7 @@ namespace Controllers
                     {
                         // Fase 3: Salvo i dati sul DB
                         bool datiSalvati = false;
+                        bool reportAggiornato = _context.ChangeTracker.Entries<Report>().Any(e => e.State == EntityState.Modified);
 
                         // a) Vertifico se ci sono domande da aggiungere al DB
                         if (datiComplessivi.domande.Count > 0)
@@ -258,6 +260,12 @@ namespace Controllers
 
                         // c) Se non ci sono dati da salvare ritorno alla pagina iniziale
                         
+                        if (!datiSalvati && reportAggiornato)
+                        {
+                            datiSalvati = true;
+                            await _context.SaveChangesAsync();
+                        }
+
                         if (!datiSalvati)
                         {
                             ViewBag.Message = "Nessun dato da salvare.";

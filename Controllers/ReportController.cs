@@ -140,7 +140,7 @@ namespace Controllers
                 () => _context.Reports
                     .AsNoTracking()
                     .Where(r => r.idEnte == selectedEnteId)
-                    .GroupBy(r => new { r.id, r.idEnte, r.idUser, r.serie, r.DataCreazione, r.stato, r.mese, r.anno })
+                    .GroupBy(r => new { r.id, r.idEnte, r.idUser, r.serie, r.DataCreazione, r.stato, r.mese, r.anno, r.note })
                     .Select(g => new Models.ViewModels.ReportViewModel
                     {
                         id = g.Key.id,
@@ -149,7 +149,8 @@ namespace Controllers
                         DataAggiornamento = g.Max(r => r.DataAggiornamento),
                         mese = g.Key.mese,
                         anno = g.Key.anno,
-                        stato = g.Key.stato,
+                        stato = g.Key.stato ?? "ND",
+                        note = g.Key.note ?? string.Empty,
                         serie = g.Key.serie,
                         count = _context.Domande.Count(d => d.idReport == g.Key.id),
                         Username = _context.Users
@@ -239,6 +240,7 @@ namespace Controllers
             }
             ViewBag.idReport = idReport;
             ViewBag.idEnte = reportEsistente.idEnte;
+            ViewBag.Serie = reportEsistente.serie;
 
             // 4. Mi ricavo tutte le domande associate al report
 

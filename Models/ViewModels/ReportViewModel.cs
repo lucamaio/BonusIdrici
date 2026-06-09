@@ -14,6 +14,8 @@ namespace Models.ViewModels
 
         public required string stato { get; set; }
 
+        public required string note { get; set; }
+
         public required int serie { get; set; }
 
         [Required]

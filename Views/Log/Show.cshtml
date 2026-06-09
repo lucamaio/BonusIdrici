@@ -1,119 +1,152 @@
 @{
     ViewData["Title"] = "Dettagli Log";
     List<Log> rows = ViewBag.Logs;
-    var LogViewModel = new Models.ViewModels.LogViewModel();
+    var logsList = rows ?? new List<Log>();
+    var tipoLog = ViewBag.TipoLog as string ?? "Log";
 }
 
-<div class="container-xxl flex-grow-1 py-5">
-    <div class="card shadow-sm border-0 rounded-4">
-        <!-- Header -->
-        <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-            <h3 class="mb-1 fw-bold">
-                <i class="bi bi-building me-2"></i> Dettagli Log - <span class="fw-semibold">@ViewBag.TipoLog</span>
-            </h3>
+<main class="data-page">
+    <section class="data-hero data-hero-blue">
+        <div>
+            <p>Diagnostica</p>
+            <h1>@tipoLog</h1>
+            <span>Dettagli e messaggi del log selezionato</span>
+        </div>
+    </section>
+
+    <section class="data-stats-grid">
+        <article class="data-stat-card stat-blue">
+            <i class="bi bi-activity"></i>
+            <span>Righe log</span>
+            <strong>@logsList.Count</strong>
+        </article>
+        <article class="data-stat-card stat-red">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+            <span>Errori</span>
+            <strong>@logsList.Count(x => x.TipoLog.Contains("ERROR", StringComparison.OrdinalIgnoreCase))</strong>
+        </article>
+        <article class="data-stat-card stat-amber">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Warning</span>
+            <strong>@logsList.Count(x => x.TipoLog.Contains("WARN", StringComparison.OrdinalIgnoreCase))</strong>
+        </article>
+    </section>
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio log</p>
+                <h2>Timestamp, livello e messaggio</h2>
+            </div>
+            <span>Ricerca, ordinamento e paginazione attivi</span>
         </div>
 
-        <!-- Barra di caricamento -->
         <div id="loadingBarContainer" style="display: none;">
             <div id="loadingBar" role="progressbar"></div>
         </div>
 
-        <!-- Body -->
-        <div class="card-body p-4">
-            @if (rows != null && rows.Count > 0){
-                <p class="lead mb-4 text-muted">Consulta tutti i log presenti</p>
-                <br>
+        @if (logsList.Any())
+        {
+            <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
+                <table id="logsTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Tipo Log</th>
+                            <th>Messaggio</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in logsList)
+                        {
+                            var statusClass = row.TipoLog.Contains("ERROR", StringComparison.OrdinalIgnoreCase)
+                                ? "status-danger"
+                                : row.TipoLog.Contains("WARN", StringComparison.OrdinalIgnoreCase)
+                                    ? "status-warning"
+                                    : "status-info";
 
-                <div class="table-responsive">
-                    <table id="logsTable" class="table table-hover align-middle border-bottom">
-                        <thead>
                             <tr>
-                                <th class="text-center">Timestamp</th>
-                                <th class="text-center">Tipo Log</th>
-                                <th class="text-center">Messaggio</th>
-                                <th class="text-center">Azioni</th>
+                                <td><span class="data-code">@row.Timestamp.ToString("dd/MM/yyyy HH:mm:ss")</span></td>
+                                <td><span class="data-status @statusClass">@row.TipoLog</span></td>
+                                <td>@row.GetShortMessage()</td>
+                                <td class="text-center">
+                                    <form asp-action="Dettails" method="post" class="d-inline">
+                                        <input type="hidden" name="Timestamp" value="@row.Timestamp" />
+                                        <input type="hidden" name="TipoLog" value="@row.TipoLog" />
+                                        <input type="hidden" name="Messaggio" value="@row.Messaggio" />
+                                        <button type="submit" class="data-icon-button" title="Dettagli log">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var row in rows)
-                            {
-                                <tr>
-                                    <td class="text-center"><span>@row.Timestamp</span></td>
-                                    <td class="fw-semibold text-center"><span>@row.TipoLog</span></td>
-                                    <td class="text-center"><span>@row.GetShortMessage()</span></td>
-                                   
-                                  
-                                    <td class="text-center">
-                                        <form asp-action="Dettails" method="post">
-                                            <input type="hidden" name="Timestamp" value="@row.Timestamp" />
-                                            <input type="hidden" name="TipoLog" value="@row.TipoLog" />
-                                            <input type="hidden" name="Messaggio" value="@row.Messaggio" />
-                                            <button type="submit" class="btn btn-sm btn-light border me-1" title="Dettagli">
-                                                <i class="bi bi-pencil-square text-primary"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-warning text-center shadow-sm rounded-3">
-                    <i class="bi bi-exclamation-triangle me-2"></i> Nessun domande disponibile per il tipo di log selezionato.
-                </div>
-            }
-            <hr class="my-4" />
-
-            <div class="d-grid mt-4">
-                <a href="@Url.Action("Index", "Log")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                    <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Selezione
-                </a>
+                        }
+                    </tbody>
+                </table>
             </div>
-                   
-        </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun log disponibile</strong>
+                <span>Non risultano righe disponibili per il tipo di log selezionato.</span>
+            </div>
+        }
+    </section>
+
+    <div class="data-bottom-actions">
+        <a href="@Url.Action("Index", "Log")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left-circle"></i>
+            <span>Torna alla selezione</span>
+        </a>
     </div>
-</div>
+</main>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
             $("#loadingBarContainer").show();
-                var progress = 0;
-                var interval = setInterval(function () {
-                    if (progress < 90) {
-                        progress += 10;
-                        $("#loadingBar").css("width", progress + "%");
-                    }
-                }, 300);
-                
+            var progress = 0;
+            var interval = setInterval(function () {
+                if (progress < 90) {
+                    progress += 10;
+                    $("#loadingBar").css("width", progress + "%");
+                }
+            }, 300);
+
             var logsTable = $('#logsTable').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
                 responsive: true,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
                 language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"Bf>>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end domande"p>>',
-                buttons: [
-                    {
-                        @* text: '<i class="bi bi-plus-circle me-1"></i> Varia Serie',
-                        className: 'btn btn-sm btn-success',
-                        action: function () {
-                            window.location.href = '@Url.Action("VariaSerie", "Domande")'
-                                + '?idEnte=@idEnte&idAto=@idAto';
-                        } *@
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                buttons: [],
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var pages = api.page.info().pages;
+                    if (pages <= 1) {
+                        $(api.table().container()).find('.dataTables_paginate').hide();
+                        $(api.table().container()).find('.dataTables_length').hide();
+                    } else {
+                        $(api.table().container()).find('.dataTables_paginate').show();
+                        $(api.table().container()).find('.dataTables_length').show();
                     }
-                ],
-            }); 
+                }
+            });
+
             logsTable.on('init', function () {
                 clearInterval(interval);
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
                     $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); 
+                    $("#tableWrapper").fadeIn();
                 }, 500);
             });
-        }); 
+        });
     </script>
 }

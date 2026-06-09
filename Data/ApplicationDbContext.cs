@@ -237,6 +237,7 @@ namespace Data
                 entity.Property(f => f.DataAggiornamento).HasColumnName("data_aggiornamento");
                 entity.Property(f=>f.idEnte).HasColumnName("id_ente").IsRequired();
                 entity.Property(f=>f.idUser).HasColumnName("id_user").IsRequired();
+                entity.Property(f=>f.note).HasColumnName("note");
             });
 
             // Configurazione per la classe Toponimo

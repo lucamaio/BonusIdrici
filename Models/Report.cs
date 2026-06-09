@@ -35,6 +35,8 @@ namespace Models
         [Required]
         public required int serie {get; set;}
 
+        public string? note { get; set; }
+
         // Stati validi per il report
         private static List<string> statiValidi = new List<string> { "Da verificare", "Approvato", "Emesso", "Annullato" };
 

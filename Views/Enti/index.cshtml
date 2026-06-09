@@ -1,106 +1,121 @@
 @model IEnumerable<Models.ViewModels.EntiViewModel>
 @{
     ViewData["Title"] = "Enti";
+    var entiList = Model?.ToList() ?? new List<Models.ViewModels.EntiViewModel>();
 }
 
-<div class="container-xxl flex-grow-1 py-5">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4 w-100">
-                <!-- Header -->
-               <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
-                    <div class="d-flex fw-bold justify-content-center align-items-center">
-                        <i class="fa-solid fa-building me-2"></i>
-                        <h3 class="fw-bold mb-0">Enti</h3>
-                    </div>
-                </div>
-
-                <!-- Barra di caricamento -->
-                <div id="loadingBarContainer" style="display: none;">
-                    <div id="loadingBar" role="progressbar"></div>
-                </div>
-
-                @if (!string.IsNullOrEmpty(ViewBag.Message))
-                    {
-                        <div class="alert alert-info mt-3" role="alert">
-                            @ViewBag.Message
-                        </div>
-                    }
-
-                <!-- Body -->
-                <div class="card-body p-4 position-relative">
-                    @if (Model != null && Model.Any())
-                    {
-                       <div class="info-text mb-4">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <span>Di seguito sono elencate tutte gli enti registrati nel sistema.</span>
-                        </div>
-
-                        <div class="d-flex justify-content-end mb-3">
-                            <a href="@Url.Action("Create", "Enti")" class="btn btn-modern-add shadow-sm">
-                                <i class="bi bi-plus-circle me-2"></i> Aggiungi un Ente
-                            </a>
-                        </div>
-
-                        <div class="table-responsive w-100" id="tableWrapper" style="display: none;"> 
-                            <table id="entiTable" class="table table-hover align-middle border-bottom w-100">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">ID</th>
-                                        <th class="text-center">Nome</th>
-                                        <th class="text-center">Istat</th>
-                                        <th class="text-center">Codice Fiscale</th>
-                                        <th class="text-center">P.IVA</th>
-                                        <th class="text-center">CAP</th>
-                                        <th class="text-center">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td><span class="text-center fw-semibold">@item.id</span></td>
-                                            <td><span class="text-center fw-semibold">@item.nome</span></td>
-                                            <td><span class="text-center">@item.istat</span></td>    
-                                            <td><span class="text-center">@item.CodiceFiscale</span></td>
-                                            <td><span class="text-center">@item.partitaIva</span></td>
-                                            <td><span class="text-center">@item.Cap</span></td>
-                                            <td class="text-center">
-                                                <a class="btn btn-modern-edit btn-sm" title="Modifica Dati Ente"
-                                                   href="@Url.Action("Modifica", "Enti", new { id = item.id})">
-                                                    <i class="bi bi-pencil-square text-primary"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                          <div class="alert alert-warning text-center shadow-sm rounded-3 mb-3">
-                                <i class="bi bi-exclamation-triangle me-2"></i> Nessun dato trovato per l'ente selezionato.
-                            </div>
-
-                            <div class="d-flex justify-content-end mb-3">
-                                <a href="@Url.Action("Create", "Ente")"
-                                class="btn btn-anagrafe btn-sm shadow-sm">
-                                    <i class="bi bi-plus-circle me-1"></i> Aggiungi
-                                </a>
-                            </div>
-                    }
-                         <div class="d-grid mt-4">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg shadow-sm">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Torna alla Home
-                        </a>
-                    </div>
-                                
-                </div>
-            </div>
+<main class="data-page">
+    <section class="data-hero data-hero-blue">
+        <div>
+            <p>Gestione enti</p>
+            <h1>Enti</h1>
+            <span>Amministrazione degli enti abilitati</span>
         </div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("Create", "Enti")" class="btn data-primary-action">
+                <i class="bi bi-plus-circle"></i>
+                <span>Aggiungi ente</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="data-stats-grid">
+        <article class="data-stat-card stat-blue">
+            <i class="bi bi-building-fill"></i>
+            <span>Enti registrati</span>
+            <strong>@entiList.Count</strong>
+        </article>
+        <article class="data-stat-card stat-green">
+            <i class="bi bi-check2-circle"></i>
+            <span>Selene attivo</span>
+            <strong>@entiList.Count(x => x.Selene)</strong>
+        </article>
+        <article class="data-stat-card stat-amber">
+            <i class="bi bi-hdd-network-fill"></i>
+            <span>Piranha attivo</span>
+            <strong>@entiList.Count(x => x.Piranha)</strong>
+        </article>
+    </section>
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Archivio enti</p>
+                <h2>Dati anagrafici e codici ente</h2>
+            </div>
+            <span>Ricerca, ordinamento e paginazione attivi</span>
+        </div>
+
+        <div id="loadingBarContainer" style="display: none;">
+            <div id="loadingBar" role="progressbar"></div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info mt-3" role="alert">
+                @ViewBag.Message
+            </div>
+        }
+
+        @if (entiList.Any())
+        {
+            <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
+                <table id="entiTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Ente</th>
+                            <th>Istat</th>
+                            <th>Codice Fiscale</th>
+                            <th>P.IVA</th>
+                            <th>CAP</th>
+                            <th>Serie</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in entiList)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@item.nome</strong>
+                                        <span>ID @item.id</span>
+                                    </div>
+                                </td>
+                                <td><span class="data-code">@item.istat</span></td>
+                                <td>@item.CodiceFiscale</td>
+                                <td>@item.partitaIva</td>
+                                <td>@item.Cap</td>
+                                <td><span class="data-code">@item.Serie</span></td>
+                                <td class="text-center">
+                                    <a class="data-icon-button" title="Modifica dati ente"
+                                       href="@Url.Action("Modifica", "Enti", new { id = item.id })">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Nessun ente trovato</strong>
+                <span>Non risultano enti registrati nel sistema.</span>
+            </div>
+        }
+    </section>
+
+    <div class="data-bottom-actions">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left-circle"></i>
+            <span>Torna alla home</span>
+        </a>
     </div>
-</div>
+</main>
 
 @section Scripts {
     <script>
@@ -142,10 +157,9 @@
                 $("#loadingBar").css("width", "100%");
                 setTimeout(function () {
                     $("#loadingBarContainer").fadeOut();
-                    $("#tableWrapper").fadeIn(); 
+                    $("#tableWrapper").fadeIn();
                 }, 500);
             });
         });
     </script>
 }
-

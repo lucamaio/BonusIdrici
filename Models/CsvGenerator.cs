@@ -336,7 +336,7 @@ public static class CsvGenerator
                     EscapeCsvField(domanda.numeroComponenti?.ToString(CultureInfo.InvariantCulture), Delimitatore),
                     EscapeCsvField(domanda.mc?.ToString(CultureInfo.InvariantCulture), Delimitatore),
                     EscapeCsvField(domanda.incongruenze?.ToString() ?? string.Empty, Delimitatore),
-                    EscapeCsvField(domanda.note, Delimitatore)
+                    EscapeCsvField(DomandaNoteFormatter.NascondiNoteTecniche(domanda.note), Delimitatore)
                 };
 
                 csvContent.AppendLine(string.Join(Delimitatore, campi));

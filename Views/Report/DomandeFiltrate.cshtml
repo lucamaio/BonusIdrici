@@ -112,7 +112,7 @@
                                                     <span class="badge bg-secondary">N/A</span>
                                                 }
                                             </td>
-                                            <td style="min-width: 260px; white-space: pre-wrap;">@domanda.note</td>
+                                            <td style="min-width: 260px; white-space: pre-wrap;">@DomandaNoteFormatter.NascondiNoteTecniche(domanda.note)</td>
                                             <td class="text-center">
                                                 <a class="btn btn-modern-edit btn-sm" title="Varia"
                                                    href="@Url.Action("Varia", "Report", new { id = domanda.id })">

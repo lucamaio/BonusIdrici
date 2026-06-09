@@ -20,13 +20,19 @@ namespace BonusIdrici2.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await CheckAndCleanupAsync(stoppingToken);
-
-            using var timer = new PeriodicTimer(GetCheckInterval());
-
-            while (await timer.WaitForNextTickAsync(stoppingToken))
+            try
             {
                 await CheckAndCleanupAsync(stoppingToken);
+
+                using var timer = new PeriodicTimer(GetCheckInterval());
+
+                while (await timer.WaitForNextTickAsync(stoppingToken))
+                {
+                    await CheckAndCleanupAsync(stoppingToken);
+                }
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
             }
         }
 
