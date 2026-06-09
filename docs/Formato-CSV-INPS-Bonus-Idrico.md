@@ -4,6 +4,8 @@ Funzione di lettura: `CSVReader.LeggiFileINPS`.
 
 Il file deve avere almeno 16 campi, quindi posizioni da 1 a 16. Tutte le posizioni vengono lette dal codice.
 
+Il tracciato INPS resta posizionale: la prima riga viene saltata come intestazione e i campi vengono letti per indice.
+
 ## Ordine Campi
 
 | Posizione | Indice codice | Campo | Obbligatorio per il caricamento | Note |
@@ -31,3 +33,6 @@ Esempio intestazione minima coerente:
 IdAto;CodiceBonus;CodiceFiscaleRichiedente;NomeDichiarante;CognomeDichiarante;CodiciFiscaliFamiliari;AnnoValidita;DataInizioValidita;DataFineValidita;IndirizzoAbitazione;NumeroCivico;IstatAbitazione;CapAbitazione;ProvinciaAbitazione;PresenzaPod;NumeroComponenti
 ```
 
+## Confronto Indirizzi
+
+L'indirizzo abitazione del file INPS viene confrontato con la residenza anagrafica e con l'ubicazione dell'utenza idrica. Quando le vie dell'ente sono collegate a `IndirizziNormalizzati`, il confronto usa prima l'identificativo normalizzato; se manca il collegamento, usa il confronto testuale legacy e registra una nota.

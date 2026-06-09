@@ -158,6 +158,23 @@ namespace Controllers
             return View(_sectionActivityService.GetAdminActivityDashboard());
         }
 
+        public IActionResult AttivitaDettaglio(string sezione)
+        {
+            if (!VerificaSessione("ADMIN"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var detail = _sectionActivityService.GetAdminActivityDetail(sezione);
+
+            if (detail == null)
+            {
+                return RedirectToAction("Attivita");
+            }
+
+            return View(detail);
+        }
+
         public IActionResult ClearCache()
         {
             if (!VerificaSessione("ADMIN") || idUser != 1)

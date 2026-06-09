@@ -5,7 +5,6 @@
     var selectedEnteId = ViewBag.SelectedEnteId;
     var selectedEnteNome = ViewBag.SelectedEnteNome;
     var totalePersone = Model?.Count() ?? 0;
-    var famiglie = Model?.Select(x => x.CodiceFiscale).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().Count() ?? 0;
     var sectionActivity = ViewBag.SectionActivity as Models.ViewModels.SectionActivitySummaryViewModel;
 }
 
@@ -14,25 +13,46 @@
         <div>
             <p>Anagrafe ente</p>
             <h1>@selectedEnteNome</h1>
-            <span>ID Ente: @selectedEnteId</span>
         </div>
-        <div class="data-hero-actions">
-            <a href="@Url.Action("Create", "Anagrafe", new { idEnte = selectedEnteId })" class="btn data-primary-action">
-                <i class="bi bi-plus-circle"></i>
-                <span>Aggiungi persona</span>
-            </a>
-            <a href="@Url.Action("Snapshot", "Anagrafe", new { selectedEnteId = selectedEnteId })" class="btn btn-outline-light">
-                <i class="bi bi-clock-history"></i>
-                <span>Snapshot</span>
-            </a>
-            @if (ViewBag.Ruolo == "ADMIN" && ViewBag.idUser == 1)
-            {
-                <a href="@Url.Action("EsportaCsv", "Anagrafe", new { selectedEnteId = selectedEnteId })" class="btn btn-outline-light">
-                    <i class="bi bi-download"></i>
-                    <span>Esporta CSV</span>
-                </a>
-            }
+
+        @* Pulsante delle azioni - contente le varie operazioni possibili a seconda del ruolo dell'utente *@
+        <div class="data-hero-actions d-flex justify-content-end mb-3">
+            <button id="myDropdownToggle" type="button" class="btn data-primary-action dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear-fill me-1"></i> Azioni
+            </button>
+            <ul class="dropdown-menu shadow-sm">
+                <!-- Sezione: Esportazioni -->
+                <li class="dropdown-header text-muted"><b>Operazioni Base</b></li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("Create", "Anagrafe", new { idEnte = selectedEnteId })">
+                        <i class="bi bi-plus-circle me-2 text-primary"></i> Agiungi Persona
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("Snapshot", "Anagrafe", new { selectedEnteId = selectedEnteId })">
+                        <i class="bi bi-clock-history me-2 text-primary"></i> Vedi Snapshot
+                    </a>
+                </li>
+               
+                @* Voci admin *@
+                @if(ViewBag.Ruolo == "ADMIN" && ViewBag.idUser == 1) {
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header text-muted"><b>Operazioni ADMIN</b></li>
+                    
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("EsportaCsv", "Anagrafe", new { selectedEnteId = selectedEnteId })">
+                            <i class="bi bi-database-down me-2 text-warning"></i> <label class="text-warning">Esporta CSV</label>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Upload", "Anagrafe")">
+                            <i class="bi bi-download me-2 text-danger"></i> <label class="text-danger">Carica Anagrafe</label>
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
+        
     </section>
 
     <section class="data-stats-grid">
@@ -41,23 +61,20 @@
             <span>Persone registrate</span>
             <strong>@totalePersone</strong>
         </article>
-        <article class="data-stat-card">
-            <i class="bi bi-person-vcard"></i>
-            <span>Codici fiscali</span>
-            <strong>@famiglie</strong>
-        </article>
-        <article class="data-stat-card">
-            <i class="bi bi-building-check"></i>
-            <span>Ente selezionato</span>
-            <strong>@selectedEnteId</strong>
-        </article>
+
+       @if (sectionActivity?.LastUpdate != null)
+        {
+            <article class="data-stat-card">
+                <i class="bi bi-clock-history text-success"></i>
+                <span>Ultimo aggiornamento</span>
+                <strong class="text-success">@sectionActivity.LastUpdate.Value.ToString("dd/MM/yyyy")</strong>
+            </article>
+        }
+
+        
     </section>
-
-    @if (sectionActivity != null)
-    {
-        @await Html.PartialAsync("_SectionActivityPanel", sectionActivity)
-    }
-
+    
+   
     <section class="data-table-card">
         <div class="data-table-header">
             <div>
@@ -183,5 +200,18 @@
                 }, 500);
             });
         });
+
+         document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('myDropdownToggle');
+        if (btn) {
+            new bootstrap.Dropdown(btn, {
+                popperConfig: {
+                    modifiers: [
+                        { name: 'preventOverflow', options: { boundary: document.body } }
+                    ]
+                }
+            });
+        }
+    });
     </script>
 }

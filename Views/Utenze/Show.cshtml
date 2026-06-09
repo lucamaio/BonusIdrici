@@ -12,25 +12,46 @@
         <div>
             <p>Utenze idriche ente</p>
             <h1>@selectedEnteNome</h1>
-            <span>ID Ente: @selectedEnteId</span>
         </div>
-        <div class="data-hero-actions">
-            <a href="@Url.Action("Create", "Utenze", new { idEnte = selectedEnteId })" class="btn data-primary-action">
-                <i class="bi bi-plus-circle"></i>
-                <span>Aggiungi utenza</span>
-            </a>
-            <a href="@Url.Action("Snapshot", "Utenze", new { selectedEnteId = selectedEnteId })" class="btn btn-outline-light">
-                <i class="bi bi-clock-history"></i>
-                <span>Snapshot</span>
-            </a>
-            @if (ViewBag.Ruolo == "ADMIN" && ViewBag.idUser == 1)
-            {
-                <a href="@Url.Action("EsportaCsv", "Utenze", new { selectedEnteId = selectedEnteId })" class="btn btn-outline-light">
-                    <i class="bi bi-download"></i>
-                    <span>Esporta CSV</span>
-                </a>
-            }
+
+
+        <div class="data-hero-actions d-flex justify-content-end mb-3">
+            <button id="myDropdownToggle" type="button" class="btn data-primary-action dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear-fill me-1"></i> Azioni
+            </button>
+            <ul class="dropdown-menu shadow-sm">
+                <!-- Sezione: Esportazioni -->
+                <li class="dropdown-header text-muted"><b>Operazioni Base</b></li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("Create", "Utenze", new { idEnte = selectedEnteId })">
+                        <i class="bi bi-plus-circle me-2 text-primary"></i> Agiungi utenza
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("Snapshot", "Utenze", new { selectedEnteId = selectedEnteId })">
+                        <i class="bi bi-clock-history me-2 text-primary"></i> Vedi Snapshot
+                    </a>
+                </li>
+               
+                @* Voci admin *@
+                @if(ViewBag.Ruolo == "ADMIN" && ViewBag.idUser == 1) {
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header text-muted"><b>Operazioni ADMIN</b></li>
+                    
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("EsportaCsv", "Utenze", new { selectedEnteId = selectedEnteId })">
+                            <i class="bi bi-database-down me-2 text-warning"></i> <label class="text-warning">Esporta CSV</label>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Upload", "Utenze")">
+                            <i class="bi bi-download me-2 text-danger"></i> <label class="text-danger">Carica Utenze</label>
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
+        
     </section>
 
     <section class="data-stats-grid data-stats-grid-wide">

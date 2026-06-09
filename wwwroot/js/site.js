@@ -62,6 +62,10 @@
 // Load-Bar
 
  $(document).ready(function () {
+    if (!$('#elencoDomande').length) {
+        return;
+    }
+
     $("#loadingBarContainer").show();
     var progress = 0;
     var interval = setInterval(function () {
@@ -106,6 +110,66 @@
     });
 
 });
+
+(function (window, $) {
+    if (!$) {
+        return;
+    }
+
+    window.initDataTableWithLoader = function (selector, options) {
+        var $table = $(selector);
+
+        if (!$table.length || !$.fn.DataTable) {
+            return null;
+        }
+
+        if ($.fn.DataTable.isDataTable($table)) {
+            return $table.DataTable();
+        }
+
+        var $target = $table.closest('.table-responsive');
+        if (!$target.length) {
+            $target = $table;
+        }
+
+        var $loader = $('<div class="table-loader" role="status" aria-live="polite">' +
+            '<div class="table-loader-track"><span></span></div>' +
+            '<div class="table-loader-label"><i class="bi bi-hourglass-split"></i><span>Caricamento tabella...</span></div>' +
+            '</div>');
+
+        $loader.insertBefore($target);
+        $target.addClass('table-loader-target').hide();
+
+        var progress = 0;
+        var interval = setInterval(function () {
+            if (progress < 90) {
+                progress += 10;
+                $loader.find('.table-loader-track span').css('width', progress + '%');
+            }
+        }, 180);
+
+        var settings = $.extend(true, {}, options || {});
+        var originalInitComplete = settings.initComplete;
+
+        settings.initComplete = function (settingsObj, json) {
+            clearInterval(interval);
+            $loader.find('.table-loader-track span').css('width', '100%');
+
+            setTimeout(function () {
+                $loader.fadeOut(160, function () {
+                    $(this).remove();
+                });
+                $target.fadeIn(180);
+            }, 220);
+
+            if (typeof originalInitComplete === 'function') {
+                originalInitComplete.call(this, settingsObj, json);
+            }
+        };
+
+        return $table.DataTable(settings);
+    };
+})(window, window.jQuery);
 
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchEnte');

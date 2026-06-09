@@ -2,17 +2,45 @@
 
 Funzione di lettura: `CSVReader.LeggiFileUtenzeIdriche`.
 
-Questo documento descrive il tracciato del CSV `RicercaParametricaH2O`, usato per caricare o aggiornare le utenze idriche. Il file di esempio analizzato contiene 83 colonne. Il codice usa direttamente la posizione delle colonne, quindi l'ordine deve restare invariato anche per i campi non usati.
+Questo documento descrive il tracciato del CSV `RicercaParametricaH2O`, usato per caricare o aggiornare le utenze idriche. Il file di esempio analizzato contiene 83 colonne, ma la lettura dei campi usati dal sistema e' ora guidata dalle intestazioni quando sono presenti.
 
 ## Regole Generali
 
 - Separatore campi: `;`.
-- Prima riga: intestazione, viene saltata.
-- Ordine colonne: vincolante.
+- Prima riga: intestazione, viene usata per cercare i campi e poi saltata.
+- Ordine colonne: consigliato come tracciato storico, ma non piu' vincolante per i campi riconosciuti da intestazione.
 - Date accettate dal codice: `dd/MM/yyyy` oppure `yyyy-MM-dd`.
 - Il parser rimuove eventuali virgolette doppie dai valori.
 - Evitare valori contenenti `;`, perche' la lettura usa `Split(';')`.
-- Il caricamento richiede almeno 39 colonne, ma il tracciato completo atteso per `RicercaParametricaH2O` ne contiene 83.
+- Il caricamento richiede almeno 39 colonne, ma il tracciato completo storico per `RicercaParametricaH2O` ne contiene 83.
+- Se una intestazione riconosciuta viene trovata, il codice usa quella posizione; se non viene trovata, usa l'indice storico.
+
+## Intestazioni Riconosciute
+
+Per le utenze idriche il codice cerca queste intestazioni:
+
+| Campo applicativo | Intestazione principale | Alternative |
+| --- | --- | --- |
+| Id Acquedotto | `IDAcquedotto` | - |
+| Stato | `Stato` | - |
+| Matricola Contatore | `MatContatore` | - |
+| Periodo Iniziale | `PeriodoInizio` | - |
+| Periodo Finale | `PeriodoFine` | - |
+| Indirizzo Ubicazione | `ToponimiUbiDescrizione` | - |
+| Numero Civico | `NCivico` | - |
+| Sub | `Sub` | - |
+| Scala | `Scala` | - |
+| Piano | `Piano` | - |
+| Interno | `Interno` | - |
+| Tipo Utenza | `CategoriaDDesCategoria` | `TipoUtenzaDom` |
+| Cognome / Ragione Sociale | `AnagraficaCognome` | - |
+| Nome | `AnagraficaNome` | - |
+| Sesso | `Sesso` | - |
+| Data Nascita | `DataNascita` | - |
+| Codice Fiscale | `CodiceFiscale` | - |
+| Partita IVA | `PartitaIVA` | - |
+
+Le intestazioni vengono normalizzate prima del confronto, quindi spazi, punteggiatura e differenze di maiuscole/minuscole non sono rilevanti.
 
 ## Colonne Usate Dal Sistema
 
@@ -58,7 +86,7 @@ Queste colonne alimentano direttamente il salvataggio in `UtenzaIdrica`, la crea
 | 13 | 12 | MatContatore | Si | Matricola contatore. |
 | 14 | 13 | PeriodoInizio | Si | Data inizio. |
 | 15 | 14 | PeriodoFine | Si | Data fine, facoltativa. |
-| 16 | 15 | Quantita | No | Mantenere la colonna. |
+| 16 | 15 | Quantita | No | Colonna storica non usata. Nei file senza questa colonna il caricamento puo' comunque funzionare se le intestazioni dei campi usati sono presenti. |
 | 17 | 16 | ToponimiUbiDescrizione | Si | Indirizzo ubicazione. |
 | 18 | 17 | NCivico | Si | Numero civico ubicazione. |
 | 19 | 18 | Sub | Si | Sub ubicazione. |
@@ -144,6 +172,18 @@ Queste colonne alimentano direttamente il salvataggio in `UtenzaIdrica`, la crea
 | `Indirizzo ubicazione mancante` | Posizione 17, `ToponimiUbiDescrizione`. |
 | `Data Nascita mancante` | Posizione 37, `DataNascita`; warning non bloccante per persone fisiche. |
 | `Numero civico mancante` | Posizione 18, `NCivico`. |
+
+## Compatibilita Con File Phiranha
+
+Il caricamento e' compatibile con file Phiranha in cui la colonna `Quantita` non e' presente o alcune colonne non usate sono spostate. La condizione importante e' che le intestazioni dei campi usati siano presenti e che la riga abbia almeno 39 campi.
+
+Se il sistema mostra `Nessun dato valido trovato nel file CSV`, controllare prima:
+
+- presenza della riga di intestazione;
+- separatore `;`;
+- colonne `CodiceFiscale`, `Sesso`, `CategoriaDDesCategoria` o `TipoUtenzaDom`;
+- colonne `ToponimiUbiDescrizione` e `NCivico`;
+- eventuali errori in `wwwroot/log/Elaborazione_Utenze.log`.
 
 ## Intestazione Attesa
 

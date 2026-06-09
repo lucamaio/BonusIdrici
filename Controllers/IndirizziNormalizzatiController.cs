@@ -21,19 +21,21 @@ namespace Controllers
         private readonly AppCacheService _cache;
         private readonly IndirizziService _indirizziService;
         private readonly VieEnteService _vieEnteService;
+        private readonly SectionActivityService _sectionActivityService;
         private readonly FileLog _logIndirizzi = new FileLog("wwwroot/log/IndirizziNormalizzati.log");
 
          private string? ruolo;
         private int? idUser;
         private string? username;
 
-        public IndirizziNormalizzatiController(ILogger<IndirizziNormalizzatiController> logger, ApplicationDbContext context, AppCacheService cache, IndirizziService indirizziService, VieEnteService vieEnteService)
+        public IndirizziNormalizzatiController(ILogger<IndirizziNormalizzatiController> logger, ApplicationDbContext context, AppCacheService cache, IndirizziService indirizziService, VieEnteService vieEnteService, SectionActivityService sectionActivityService)
         {
             _logger = logger;
             _context = context;
             _cache = cache;
             _indirizziService = indirizziService;
             _vieEnteService = vieEnteService;
+            _sectionActivityService = sectionActivityService;
 
             if (VerificaSessione())
             {
@@ -163,9 +165,85 @@ namespace Controllers
             ViewBag.VieAmbigue = vieEnte.Count(v => v.Stato == "AMBIGUA");
             ViewBag.TotaleIndirizziNormalizzati = indirizziNormalizzati.Count;
             ViewBag.NomeEnte = _context.Enti.Where(e => e.id == selectedEnteId).Select(e => e.nome).FirstOrDefault() ?? "N/D";
+            ViewBag.SectionActivity = _sectionActivityService.GetIndirizziNormalizzatiActivity(selectedEnteId);
 
             return View("Show");
 
+        }
+
+        public IActionResult Modifica(int id)
+        {
+            if (!VerificaSessione())
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla modifica indirizzo normalizzato ID " + id);
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var indirizzoNormalizzato = _context.IndirizziNormalizzati
+                .AsNoTracking()
+                .FirstOrDefault(i => i.Id == id);
+
+            if (indirizzoNormalizzato == null)
+            {
+                TempData["Message"] = "Indirizzo normalizzato non trovato.";
+                return RedirectToAction("Index");
+            }
+
+            var vieCollegate = _context.VieEnte
+                .AsNoTracking()
+                .Where(v => v.IdEnte == indirizzoNormalizzato.IdEnte && v.IdIndirizzoNormalizzato == indirizzoNormalizzato.Id)
+                .OrderBy(v => v.DenominazionePulita)
+                .ThenBy(v => v.DenominazioneOriginale)
+                .ThenBy(v => v.Fonte)
+                .ToList();
+
+            ViewBag.NomeEnte = _context.Enti
+                .AsNoTracking()
+                .Where(e => e.id == indirizzoNormalizzato.IdEnte)
+                .Select(e => e.nome)
+                .FirstOrDefault() ?? "N/D";
+            ViewBag.VieCollegate = vieCollegate;
+
+            return View("Modifica", indirizzoNormalizzato);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, int idEnte, string denominazioneNormalizzata, bool attivo, string? note)
+        {
+            if (!VerificaSessione())
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad aggiornare indirizzo normalizzato ID " + id);
+                ViewBag.Message = "Utente non autorizzato ad accedere a questa pagina";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var indirizzoNormalizzato = await _context.IndirizziNormalizzati
+                .FirstOrDefaultAsync(i => i.Id == id && i.IdEnte == idEnte);
+
+            if (indirizzoNormalizzato == null)
+            {
+                TempData["Message"] = "Indirizzo normalizzato non trovato.";
+                return RedirectToAction("Index");
+            }
+
+            if (string.IsNullOrWhiteSpace(denominazioneNormalizzata))
+            {
+                TempData["Message"] = "La denominazione normalizzata e obbligatoria.";
+                return RedirectToAction("Modifica", new { id });
+            }
+
+            indirizzoNormalizzato.DenominazioneNormalizzata = denominazioneNormalizzata.Trim().ToUpperInvariant();
+            indirizzoNormalizzato.Attivo = attivo;
+            indirizzoNormalizzato.Note = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+            indirizzoNormalizzato.DataAggiornamento = DateTime.Now;
+            indirizzoNormalizzato.IdUser = idUser ?? indirizzoNormalizzato.IdUser;
+
+            await _context.SaveChangesAsync();
+            _cache.ClearEnteCache(idEnte);
+
+            TempData["Message"] = "Indirizzo normalizzato aggiornato correttamente.";
+            return RedirectToAction("Show", new { selectedEnteId = idEnte });
         }
 
 
@@ -221,7 +299,7 @@ namespace Controllers
             {
                 var result = await _vieEnteService.CreaIndirizziNormalizzatiAsync(selectedEnteId, idUser ?? 0);
                 _cache.ClearEnteCache(selectedEnteId);
-                TempData["Message"] = $"Indirizzi normalizzati creati. Gruppi: {result.GruppiAnalizzati}, Creati: {result.IndirizziCreati}, Vie collegate: {result.VieCollegate}, Ambigue: {result.VieAmbigue}.";
+                TempData["Message"] = $"Indirizzi normalizzati creati. Gruppi: {result.GruppiAnalizzati}, Creati: {result.IndirizziCreati}, Vie collegate: {result.VieCollegate}, Abbreviazioni collegate: {result.VieAbbreviateCollegate}, Ambigue: {result.VieAmbigue}.";
                 return RedirectToAction("Show", new { selectedEnteId });
             }
             catch (Exception ex)

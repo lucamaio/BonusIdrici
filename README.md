@@ -11,6 +11,7 @@ Il sistema aiuta amministratori e operatori a:
 - importare forniture idriche;
 - mantenere uno storico mensile di anagrafe e utenze;
 - normalizzare gli indirizzi tramite toponimi;
+- creare e verificare normalizzazioni condivise fra vie anagrafiche e vie utenze;
 - elaborare le richieste INPS del bonus idrico;
 - verificare forniture dirette e indirette;
 - produrre report, statistiche ed esportazioni CSV.
@@ -26,10 +27,10 @@ Il sistema aiuta amministratori e operatori a:
 
 ## Struttura Principale
 
-- `Controllers/`: controller MVC per anagrafe, utenze, toponimi, elaborazioni, report, utenti ed enti.
+- `Controllers/`: controller MVC per anagrafe, utenze, toponimi, indirizzi normalizzati, elaborazioni, report, utenti ed enti.
 - `Models/`: entita', lettori CSV, generatori CSV e funzioni trasversali.
 - `Data/ApplicationDbContext.cs`: mapping Entity Framework delle tabelle.
-- `Services/`: cache applicativa, riepilogo attivita' e pulizia log.
+- `Services/`: cache applicativa, riepilogo attivita', normalizzazione indirizzi e pulizia log.
 - `Views/`: pagine Razor.
 - `docs/`: documentazione tecnica e tracciati CSV.
 
@@ -38,10 +39,11 @@ Il sistema aiuta amministratori e operatori a:
 1. Configurare gli enti con dati territoriali: ISTAT, CAP, provincia, partita IVA e impostazioni operative.
 2. Caricare l'anagrafe del mese di riferimento.
 3. Caricare le utenze idriche dello stesso mese.
-4. Controllare eventuali warning su indirizzi e toponimi.
-5. Elaborare il file INPS scegliendo ente, mese, anno e opzioni di confronto.
-6. Verificare le domande con incongruenze.
-7. Esportare gli esiti richiesti.
+4. Popolare le `VieEnte` e creare o aggiornare gli `IndirizziNormalizzati`.
+5. Controllare eventuali warning su indirizzi, vie ambigue e toponimi.
+6. Elaborare il file INPS scegliendo ente, mese, anno e opzioni di confronto.
+7. Verificare le domande con incongruenze.
+8. Esportare gli esiti richiesti.
 
 ## Dati Correnti E Storico
 
@@ -52,6 +54,8 @@ Dato corrente:
 - `dichiaranti`;
 - `utenzeidriche`;
 - `toponomi`;
+- `VieEnte`;
+- `IndirizziNormalizzati`;
 - `reports`;
 - `domande`.
 
@@ -74,6 +78,7 @@ Per ogni richiesta il sistema:
 - controlla la competenza territoriale su ISTAT, CAP e provincia;
 - cerca il richiedente nello snapshot anagrafico del periodo;
 - verifica la fornitura nello snapshot utenze del periodo;
+- confronta gli indirizzi usando prima `VieEnte` e `IndirizziNormalizzati`, poi il fallback testuale;
 - valuta eventuali componenti maggiorenni del nucleo;
 - calcola l'esito;
 - calcola i metri cubi per esiti favorevoli;
@@ -100,6 +105,15 @@ La logica principale e' in `FunzioniTrasversali`:
 
 I toponimi possono essere gestiti manualmente oppure creati e aggiornati durante il caricamento delle utenze idriche.
 
+## Indirizzi Normalizzati
+
+La normalizzazione moderna passa da due tabelle:
+
+- `VieEnte`: raccoglie le vie lette da anagrafe e utenze, con fonte, occorrenze, civico eventualmente estratto e stato operativo;
+- `IndirizziNormalizzati`: rappresenta la forma unica a cui collegare piu' varianti della stessa via.
+
+La sezione `Indirizzi Normalizzati` permette di popolare le vie dell'ente, creare normalizzazioni automatiche, modificare una normalizzazione e vedere tutte le `VieEnte` collegate. Le abbreviazioni con iniziali, come `VIA B CAPUTO`, vengono collegate automaticamente solo quando esiste una corrispondenza univoca, per esempio `VIA BENEDETTO CAPUTO`; se ci sono piu' candidati restano in stato `AMBIGUA`.
+
 ## Cache
 
 `AppCacheService` gestisce una cache in memoria con chiavi leggibili, per esempio:
@@ -120,6 +134,7 @@ Le modifiche ai dati invalidano le chiavi tramite `ClearEnteCache`, `ClearUserCa
 Documenti tecnici:
 
 - `docs/Gestione-Toponimi.md`;
+- `docs/Gestione-Indirizzi-Normalizzati.md`;
 - `docs/Processo-Richieste-INPS.md`;
 - `docs/Storico-Anagrafe-Utenze.md`;
 - `docs/Sistema-Cache.md`;
@@ -139,9 +154,12 @@ I log principali sono:
 - `wwwroot/log/utenti.log`;
 - `wwwroot/log/Elaborazione_Anagrafe.log`;
 - `wwwroot/log/Elaborazione_Utenze.log`;
-- `wwwroot/log/Elaborazione_INPS.log`.
+- `wwwroot/log/Elaborazione_INPS.log`;
+- `wwwroot/log/IndirizziNormalizzati.log`.
 
 I warning non bloccano sempre il caricamento. Gli errori indicano righe saltate o dati insufficienti.
+
+La pagina `Attivita` dell'amministratore mostra le ultime 5 operazioni per categoria applicativa e le ultime 5 righe diagnostiche per livello `ERROR`, `WARNING`, `INFO` e `DEBUG`. I pulsanti di dettaglio aprono tabelle complete con paginazione.
 
 ## Build E Avvio
 

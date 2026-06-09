@@ -117,32 +117,24 @@
 
             <nav class="sidebar-nav">
                 <section class="sidebar-section">
-                    <span class="sidebar-section-title">Principale</span>
+                    <span class="sidebar-section-title">Cruscotto</span>
                     <a asp-controller="Home" asp-action="Index">
                         <i class="bi bi-house-door"></i>
-                        <span>Home</span>
-                    </a>
-                    <a asp-controller="Home" asp-action="Info">
-                        <i class="bi bi-info-circle"></i>
-                        <span>Info</span>
-                    </a>
-                    <a href="https://www.p-service.it/index.html" target="_blank" rel="noopener">
-                        <i class="bi bi-telephone"></i>
-                        <span>Contatti</span>
+                        <span>Dashboard</span>
                     </a>
                 </section>
 
                 @if (canUseOperations)
                 {
                     <section class="sidebar-section">
-                        <span class="sidebar-section-title">Operazioni</span>
+                        <span class="sidebar-section-title">Consultazione Dati</span>
                         <a asp-controller="Anagrafe" asp-action="Index">
                             <i class="bi bi-people"></i>
                             <span>Anagrafe</span>
                         </a>
-                        <a asp-controller="Toponomi" asp-action="Index">
+                        <a asp-controller="IndirizziNormalizzati" asp-action="Index">
                             <i class="bi bi-signpost"></i>
-                            <span>Toponomi</span>
+                            <span>Indirizzi Normalizzati</span>
                         </a>
                         @if (isAdminPrincipale)
                         {
@@ -155,9 +147,17 @@
                             <i class="bi bi-droplet-half"></i>
                             <span>Utenze Idriche</span>
                         </a>
+                    </section>
+
+                    <section class="sidebar-section">
+                        <span class="sidebar-section-title">Elaborazioni</span>
+                        <a asp-controller="Elaborazione" asp-action="NewProcessing">
+                            <i class="bi bi-play-circle"></i>
+                            <span>Nuova Elaborazione</span>
+                        </a>
                         <a asp-controller="Report" asp-action="Index">
                             <i class="bi bi-file-earmark-bar-graph"></i>
-                            <span>Elaborazioni</span>
+                            <span>Report Elaborati</span>
                         </a>
                     </section>
                 }
@@ -165,7 +165,7 @@
                 @if (isAdmin)
                 {
                     <section class="sidebar-section sidebar-admin-section">
-                        <span class="sidebar-section-title">Opzioni Admin</span>
+                        <span class="sidebar-section-title">Caricamenti</span>
                         <a asp-controller="Anagrafe" asp-action="Upload">
                             <i class="bi bi-cloud-arrow-up"></i>
                             <span>Carica Anagrafe</span>
@@ -174,10 +174,10 @@
                             <i class="bi bi-database-add"></i>
                             <span>Carica Utenze</span>
                         </a>
-                        <a asp-controller="Elaborazione" asp-action="NewProcessing">
-                            <i class="bi bi-play-circle"></i>
-                            <span>Nuova Elaborazione</span>
-                        </a>
+                    </section>
+
+                    <section class="sidebar-section sidebar-admin-section">
+                        <span class="sidebar-section-title">Amministratore</span>
                         <a asp-controller="Enti" asp-action="Index">
                             <i class="bi bi-building-gear"></i>
                             <span>Gestione Enti</span>
@@ -186,6 +186,14 @@
                             <i class="bi bi-person-gear"></i>
                             <span>Gestione Utenti</span>
                         </a>
+                        <a asp-controller="Statistiche" asp-action="Index">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span>Statistiche</span>
+                        </a>
+                    </section>
+
+                    <section class="sidebar-section sidebar-admin-section">
+                        <span class="sidebar-section-title">Monitoraggio</span>
                         <a asp-controller="Log" asp-action="Index">
                             <i class="bi bi-activity"></i>
                             <span>Diagnostica</span>
@@ -194,12 +202,24 @@
                             <i class="bi bi-clock-history"></i>
                             <span>Attività Recenti</span>
                         </a>
-                        <a asp-controller="Statistiche" asp-action="Index">
-                            <i class="bi bi-graph-up-arrow"></i>
-                            <span>Statistiche</span>
-                        </a>
                     </section>
                 }
+
+                <section class="sidebar-section">
+                    <span class="sidebar-section-title">Supporto</span>
+                    <a asp-controller="Home" asp-action="Info">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Info</span>
+                    </a>
+                    <a asp-controller="Home" asp-action="FAQ">
+                        <i class="bi bi-question-circle"></i>
+                        <span>FAQ operative</span>
+                    </a>
+                    <a href="https://www.p-service.it/index.html" target="_blank" rel="noopener">
+                        <i class="bi bi-telephone"></i>
+                        <span>Contatti</span>
+                    </a>
+                </section>
             </nav>
 
             @if (isLogged)
@@ -267,6 +287,22 @@
     <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.min.js"></script>
+
+    <script>
+        if (window.jQuery && $.fn.dataTable) {
+            $.extend(true, $.fn.dataTable.defaults, {
+                pagingType: "full_numbers",
+                language: {
+                    paginate: {
+                        first: "«",
+                        previous: "‹",
+                        next: "›",
+                        last: "»"
+                    }
+                }
+            });
+        }
+    </script>
 
     <!-- Script Sidebar -->
     <script>

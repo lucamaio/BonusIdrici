@@ -124,7 +124,7 @@ namespace Controllers
         // Funzione 1: Genera i report e le relative domande
 
         [HttpPost]
-        public async Task<IActionResult> Processing(IFormFile csv_file, int selectedEnteId, string mese, string anno, int serie, bool confrontoCivico, bool escludiComponenti)
+        public async Task<IActionResult> Processing(IFormFile csv_file, int selectedEnteId, string mese, string anno, int serie, bool confrontoCivico, bool escludiComponenti, bool escludiAlertSnapshot)
         {
             // Fase 0: Verifico se esiste una sessione
             if (!VerificaSessione())
@@ -223,6 +223,7 @@ namespace Controllers
                     idReport,
                     confrontoCivico,
                     escludiComponenti,
+                    escludiAlertSnapshot,
                     annoReport,
                     meseReport);
                 AccountController.logFile.LogInfo($"L'utente {username} ha effetuato un nuova elaborazione del file csv del INPS per l'ente {selectedEnteId}");

@@ -9,7 +9,7 @@ Entrambi i caricamenti:
 - sono riservati agli utenti con ruolo `ADMIN`;
 - accettano solo file `.csv`;
 - usano `;` come delimitatore;
-- ignorano la prima riga, considerata intestazione;
+- usano la prima riga come intestazione; anagrafe la salta, utenze la usa anche per riconoscere le colonne;
 - richiedono ente, mese e anno di riferimento;
 - salvano temporaneamente il file con `Path.GetTempFileName`;
 - cancellano il file temporaneo nel blocco `finally`;
@@ -114,6 +114,8 @@ Il controller:
 
 `CSVReader.LeggiFileUtenzeIdriche` richiede almeno 39 campi per riga.
 
+Per le utenze idriche la lettura dei campi principali usa prima le intestazioni. Se una intestazione non viene trovata, il codice ricade sull'indice storico del tracciato `RicercaParametricaH2O`. Questo consente di caricare anche esportazioni Phiranha in cui alcune colonne non usate sono state spostate o manca la colonna storica `Quantita`.
+
 Campi principali usati:
 
 - `idAcquedotto`;
@@ -162,6 +164,8 @@ Durante il caricamento utenze, il sistema normalizza l'indirizzo di ubicazione e
 Se il toponimo non esiste, viene creato. Se esiste ma mancano normalizzazione o tipo, viene aggiornato.
 
 Se piu' toponimi risultano compatibili, l'associazione automatica viene evitata e viene scritto un warning.
+
+La normalizzazione usata per i confronti recenti e' invece basata su `VieEnte` e `IndirizziNormalizzati`. Il caricamento utenze mantiene il collegamento legacy ai toponimi, ma dopo il caricamento e' consigliato popolare `VieEnte` e creare gli indirizzi normalizzati dalla sezione dedicata.
 
 ## Inserimento E Aggiornamento Utenze
 
@@ -226,6 +230,8 @@ Per un'elaborazione INPS affidabile:
 
 1. caricare l'anagrafe del mese corretto;
 2. caricare le utenze idriche dello stesso mese;
-3. controllare eventuali warning sui toponimi;
-4. elaborare il file INPS dello stesso periodo;
-5. verificare le domande marcate con incongruenze prima dell'esportazione.
+3. popolare `VieEnte` dalla sezione `Indirizzi Normalizzati`;
+4. creare o aggiornare gli `IndirizziNormalizzati`;
+5. controllare eventuali warning su toponimi e vie ambigue;
+6. elaborare il file INPS dello stesso periodo;
+7. verificare le domande marcate con incongruenze prima dell'esportazione.

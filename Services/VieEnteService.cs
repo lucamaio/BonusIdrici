@@ -136,12 +136,13 @@ namespace BonusIdrici2.Services
             var vie = await _context.VieEnte
                 .Where(v => v.IdEnte == idEnte
                     && v.IdIndirizzoNormalizzato == null
-                    && (v.Stato == "DA_ANALIZZARE" || v.Stato == "PROPOSTA"))
+                    && (v.Stato == "DA_ANALIZZARE" || v.Stato == "PROPOSTA" || v.Stato == "AMBIGUA"))
                 .ToListAsync();
 
             var gruppi = vie
                 .GroupBy(v => NormalizzaChiave(v.DenominazioneNormalizzataProposta ?? v.DenominazionePulita))
                 .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+                .OrderBy(g => ContieneAbbreviazioneAmbigua(g.Key) ? 1 : 0)
                 .ToList();
 
             result.GruppiAnalizzati = gruppi.Count;
@@ -153,9 +154,27 @@ namespace BonusIdrici2.Services
             foreach (var gruppo in gruppi)
             {
                 var vieGruppo = gruppo.ToList();
+                var denominazioneNormalizzata = gruppo.Key;
 
                 if (confermaAutomaticaSoloCasiSicuri && vieGruppo.Any(v => ContieneAbbreviazioneAmbigua(v.DenominazionePulita)))
                 {
+                    var indirizzoCompatibile = TrovaIndirizzoNormalizzatoCompatibile(denominazioneNormalizzata, indirizziEsistenti);
+
+                    if (indirizzoCompatibile != null)
+                    {
+                        foreach (var via in vieGruppo)
+                        {
+                            via.IdIndirizzoNormalizzato = indirizzoCompatibile.Id;
+                            via.Stato = "COLLEGATA";
+                            via.DataAggiornamento = DateTime.Now;
+                            via.Note = UnisciNote(via.Note, $"Collegata automaticamente a '{indirizzoCompatibile.DenominazioneNormalizzata}' tramite abbreviazione univoca.");
+                        }
+
+                        result.VieCollegate += vieGruppo.Count;
+                        result.VieAbbreviateCollegate += vieGruppo.Count;
+                        continue;
+                    }
+
                     foreach (var via in vieGruppo)
                     {
                         via.Stato = "AMBIGUA";
@@ -167,7 +186,6 @@ namespace BonusIdrici2.Services
                     continue;
                 }
 
-                var denominazioneNormalizzata = gruppo.Key;
                 var indirizzo = indirizziEsistenti.FirstOrDefault(i =>
                     string.Equals(NormalizzaChiave(i.DenominazioneNormalizzata), denominazioneNormalizzata, StringComparison.OrdinalIgnoreCase));
 
@@ -240,7 +258,101 @@ namespace BonusIdrici2.Services
         private static bool ContieneAbbreviazioneAmbigua(string? denominazione)
         {
             var tokens = PulisciSpazi(denominazione).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            return tokens.Any(token => token.Length == 1 && char.IsLetter(token[0]));
+            return tokens
+                .Select((token, index) => new { token, index })
+                .Any(item => item.token.Length == 1
+                    && char.IsLetter(item.token[0])
+                    && !IsNumeroRomanoOrdinale(item.token)
+                    && !IsAbbreviazioneToponimoNonAmbigua(item.token, item.index));
+        }
+
+        private static IndirizzoNormalizzato? TrovaIndirizzoNormalizzatoCompatibile(
+            string denominazioneAbbreviata,
+            List<IndirizzoNormalizzato> indirizziEsistenti)
+        {
+            var candidati = indirizziEsistenti
+                .Where(indirizzo => !ContieneAbbreviazioneAmbigua(indirizzo.DenominazioneNormalizzata))
+                .Where(indirizzo => SonoCompatibiliConAbbreviazione(denominazioneAbbreviata, indirizzo.DenominazioneNormalizzata))
+                .ToList();
+
+            return candidati.Count == 1 ? candidati[0] : null;
+        }
+
+        private static bool SonoCompatibiliConAbbreviazione(string abbreviato, string completo)
+        {
+            var tokensAbbreviati = PreparaTokenConfronto(abbreviato);
+            var tokensCompleti = PreparaTokenConfronto(completo);
+
+            if (tokensAbbreviati.Count != tokensCompleti.Count)
+            {
+                return false;
+            }
+
+            var haAbbreviazioneEspansa = false;
+
+            for (var i = 0; i < tokensAbbreviati.Count; i++)
+            {
+                var tokenAbbreviato = tokensAbbreviati[i];
+                var tokenCompleto = tokensCompleti[i];
+
+                if (string.Equals(tokenAbbreviato, tokenCompleto, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (tokenAbbreviato.Length == 1
+                    && char.IsLetter(tokenAbbreviato[0])
+                    && !IsNumeroRomanoOrdinale(tokenAbbreviato)
+                    && tokenCompleto.StartsWith(tokenAbbreviato, StringComparison.OrdinalIgnoreCase))
+                {
+                    haAbbreviazioneEspansa = true;
+                    continue;
+                }
+
+                return false;
+            }
+
+            return haAbbreviazioneEspansa;
+        }
+
+        private static List<string> PreparaTokenConfronto(string valore)
+        {
+            return NormalizzaChiave(valore)
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Select(NormalizzaTokenConfronto)
+                .ToList();
+        }
+
+        private static string NormalizzaTokenConfronto(string token)
+        {
+            return token switch
+            {
+                "VIC" => "VICOLO",
+                "VICO" => "VICOLO",
+                "CDA" => "CONTRADA",
+                "C" => "CONTRADA",
+                "PRIMO" => "I",
+                "SECONDO" => "II",
+                "TERZO" => "III",
+                "QUARTO" => "IV",
+                "QUINTO" => "V",
+                "SESTO" => "VI",
+                "SETTIMO" => "VII",
+                "OTTAVO" => "VIII",
+                "NONO" => "IX",
+                "DECIMO" => "X",
+                _ => token
+            };
+        }
+
+        private static bool IsNumeroRomanoOrdinale(string token)
+        {
+            return token is "I" or "II" or "III" or "IV" or "V" or "VI" or "VII" or "VIII" or "IX" or "X";
+        }
+
+        private static bool IsAbbreviazioneToponimoNonAmbigua(string token, int index)
+        {
+            return index == 0 && token is "C";
         }
 
         private static string? UnisciNote(string? noteEsistenti, string? nuovaNota)
@@ -285,5 +397,6 @@ namespace BonusIdrici2.Services
         public int VieAmbigue { get; set; }
         public int VieScartate { get; set; }
         public int GiaEsistenti { get; set; }
+        public int VieAbbreviateCollegate { get; set; }
     }
 }

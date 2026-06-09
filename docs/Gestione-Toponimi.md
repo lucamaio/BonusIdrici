@@ -2,6 +2,8 @@
 
 Questo documento descrive come l'applicazione gestisce i toponimi, cioe' le denominazioni stradali usate per collegare gli indirizzi delle utenze idriche agli indirizzi dell'anagrafe e dei file INPS.
 
+Nota: i toponimi restano supportati come logica legacy e come supporto al caricamento utenze. Il confronto indirizzi piu' recente usa anche `VieEnte` e `IndirizziNormalizzati`, descritti in `Gestione-Indirizzi-Normalizzati.md`.
+
 ## Scopo
 
 I toponimi servono a ridurre le differenze formali fra indirizzi scritti in modi diversi. Per esempio abbreviazioni, accenti, punti, spazi, numeri civici scritti dentro l'indirizzo e iniziali di nomi propri vengono normalizzati prima del confronto.
@@ -98,9 +100,11 @@ Anche questo secondo passaggio usa:
 
 ## Effetto Sull'Elaborazione INPS
 
-I toponimi entrano nella verifica della fornitura quando l'indirizzo dell'utenza non coincide direttamente con la residenza del dichiarante.
+I toponimi entrano nella verifica della fornitura quando l'indirizzo dell'utenza non coincide direttamente con la residenza del dichiarante e non e' disponibile un collegamento normalizzato tramite `VieEnte`.
 
 In `FunzioniTrasversali.VerificaEsistenzaFornitura`, se la fornitura ha `idToponimo`, il sistema recupera il toponimo e confronta la sua `normalizzazione` con l'indirizzo di residenza o con l'indirizzo INPS. Questo permette di riconoscere forniture che sarebbero diverse solo per forma testuale.
+
+Quando l'elaborazione passa da `INPSReaderNormalizzatoService`, il confronto tenta prima di risolvere entrambi gli indirizzi in `VieEnte` e di confrontare `IdIndirizzoNormalizzato`. Se uno dei due indirizzi non e' collegato, il sistema torna al confronto testuale legacy, quindi anche ai toponimi.
 
 ## Cache
 
@@ -117,4 +121,5 @@ La cache dura 15 minuti. Ogni creazione, modifica o caricamento utenze che tocca
 - Se un indirizzo contiene un civico diverso dal campo civico separato, il sistema registra un warning.
 - Se piu' toponimi sono compatibili, l'associazione automatica viene evitata.
 - La qualita' dei toponimi incide direttamente sugli esiti INPS, soprattutto sugli esiti `01` e `03`.
+- Per i confronti nuovi, la qualita' dei collegamenti `VieEnte` -> `IndirizziNormalizzati` e' prioritaria.
 - Dopo un caricamento utenze con molti indirizzi malformati, conviene controllare i toponimi prima di lanciare elaborazioni INPS.

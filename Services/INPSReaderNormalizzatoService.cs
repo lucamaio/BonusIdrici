@@ -22,6 +22,7 @@ namespace BonusIdrici2.Services
             int idReport,
             bool confrontoCivico,
             bool escludiComponenti,
+            bool escludiAlertSnapshot,
             int annoReport,
             int meseReport)
         {

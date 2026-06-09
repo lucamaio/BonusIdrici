@@ -1,7 +1,7 @@
 @{
     ViewData["Title"] = "Indirizzi Normalizzati - Ente";
-    List<IndirizzoNormalizzato>? IndirizziNormalizzati = ViewBag.IndirizziNormalizzati;
-    List<VieEnte>? VieEnte = ViewBag.VieEnte;
+    List<IndirizzoNormalizzato> IndirizziNormalizzati = ViewBag.IndirizziNormalizzati as List<IndirizzoNormalizzato> ?? new List<IndirizzoNormalizzato>();
+    List<VieEnte> VieEnte = ViewBag.VieEnte as List<VieEnte> ?? new List<VieEnte>();
     var sectionActivity = ViewBag.SectionActivity as Models.ViewModels.SectionActivitySummaryViewModel;
     var nomeEnte = ViewBag.NomeEnte as string ?? "Ente";
     var selectedEnteId = ViewBag.selectedEnteId as int? ?? 0;
@@ -10,40 +10,57 @@
 
 <main class="data-page">
 
-    
-    @if (sectionActivity != null)
+
+    <section class="data-hero data-hero-red">
+        <div>
+            <p>Indirizzi Normalizzati</p>
+            <h1>@nomeEnte</h1>
+        </div>
+        
+        @if (isAdminPrincipale)
+        {
+
+            <div class="data-hero-actions d-flex justify-content-end mb-3">
+            <button id="myDropdownToggle" type="button" class="btn data-primary-action dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear-fill me-1"></i> Azioni
+            </button>
+            <ul class="dropdown-menu shadow-sm">
+                <!-- Sezione: Esportazioni -->
+                <li class="dropdown-header text-muted"><b>Operazioni Base</b></li>
+                <li>
+                    <form asp-controller="IndirizziNormalizzati"
+                          asp-action="PopolaVieEnte"
+                          method="post">
+                        <input type="hidden" name="selectedEnteId" value="@selectedEnteId" />
+                        <button type="submit" class="dropdown-item">
+                            <i class="bi bi-signpost-split-fill me-2 text-primary"></i> Popola Vie Ente
+                        </button>
+                    </form>
+                </li>
+                <li>
+                    <form asp-controller="IndirizziNormalizzati"
+                          asp-action="CreaIndirizziNormalizzati"
+                          method="post">
+                        <input type="hidden" name="selectedEnteId" value="@selectedEnteId" />
+                        <button type="submit" class="dropdown-item">
+                            <i class="bi bi-link-45deg me-2 text-primary"></i> Crea Indirizzi Normalizzati
+                        </button>
+                    </form>
+                </li>
+               
+                
+            </ul>
+        </div>
+        }
+
+    </section>
+
+      @if (sectionActivity != null)
     {
         @await Html.PartialAsync("_SectionActivityPanel", sectionActivity)
     }
 
-    <section class="data-hero data-hero-red">
-        <div>
-            <p>Elaborazioni disponibili</p>
-            <h1>Indirizzi Normalizzati</h1>
-            <span>Ente: @nomeEnte</span>
-        </div>
-        @if (isAdminPrincipale)
-        {
-            <div class="data-hero-actions">
-                <form asp-controller="IndirizziNormalizzati" asp-action="PopolaVieEnte" method="post" class="d-inline">
-                    <input type="hidden" name="selectedEnteId" value="@selectedEnteId" />
-                    <button type="submit" class="btn data-primary-action" title="Legge gli indirizzi da anagrafe e utenze e popola la tabella VieEnte">
-                        <i class="bi bi-signpost-split-fill"></i>
-                        <span>Popola Vie Ente</span>
-                    </button>
-                </form>
-                <form asp-controller="IndirizziNormalizzati" asp-action="CreaIndirizziNormalizzati" method="post" class="d-inline">
-                    <input type="hidden" name="selectedEnteId" value="@selectedEnteId" />
-                    <button type="submit" class="btn btn-outline-light" title="Crea e collega le normalizzazioni partendo dalle VieEnte gia raccolte">
-                        <i class="bi bi-link-45deg"></i>
-                        <span>Crea Indirizzi Normalizzati</span>
-                    </button>
-                </form>
-            </div>
-        }
-    </section>
-
-    @if (isAdminPrincipale)
+    @* @if (isAdminPrincipale)
     {
         <section class="data-stats-grid">
             <article class="data-stat-card stat-blue">
@@ -72,7 +89,7 @@
                 <strong>@ViewBag.TotaleIndirizziNormalizzati</strong>
             </article>
         </section>
-    }
+    } *@
 
     @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
     {
@@ -101,7 +118,7 @@
         </article>
     </section>
 
-    @if (isAdminPrincipale)
+    @* @if (isAdminPrincipale)
     {
         <section class="data-table-card">
             <div class="data-table-header">
@@ -164,7 +181,7 @@
                 </div>
             }
         </section>
-    }
+    } *@
 
     @* Tabella degli indirizzi normalizzati *@
 
@@ -182,7 +199,7 @@
                  role="progressbar" style="width: 0%"></div>
         </div>
 
-        @if (IndirizziNormalizzati != null && IndirizziNormalizzati.Count > 0)
+        @if (IndirizziNormalizzati.Count > 0)
         {
             <div class="table-responsive w-100" id="tableWrapper" style="display: none;">
                 <table id="IndirizziTable" class="table table-hover align-middle data-table w-100">
@@ -288,7 +305,7 @@
             });
 
             if ($('#vieEnteTable').length) {
-                $('#vieEnteTable').DataTable({
+                initDataTableWithLoader('#vieEnteTable', {
                     paging: true,
                     searching: true,
                     ordering: true,

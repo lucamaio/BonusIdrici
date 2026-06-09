@@ -1,0 +1,231 @@
+@model Models.IndirizzoNormalizzato
+
+@{
+    ViewData["Title"] = "Modifica Indirizzo Normalizzato";
+    var nomeEnte = ViewBag.NomeEnte as string ?? "N/D";
+    var vieCollegate = ViewBag.VieCollegate as List<Models.VieEnte> ?? new List<Models.VieEnte>();
+}
+
+<div class="domande-page container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-11">
+            <div class="modern-card shadow rounded-4 border-0">
+
+                <div class="card-header header-classic border-0 rounded-top-4 d-flex flex-column align-items-center p-4">
+                    <h3 class="mb-1 fw-bold fs-4">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span class="fw-semibold">Modifica Indirizzo Normalizzato</span>
+                    </h3>
+                    <span class="small opacity-75">@nomeEnte</span>
+                </div>
+
+                <div class="modern-card-body p-4 small">
+                    @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
+                    {
+                        <div class="alert alert-info border-0 shadow-sm rounded-3">
+                            <i class="bi bi-info-circle me-2"></i> @TempData["Message"]
+                        </div>
+                    }
+
+                    <form asp-controller="IndirizziNormalizzati" asp-action="Update" method="post">
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" id="toggleAll" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-angles-down"></i> Espandi tutte
+                            </button>
+                        </div>
+
+                        <div class="accordion" id="accordionIndirizzoNormalizzato">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading1">
+                                    <button class="accordion-button fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        <i class="fa-solid fa-id-card me-2"></i> Dati Identificativi
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1"
+                                     data-bs-parent="#accordionIndirizzoNormalizzato">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="id" class="form-label">ID</label>
+                                                <input type="text" class="form-control readonly-field" id="id" name="id" value="@Model.Id" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="idEnte" class="form-label">Id Ente</label>
+                                                <input type="number" class="form-control readonly-field" id="idEnte" name="idEnte" value="@Model.IdEnte" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="attivo" class="form-label">Stato</label>
+                                                <select class="form-select" id="attivo" name="attivo">
+                                                    <option value="true" selected="@(Model.Attivo ? "selected" : null)">Verificato</option>
+                                                    <option value="false" selected="@(!Model.Attivo ? "selected" : null)">Da verificare</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <label for="denominazioneNormalizzata" class="form-label">Denominazione Normalizzata *</label>
+                                                <input type="text" class="form-control" id="denominazioneNormalizzata" name="denominazioneNormalizzata"
+                                                       value="@Model.DenominazioneNormalizzata" required>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <label for="note" class="form-label">Note</label>
+                                                <textarea class="form-control" id="note" name="note" rows="3">@Model.Note</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading2">
+                                    <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        <i class="fa-solid fa-calendar-days me-2"></i> Metadati
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2"
+                                     data-bs-parent="#accordionIndirizzoNormalizzato">
+                                    <div class="accordion-body">
+                                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                                            <div>
+                                                <label for="dataCreazione" class="form-label">Data Creazione</label>
+                                                <input class="form-control readonly-field" type="date" id="dataCreazione"
+                                                       value="@(Model.DataCreazione?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="dataAggiornamento" class="form-label">Data Aggiornamento</label>
+                                                <input class="form-control readonly-field" type="date" id="dataAggiornamento"
+                                                       value="@(Model.DataAggiornamento?.ToString("yyyy-MM-dd") ?? "")" readonly>
+                                            </div>
+
+                                            <div>
+                                                <label for="idUser" class="form-label">Id Utente</label>
+                                                <input class="form-control readonly-field" type="number" id="idUser" value="@Model.IdUser" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Show", "IndirizziNormalizzati", new { selectedEnteId = Model.IdEnte })"
+                               class="btn btn-outline-secondary btn-sm rounded-3">
+                                <i class="fa-solid fa-arrow-left"></i> Torna alla consultazione
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm rounded-3">
+                                <i class="fa-solid fa-check"></i> Aggiorna
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <section class="data-table-card mt-4">
+                <div class="data-table-header">
+                    <div>
+                        <p>Vie ente collegate</p>
+                        <h2>Normalizzazione applicata</h2>
+                    </div>
+                    <span>@vieCollegate.Count vie collegate</span>
+                </div>
+
+                @if (vieCollegate.Count > 0)
+                {
+                    <div class="table-responsive w-100">
+                        <table id="vieCollegateTable" class="table table-hover align-middle data-table w-100">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Denominazione originale</th>
+                                    <th>Denominazione pulita</th>
+                                    <th>Tipo</th>
+                                    <th>Fonte</th>
+                                    <th>Stato</th>
+                                    <th>Occorrenze</th>
+                                    <th>Civico</th>
+                                    <th>Data aggiornamento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var via in vieCollegate)
+                                {
+                                    <tr>
+                                        <td><span class="data-code">@via.Id</span></td>
+                                        <td>
+                                            <div class="data-main-cell">
+                                                <strong>@via.DenominazioneOriginale</strong>
+                                                <span>Via ente</span>
+                                            </div>
+                                        </td>
+                                        <td>@via.DenominazionePulita</td>
+                                        <td>@(string.IsNullOrWhiteSpace(via.TipologiaVia) ? "N/D" : via.TipologiaVia)</td>
+                                        <td>@(string.IsNullOrWhiteSpace(via.Fonte) ? "N/D" : via.Fonte)</td>
+                                        <td>@(string.IsNullOrWhiteSpace(via.Stato) ? "N/D" : via.Stato)</td>
+                                        <td>@via.Occorrenze</td>
+                                        <td>@(string.IsNullOrWhiteSpace(via.CivicoEstratto) ? "N/D" : via.CivicoEstratto)</td>
+                                        <td>@(via.DataAggiornamento?.ToString("dd/MM/yyyy") ?? "N/D")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="data-empty-state">
+                        <i class="bi bi-signpost"></i>
+                        <strong>Nessuna via collegata</strong>
+                        <span>Questa normalizzazione non ha ancora vie dell'ente associate.</span>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById("toggleAll");
+            const accordions = document.querySelectorAll("#accordionIndirizzoNormalizzato .accordion-collapse");
+            let expanded = false;
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener("click", function () {
+                    expanded = !expanded;
+
+                    accordions.forEach(acc => {
+                        if (expanded) {
+                            new bootstrap.Collapse(acc, { show: true });
+                        } else {
+                            new bootstrap.Collapse(acc, { hide: true });
+                        }
+                    });
+
+                    toggleBtn.innerHTML = expanded
+                        ? '<i class="fa-solid fa-angles-up"></i> Chiudi tutte'
+                        : '<i class="fa-solid fa-angles-down"></i> Espandi tutte';
+                });
+            }
+
+            if ($('#vieCollegateTable').length) {
+                initDataTableWithLoader('#vieCollegateTable', {
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    responsive: true,
+                    pageLength: 25,
+                    lengthMenu: [10, 25, 50, 100],
+                    language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                    dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>'
+                });
+            }
+        });
+    </script>
+}

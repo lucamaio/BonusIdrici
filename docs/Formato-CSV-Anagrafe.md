@@ -4,6 +4,8 @@ Funzione di lettura: `CSVReader.LoadAnagrafe`.
 
 Il file deve avere almeno 16 campi, quindi posizioni da 1 a 16. I campi non usati dal codice devono comunque restare presenti, anche vuoti, per non spostare le colonne successive.
 
+Il tracciato anagrafe resta posizionale: la prima riga viene saltata come intestazione e i campi vengono letti per indice.
+
 ## Ordine Campi
 
 | Posizione | Indice codice | Campo | Obbligatorio per il caricamento | Note |
@@ -31,3 +33,6 @@ Esempio intestazione minima coerente:
 Cognome;Nome;CodiceFiscale;Sesso;DataNascita;ComuneNascita;Campo07;IndirizzoResidenza;NumeroCivico;Campo10;Parentela;CodiceFamiglia;CodiceAbitante;NumeroComponenti;CodiceFiscaleIntestatarioScheda;DataCancellazione
 ```
 
+## Effetto Su Snapshot E Normalizzazione
+
+Ogni riga valida crea anche uno snapshot del periodo selezionato nel caricamento. Gli indirizzi di residenza possono poi essere usati dal popolamento `VieEnte`, insieme agli indirizzi di ubicazione delle utenze, per creare o aggiornare gli `IndirizziNormalizzati`.

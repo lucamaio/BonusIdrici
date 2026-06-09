@@ -1,0 +1,110 @@
+@model Models.ViewModels.AdminActivityDetailViewModel
+
+@{
+    ViewData["Title"] = $"Attivita - {Model.SectionName}";
+}
+
+<main class="data-page">
+    <section class="data-hero data-hero-blue">
+        <div>
+            <p>Area ADMIN</p>
+            <h1>@Model.SectionName</h1>
+            <span>Ultimo aggiornamento: @(Model.LastUpdate?.ToString("dd/MM/yyyy HH:mm") ?? "Nessun dato")</span>
+        </div>
+        <div class="data-hero-actions">
+            <a href="@Url.Action("Attivita", "Home")" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left-circle"></i>
+                <span>Torna alle attività</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="data-table-card">
+        <div class="data-table-header">
+            <div>
+                <p>Operazioni</p>
+                <h2>Tutte le modifiche registrate</h2>
+            </div>
+            <span>@Model.Activities.Count eventi</span>
+        </div>
+
+        @if (Model.Activities.Any())
+        {
+            <div class="table-responsive w-100">
+                <table id="adminActivityDetailTable" class="table table-hover align-middle data-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Operazione</th>
+                            <th>Elemento</th>
+                            <th>Dettaglio</th>
+                            <th class="text-center">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var activity in Model.Activities)
+                        {
+                            var routeValues = activity.RouteId.HasValue
+                                ? new Dictionary<string, object?> { [activity.RouteParameterName] = activity.RouteId }
+                                : null;
+
+                            <tr>
+                                <td data-order="@(activity.Timestamp?.ToString("yyyyMMddHHmmss") ?? "")">
+                                    @(activity.Timestamp?.ToString("dd/MM/yyyy HH:mm") ?? "N/D")
+                                </td>
+                                <td>
+                                    <div class="data-main-cell">
+                                        <strong>@activity.Operation</strong>
+                                        <span>@Model.SectionName</span>
+                                    </div>
+                                </td>
+                                <td>@activity.Title</td>
+                                <td>@(string.IsNullOrWhiteSpace(activity.Detail) ? "N/D" : activity.Detail)</td>
+                                <td class="text-center">
+                                    @if (routeValues != null)
+                                    {
+                                        <a class="data-icon-button"
+                                           href="@Url.Action(activity.Action, activity.Controller, routeValues)"
+                                           title="Apri dettaglio">
+                                            <i class="bi bi-arrow-up-right"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/D</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="data-empty-state">
+                <i class="bi bi-info-circle"></i>
+                <strong>Nessuna operazione registrata</strong>
+                <span>Non risultano modifiche per questa categoria.</span>
+            </div>
+        }
+    </section>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            initDataTableWithLoader('#adminActivityDetailTable', {
+                paging: true,
+                searching: true,
+                ordering: true,
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
+                order: [[0, 'desc']],
+                language: { url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/it-IT.json" },
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>t<"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>'
+            });
+        });
+    </script>
+}

@@ -762,7 +762,6 @@ C:\Users\User000015\Documents\BonusIdrici2\obj\verify-build\runtimes\win-x64\nat
 C:\Users\User000015\Documents\BonusIdrici2\obj\verify-build\runtimes\win-x64\native\krbcc64.dll
 C:\Users\User000015\Documents\BonusIdrici2\obj\verify-build\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\User000015\Documents\BonusIdrici2\obj\verify-build\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-91b0v2kihq.gz
 C:\Users\User000015\Documents\BonusIdrici2\.codex-build-check\appsettings.Development.json
 C:\Users\User000015\Documents\BonusIdrici2\.codex-build-check\appsettings.json
 C:\Users\User000015\Documents\BonusIdrici2\.codex-build-check\BonusIdrici2.staticwebassets.runtime.json
@@ -1064,4 +1063,5 @@ C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\artifacts\build-veri
 C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\artifacts\build-verify\BonusIdrici2.runtimeconfig.json
 C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\artifacts\build-verify\BonusIdrici2.staticwebassets.endpoints.json
 C:\Users\User000015\Documents\BonusIdrici2\bin\Debug\net9.0\artifacts\build-verify\BonusIdrici2.staticwebassets.runtime.json
-C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-qdk602gv7b.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\5do40fxjmg-u2gulk4q6p.gz
+C:\Users\User000015\Documents\BonusIdrici2\obj\Debug\net9.0\compressed\vh59zl9ipq-c26r07ki6v.gz

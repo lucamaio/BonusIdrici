@@ -28,7 +28,7 @@
                         <p>@activitySection.SectionName</p>
                         <h4>Operazioni recenti</h4>
                     </div>
-                    <span>@activitySection.RecentActivities.Count eventi</span>
+                    <span>Ultime @activitySection.RecentActivities.Count</span>
                 </div>
 
                 <div class="admin-activity-last-update">
@@ -71,6 +71,14 @@
                             </li>
                         }
                     </ul>
+
+                    <div class="admin-diagnostic-actions">
+                        <a class="btn btn-sm btn-outline-primary"
+                           href="@Url.Action("AttivitaDettaglio", "Home", new { sezione = activitySection.SectionKey })">
+                            <i class="bi bi-search"></i>
+                            Esplora dettaglio
+                        </a>
+                    </div>
                 }
                 else
                 {
@@ -81,5 +89,76 @@
                 }
             </article>
         }
+    </section>
+
+    <section class="admin-diagnostic-activity">
+        <div class="data-table-header">
+            <div>
+                <p>Diagnostica</p>
+                <h2>Log recenti per categoria</h2>
+            </div>
+            <span>Ultimi 5 eventi per livello</span>
+        </div>
+
+        <div class="admin-diagnostic-grid">
+            @foreach (var diagnosticSection in Model.DiagnosticActivities)
+            {
+                <article class="admin-diagnostic-card">
+                    <div class="section-activity-feed-header">
+                        <div>
+                            <p>@diagnosticSection.Level</p>
+                            <h4>
+                                <span class="section-activity-icon @diagnosticSection.Tone">
+                                    <i class="bi @diagnosticSection.Icon"></i>
+                                </span>
+                                @diagnosticSection.Title
+                            </h4>
+                        </div>
+                        <span>@diagnosticSection.TotalCount eventi</span>
+                    </div>
+
+                    @if (diagnosticSection.RecentEvents.Any())
+                    {
+                        <ul class="admin-activity-list admin-diagnostic-list">
+                            @foreach (var logEvent in diagnosticSection.RecentEvents)
+                            {
+                                <li>
+                                    <span class="section-activity-icon @diagnosticSection.Tone">
+                                        <i class="bi @diagnosticSection.Icon"></i>
+                                    </span>
+                                    <div>
+                                        <div class="section-activity-row">
+                                            <strong>@logEvent.SourceTitle</strong>
+                                            <time>@logEvent.Timestamp?.ToString("dd/MM/yyyy HH:mm")</time>
+                                        </div>
+                                        <p>@logEvent.Message</p>
+                                    </div>
+                                    <a class="section-activity-link"
+                                       href="@Url.Action("Show", "Log", new { tipoLog = logEvent.SourceKey })"
+                                       title="Esplora dettaglio">
+                                        <i class="bi bi-arrow-up-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="admin-diagnostic-actions">
+                            <a class="btn btn-sm btn-outline-primary"
+                               href="@Url.Action("ShowLevel", "Log", new { livello = diagnosticSection.Level })">
+                                <i class="bi bi-search"></i>
+                                Esplora dettaglio
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="section-activity-empty">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Nessun evento @diagnosticSection.Title.ToLower() registrato.</span>
+                        </div>
+                    }
+                </article>
+            }
+        </div>
     </section>
 </main>

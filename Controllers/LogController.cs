@@ -24,7 +24,7 @@ namespace Controllers
         {
             ("Accessi", "Accessi utenti", "Login, logout e tentativi di accesso al sistema.", "bi-person-check", "diag-blue", "wwwroot/log/utenti.log"),
             ("Esportazioni", "Elaborazioni INPS", "Operazioni di elaborazione file INPS e generazione domande.", "bi-file-earmark-bar-graph", "diag-red", "wwwroot/log/Elaborazione_INPS.log"),
-            ("CaricamentoUtenze", "Caricamento utenze", "Importazione e controllo dei flussi utenze idriche.", "bi-droplet-half", "diag-cyan", "wwwroot/log/    .log"),
+            ("CaricamentoUtenze", "Caricamento utenze", "Importazione e controllo dei flussi utenze idriche.", "bi-droplet-half", "diag-cyan", "wwwroot/log/Elaborazione_Utenze.log"),
             ("CaricamentoAnagrafiche", "Caricamento anagrafe", "Importazione e aggiornamento dati anagrafici.", "bi-people", "diag-green", "wwwroot/log/Elaborazione_Anagrafe.log"),
             ("Domande", "Domande e report", "Operazioni sulle domande elaborate e sui report.", "bi-journal-check", "diag-purple", "wwwroot/log/Domande.log"),
             ("Report", "Report applicativi", "Tracciamento tecnico dei report e delle esportazioni.", "bi-clipboard-data", "diag-amber", "wwwroot/log/Report.log")
@@ -148,6 +148,65 @@ namespace Controllers
             logs.Reverse();  // Invertito per mostrare prima i log più recenti
             ViewBag.Logs = logs;
             return View();
+        }
+
+        public IActionResult ShowLevel(string livello)
+        {
+            if (!VerificaSessione("ADMIN"))
+            {
+                AccountController.logFile.LogWarning("Utente non autorizzato ad accedere alla pagina di visualizzazione log per livello.");
+                ViewBag.Messaggio = "Accesso non autorizzato.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var livelliValidi = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ERROR",
+                "WARNING",
+                "INFO",
+                "DEBUG"
+            };
+
+            if (string.IsNullOrWhiteSpace(livello) || !livelliValidi.Contains(livello))
+            {
+                ViewBag.Messaggio = "Livello di log non valido.";
+                return RedirectToAction("Index");
+            }
+
+            var logs = new List<Log>();
+
+            foreach (var definition in logDefinitions)
+            {
+                var righeFile = ReadLogLines(definition.Path);
+
+                foreach (var riga in righeFile)
+                {
+                    try
+                    {
+                        var log = new Log(riga);
+
+                        if (!string.Equals(log.TipoLog, livello, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        logs.Add(new Log
+                        {
+                            Timestamp = log.Timestamp,
+                            TipoLog = log.TipoLog,
+                            Messaggio = $"[{definition.Title}] {log.Messaggio}"
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogDebug(ex, "Riga log non leggibile nel dettaglio per livello.");
+                    }
+                }
+            }
+
+            ViewBag.TipoLog = $"Diagnostica - {livello.ToUpperInvariant()}";
+            ViewBag.Logs = logs.OrderByDescending(log => log.Timestamp).ToList();
+            return View("Show");
         }
 
         // Pagina 3 - Visualizzazione del dettaglio di un'operazione

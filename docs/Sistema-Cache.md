@@ -94,6 +94,8 @@ Questa convenzione rende possibile invalidare intere aree con `RemoveByPrefix`.
 Viene chiamato dopo operazioni che cambiano dati dell'ente, per esempio:
 
 - creazione o modifica toponimi;
+- popolamento `VieEnte`;
+- creazione o modifica `IndirizziNormalizzati`;
 - creazione o modifica anagrafe;
 - caricamento anagrafe;
 - creazione o modifica utenze;
@@ -117,6 +119,7 @@ Esempi principali:
 - `AnagrafeController.Show`: cache `anagrafe:ente:{selectedEnteId}`;
 - `UtenzeController.Show`: cache `utenze:ente:{selectedEnteId}`;
 - `ToponomiController.Show`: cache `toponimi:ente:{selectedEnteId}`;
+- `IndirizziNormalizzatiController.Show`: elenco `VieEnte` e `IndirizziNormalizzati` dell'ente;
 - viste di selezione ente: cache `enti:all`;
 - dettaglio nome ente: cache `enti:detail:{selectedEnteId}`.
 
@@ -136,4 +139,5 @@ La cache e' in memoria del processo applicativo. Quindi:
 - Ogni modifica ai dati deve invalidare le chiavi coerenti.
 - Se si aggiungono nuove viste cacheate, scegliere chiavi con prefissi coerenti.
 - Se una vista mostra dati vecchi, controllare prima che il controller stia chiamando `ClearEnteCache`, `ClearReportCache` o `RemoveByPrefix` nel punto giusto.
+- Dopo modifiche a `VieEnte` o `IndirizziNormalizzati`, verificare anche la dashboard admin e le attivita' recenti.
 - Per dati modificabili, preferire cache brevi e invalidazione esplicita.

@@ -37,6 +37,13 @@ Snapshot utenze:
 utenzeidriche_snapshot
 ```
 
+Normalizzazione corrente degli indirizzi:
+
+```text
+VieEnte
+IndirizziNormalizzati
+```
+
 Nel codice sono esposte da `ApplicationDbContext` come:
 
 - `Dichiaranti`;
@@ -121,6 +128,8 @@ Nel caricamento utenze:
 
 Questo significa che ricaricare lo stesso periodo sostituisce la fotografia precedente per quell'ente, mese e anno.
 
+`VieEnte` e `IndirizziNormalizzati` non sono snapshot mensili: sono una normalizzazione corrente dell'ente. Il popolamento standard legge anagrafe e utenze correnti; gli snapshot possono essere inclusi solo passando esplicitamente l'opzione `includiSnapshot`.
+
 ## Hash Record
 
 Ogni snapshot salva `HashRecord`, calcolato con SHA-256 sui campi rilevanti.
@@ -161,6 +170,7 @@ Se trova snapshot utenze:
 - cerca le forniture nella snapshot del periodo;
 - controlla validita' alla fine del mese report;
 - usa stato, periodo, tipo utenza e indirizzo della fotografia storica.
+- confronta l'indirizzo usando la normalizzazione corrente quando le vie sono collegate a `IndirizziNormalizzati`.
 
 Se non trova snapshot utenze:
 
@@ -188,3 +198,4 @@ Il fallback su dati correnti e' intenzionale: evita che l'elaborazione si blocch
 - Ricaricare un periodo sostituisce gli snapshot precedenti per quel periodo.
 - Se gli snapshot mancano, controllare le note delle domande prima di esportare esiti definitivi.
 - Gli snapshot non vengono modificati dalle modifiche manuali successive: quelle modifiche impattano il dato corrente, non la fotografia gia' salvata.
+- Le modifiche a `VieEnte` e `IndirizziNormalizzati` impattano i confronti futuri per l'ente, anche quando le utenze lette provengono da snapshot.

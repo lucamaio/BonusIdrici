@@ -139,6 +139,26 @@ Una fornitura e' considerata favorevole se:
 
 Se la fornitura trovata non e' domestica, non e' valida nel periodo o ha indirizzo incoerente, l'esito diventa `03`.
 
+## Confronto Indirizzi Normalizzato
+
+L'elaborazione recente usa `INPSReaderNormalizzatoService` per sostituire il solo confronto indirizzi, mantenendo la logica legacy di lettura e validazione INPS.
+
+Il servizio carica le `VieEnte` dell'ente, escluse quelle con stato `SCARTATA`, e costruisce una ricerca su:
+
+- `DenominazioneOriginale`;
+- `DenominazionePulita`;
+- `DenominazioneNormalizzataProposta`.
+
+Durante il confronto:
+
+1. se il confronto del civico e' attivo, il civico viene verificato prima;
+2. l'indirizzo INPS e l'indirizzo utenza vengono cercati in `VieEnte`;
+3. se entrambi hanno `IdIndirizzoNormalizzato`, il confronto avviene sugli ID;
+4. se gli ID coincidono, gli indirizzi sono coerenti;
+5. se manca una normalizzazione, il sistema usa il confronto testuale legacy e aggiunge una nota.
+
+Questo permette di gestire varianti come `VIA B CAPUTO` e `VIA BENEDETTO CAPUTO` quando entrambe sono collegate alla stessa normalizzazione.
+
 ## Componenti Del Nucleo
 
 Se il dichiarante non ha una fornitura diretta, il sistema valuta i componenti maggiorenni del nucleo.
@@ -201,3 +221,10 @@ La domanda viene marcata con `incongruenze = true` quando ci sono condizioni da 
 - fallback su dati correnti.
 
 Le spiegazioni vengono salvate nel campo `note`.
+
+Nel caso del confronto indirizzi normalizzato, le note possono indicare anche:
+
+- confronto riuscito tramite `IdIndirizzoNormalizzato`;
+- indirizzi collegati a normalizzazioni diverse;
+- `ViaEnte` non collegata a `IndirizzoNormalizzato`;
+- fallback testuale usato per normalizzazione non disponibile.
